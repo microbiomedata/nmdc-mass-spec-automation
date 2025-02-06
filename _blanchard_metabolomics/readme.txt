@@ -10,11 +10,12 @@ Raw data located here:
 
 Processed data located here:
 
--
+- /Users/heal742/Library/CloudStorage/OneDrive-PNNL/Documents/_DMS_data/_NMDC/_blanchard_metabolomics/processed_20250205
 
 Mapping located here:
 
 
-Example minio location for raw data: 
-metabolomics/blanchard_11_8ws97026/raw/
+Minio locations (in metabolomics bucket):
+- blanchard_11_8ws97026/raw
+- blanchard_11_8ws97026/processed_20250205
 
