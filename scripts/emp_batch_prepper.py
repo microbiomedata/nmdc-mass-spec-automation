@@ -6,7 +6,7 @@ import os
 import shutil
 
 # Set raw data directory
-raw_data_dir = "/Users/heal742/Library/CloudStorage/OneDrive-PNNL/Documents/_DMS_data/_NMDC/_emp500_metabolomics/raw"
+raw_data_dir = "/Users/heal742/Library/CloudStorage/OneDrive-PNNL/Documents/_DMS_data/_NMDC/_emp500_metabolomics/raw/"
 batched_data_dir = "/Users/heal742/Library/CloudStorage/OneDrive-PNNL/Documents/_DMS_data/_NMDC/_emp500_metabolomics/batched_raw"
 
 # Read in excel file (first sheet) from here: _emp_500_metabolomics/EMP500_Biosample_Mapping_SOP_04.xlsx

@@ -2,3 +2,5 @@ venv/
 .vscode/
 .DS_Store
 *.hdf5
+
+__pycache__/

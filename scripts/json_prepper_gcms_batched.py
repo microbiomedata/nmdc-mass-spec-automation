@@ -30,6 +30,7 @@ from json_prepper_gcms import generate_json
 if __name__ == "__main__":
     # Outer "batch directory" for the raw data
     batched_data_dir = "/Users/heal742/Library/CloudStorage/OneDrive-PNNL/Documents/_DMS_data/_NMDC/_emp500_metabolomics/batched_raw"
+    json_output_dir = "_emp_500_metabolomics"
 
     # Get the list of batch directories
     batch_dirs = [str(f) for f in Path(batched_data_dir).rglob("batch_*")]
@@ -48,6 +49,7 @@ if __name__ == "__main__":
         
         cores = 5
         output_dir = "output_" + os.path.basename(batch_dir)
+        output_json = os.path.join(json_output_dir, "run_metaMS_gcms_" + os.path.basename(batch_dir) + ".json")
 
         # Generate the json file
         generate_json(
@@ -55,5 +57,5 @@ if __name__ == "__main__":
             calibration_file_name=calibration_file_name,
             cores=cores,
             output_dir=output_dir,
-            output_json=os.path.join(batch_dir, "run_metaMS_gcms.json")
+            output_json=output_json
         )
