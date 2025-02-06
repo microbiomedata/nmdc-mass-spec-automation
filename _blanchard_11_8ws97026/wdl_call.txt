@@ -1,0 +1,1 @@
+miniwdl run wdl/metaMS_lcmslipidomics.wdl -i /Users/heal742/LOCAL/05_NMDC/02_MetaMS/data_processing/_blanchard_11_8ws97026/run_metaMS_lipidomics.json --verbose --no-cache --copy-input-files

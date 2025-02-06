@@ -1,0 +1,1 @@
+miniwdl run wdl/metaMS_gcms.wdl -i /Users/heal742/LOCAL/05_NMDC/02_MetaMS/data_processing/_blanchard_metabolomics/run_metaMS_gcms.json --verbose --no-cache --copy-input-files

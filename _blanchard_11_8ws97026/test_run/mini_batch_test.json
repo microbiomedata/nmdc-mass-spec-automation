@@ -1,0 +1,199 @@
+{
+  "data_generation_set": [
+    {
+      "id": "nmdc:dgms-11-15g8aq08",
+      "type": "nmdc:MassSpectrometry",
+      "name": "Blanch_Nat_Lip_H_32_AB_O_19_POS_23Jan18_Brandi-WCSH5801",
+      "description": "Generation of mass spectrometry data for the analysis of lipids.",
+      "has_input": [
+        "nmdc:bsm-11-k4wb6c34"
+      ],
+      "has_output": [
+        "nmdc:dobj-11-8gc6wp78"
+      ],
+      "processing_institution": "EMSL",
+      "start_date": "2018-01-24T04:31:47Z",
+      "end_date": "2018-01-24T05:05:47Z",
+      "analyte_category": "lipidome",
+      "associated_studies": [
+        "nmdc:sty-11-8ws97026"
+      ],
+      "add_date": "2024-12-18",
+      "instrument_used": [
+        "nmdc:inst-14-njkx0e66"
+      ],
+      "eluent_introduction_category": "liquid_chromatography",
+      "has_chromatography_configuration": "nmdc:chrcon-14-pjbw3m78",
+      "has_mass_spectrometry_configuration": "nmdc:mscon-14-e1vant42"
+    },
+    {
+      "id": "nmdc:dgms-11-m31b8t15",
+      "type": "nmdc:MassSpectrometry",
+      "name": "Blanch_Nat_Lip_H_32_AB_O_19_NEG_25Jan18_Brandi-WCSH5801",
+      "description": "Generation of mass spectrometry data for the analysis of lipids.",
+      "has_input": [
+        "nmdc:bsm-11-k4wb6c34"
+      ],
+      "has_output": [
+        "nmdc:dobj-11-9cmeze95"
+      ],
+      "processing_institution": "EMSL",
+      "start_date": "2018-01-26T16:40:17Z",
+      "end_date": "2018-01-26T17:14:17Z",
+      "analyte_category": "lipidome",
+      "associated_studies": [
+        "nmdc:sty-11-8ws97026"
+      ],
+      "add_date": "2024-12-18",
+      "instrument_used": [
+        "nmdc:inst-14-njkx0e66"
+      ],
+      "eluent_introduction_category": "liquid_chromatography",
+      "has_chromatography_configuration": "nmdc:chrcon-14-pjbw3m78",
+      "has_mass_spectrometry_configuration": "nmdc:mscon-14-pqgtpa49"
+    }
+  ],
+  "data_object_set": [
+    {
+      "id": "nmdc:dobj-11-bsvxb850",
+      "type": "nmdc:DataObject",
+      "name": "Blanch_Nat_Lip_H_34_AB_M_01_NEG_25Jan18_Brandi-WCSH5801.hdf5",
+      "description": "CoreMS hdf5 file representing a lipidomics data file including annotations.",
+      "data_category": "processed_data",
+      "data_object_type": "LC-MS Lipidomics Results",
+      "file_size_bytes": 750042293,
+      "md5_checksum": "bf5306cc8ec3234ad455bf434874fa27",
+      "url": "https://nmdcdemo.emsl.pnnl.gov/lipidomics/blanchard_11_8ws97026/20241218_processed/Blanch_Nat_Lip_H_34_AB_M_01_NEG_25Jan18_Brandi-WCSH5801.hdf5",
+      "was_generated_by": "nmdc:wfmb-11-6r9nhq32.1"
+    },
+    {
+      "id": "nmdc:dobj-11-wb8g4h92",
+      "type": "nmdc:DataObject",
+      "name": "Blanch_Nat_Lip_H_34_AB_M_01_NEG_25Jan18_Brandi-WCSH5801.toml",
+      "description": "CoreMS parameters used for Lipidomics workflow.",
+      "data_category": "workflow_parameter_data",
+      "data_object_type": "Configuration toml",
+      "file_size_bytes": 12668,
+      "md5_checksum": "da7f3a98506322255816e3c2507a11e9",
+      "url": "https://nmdcdemo.emsl.pnnl.gov/lipidomics/blanchard_11_8ws97026/20241218_processed/Blanch_Nat_Lip_H_34_AB_M_01_NEG_25Jan18_Brandi-WCSH5801.toml",
+      "was_generated_by": "nmdc:wfmb-11-6r9nhq32.1"
+    },
+    {
+      "id": "nmdc:dobj-11-e2smxa98",
+      "type": "nmdc:DataObject",
+      "name": "Blanch_Nat_Lip_H_34_AB_M_01_NEG_25Jan18_Brandi-WCSH5801.csv",
+      "description": "Lipid annotations as a result of a lipidomics workflow activity.",
+      "data_category": "processed_data",
+      "data_object_type": "LC-MS Lipidomics Results",
+      "file_size_bytes": 23882408,
+      "md5_checksum": "ed887ab5a6fcda842ec3ac4ee5ef2953",
+      "url": "https://nmdcdemo.emsl.pnnl.gov/lipidomics/blanchard_11_8ws97026/20241218_processed/Blanch_Nat_Lip_H_34_AB_M_01_NEG_25Jan18_Brandi-WCSH5801.csv",
+      "was_generated_by": "nmdc:wfmb-11-6r9nhq32.1"
+    },
+    {
+      "id": "nmdc:dobj-11-8gc6wp78",
+      "type": "nmdc:DataObject",
+      "name": "Blanch_Nat_Lip_H_32_AB_O_19_POS_23Jan18_Brandi-WCSH5801.raw",
+      "description": "LC-DDA-MS/MS raw data for lipidomics data acquisition.",
+      "data_category": "instrument_data",
+      "data_object_type": "LC-DDA-MS/MS Raw Data",
+      "file_size_bytes": 90654034,
+      "md5_checksum": "f509e3cdfc8e944b1d70bbc5e2c7c7fc",
+      "url": "https://nmdcdemo.emsl.pnnl.gov/lipidomics/blanchard_11_8ws97026/Blanch_Nat_Lip_H_32_AB_O_19_POS_23Jan18_Brandi-WCSH5801.raw",
+      "was_generated_by": "nmdc:dgms-11-15g8aq08"
+    },
+    {
+      "id": "nmdc:dobj-11-7h4n2e03",
+      "type": "nmdc:DataObject",
+      "name": "Blanch_Nat_Lip_H_34_AB_M_01_POS_23Jan18_Brandi-WCSH5801.toml",
+      "description": "CoreMS parameters used for Lipidomics workflow.",
+      "data_category": "workflow_parameter_data",
+      "data_object_type": "Configuration toml",
+      "file_size_bytes": 12668,
+      "md5_checksum": "6c5596d6f9f0446f1a0a628ff25a860a",
+      "url": "https://nmdcdemo.emsl.pnnl.gov/lipidomics/blanchard_11_8ws97026/20241218_processed/Blanch_Nat_Lip_H_34_AB_M_01_POS_23Jan18_Brandi-WCSH5801.toml",
+      "was_generated_by": "nmdc:wfmb-11-5txkd586.1"
+    },
+    {
+      "id": "nmdc:dobj-11-vvx06v04",
+      "type": "nmdc:DataObject",
+      "name": "Blanch_Nat_Lip_H_34_AB_M_01_POS_23Jan18_Brandi-WCSH5801.hdf5",
+      "description": "CoreMS hdf5 file representing a lipidomics data file including annotations.",
+      "data_category": "processed_data",
+      "data_object_type": "LC-MS Lipidomics Results",
+      "file_size_bytes": 1154873676,
+      "md5_checksum": "f6097ed57034fee759680b2fb9990065",
+      "url": "https://nmdcdemo.emsl.pnnl.gov/lipidomics/blanchard_11_8ws97026/20241218_processed/Blanch_Nat_Lip_H_34_AB_M_01_POS_23Jan18_Brandi-WCSH5801.hdf5",
+      "was_generated_by": "nmdc:wfmb-11-5txkd586.1"
+    },
+    {
+      "id": "nmdc:dobj-11-14r5jk91",
+      "type": "nmdc:DataObject",
+      "name": "Blanch_Nat_Lip_H_34_AB_M_01_POS_23Jan18_Brandi-WCSH5801.csv",
+      "description": "Lipid annotations as a result of a lipidomics workflow activity.",
+      "data_category": "processed_data",
+      "data_object_type": "LC-MS Lipidomics Results",
+      "file_size_bytes": 45157404,
+      "md5_checksum": "ff6f51c3d1cca8232e5769d6dd0f17c7",
+      "url": "https://nmdcdemo.emsl.pnnl.gov/lipidomics/blanchard_11_8ws97026/20241218_processed/Blanch_Nat_Lip_H_34_AB_M_01_POS_23Jan18_Brandi-WCSH5801.csv",
+      "was_generated_by": "nmdc:wfmb-11-5txkd586.1"
+    },
+    {
+      "id": "nmdc:dobj-11-9cmeze95",
+      "type": "nmdc:DataObject",
+      "name": "Blanch_Nat_Lip_H_32_AB_O_19_NEG_25Jan18_Brandi-WCSH5801.raw",
+      "description": "LC-DDA-MS/MS raw data for lipidomics data acquisition.",
+      "data_category": "instrument_data",
+      "data_object_type": "LC-DDA-MS/MS Raw Data",
+      "file_size_bytes": 80571062,
+      "md5_checksum": "ad7a2ba1d3a900a10b06e248bc112d34",
+      "url": "https://nmdcdemo.emsl.pnnl.gov/lipidomics/blanchard_11_8ws97026/Blanch_Nat_Lip_H_32_AB_O_19_NEG_25Jan18_Brandi-WCSH5801.raw",
+      "was_generated_by": "nmdc:dgms-11-m31b8t15"
+    }
+  ],
+  "workflow_execution_set": [
+    {
+      "id": "nmdc:wfmb-11-6r9nhq32.1",
+      "type": "nmdc:MetabolomicsAnalysis",
+      "name": "Lipidomics analysis for Blanch_Nat_Lip_H_32_AB_O_19_POS_23Jan18_Brandi-WCSH5801.raw",
+      "description": "Analysis of raw mass spectrometry data for the annotation of lipids.",
+      "has_input": [
+        "nmdc:dobj-11-8gc6wp78",
+        "nmdc:dobj-11-wb8g4h92"
+      ],
+      "has_output": [
+        "nmdc:dobj-11-bsvxb850",
+        "nmdc:dobj-11-e2smxa98"
+      ],
+      "processing_institution": "EMSL",
+      "execution_resource": "EMSL-RZR",
+      "git_url": "https://github.com/microbiomedata/metaMS/wdl/metaMS_lipidomics.wdl",
+      "started_at_time": "2024-12-18 13:28:09",
+      "was_informed_by": "nmdc:dgms-11-15g8aq08",
+      "ended_at_time": "2024-12-18 13:25:07",
+      "version": "1.0.0"
+    },
+    {
+      "id": "nmdc:wfmb-11-5txkd586.1",
+      "type": "nmdc:MetabolomicsAnalysis",
+      "name": "Lipidomics analysis for Blanch_Nat_Lip_H_32_AB_O_19_NEG_25Jan18_Brandi-WCSH5801.raw",
+      "description": "Analysis of raw mass spectrometry data for the annotation of lipids.",
+      "has_input": [
+        "nmdc:dobj-11-9cmeze95",
+        "nmdc:dobj-11-7h4n2e03"
+      ],
+      "has_output": [
+        "nmdc:dobj-11-vvx06v04",
+        "nmdc:dobj-11-14r5jk91"
+      ],
+      "processing_institution": "EMSL",
+      "execution_resource": "EMSL-RZR",
+      "git_url": "https://github.com/microbiomedata/metaMS/wdl/metaMS_lipidomics.wdl",
+      "started_at_time": "2024-12-18 13:28:09",
+      "was_informed_by": "nmdc:dgms-11-m31b8t15",
+      "ended_at_time": "2024-12-18 13:16:05",
+      "version": "1.0.0"
+    }
+  ],
+  "@type": "Database"
+}
