@@ -1,5 +1,5 @@
 """
-# This script will write a .json file to run the lipidomics wdl workflow
+# This script will write several json files to be used for processing the raw data in batches.
 # Example json below:
 {
     "gcmsMetabolomics.runMetaMSGCMS.file_paths": [

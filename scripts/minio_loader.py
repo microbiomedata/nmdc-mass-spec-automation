@@ -45,8 +45,8 @@ if __name__ == '__main__':
                          secret_key=os.environ["MINIO_SECRET_KEY"],
                          secure=True)
     bucket_name = "metabolomics"  # Specify the bucket name
-    folder_name = "blanchard_11_8ws97026/processed_20250205"  # Specify the folder name within the bucket
-    directory = "/Users/heal742/Library/CloudStorage/OneDrive-PNNL/Documents/_DMS_data/_NMDC/_blanchard_metabolomics/processed_20250205"
+    folder_name = "emp500_11_547rwq94/raw"  # Specify the folder name within the bucket
+    directory = "/Users/heal742/Library/CloudStorage/OneDrive-PNNL/Documents/_DMS_data/_NMDC/_emp500_metabolomics/raw"
     # Check if the bucket exists
     if not minio_client.bucket_exists(bucket_name):
         print(f"Bucket {bucket_name} does not exist.")
