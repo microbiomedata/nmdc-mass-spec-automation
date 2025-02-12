@@ -29,7 +29,7 @@ def move_files(input_dir, output_dir):
 
 if __name__ == "__main__":
     # Must be set for the script to run
-    input_dir = "/Users/heal742/Library/CloudStorage/OneDrive-PNNL/Documents/_DMS_data/_NMDC/_blanchard_metabolomics/processed_20250205/output_files"
-    output_dir = "/Users/heal742/Library/CloudStorage/OneDrive-PNNL/Documents/_DMS_data/_NMDC/_blanchard_metabolomics/processed_20250205"
+    input_dir = "/Users/heal742/Library/CloudStorage/OneDrive-PNNL/Documents/_DMS_data/_NMDC/_emp500_metabolomics/processed_20250212"
+    output_dir = "/Users/heal742/Library/CloudStorage/OneDrive-PNNL/Documents/_DMS_data/_NMDC/_emp500_metabolomics/processed_20250212test"
 
     move_files(input_dir, output_dir)
