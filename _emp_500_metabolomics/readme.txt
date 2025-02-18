@@ -10,10 +10,11 @@ Raw data located here:
 
 Processed data located here:
 
+- /Users/heal742/Library/CloudStorage/OneDrive-PNNL/Documents/_DMS_data/_NMDC/_emp500_metabolomics/processed_20250212
 
 Mapping located here:
 
 
 Minio locations (in metabolomics bucket):
 - emp500_11_547rwq94/raw
-
+- emp500_11_547rwq94/processed_20250212
