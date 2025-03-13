@@ -18,3 +18,29 @@ Mapping located here:
 Minio locations (in metabolomics bucket):
 - emp500_11_547rwq94/raw
 - emp500_11_547rwq94/processed_20250212
+
+
+Metadata script:
+################
+from datetime import datetime
+from src.metadata_generator import GCMSMetabolomicsMetadataGenerator
+import os
+
+# Set up output file with datetime stame
+output_file = (
+    "/Users/heal742/LOCAL/05_NMDC/02_MetaMS/data_processing/_emp_500_metabolomics/emp500_metabolomics_metadata"
+    + datetime.now().strftime("%Y%m%d%H%M%S")
+    + ".json"
+)
+
+# Start the metadata generation setup
+generator = GCMSMetabolomicsMetadataGenerator(
+    metadata_file="/Users/heal742/LOCAL/05_NMDC/02_MetaMS/data_processing/_emp_500_metabolomics/emp500_metabolomics_metadata.csv",
+    database_dump_json_path=output_file,
+    raw_data_url="https://nmdcdemo.emsl.pnnl.gov/metabolomics/emp500_11_547rwq94/raw/",
+    process_data_url="https://nmdcdemo.emsl.pnnl.gov/metabolomics/emp500_11_547rwq94/processed_20250212/",
+)
+
+# Run the metadata generation process
+generator.run()
+assert os.path.exists(output_file)
