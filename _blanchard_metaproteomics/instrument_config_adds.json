@@ -1,0 +1,81 @@
+{
+  "configuration_set": [
+    {
+      "id": "nmdc:chrcon-11-0stw8m53", 
+      "name": "EMSL 120 min LC method for proteomics",
+      "description": "EMSL LC method for proteomics, 120 minute gradient with 1% formic acid in water (A) and 0.1% formic acid in acetonitrile (B) on C18 hand pulled column.",
+      "type": "nmdc:ChromatographyConfiguration",
+      "chromatographic_category": "liquid_chromatography",
+      "stationary_phase": "C18",
+      "ordered_mobile_phases": [
+        {
+          "type": "nmdc:MobilePhaseSegment",
+          "duration": {
+            "type": "nmdc:QuantityValue",
+            "has_unit": "min",
+            "has_numeric_value": 120
+          },
+          "substances_used": [
+            {
+              "known_as": "formic_acid",
+              "type": "nmdc:PortionOfSubstance",
+              "final_concentration": {
+                "type": "nmdc:QuantityValue",
+                "has_unit": "%",
+                "has_numeric_value": 0.1
+              }
+            },
+            {
+              "known_as": "water",
+              "type": "nmdc:PortionOfSubstance",
+              "final_concentration": {
+                "type": "nmdc:QuantityValue",
+                "has_unit": "%",
+                "has_numeric_value": 0.99
+              }
+            }
+          ]
+        },
+        {
+          "type": "nmdc:MobilePhaseSegment",
+          "duration": {
+            "type": "nmdc:QuantityValue",
+            "has_unit": "min",
+            "has_numeric_value": 120
+          },
+          "substances_used": [
+            {
+              "known_as": "formic_acid",
+              "type": "nmdc:PortionOfSubstance",
+              "final_concentration": {
+                "type": "nmdc:QuantityValue",
+                "has_unit": "%",
+                "has_numeric_value": 0.1
+              }
+            },
+            {
+              "known_as": "acetonitrile",
+              "type": "nmdc:PortionOfSubstance",
+              "final_concentration": {
+                "type": "nmdc:QuantityValue",
+                "has_unit": "%",
+                "has_numeric_value": 0.99
+              }
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "instrument_set": [
+    {
+      "id": "nmdc:inst-11-1ct2pw33",
+      "model": "orbitrap_q_exactive",
+      "name": "QExactP06",
+      "vendor": "thermo_fisher",
+      "type": "nmdc:Instrument"
+    }
+  ],
+  
+  "@type": "Database"
+}

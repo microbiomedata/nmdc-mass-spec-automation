@@ -44,3 +44,6 @@ generator = GCMSMetabolomicsMetadataGenerator(
 # Run the metadata generation process
 generator.run()
 assert os.path.exists(output_file)
+
+#####
+Metadata json = /Users/heal742/LOCAL/05_NMDC/02_MetaMS/data_processing/_emp_500_metabolomics/emp500_metabolomics_metadata20250312172507.json
