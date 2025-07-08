@@ -7,7 +7,7 @@ Configurations generated guided by documentation here: https://github.com/biocor
 
 Raw data located here: 
 
-- 
+- /Users/heal742/Library/CloudStorage/OneDrive-PNNL/Documents/_DMS_data/_NMDC/_massive/_emp500_lcms/RAW
 
 Processed data located here:
 
