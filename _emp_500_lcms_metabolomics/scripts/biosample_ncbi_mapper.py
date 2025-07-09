@@ -49,6 +49,14 @@ def fetch_lcms_id_from_biosample_report(biosample_report):
             return attr.get("value")
     return None
 
+def fetch_lcms_extraction_method_from_biosample_report(biosample_report):
+    # from report, find attributes, then get the lcms_extraction_method attribute value
+    bio_sample_attributes = biosample_report.get("attributes", [])
+    for attr in bio_sample_attributes:
+        if attr.get("name") == "lcms_extraction_protocol":
+            return attr.get("value")
+    return None
+
 def fetch_submitter_id_from_biosample_report(biosample_report):
     # from report, find attributes, then get the Submitter Id attribute value
     bio_sample_attributes = biosample_report.get("attributes", [])
@@ -61,17 +69,16 @@ def convert_ncbi_id_to_attributes(ncbi_id):
     biosample_report = fetch_biosample_report(ncbi_id)['reports'][0]
     lcms_name = fetch_lcms_id_from_biosample_report(biosample_report)
     submitter_id = fetch_submitter_id_from_biosample_report(biosample_report)
-    if lcms_name is None:
-        print(f"Warning: No LC-MS name found for NCBI ID {ncbi_id}.")
-    if submitter_id is None:
-        print(f"Warning: No Submitter ID found for NCBI ID {ncbi_id}.")
+    lcms_extraction_protocol = fetch_lcms_extraction_method_from_biosample_report(biosample_report)
     return (
-        lcms_name if lcms_name else "Unknown LC-MS Name",
-        submitter_id if submitter_id else "Unknown Submitter ID"
+        lcms_name if lcms_name else None,
+        submitter_id if submitter_id else None,
+        lcms_extraction_protocol if lcms_extraction_protocol else None
     )
 
 # Example usage:
 if __name__ == "__main__":
+    # Fetch all biosamples associated with the study "nmdc:sty-11-547rwq94" in the NMDC database
     biosample_search = BiosampleSearch()
     biosamples = biosample_search.get_record_by_filter(
         filter='{"associated_studies":"nmdc:sty-11-547rwq94"}',
@@ -79,11 +86,11 @@ if __name__ == "__main__":
         fields="id,name,description,gold_biosample_identifiers,samp_name,insdc_biosample_identifiers",
         all_pages=True,
     )
-    # turn this into a dataframe
     df = pd.DataFrame(biosamples)
-    # extract the correct insdc_biosample_identifiers (remove from a list and take off the leading "biosample:")
     df['insdc_biosample_identifiers'] = df['insdc_biosample_identifiers'].apply(lambda x: x[0].replace("biosample:", "") if x else None)
-    df['lcms_name'], df['submitter_id'] = zip(*df['insdc_biosample_identifiers'].apply(lambda x: convert_ncbi_id_to_attributes(x) if x else (None, None)))
+
+    # Use NCBI IDs to extract some additional metadata attributes that are only present in the NCBI BioSample report (not in NMDC)
+    df['lcms_name'], df['submitter_id'], df['lcms_extraction_protocol'] = zip(*df['insdc_biosample_identifiers'].apply(lambda x: convert_ncbi_id_to_attributes(x) if x else (None, None, None)))
     print("finished converting NCBI IDs to LC-MS names and Submitter IDs")
     # save the dataframe to a csv file
     df.to_csv("_emp_500_lcms_metabolomics/biosample_attributes.csv", index=False)
