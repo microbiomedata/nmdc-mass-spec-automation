@@ -76,7 +76,6 @@ def convert_ncbi_id_to_attributes(ncbi_id):
         lcms_extraction_protocol if lcms_extraction_protocol else None
     )
 
-# Example usage:
 if __name__ == "__main__":
     # Fetch all biosamples associated with the study "nmdc:sty-11-547rwq94" in the NMDC database
     biosample_search = BiosampleSearch()
