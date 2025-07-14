@@ -102,6 +102,31 @@ final_mapped_raw_data_files["processed_data_directory"] = "/Users/heal742/Librar
 final_mapped_raw_data_files["mass_spec_configuration_name"] = "LC-MS Metabolomics Method for EMP 500 Samples"
 final_mapped_raw_data_files["chromat_configuration_name"] = "LC-MS Chromatography Configuration for EMP 500 Samples"
 final_mapped_raw_data_files["execution_resource"] = "EMSL-RZR"
+final_mapped_raw_data_files["instrument_used"] = "QExactHF03" #TODO KRH: Update this if/when we put in changesheets for instrument names
+
+##### Merge the raw data files to the instrument data from _emp_500_lcms_metabolomics/raw_file_info_TIMESTAMP.csv ============
+raw_file_info = pd.read_csv("_emp_500_lcms_metabolomics/raw_file_info_20250711_094112.csv")
+raw_file_info["instrument_analysis_end_date"] = pd.to_datetime(raw_file_info["write_time"]).dt.strftime('%Y-%m-%dT%H:%M:%SZ')
+# merge the raw data files with the raw file info (left is "file_name", right is "raw_data_file_short")
+final_mapped_raw_data_files = final_mapped_raw_data_files.merge(raw_file_info[["file_name","instrument_analysis_end_date"]], left_on="raw_data_file_short", right_on="file_name", how="left")
+
+##### Grab all the .raw files from the ftp .txt file and add them to the final mapped raw data files ============
+# read in the unstructured .txt file with ftp locations by looking for lines that end with .raw and add them to the final mapped raw data files
+ftp_locs = []
+ftp_file = "_emp_500_lcms_metabolomics/emp500_massive_ftp_locs.txt"
+with open(ftp_file, "r") as f:
+    for line in f:
+        if line.endswith(".raw\n"):
+            ftp_locs.append(line.strip())
+ftp_locs = [loc.split(" ")[-1] for loc in ftp_locs]
+ftp_locs_df = pd.DataFrame(ftp_locs, columns=["ftp_location"])
+ftp_locs_df.drop_duplicates(inplace=True)
+ftp_locs_df["url"] = "wget " + ftp_locs_df["ftp_location"]
+ftp_locs_df["raw_data_file_short"] = ftp_locs_df["ftp_location"].str.extract(r'([^/]+\.raw)$')[0]
+final_mapped_raw_data_files = final_mapped_raw_data_files.merge(ftp_locs_df[["raw_data_file_short", "url"]], on="raw_data_file_short", how="left")
+
+##### Check that the final_mapped_raw_data_files is the correct length (same as raw_data_files_df) ============
+assert final_mapped_raw_data_files.shape[0] == raw_data_files_df.shape[0], "Final mapped raw data files does not match the number of raw data files"
 
 ##### Save the final mapped raw data files to a CSV file ============
 output_file = "_emp_500_lcms_metabolomics/mapped_raw_data_files.csv"
@@ -111,8 +136,4 @@ final_mapped_raw_data_files.to_csv(output_file, index=False)
 #TODO:
 Add the following columns to the final mapped raw data files:
 material_processing_type = "unknown"
-instrument_used = "TBD"
-instrument_analysis_start_date = "TBD"
-instrument_analysis_end_date = "TBD"
-execution_resource = "EMSL-RZR"
 """
