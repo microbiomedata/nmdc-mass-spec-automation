@@ -29,7 +29,7 @@ export_eics = false
 export_unprocessed_ms1 = false
 verbose_processing = false
 ph_inten_min_rel = 0.0005
-ph_inten_min_rel = 0.0005
+ph_persis_min_rel = 0.0005
 ph_smooth_it = 0
 
 [mass_spectrum.ms1.molecular_search]
