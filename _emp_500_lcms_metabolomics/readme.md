@@ -34,13 +34,18 @@ This script will run the WDL in batches of 50 files each.
 2. Clean the mapping using the `scripts/metadata_map_maker.py` to get file name to biosample id (writes `_emp_500_lcms_metabolomics/mapped_raw_data_files.csv`)
 3. Get start and end times, instrument details using `scripts/raw_file_info_pull_logger.py` script (writes `_emp_500_lcms_metabolomics/raw_file_info_TIMESTAMP.csv` and `_emp_500_lcms_metabolomics/processing_errors_TIMESTAMP.csv`)
 **One problematic file was found: `1E11_2_27_bowen-74-s010-a04.raw`
+4. Get ftp locations for the MASSIVE study by calling the following in the terminal (this will take a while and writes `_emp_500_lcms_metabolomics/emp500_massive_ftp_locs.txt`):
+```bash
+wget --spider -r -nd ftp://massive-ftp.ucsd.edu/v02/MSV000083475/raw/RAW -o _emp_500_lcms_metabolomics/emp500_massive_ftp_locs.txt
+```
+5. Clean up the ft locations from the wget.
+
+
 #TODO KRH: need to get ftp file locations for the url
 
 Minio locations (in metabolomics bucket):
 - 
 
-MASSIVE ftp locations:
 ```
-wget --spider -r -nd ftp://massive-ftp.ucsd.edu/v02/MSV000083475/raw/RAW -o emp500_massive_raw_v2.txt
 grep -oP 'ftp://[^ ]+\.raw' emp500_massive_raw_v2.txt > emp500_massive_raw_v2_clean.txt
 ```
