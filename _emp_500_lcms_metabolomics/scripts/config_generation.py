@@ -20,7 +20,7 @@ if __name__ == "__main__":
         resolution_categories=["high"],
         mass_analyzers=["Orbitrap"],
         ionization_source="electrospray_ionization",
-        mass_spectrum_collection_modes=["centroid"],
+        mass_spectrum_collection_modes=["profile"],
         polarity_mode="positive",
         CLIENT_ID=client_id,
         CLIENT_SECRET=client_secret,

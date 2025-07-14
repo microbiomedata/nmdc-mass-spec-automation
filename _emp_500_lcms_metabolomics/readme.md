@@ -14,12 +14,27 @@ Massive id = MSV000083475
 ftp link = ftp://massive-ftp.ucsd.edu/v02/MSV000083475/raw/RAW
 
 # Processed data
+Json prepper script: _emp_500_metabolomics/scripts/wdl_json_preppper.py.
 
+This prepares the json files in batches of 50 files each to minimize the number of raw files we need to have locally loaded at one time.
+
+Shell script to run the WDLs in batches: _emp_500_metabolomics/scripts/emp500_metab.sh.
+To run
+```bash
+chmod +x _emp_500_metabolomics/scripts/emp500_metab.sh
+
+# Run the script
+/Users/heal742/LOCAL/05_NMDC/02_MetaMS/data_processing/_emp_500_lcms_metabolomics/scripts/emp500_metab.sh
+```
+
+This script will run the WDL in batches of 50 files each.
 
 # Mapping
-1. Pull ncbi information from nmdc biosamples using `biosample_ncbi_mapper.py` script
-2. Clean the mapping using the `metadata_map_maker.py` to get file name to biosample id
-
+1. Pull ncbi information from nmdc biosamples using `scripts/biosample_ncbi_mapper.py` script
+2. Clean the mapping using the `scripts/metadata_map_maker.py` to get file name to biosample id
+3. Get start and end times, instrument details using `scripts/raw_file_info_pull_logger.py` script
+**One problematic file was found: `1E11_2_27_bowen-74-s010-a04.raw`
+#TODO KRH: need to get ftp file locations for the url
 
 Minio locations (in metabolomics bucket):
 - 
