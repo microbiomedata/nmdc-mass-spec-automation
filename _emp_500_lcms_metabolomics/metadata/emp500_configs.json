@@ -14,7 +14,7 @@
       ],
       "ionization_source": "electrospray_ionization",
       "mass_spectrum_collection_modes": [
-        "centroid"
+        "profile"
       ],
       "polarity_mode": "positive"
     },
