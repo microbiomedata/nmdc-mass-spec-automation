@@ -1,0 +1,29 @@
+{
+    "lcmsMetabolomics.runMetaMSLCMSMetabolomics.file_paths": [
+        "/Users/heal742/Library/CloudStorage/OneDrive-PNNL/Documents/_DMS_data/_NMDC/_massive/_emp500_lcms/RAW/to_process/4F8_7_12_thomas-18-s003-a03.raw",
+        "/Users/heal742/Library/CloudStorage/OneDrive-PNNL/Documents/_DMS_data/_NMDC/_massive/_emp500_lcms/RAW/to_process/3D7_6_36_tait-77-s007-a03.raw",
+        "/Users/heal742/Library/CloudStorage/OneDrive-PNNL/Documents/_DMS_data/_NMDC/_massive/_emp500_lcms/RAW/to_process/3C11_6_29_palenik-42-s008-a02.raw",
+        "/Users/heal742/Library/CloudStorage/OneDrive-PNNL/Documents/_DMS_data/_NMDC/_massive/_emp500_lcms/RAW/to_process/3D2_6_32_palenik-42-s002-a02.raw",
+        "/Users/heal742/Library/CloudStorage/OneDrive-PNNL/Documents/_DMS_data/_NMDC/_massive/_emp500_lcms/RAW/to_process/5G12_4_54_mousseau-88-s058-a02.raw",
+        "/Users/heal742/Library/CloudStorage/OneDrive-PNNL/Documents/_DMS_data/_NMDC/_massive/_emp500_lcms/RAW/to_process/7D8_8_38_song-53-s006-a04.raw",
+        "/Users/heal742/Library/CloudStorage/OneDrive-PNNL/Documents/_DMS_data/_NMDC/_massive/_emp500_lcms/RAW/to_process/1C10_1_44_berry-2-s002-a04.raw",
+        "/Users/heal742/Library/CloudStorage/OneDrive-PNNL/Documents/_DMS_data/_NMDC/_massive/_emp500_lcms/RAW/to_process/1F3_2_34_bowen-74-s004-a04.raw",
+        "/Users/heal742/Library/CloudStorage/OneDrive-PNNL/Documents/_DMS_data/_NMDC/_massive/_emp500_lcms/RAW/to_process/6B6_5_6_mousseau-88-s110-a02.raw",
+        "/Users/heal742/Library/CloudStorage/OneDrive-PNNL/Documents/_DMS_data/_NMDC/_massive/_emp500_lcms/RAW/to_process/1E9_2_22_bowen-74-s002-a04.raw",
+        "/Users/heal742/Library/CloudStorage/OneDrive-PNNL/Documents/_DMS_data/_NMDC/_massive/_emp500_lcms/RAW/to_process/7C3_8_23_song-53-s005-a04.raw",
+        "/Users/heal742/Library/CloudStorage/OneDrive-PNNL/Documents/_DMS_data/_NMDC/_massive/_emp500_lcms/RAW/to_process/8B3_TGP20.raw",
+        "/Users/heal742/Library/CloudStorage/OneDrive-PNNL/Documents/_DMS_data/_NMDC/_massive/_emp500_lcms/RAW/to_process/6C3_5_15_mousseau-88-s111-a02.raw",
+        "/Users/heal742/Library/CloudStorage/OneDrive-PNNL/Documents/_DMS_data/_NMDC/_massive/_emp500_lcms/RAW/to_process/3E11_2_16_uren-82-s001-a04.raw",
+        "/Users/heal742/Library/CloudStorage/OneDrive-PNNL/Documents/_DMS_data/_NMDC/_massive/_emp500_lcms/RAW/to_process/8D2_Myrold59-soil-5-NRCS0096.raw",
+        "/Users/heal742/Library/CloudStorage/OneDrive-PNNL/Documents/_DMS_data/_NMDC/_massive/_emp500_lcms/RAW/to_process/4E3_1_58_thomas-18-s032-a04.raw",
+        "/Users/heal742/Library/CloudStorage/OneDrive-PNNL/Documents/_DMS_data/_NMDC/_massive/_emp500_lcms/RAW/to_process/6B4_5_2_mousseau-88-s091-a02.raw",
+        "/Users/heal742/Library/CloudStorage/OneDrive-PNNL/Documents/_DMS_data/_NMDC/_massive/_emp500_lcms/RAW/to_process/6C10_5_23_mousseau-88-s087-a02.raw",
+        "/Users/heal742/Library/CloudStorage/OneDrive-PNNL/Documents/_DMS_data/_NMDC/_massive/_emp500_lcms/RAW/to_process/1E2_1_72_mayer-34-s010-a04.raw",
+        "/Users/heal742/Library/CloudStorage/OneDrive-PNNL/Documents/_DMS_data/_NMDC/_massive/_emp500_lcms/RAW/to_process/5D2_3_64_sandin-54-s001-a04.raw"
+    ],
+    "lcmsMetabolomics.runMetaMSLCMSMetabolomics.output_directory": "output",
+    "lcmsMetabolomics.runMetaMSLCMSMetabolomics.corems_toml_path": "/Users/heal742/LOCAL/05_NMDC/02_MetaMS/data_processing/_emp_500_lcms_metabolomics/metadata/emp_lcms_metab_corems_params.toml",
+    "lcmsMetabolomics.runMetaMSLCMSMetabolomics.msp_file_path": "/Users/heal742/LOCAL/05_NMDC/02_MetaMS/metams/test_data/test_lcms_metab_data/20250407_database.msp",
+    "lcmsMetabolomics.runMetaMSLCMSMetabolomics.scan_translator_path": "/Users/heal742/LOCAL/05_NMDC/02_MetaMS/data_processing/_emp_500_lcms_metabolomics/metadata/emp500_scan_translator.toml",
+    "lcmsMetabolomics.runMetaMSLCMSMetabolomics.cores": 1
+}

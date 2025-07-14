@@ -86,7 +86,7 @@ if __name__ == "__main__":
     # Optional arguments
     cores = 1
     output_dir = "output"
-    batch_size = 50
+    batch_size = 20
     json_output_dir = "/Users/heal742/LOCAL/05_NMDC/02_MetaMS/data_processing/_emp_500_lcms_metabolomics/wdl_jsons"
 
     # Known problem files to exclude
