@@ -36,16 +36,16 @@ def generate_json(
         output_json="run_metaMS_lcms_metabolomics.json"
     ):
     # Get the list of raw data files
-    raw_data_files = [str(f) for f in Path(raw_data_dir).rglob("*.raw")]
+    raw_data_files = [str(f) for f in Path(raw_data_dir).rglob("*.raw")][0:1]
 
     # Create the json object
     json_obj = {
-        "lcmsLipidomics.runMetaMSLCMSMetabolomics.file_paths": raw_data_files,
-        "lcmsLipidomics.runMetaMSLCMSMetabolomics.output_directory": output_dir,
-        "lcmsLipidomics.runMetaMSLCMSMetabolomics.corems_toml_path": corems_toml,
-        "lcmsLipidomics.runMetaMSLCMSMetabolomics.msp_file_path": db_location,
-        "lcmsLipidomics.runMetaMSLCMSMetabolomics.scan_translator_path":scan_translator_path,
-        "lcmsLipidomics.runMetaMSLCMSMetabolomics.cores": cores
+        "lcmsMetabolomics.runMetaMSLCMSMetabolomics.file_paths": raw_data_files,
+        "lcmsMetabolomics.runMetaMSLCMSMetabolomics.output_directory": output_dir,
+        "lcmsMetabolomics.runMetaMSLCMSMetabolomics.corems_toml_path": corems_toml,
+        "lcmsMetabolomics.runMetaMSLCMSMetabolomics.msp_file_path": db_location,
+        "lcmsMetabolomics.runMetaMSLCMSMetabolomics.scan_translator_path":scan_translator_path,
+        "lcmsMetabolomics.runMetaMSLCMSMetabolomics.cores": cores
     }
 
     # Write the json object to a file
@@ -57,8 +57,8 @@ def generate_json(
 if __name__ == "__main__":
     # Must be set for the script to run
     raw_data_dir = "/Users/heal742/Library/CloudStorage/OneDrive-PNNL/Documents/_DMS_data/_NMDC/_massive/_emp500_lcms/RAW/to_process"
-    corems_toml = "/Users/heal742/LOCAL/05_NMDC/02_MetaMS/data_processing/configurations/emsl_lipidomics_corems_params.toml"
-    db_location = "/Users/heal742/LOCAL/05_NMDC/00_Lipid_Databse/lipid_db/lipid_ref.sqlite"
+    corems_toml = "/Users/heal742/LOCAL/05_NMDC/02_MetaMS/data_processing/_emp_500_lcms_metabolomics/metadata/emp_lcms_metab_corems_params.toml"
+    db_location = "/Users/heal742/LOCAL/05_NMDC/02_MetaMS/metams/test_data/test_lcms_metab_data/20250407_database.msp"
     scan_translator_path = "/Users/heal742/LOCAL/05_NMDC/02_MetaMS/data_processing/_emp_500_lcms_metabolomics/metadata/emp500_scan_translator.toml"
 
     # Optional arguments

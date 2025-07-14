@@ -30,9 +30,9 @@ chmod +x _emp_500_metabolomics/scripts/emp500_metab.sh
 This script will run the WDL in batches of 50 files each.
 
 # Mapping
-1. Pull ncbi information from nmdc biosamples using `scripts/biosample_ncbi_mapper.py` script
-2. Clean the mapping using the `scripts/metadata_map_maker.py` to get file name to biosample id
-3. Get start and end times, instrument details using `scripts/raw_file_info_pull_logger.py` script
+1. Pull ncbi information from nmdc biosamples using `scripts/biosample_ncbi_mapper.py` script (writes `_emp_500_lcms_metabolomics/biosample_attributes.csv`)
+2. Clean the mapping using the `scripts/metadata_map_maker.py` to get file name to biosample id (writes `_emp_500_lcms_metabolomics/mapped_raw_data_files.csv`)
+3. Get start and end times, instrument details using `scripts/raw_file_info_pull_logger.py` script (writes `_emp_500_lcms_metabolomics/raw_file_info_TIMESTAMP.csv` and `_emp_500_lcms_metabolomics/processing_errors_TIMESTAMP.csv`)
 **One problematic file was found: `1E11_2_27_bowen-74-s010-a04.raw`
 #TODO KRH: need to get ftp file locations for the url
 
