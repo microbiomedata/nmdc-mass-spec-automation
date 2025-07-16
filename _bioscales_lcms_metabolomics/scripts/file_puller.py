@@ -54,6 +54,10 @@ if __name__ == "__main__":
     # Download each file using wget
     print(f"Starting download of {len(ftp_df)} files...")
     for index, row in tqdm.tqdm(ftp_df.iterrows(), total=len(ftp_df), desc="Downloading files"):
+        # Check if the file already exists
+        if os.path.exists(os.path.join(download_dir, row['raw_data_file_short'])):
+            print(f"File {row['raw_data_file_short']} already exists. Skipping download.")
+            continue
         ftp_location = row['ftp_location']
         file_name = row['raw_data_file_short']
         download_path = os.path.join(download_dir, file_name)
