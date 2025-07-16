@@ -40,3 +40,8 @@ if __name__ == "__main__":
     output_dir = "/Users/heal742/Library/CloudStorage/OneDrive-PNNL/Documents/_DMS_data/_NMDC/_massive/_emp500_lcms/processed_20250716"
 
     move_corems_dirs(input_dir, output_dir)
+
+    # Report how many directories are in the output directory
+    output_path = Path(output_dir)
+    corems_dirs = list(output_path.glob('*.corems'))
+    print(f"Total procsseed files in {output_dir}: {len(corems_dirs)}")
