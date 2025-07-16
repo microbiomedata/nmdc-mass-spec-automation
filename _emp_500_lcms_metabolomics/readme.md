@@ -27,6 +27,8 @@ chmod +x _emp_500_metabolomics/scripts/emp500_metab.sh
 /Users/heal742/LOCAL/05_NMDC/02_MetaMS/data_processing/_emp_500_lcms_metabolomics/scripts/emp500_metab.sh
 ```
 
+To move the processed data from the wdl locations to another place, use the `processed_data_mover.py` script. Then if there are remaining files, rerun the json prepper script to generate new json files for the remaining raw files.
+
 # Mapping
 1. Pull ncbi information from nmdc biosamples using `scripts/biosample_ncbi_mapper.py` script (writes `_emp_500_lcms_metabolomics/biosample_attributes.csv`)
 2. Get start and end times, instrument details using `scripts/raw_file_info_pull_logger.py` script (writes `_emp_500_lcms_metabolomics/raw_file_info_TIMESTAMP.csv` and `_emp_500_lcms_metabolomics/processing_errors_TIMESTAMP.csv`)

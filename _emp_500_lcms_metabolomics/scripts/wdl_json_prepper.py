@@ -29,6 +29,7 @@ from pathlib import Path
 
 def generate_batch_jsons(
         raw_data_dir, 
+        processed_data_dir,
         corems_toml, 
         db_location, 
         scan_translator_path, 
@@ -38,10 +39,25 @@ def generate_batch_jsons(
         json_output_dir=".",
         problem_files=None
     ):
+    # Remove the exisiting files in the output directory
+    json_output_dir = Path(json_output_dir)
+    if json_output_dir.exists():
+        for file in json_output_dir.glob("*.json"):
+            file.unlink()
+        print(f"Removed existing JSON files in {json_output_dir}")
+    else:
+        json_output_dir.mkdir(parents=True, exist_ok=True)
+        print(f"Created JSON output directory: {json_output_dir}")
+
     # Get the list of all raw data files
     raw_data_files = [str(f) for f in Path(raw_data_dir).rglob("*.raw")]
+
+    # For each of the raw data files, look in the processed data directory for a corresponding .corems directory
+    processed_data_files = [str(f) for f in Path(processed_data_dir).rglob("*.corems")]
+    processed_data_files = [f.replace(str(Path(processed_data_dir)), "").lstrip("/").replace(".corems", ".raw") for f in processed_data_files]
+    raw_data_files = [f for f in raw_data_files if f.replace(str(Path(raw_data_dir)), "").lstrip("/") not in processed_data_files]
     
-    print(f"Found {len(raw_data_files)} raw data files")
+    print(f"Found {len(raw_data_files)} raw data files that are not processed yet")
     
     # Filter out problem files if specified
     if problem_files:
@@ -79,6 +95,7 @@ def generate_batch_jsons(
 if __name__ == "__main__":
     # Must be set for the script to run
     raw_data_dir = "/Users/heal742/Library/CloudStorage/OneDrive-PNNL/Documents/_DMS_data/_NMDC/_massive/_emp500_lcms/RAW/to_process"
+    processed_data_dir = "/Users/heal742/Library/CloudStorage/OneDrive-PNNL/Documents/_DMS_data/_NMDC/_massive/_emp500_lcms/processed_20250716"
     corems_toml = "/Users/heal742/LOCAL/05_NMDC/02_MetaMS/data_processing/_emp_500_lcms_metabolomics/metadata/emp_lcms_metab_corems_params.toml"
     db_location = "/Users/heal742/LOCAL/05_NMDC/02_MetaMS/metams/test_data/test_lcms_metab_data/20250407_database.msp"
     scan_translator_path = "/Users/heal742/LOCAL/05_NMDC/02_MetaMS/data_processing/_emp_500_lcms_metabolomics/metadata/emp500_scan_translator.toml"
@@ -86,7 +103,7 @@ if __name__ == "__main__":
     # Optional arguments
     cores = 1
     output_dir = "output"
-    batch_size = 20
+    batch_size = 15
     json_output_dir = "/Users/heal742/LOCAL/05_NMDC/02_MetaMS/data_processing/_emp_500_lcms_metabolomics/wdl_jsons"
 
     # Known problem files to exclude
@@ -96,6 +113,7 @@ if __name__ == "__main__":
 
     generate_batch_jsons(
         raw_data_dir, 
+        processed_data_dir,
         corems_toml, 
         db_location, 
         scan_translator_path, 
