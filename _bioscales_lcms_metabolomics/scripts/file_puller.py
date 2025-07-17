@@ -40,7 +40,7 @@ if __name__ == "__main__":
     ftp_df = pull_ftp_locations(ftp_file_path)
 
     # Drop rows without "rhizo" in the file name
-    ftp_df = ftp_df[ftp_df['raw_data_file_short'].str.contains('rhizo', na=False)]
+    ftp_df = ftp_df[ftp_df['raw_data_file_short'].str.contains('rhizo|leaf|root', na=False)]
 
     # Write the DataFrame to a CSV file for reference as "bioscales_ftp_locs.csv"
     ftp_df.to_csv("_bioscales_lcms_metabolomics/bioscales_ftp_locs.csv", index=False)

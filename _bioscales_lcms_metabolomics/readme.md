@@ -1,8 +1,7 @@
 # Study id
 nmdc:sty-11-r2h77870
 
-_Also grab the leaf samples which have "leaf" and "root"_
-_Note that we are only processing the rhizosphere samples which have "rhizo" in the name_ (468 MS runs? maybe 688 runs?).
+_Note that we are only processing the rhizosphere samples which have "rhizo", "leaf", or "root" in the name_ (roughly 1350 MS runs).
 
 # Raw data
 Massive id = MSV000090886
