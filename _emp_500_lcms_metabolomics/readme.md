@@ -39,13 +39,5 @@ wget --spider -r -nd ftp://massive-ftp.ucsd.edu/v02/MSV000083475/raw/RAW -o _emp
 ```
 4. Clean the mapping using the `scripts/metadata_map_maker.py` to get file name to biosample id (writes `_emp_500_lcms_metabolomics/mapped_raw_data_files.csv`)
 
-
-
-#TODO KRH: need to get ftp file locations for the url
-
-Minio locations (in metabolomics bucket):
-- 
-
-```
-grep -oP 'ftp://[^ ]+\.raw' emp500_massive_raw_v2.txt > emp500_massive_raw_v2_clean.txt
-```
+# Notes
+On 7/18/25, we had 612 samples processed and 56 problematic files. Two main issues were found - a memory issue and a divide by zero error.  The memory issue was somewhat resolved by increasing the available memory for docker, but not completely.
