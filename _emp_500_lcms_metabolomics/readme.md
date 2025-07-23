@@ -40,4 +40,10 @@ wget --spider -r -nd ftp://massive-ftp.ucsd.edu/v02/MSV000083475/raw/RAW -o _emp
 4. Clean the mapping using the `scripts/metadata_map_maker.py` to get file name to biosample id (writes `_emp_500_lcms_metabolomics/mapped_raw_data_files.csv`)
 
 # Notes
-On 7/18/25, we had 612 samples processed and 56 problematic files. Two main issues were found - a memory issue and a divide by zero error.  The memory issue was somewhat resolved by increasing the available memory for docker, but not completely.
+As of 7/21/25, we have 617 samples processed!
+
+## Processing issues
+Two main issues were found - a memory issue and a KeyError during the deconvolutions step.  The memory issue was somewhat resolved by increasing the available memory for docker, but not completely. So far only 1 gridding error.
+
+- 4E8_1_68_thomas-18-s057-a03.raw - gridding failed during peak picking.
+- 4C1_3_60_pinto-63-s003-a04.raw - unclear why this failed, no error message logged.
