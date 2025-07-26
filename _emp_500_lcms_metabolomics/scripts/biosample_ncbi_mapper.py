@@ -78,7 +78,7 @@ def convert_ncbi_id_to_attributes(ncbi_id):
 
 if __name__ == "__main__":
     # Fetch all biosamples associated with the study "nmdc:sty-11-547rwq94" in the NMDC database
-    biosample_search = BiosampleSearch()
+    biosample_search = BiosampleSearch(env="dev")
     biosamples = biosample_search.get_record_by_filter(
         filter='{"associated_studies":"nmdc:sty-11-547rwq94"}',
         max_page_size=1000,
