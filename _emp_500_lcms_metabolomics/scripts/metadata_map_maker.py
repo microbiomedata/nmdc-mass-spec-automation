@@ -11,7 +11,9 @@ import os
 biosample_metadata_file = "_emp_500_lcms_metabolomics/biosample_attributes.csv"
 biosample_metadata = pd.read_csv(biosample_metadata_file)
 raw_data_dir = "/Users/heal742/Library/CloudStorage/OneDrive-PNNL/Documents/_DMS_data/_NMDC/_massive/_emp500_lcms/RAW/to_process"
+# List files that end in .raw
 raw_data_files = os.listdir(raw_data_dir)
+raw_data_files = [f for f in raw_data_files if f.endswith('.raw')]
 raw_data_files_df = pd.DataFrame(raw_data_files, columns=["raw_data_file"])
 print(f"Number of raw data files found: {raw_data_files_df.shape[0]}")
 
@@ -23,7 +25,7 @@ biosample_metadata_no_nas = biosample_metadata[biosample_metadata["submitter_id_
 mapped_raw_data_files = raw_data_files_df.merge(biosample_metadata_no_nas[["submitter_id_short", "id"]], on="submitter_id_short", how="left")
 mapped_raw_data_files = mapped_raw_data_files[mapped_raw_data_files["id"].notna()]
 # Report how many records from raw_data_files_df have been mapped to biosample_metadata
-print(f"Number of mapped raw files: {mapped_raw_data_files.shape[0]} out of {raw_data_files_df.shape[0]} after merging on submitter_id_short")
+print(f"Number of mapped raw files: {mapped_raw_data_files.shape[0]} out of {raw_data_files_df.shape[0]} after merging on submitter_id_short") #512
 
 ##### Map raw data files based on lcms_name =============
 biosample_metadata_with_lcms_name = biosample_metadata[biosample_metadata["lcms_name"].notna()].copy()
@@ -32,7 +34,7 @@ biosample_metadata_with_lcms_name["lcms_name"] = biosample_metadata_with_lcms_na
 mapped_raw_data_files_lcms = raw_data_files_df.merge(biosample_metadata_with_lcms_name[["lcms_name", "id"]], left_on="raw_data_file", right_on="lcms_name", how="left")
 mapped_raw_data_files_lcms = mapped_raw_data_files_lcms[mapped_raw_data_files_lcms["id"].notna()]
 mapped_raw_data_files = pd.concat([mapped_raw_data_files, mapped_raw_data_files_lcms])
-print(f"Number of mapped raw files: {mapped_raw_data_files.shape[0]} out of {raw_data_files_df.shape[0]} after merging on lcms_name")
+print(f"Number of mapped raw files: {mapped_raw_data_files.shape[0]} out of {raw_data_files_df.shape[0]} after merging on lcms_name") #521
 
 ##### Map raw data files based on NCBI biosample name =============
 unmapped_raw_data_files = raw_data_files_df[~raw_data_files_df["raw_data_file"].isin(mapped_raw_data_files["raw_data_file"])].copy()
@@ -45,7 +47,7 @@ unmapped_raw_data_files["biosample_name_short"] = unmapped_raw_data_files["biosa
 mapped_raw_data_files_name = unmapped_raw_data_files.merge(biosample_metadata_with_name[["biosample_name_short", "id"]], on="biosample_name_short", how="left")
 mapped_raw_data_files_name = mapped_raw_data_files_name[mapped_raw_data_files_name["id"].notna()]
 mapped_raw_data_files = pd.concat([mapped_raw_data_files, mapped_raw_data_files_name])
-print(f"Number of mapped raw files: {mapped_raw_data_files.shape[0]} out of {raw_data_files_df.shape[0]} after merging on biosample_name_short")
+print(f"Number of mapped raw files: {mapped_raw_data_files.shape[0]} out of {raw_data_files_df.shape[0]} after merging on biosample_name_short") #585
 
 ##### Map raw data files for stegn 36 ============
 unmapped_raw_data_files = unmapped_raw_data_files[~unmapped_raw_data_files["raw_data_file"].isin(mapped_raw_data_files["raw_data_file"])].copy()
@@ -55,7 +57,7 @@ biosample_metadata_stegen["biosample_name_short"] = biosample_metadata_stegen["b
 mapped_raw_data_files_stegen = unmapped_raw_data_files.merge(biosample_metadata_stegen[["biosample_name_short", "id"]], on="biosample_name_short", how="left")
 mapped_raw_data_files_stegen = mapped_raw_data_files_stegen[mapped_raw_data_files_stegen["id"].notna()]
 mapped_raw_data_files = pd.concat([mapped_raw_data_files, mapped_raw_data_files_stegen])
-print(f"Number of mapped raw files: {mapped_raw_data_files.shape[0]} out of {raw_data_files_df.shape[0]} after merging on stegen 36 biosample_name_short")
+print(f"Number of mapped raw files: {mapped_raw_data_files.shape[0]} out of {raw_data_files_df.shape[0]} after merging on stegen 36 biosample_name_short") #596
 
 ##### Map raw data files for Makhalanyane 46 ============
 unmapped_raw_data_files = unmapped_raw_data_files[~unmapped_raw_data_files["raw_data_file"].isin(mapped_raw_data_files["raw_data_file"])].copy()
@@ -65,7 +67,7 @@ biosample_metadata_makhalanyane["biosample_name_short"] = biosample_metadata_mak
 mapped_raw_data_files_makhalanyane = unmapped_raw_data_files.merge(biosample_metadata_makhalanyane[["biosample_name_short", "id"]], on="biosample_name_short", how="left")
 mapped_raw_data_files_makhalanyane = mapped_raw_data_files_makhalanyane[mapped_raw_data_files_makhalanyane["id"].notna()]
 mapped_raw_data_files = pd.concat([mapped_raw_data_files, mapped_raw_data_files_makhalanyane])
-print(f"Number of mapped raw files: {mapped_raw_data_files.shape[0]} out of {raw_data_files_df.shape[0]} after merging on makhalanyane biosample_name_short")
+print(f"Number of mapped raw files: {mapped_raw_data_files.shape[0]} out of {raw_data_files_df.shape[0]} after merging on makhalanyane biosample_name_short") #606
 
 ##### Map raw data files for Shade23 ============
 unmapped_raw_data_files = unmapped_raw_data_files[~unmapped_raw_data_files["raw_data_file"].isin(mapped_raw_data_files["raw_data_file"])].copy()
@@ -75,7 +77,7 @@ biosample_metadata_shade23["biosample_name_short"] = biosample_metadata_shade23[
 mapped_raw_data_files_shade23 = unmapped_raw_data_files.merge(biosample_metadata_shade23[["biosample_name_short", "id"]], on="biosample_name_short", how="left")
 mapped_raw_data_files_shade23 = mapped_raw_data_files_shade23[mapped_raw_data_files_shade23["id"].notna()]
 mapped_raw_data_files = pd.concat([mapped_raw_data_files, mapped_raw_data_files_shade23])
-print(f"Number of mapped raw files: {mapped_raw_data_files.shape[0]} out of {raw_data_files_df.shape[0]} after merging on shade23 biosample_name_short")
+print(f"Number of mapped raw files: {mapped_raw_data_files.shape[0]} out of {raw_data_files_df.shape[0]} after merging on shade23 biosample_name_short") #616
 
 ##### Map re-runs based on raw data file name suffix ============
 unmapped_raw_data_files = unmapped_raw_data_files[~unmapped_raw_data_files["raw_data_file"].isin(mapped_raw_data_files["raw_data_file"])].copy()
@@ -84,7 +86,7 @@ rerun_samples = unmapped_raw_data_files[unmapped_raw_data_files["submitter_id_sh
 mapped_rerun_samples = rerun_samples.merge(biosample_metadata_no_nas[["submitter_id_short", "id"]], left_on="submitter_id_short_rerun", right_on="submitter_id_short", how="left")
 mapped_rerun_samples = mapped_rerun_samples[mapped_rerun_samples["id"].notna()]
 mapped_raw_data_files = pd.concat([mapped_raw_data_files, mapped_rerun_samples[["raw_data_file", "id"]]])
-print(f"Number of mapped raw files: {mapped_raw_data_files.shape[0]} out of {raw_data_files_df.shape[0]} after merging on rerun samples")
+print(f"Number of mapped raw files: {mapped_raw_data_files.shape[0]} out of {raw_data_files_df.shape[0]} after merging on rerun samples") #619
 
 ##### Add back unmapped raw data files and clean up output ============
 final_mapped_raw_data_files = mapped_raw_data_files[["raw_data_file", "id"]].copy()
@@ -126,6 +128,7 @@ ftp_locs_df["raw_data_file_short"] = ftp_locs_df["ftp_location"].str.extract(r'(
 final_mapped_raw_data_files = final_mapped_raw_data_files.merge(ftp_locs_df[["raw_data_file_short", "url"]], on="raw_data_file_short", how="left")
 
 ##### Check that the final_mapped_raw_data_files is the correct length (same as raw_data_files_df) ============
+# This is just to make sure nothing got merged wrong
 assert final_mapped_raw_data_files.shape[0] == raw_data_files_df.shape[0], "Final mapped raw data files does not match the number of raw data files"
 
 ##### Save the final mapped raw data files to a CSV file ============

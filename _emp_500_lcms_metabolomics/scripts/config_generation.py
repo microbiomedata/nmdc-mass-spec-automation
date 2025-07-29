@@ -12,6 +12,12 @@ if __name__ == "__main__":
     # Make a database object
     db = generator.start_nmdc_database()
 
+    # Make a protocol record for the LC-MS method that we'll add to both the mass spectrometry and chromatography configurations
+    emp500_protocol = generator.generate_protocol(
+        name="LC-MS Metabolomics Method for EMP 500 Samples",
+        url="https://github.com/biocore/emp/blob/master/protocols/MetabolomicsLC.md"
+    )
+
     # Make a configuration record for LC-MS Mass spec configuration
     emp500_ms_config = generator.generate_mass_spectrometry_configuration(
         name="LC-MS Metabolomics Method for EMP 500 Samples",
@@ -20,10 +26,11 @@ if __name__ == "__main__":
         resolution_categories=["high"],
         mass_analyzers=["Orbitrap"],
         ionization_source="electrospray_ionization",
-        mass_spectrum_collection_modes=["profile"],
+        mass_spectrum_collection_modes=["reduced_profile"],
         polarity_mode="positive",
         CLIENT_ID=client_id,
         CLIENT_SECRET=client_secret,
+        protocol_link=emp500_protocol
     )
     # Add to the database
     db.configuration_set.append(emp500_ms_config)
@@ -68,6 +75,7 @@ if __name__ == "__main__":
         temperature_unit="Cel",
         CLIENT_ID=client_id,
         CLIENT_SECRET=client_secret,
+        protocol_link=emp500_protocol
     )
     # Add to the database
     db.configuration_set.append(emp500_chromat_config)

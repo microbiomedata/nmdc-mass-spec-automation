@@ -1,10 +1,15 @@
 {
   "configuration_set": [
     {
-      "id": "nmdc:mscon-11-8ck6x110",
+      "id": "nmdc:mscon-11-kaj7ew91",
       "type": "nmdc:MassSpectrometryConfiguration",
       "name": "LC-MS Metabolomics Method for EMP 500 Samples",
       "description": "Mass spectrometry configuration for LC-MS metabolomics data for EMP 500 samples. This configuration uses a Thermo Orbitrap mass spectrometer with data-dependent acquisition. More information can be found here: https://github.com/biocore/emp/blob/master/protocols/MetabolomicsLC.md",
+      "protocol_link": {
+        "type": "nmdc:Protocol",
+        "url": "https://github.com/biocore/emp/blob/master/protocols/MetabolomicsLC.md",
+        "name": "LC-MS Metabolomics Method for EMP 500 Samples"
+      },
       "mass_spectrometry_acquisition_strategy": "data_dependent_acquisition",
       "resolution_categories": [
         "high"
@@ -14,15 +19,20 @@
       ],
       "ionization_source": "electrospray_ionization",
       "mass_spectrum_collection_modes": [
-        "profile"
+        "reduced_profile"
       ],
       "polarity_mode": "positive"
     },
     {
-      "id": "nmdc:chrcon-11-skm1j842",
+      "id": "nmdc:chrcon-11-vhsmnr50",
       "type": "nmdc:ChromatographyConfiguration",
       "name": "LC-MS Chromatography Configuration for EMP 500 Samples",
       "description": "Chromatography configuration for LC-MS metabolomics data for EMP 500 samples. This configuration uses a C18 column with a gradient of water and acetonitrile. More information can be found here: https://github.com/biocore/emp/blob/master/protocols/MetabolomicsLC.md",
+      "protocol_link": {
+        "type": "nmdc:Protocol",
+        "url": "https://github.com/biocore/emp/blob/master/protocols/MetabolomicsLC.md",
+        "name": "LC-MS Metabolomics Method for EMP 500 Samples"
+      },
       "chromatographic_category": "liquid_chromatography",
       "stationary_phase": "C18",
       "ordered_mobile_phases": [

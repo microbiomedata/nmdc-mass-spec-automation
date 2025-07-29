@@ -45,5 +45,14 @@ As of 7/21/25, we have 617 samples processed!
 ## Processing issues
 Two main issues were found - a memory issue and a KeyError during the deconvolutions step.  The memory issue was somewhat resolved by increasing the available memory for docker, but not completely. So far only 1 gridding error.
 
-- 4E8_1_68_thomas-18-s057-a03.raw - gridding failed during peak picking.
+- 4E8_1_68_thomas-18-s057-a03.raw - gridding failed during peak picking. _FIXED!_
 - 4C1_3_60_pinto-63-s003-a04.raw - unclear why this failed, no error message logged.
+
+### Using branch of corems called 219_decon_checks, trying to process again with more debugging print messages to understand where files failed.
+The following samples failed during find mass features stage with no error messages 
+- 4C1_3_60_pinto-63-s003-a04.raw (Up to 10 G memory being used during the find mass features step wiht no metadata loaded)
+- 4C7_3_80_pinto-63-s009-a04.raw
+- 4A1_2_4_pinto-63-s024-a04.raw
+This looks like it's related to ripser underneath and we'll need to partition this somehow.
+
+Trying to save and pickle the metadata to free up memory during the ms1 data processing

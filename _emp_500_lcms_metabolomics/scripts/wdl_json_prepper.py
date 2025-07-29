@@ -75,6 +75,7 @@ def generate_batch_jsons(
     # Create JSON file for each batch
     for batch_num, batch_files in enumerate(batches, 1):
         json_obj = {
+            "lcmsMetabolomics.docker_image": "local-metams:latest", #TODO KRH: Remove this after testing
             "lcmsMetabolomics.runMetaMSLCMSMetabolomics.file_paths": batch_files,
             "lcmsMetabolomics.runMetaMSLCMSMetabolomics.output_directory": output_dir,
             "lcmsMetabolomics.runMetaMSLCMSMetabolomics.corems_toml_path": corems_toml,
@@ -103,7 +104,7 @@ if __name__ == "__main__":
     # Optional arguments
     cores = 1
     output_dir = "output"
-    batch_size = 1
+    batch_size = 5
     json_output_dir = "/Users/heal742/LOCAL/05_NMDC/02_MetaMS/data_processing/_emp_500_lcms_metabolomics/wdl_jsons"
 
     # Known problem files to exclude
