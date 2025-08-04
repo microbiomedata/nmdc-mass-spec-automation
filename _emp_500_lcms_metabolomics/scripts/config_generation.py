@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-from src.metadata_generator import NMDCMetadataGenerator
+from nmdc_ms_metadata_gen.metadata_generator import NMDCMetadataGenerator
 from pathlib import Path
 
 # Example usage of NMDCMetadataGenerator
