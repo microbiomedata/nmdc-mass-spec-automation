@@ -53,6 +53,14 @@ The following samples failed during find mass features stage with no error messa
 - 4C1_3_60_pinto-63-s003-a04.raw (Up to 10 G memory being used during the find mass features step wiht no metadata loaded)
 - 4C7_3_80_pinto-63-s009-a04.raw
 - 4A1_2_4_pinto-63-s024-a04.raw
-This looks like it's related to ripser underneath and we'll need to partition this somehow.
+This looks like it's related to ripser underneath and we'll need to partition this somehow.  We could break up in time chunks?
 
 Trying to save and pickle the metadata to free up memory during the ms1 data processing
+
+
+#
+f.MSV000083475/raw/RAW/PLATE7/Plate7.sld <- no https: available>
+
+https://massive.ucsd.edu/ProteoSAFe/DownloadResultFile?file=f.MSV000090886%2Fccms_peak%2Fmzml_files%2F20220211_JGI_MD_507130_BioS_final1_IDX_C18_USDAY59443_NEG_MSMS_0_QC_Post_Rg80to1200-CE102040--QC_Run1078.mzML&forceDownload=true
+
+https://massive.ucsd.edu/ProteoSAFe/DownloadResultFile?file=f.MSV000083475%2Fraw%2FRAW%2FPLATE3and4%2FWash_01_20190212070927.raw&forceDownload=true

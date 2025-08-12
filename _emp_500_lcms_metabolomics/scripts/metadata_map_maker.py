@@ -6,7 +6,25 @@ It will then clean up the output for a final mapping as an input to the metadata
 
 import pandas as pd
 import os
+import urllib.parse
 
+
+def convert_ftp_to_https_massive(ftp_url):
+    """
+    Convert FTP URL to HTTPS URL for MASSIVE.
+    """
+    if ftp_url.startswith("ftp:/"):
+        # Remove "ftp://massive-ftp.ucsd.edu" and replace with "https://massive.ucsd.edu/ProteoSAFe/DownloadResultFile?file="
+        https_url = ftp_url.replace("ftp://massive-ftp.ucsd.edu", "https://massive.ucsd.edu/ProteoSAFe/DownloadResultFile?file=")
+        # remove everything before MSV
+        ftp_path = "MSV" + ftp_url.split("MSV")[1]
+        # url encode the ftp_path
+        ftp_path_url_encoded = urllib.parse.quote(ftp_path, safe='')
+        https_url = https_url + ftp_path_url_encoded + "&forceDownload=true"
+        return https_url
+    else:
+        raise ValueError("FTP URL must start with 'ftp://massive-ftp.ucsd.edu'")
+    
 ##### Read in the biosample metadata file and raw data files and convert them to dataframes =============
 biosample_metadata_file = "_emp_500_lcms_metabolomics/biosample_attributes.csv"
 biosample_metadata = pd.read_csv(biosample_metadata_file)
@@ -100,10 +118,10 @@ final_mapped_raw_data_files["biosample.associated_studies"] = "['nmdc:sty-11-547
 # Add additional columns to the final mapped raw data files
 final_mapped_raw_data_files["material_processing_type"] = "unknown"
 final_mapped_raw_data_files["raw_data_file"] = raw_data_dir + "/" + final_mapped_raw_data_files["raw_data_file_short"]
-final_mapped_raw_data_files["processed_data_directory"] = "/Users/heal742/Library/CloudStorage/OneDrive-PNNL/Documents/_DMS_data/_NMDC/_massive/_emp500_lcms/processed/202507/" + final_mapped_raw_data_files["raw_data_file_short"].str.replace('.raw', '.corems')
+final_mapped_raw_data_files["processed_data_directory"] = "/Users/heal742/Library/CloudStorage/OneDrive-PNNL/Documents/_DMS_data/_NMDC/_massive/_emp500_lcms/processed_20250716/" + final_mapped_raw_data_files["raw_data_file_short"].str.replace('.raw', '.corems')
 final_mapped_raw_data_files["mass_spec_configuration_name"] = "LC-MS Metabolomics Method for EMP 500 Samples"
 final_mapped_raw_data_files["chromat_configuration_name"] = "LC-MS Chromatography Configuration for EMP 500 Samples"
-final_mapped_raw_data_files["execution_resource"] = "EMSL-RZR"
+final_mapped_raw_data_files["execution_resource"] = "EMSL"
 final_mapped_raw_data_files["instrument_used"] = "QExactHF03" #TODO KRH: Update this if/when we put in changesheets for instrument names
 
 ##### Merge the raw data files to the instrument data from _emp_500_lcms_metabolomics/raw_file_info_TIMESTAMP.csv ============
@@ -123,7 +141,7 @@ with open(ftp_file, "r") as f:
 ftp_locs = [loc.split(" ")[-1] for loc in ftp_locs]
 ftp_locs_df = pd.DataFrame(ftp_locs, columns=["ftp_location"])
 ftp_locs_df.drop_duplicates(inplace=True)
-ftp_locs_df["url"] = "wget " + ftp_locs_df["ftp_location"]
+ftp_locs_df["url"] = ftp_locs_df["ftp_location"].apply(convert_ftp_to_https_massive)
 ftp_locs_df["raw_data_file_short"] = ftp_locs_df["ftp_location"].str.extract(r'([^/]+\.raw)$')[0]
 final_mapped_raw_data_files = final_mapped_raw_data_files.merge(ftp_locs_df[["raw_data_file_short", "url"]], on="raw_data_file_short", how="left")
 
@@ -131,12 +149,15 @@ final_mapped_raw_data_files = final_mapped_raw_data_files.merge(ftp_locs_df[["ra
 # This is just to make sure nothing got merged wrong
 assert final_mapped_raw_data_files.shape[0] == raw_data_files_df.shape[0], "Final mapped raw data files does not match the number of raw data files"
 
-##### Save the final mapped raw data files to a CSV file ============
-output_file = "_emp_500_lcms_metabolomics/mapped_raw_data_files.csv"
-final_mapped_raw_data_files.to_csv(output_file, index=False)
+##### Remove rows where the processed data directory does not exist in the file system or where biosample_id is missing
+final_mapped_raw_data_files_with_data = final_mapped_raw_data_files[final_mapped_raw_data_files["processed_data_directory"].apply(os.path.exists)]
+final_mapped_raw_data_files_with_data = final_mapped_raw_data_files_with_data[final_mapped_raw_data_files_with_data["biosample_id"].notna()] #586 samples
+
+##### Save the metadata mapped raw data files to a CSV file ============
+output_file = "_emp_500_lcms_metabolomics/mapped_raw_data_files_20250812_batch1.csv"
+final_mapped_raw_data_files_with_data.to_csv(output_file, index=False)
 
 """
 #TODO:
-Add the following columns to the final mapped raw data files:
-material_processing_type = "unknown"
+Fix processing institution, add processinging institution for other parts.
 """
