@@ -152,6 +152,14 @@ final_mapped_raw_data_files = final_mapped_raw_data_files.merge(ftp_locs_df[["ra
 # This is just to make sure nothing got merged wrong
 assert final_mapped_raw_data_files.shape[0] == raw_data_files_df.shape[0], "Final mapped raw data files does not match the number of raw data files"
 
+##### Add manifest information - order by time, calculate time between samples
+final_mapped_raw_data_files = final_mapped_raw_data_files.sort_values(by=["instrument_analysis_end_date"])
+final_mapped_raw_data_files["instrument_analysis_end_date_indatetime"] = pd.to_datetime(final_mapped_raw_data_files["instrument_analysis_end_date"])
+final_mapped_raw_data_files["time_between_samples"] = final_mapped_raw_data_files["instrument_analysis_end_date_indatetime"].diff().dt.total_seconds().fillna(0).astype(int)
+# Make sure all time_between_samples are less than 1 day (24 hrs, 86400 seconds)
+assert (final_mapped_raw_data_files["time_between_samples"] < 86400).all()
+final_mapped_raw_data_files["manifest_name"] = "EMP 500 LCMS Metabolomics Data Acquisition"
+
 ##### Remove rows where the processed data directory does not exist in the file system or where biosample_id is missing
 final_mapped_raw_data_files_with_data = final_mapped_raw_data_files[final_mapped_raw_data_files["processed_data_directory"].apply(os.path.exists)]
 final_mapped_raw_data_files_with_data = final_mapped_raw_data_files_with_data[final_mapped_raw_data_files_with_data["biosample_id"].notna()] #586 samples

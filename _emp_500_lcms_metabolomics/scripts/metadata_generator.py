@@ -13,7 +13,7 @@ if __name__ == "__main__":
     generator = LCMSMetabolomicsMetadataGenerator(
         metadata_file="path", #TODO KRH: This should have raw_dataurl and manifest information
         database_dump_json_path=output_file,
-        process_data_url="https://nmdcdemo.emsl.pnnl.gov/", #TODO KRH: This will need to be updated
+        process_data_url="https://nmdcdemo.emsl.pnnl.gov/metabolomics/emp500_11_547rwq94_lcms/processed_20250716/", #TODO KRH: This will need to be updated
         existing_data_objects= None, #TODO KRH: Add LCMS Metabolomics database here
     )
     # Run the metadata generation process
