@@ -14,13 +14,16 @@ def convert_ftp_to_https_massive(ftp_url):
     Convert FTP URL to HTTPS URL for MASSIVE.
     """
     if ftp_url.startswith("ftp:/"):
+        # ftp://massive-ftp.ucsd.edu/v02/MSV000083475/raw/RAW/PLATE1and2/1A10_1_12_mayer-34-s008-a04.raw
+        # turns into
+        # https://massive.ucsd.edu/ProteoSAFe/DownloadResultFile?file=f.MSV000083475/raw/RAW/PLATE1and2/1A10_1_12_mayer-34-s008-a04.raw&forceDownload=true
         # Remove "ftp://massive-ftp.ucsd.edu" and replace with "https://massive.ucsd.edu/ProteoSAFe/DownloadResultFile?file="
-        https_url = ftp_url.replace("ftp://massive-ftp.ucsd.edu", "https://massive.ucsd.edu/ProteoSAFe/DownloadResultFile?file=")
+        https_stub = "https://massive.ucsd.edu/ProteoSAFe/DownloadResultFile?file=f."
         # remove everything before MSV
-        ftp_path = "MSV" + ftp_url.split("MSV")[1]
+        file_loc = "MSV" + ftp_url.split("MSV")[1]
         # url encode the ftp_path
-        ftp_path_url_encoded = urllib.parse.quote(ftp_path, safe='')
-        https_url = https_url + ftp_path_url_encoded + "&forceDownload=true"
+        file_loc_encoded = urllib.parse.quote(file_loc, safe='')
+        https_url = https_stub + file_loc_encoded + "&forceDownload=true"
         return https_url
     else:
         raise ValueError("FTP URL must start with 'ftp://massive-ftp.ucsd.edu'")
@@ -152,6 +155,7 @@ assert final_mapped_raw_data_files.shape[0] == raw_data_files_df.shape[0], "Fina
 ##### Remove rows where the processed data directory does not exist in the file system or where biosample_id is missing
 final_mapped_raw_data_files_with_data = final_mapped_raw_data_files[final_mapped_raw_data_files["processed_data_directory"].apply(os.path.exists)]
 final_mapped_raw_data_files_with_data = final_mapped_raw_data_files_with_data[final_mapped_raw_data_files_with_data["biosample_id"].notna()] #586 samples
+print("Number of mapped files with processed results: {}".format(final_mapped_raw_data_files_with_data.shape[0]))
 
 ##### Save the metadata mapped raw data files to a CSV file ============
 output_file = "_emp_500_lcms_metabolomics/mapped_raw_data_files_20250812_batch1.csv"
