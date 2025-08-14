@@ -169,6 +169,10 @@ print("Number of mapped files with processed results: {}".format(final_mapped_ra
 output_file = "_emp_500_lcms_metabolomics/mapped_raw_data_files_20250812_batch1.csv"
 final_mapped_raw_data_files_with_data.to_csv(output_file, index=False)
 
+##### Save a test version (5 random samples)
+test_output_file = "_emp_500_lcms_metabolomics/mapped_raw_data_files_20250812_batch1_test.csv"
+final_mapped_raw_data_files_with_data.sample(n=5).to_csv(test_output_file, index=False)
+
 """
 #TODO:
 Fix processing institution, add processinging institution for other parts.
