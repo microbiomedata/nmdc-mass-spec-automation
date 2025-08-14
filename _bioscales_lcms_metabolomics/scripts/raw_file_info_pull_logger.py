@@ -6,7 +6,6 @@ import logging
 from datetime import datetime
 import csv
 
-from corems.mass_spectra.input.rawFileReader import ImportMassSpectraThermoMSFileReader
 from corems.mass_spectra.input.mzml import MZMLSpectraParser
 
 
@@ -41,10 +40,10 @@ def get_raw_file_info_single(
     """
     try:
         if file_in.suffix.lower() == ".raw":
-            parser = ImportMassSpectraThermoMSFileReader(file_in)
+            raise ValueError("Raw file parsing not implemented. Please use mzML files.")
         elif file_in.suffix.lower() == ".mzml":
             parser = MZMLSpectraParser(file_in)
-        myLCMSobj = parser.get_lcms_obj(spectra="none")
+        myLCMSobj = parser.get_lcms_obj(spectra='ms1') #TODO KRH: Fix this bug in corems; should be able to parse mzML with spectra='none'
 
         # Get file metadata
         instrument_info = parser.get_instrument_info()
@@ -215,7 +214,7 @@ if __name__ == "__main__":
         "/Users/heal742/Library/CloudStorage/OneDrive-PNNL/Documents/_DMS_data/_NMDC/_massive/_bioscales_lcms/to_process"
     )
     out_dir = Path("/Users/heal742/LOCAL/05_NMDC/02_MetaMS/data_processing/_bioscales_lcms_metabolomics/bioscales_file_info")
-    cores = 6
+    cores = 7
 
     get_all_raw_file_info(
         file_dir=file_dir,

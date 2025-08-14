@@ -1,0 +1,9 @@
+2025-08-06 17:00:35,241 - INFO - Found 1368 files to process
+2025-08-06 17:00:35,241 - INFO - Results will be written to: /Users/heal742/LOCAL/05_NMDC/02_MetaMS/data_processing/_bioscales_lcms_metabolomics/bioscales_file_info/raw_file_info_20250806_170035.csv
+2025-08-06 17:00:35,241 - INFO - Errors will be logged to: /Users/heal742/LOCAL/05_NMDC/02_MetaMS/data_processing/_bioscales_lcms_metabolomics/bioscales_file_info/processing_errors_20250806_170035.csv
+2025-08-06 17:16:17,272 - INFO - Processing complete!
+2025-08-06 17:16:17,273 - INFO - Successfully processed: 1365 files
+2025-08-06 17:16:17,273 - INFO - Failed to process: 3 files
+2025-08-06 17:16:17,273 - INFO - Results saved to: /Users/heal742/LOCAL/05_NMDC/02_MetaMS/data_processing/_bioscales_lcms_metabolomics/bioscales_file_info/raw_file_info_20250806_170035.csv
+2025-08-06 17:16:17,273 - INFO - Error details saved to: /Users/heal742/LOCAL/05_NMDC/02_MetaMS/data_processing/_bioscales_lcms_metabolomics/bioscales_file_info/processing_errors_20250806_170035.csv
+2025-08-06 17:16:17,273 - INFO - Processing log saved to: /Users/heal742/LOCAL/05_NMDC/02_MetaMS/data_processing/_bioscales_lcms_metabolomics/bioscales_file_info/processing_errors_20250806_170035.log
