@@ -124,7 +124,8 @@ final_mapped_raw_data_files["raw_data_file"] = raw_data_dir + "/" + final_mapped
 final_mapped_raw_data_files["processed_data_directory"] = "/Users/heal742/Library/CloudStorage/OneDrive-PNNL/Documents/_DMS_data/_NMDC/_massive/_emp500_lcms/processed_20250716/" + final_mapped_raw_data_files["raw_data_file_short"].str.replace('.raw', '.corems')
 final_mapped_raw_data_files["mass_spec_configuration_name"] = "LC-MS Metabolomics Method for EMP 500 Samples"
 final_mapped_raw_data_files["chromat_configuration_name"] = "LC-MS Chromatography Configuration for EMP 500 Samples"
-final_mapped_raw_data_files["execution_resource"] = "EMSL"
+final_mapped_raw_data_files["processing_institution_workflow"] = "NMDC"
+final_mapped_raw_data_files["processing_institution_generation"] = "UCSD"
 final_mapped_raw_data_files["instrument_used"] = "QExactHF03" #TODO KRH: Update this if/when we put in changesheets for instrument names
 
 ##### Merge the raw data files to the instrument data from _emp_500_lcms_metabolomics/raw_file_info_TIMESTAMP.csv ============
@@ -144,9 +145,9 @@ with open(ftp_file, "r") as f:
 ftp_locs = [loc.split(" ")[-1] for loc in ftp_locs]
 ftp_locs_df = pd.DataFrame(ftp_locs, columns=["ftp_location"])
 ftp_locs_df.drop_duplicates(inplace=True)
-ftp_locs_df["url"] = ftp_locs_df["ftp_location"].apply(convert_ftp_to_https_massive)
+ftp_locs_df["raw_data_url"] = ftp_locs_df["ftp_location"].apply(convert_ftp_to_https_massive)
 ftp_locs_df["raw_data_file_short"] = ftp_locs_df["ftp_location"].str.extract(r'([^/]+\.raw)$')[0]
-final_mapped_raw_data_files = final_mapped_raw_data_files.merge(ftp_locs_df[["raw_data_file_short", "url"]], on="raw_data_file_short", how="left")
+final_mapped_raw_data_files = final_mapped_raw_data_files.merge(ftp_locs_df[["raw_data_file_short", "raw_data_url"]], on="raw_data_file_short", how="left")
 
 ##### Check that the final_mapped_raw_data_files is the correct length (same as raw_data_files_df) ============
 # This is just to make sure nothing got merged wrong
