@@ -4,3 +4,4 @@ venv/
 *.hdf5
 
 __pycache__/
+.env
