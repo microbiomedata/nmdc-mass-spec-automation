@@ -13,11 +13,10 @@ if __name__ == "__main__":
     db = generator.start_nmdc_database()
 
     # Generate instrument records 
-    #TODO KRH: Add instrument record for Thermo Orbitrap IQ-X Tribrid (IQX)
     instrument = generator.generate_instrument(
         name="Thermo Orbitrap IQ-X Tribrid",
         description="Thermo Orbitrap IQ-X Tribrid (IQX) mass spectrometer.",
-        model="orbitrap_eclipse_tribid",  #TODO KRH: Chang to orbitrap_iqx_tribrid when available in schema
+        model="orbitrap_iqx_tribrid",
         vendor="thermo_fisher",
         CLIENT_ID=client_id,
         CLIENT_SECRET=client_secret

@@ -1,12 +1,12 @@
 {
   "instrument_set": [
     {
-      "id": "nmdc:inst-11-fe930w46",
+      "id": "nmdc:inst-12-0x1cy335",
       "type": "nmdc:Instrument",
       "name": "Thermo Orbitrap IQ-X Tribrid",
       "description": "Thermo Orbitrap IQ-X Tribrid (IQX) mass spectrometer.",
       "vendor": "thermo_fisher",
-      "model": "orbitrap_eclipse_tribid"
+      "model": "orbitrap_iqx_tribrid"
     }
   ],
   "@type": "Database"
