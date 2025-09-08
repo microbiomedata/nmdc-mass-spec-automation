@@ -36,3 +36,15 @@ Metadata saved here: `_bioscales_lcms_metabolomics/metadata/instrument.json`
 # Sample mapping
 Files are mapped to exisiting NMDC biosamples, configurations, and instruments in the script `_bioscales_lcms_metabolomics/scripts/biosample_mapper.py`.
 Output are written to `_bioscales_lcms_metabolomics/metadata/mapped_biosamples.json`.
+
+# Generate four batches of processing scripts
+The script `_bioscales_lcms_metabolomics/scripts/wdl_json_prepper.py` generates four types of json files for processing the data in four batches:
+- RP positive mode
+- RP negative mode
+- HILIC positive mode
+- HILIC negative mode
+
+These use the configurations and mapped biosamples generated in the previous steps.
+
+# Shell script to run the batches: `_bioscales_lcms_metabolomics/scripts/bioscales_metams_wdl_runner.sh`
+`bash /Users/heal742/LOCAL/05_NMDC/02_MetaMS/data_processing/_bioscales_lcms_metabolomics/scripts/bioscales_metams_wdl_runner.sh`
