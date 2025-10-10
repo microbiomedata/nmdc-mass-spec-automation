@@ -33,9 +33,13 @@ New instrument used in this study: "Thermo Orbitrap IQ-X Tribrid (IQX) mass spec
 Script to generate this here: `_bioscales_lcms_metabolomics/scripts/instrument_generation.py`
 Metadata saved here: `_bioscales_lcms_metabolomics/metadata/instrument.json`
 
-# Sample mapping
+# Sample mapping and metadata generation input file prep
 Files are mapped to exisiting NMDC biosamples, configurations, and instruments in the script `_bioscales_lcms_metabolomics/scripts/biosample_mapper.py`.
 Output are written to `_bioscales_lcms_metabolomics/metadata/mapped_biosamples.json`.
+
+Instrument start/end times, instrument details, and raw file names are pulled from the output of the `scripts/raw_file_info_pull_logger.py` script, which is saved as `_bioscales_lcms_metabolomics/bioscales_file_info/raw_file_info_TIMESTAMP.csv`.
+
+These are combined to prepare the metadata generation input file in the script `_bioscales_lcms_metabolomics/scripts/workflow_metadata_prepper.py`.
 
 # Generate four batches of processing scripts
 The script `_bioscales_lcms_metabolomics/scripts/wdl_json_prepper.py` generates four types of json files for processing the data in four batches:

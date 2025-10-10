@@ -35,9 +35,9 @@ def generate_batch_jsons(
     corems_toml,
     db_location,
     scan_translator_path,
-    cores=1,
+    cores=5,
     output_dir="output",
-    batch_size=50,
+    batch_size=10,
     json_output_dir=".",
     problem_files=None,
 ):
@@ -56,7 +56,7 @@ def generate_batch_jsons(
     processed_data_files = [
         f.replace(str(Path(processed_data_dir)), "")
         .lstrip("/")
-        .replace(".corems", ".raw")
+        .replace(".corems", ".mzML")
         for f in processed_data_files
     ]
     raw_data_files = [
@@ -112,7 +112,8 @@ def generate_batch_jsons(
 
 
 if __name__ == "__main__":
-    raw_data_dir = "/Users/heal742/Library/CloudStorage/OneDrive-PNNL/Documents/_DMS_data/_NMDC/_massive/_bioscales_lcms/to_process"
+    raw_data_dir = "/Users/heal742/LOCAL/staging"
+    all_expected = False
 
     # Read in the metadata file
     mapped_metadata = pd.read_csv(
@@ -129,10 +130,12 @@ if __name__ == "__main__":
     ]["raw_data_file_short"].to_list()
     rp_pos_files = [raw_data_dir + "/" + f for f in rp_pos_files]
     # check that all files exist
-    if not all(Path(f).exists() for f in rp_pos_files):
-        missing_files = [f for f in rp_pos_files if not Path(f).exists()]
-        print(f"Warning: Some RP positive files do not exist: {missing_files}")
-        assert False, "Some RP positive files are missing, please check."
+    if all_expected:
+        if not all(Path(f).exists() for f in rp_pos_files):
+            missing_files = [f for f in rp_pos_files if not Path(f).exists()]
+            print(f"Warning: Some RP positive files do not exist: {missing_files}")
+            assert False, "Some RP positive files are missing, please check."
+    rp_pos_files = [f for f in rp_pos_files if Path(f).exists()]
     print(f"Total RP positive files: {len(rp_pos_files)}")
 
     # RP, negative mode
@@ -143,10 +146,12 @@ if __name__ == "__main__":
         ) & (mapped_metadata["mass_spec_configuration_name"].str.contains("negative", case=False, na=False))
     ]["raw_data_file_short"].to_list()
     rp_neg_files = [raw_data_dir + "/" + f for f in rp_neg_files]
-    if not all(Path(f).exists() for f in rp_neg_files):
-        missing_files = [f for f in rp_neg_files if not Path(f).exists()]
-        print(f"Warning: Some RP negative files do not exist: {missing_files}")
-        assert False, "Some RP negative files are missing, please check."
+    if all_expected:
+        if not all(Path(f).exists() for f in rp_neg_files):
+            missing_files = [f for f in rp_neg_files if not Path(f).exists()]
+            print(f"Warning: Some RP negative files do not exist: {missing_files}")
+            assert False, "Some RP negative files are missing, please check."
+    rp_neg_files = [f for f in rp_neg_files if Path(f).exists()]
     print(f"Total RP negative files: {len(rp_neg_files)}")
 
     # HILIC, positive mode
@@ -157,10 +162,12 @@ if __name__ == "__main__":
         ) & (mapped_metadata["mass_spec_configuration_name"].str.contains("positive", case=False, na=False))
     ]["raw_data_file_short"].to_list()
     hilic_pos_files = [raw_data_dir + "/" + f for f in hilic_pos_files]
-    if not all(Path(f).exists() for f in hilic_pos_files):  
-        missing_files = [f for f in hilic_pos_files if not Path(f).exists()]
-        print(f"Warning: Some HILIC positive files do not exist: {missing_files}")
-        assert False, "Some HILIC positive files are missing, please check."
+    if all_expected:
+        if not all(Path(f).exists() for f in hilic_pos_files):
+            missing_files = [f for f in hilic_pos_files if not Path(f).exists()]
+            print(f"Warning: Some HILIC positive files do not exist: {missing_files}")
+            assert False, "Some HILIC positive files are missing, please check."
+    hilic_pos_files = [f for f in hilic_pos_files if Path(f).exists()]
     print(f"Total HILIC positive files: {len(hilic_pos_files)}")
 
     # HILIC, negative mode
@@ -171,14 +178,16 @@ if __name__ == "__main__":
         ) & (mapped_metadata["mass_spec_configuration_name"].str.contains("negative", case=False, na=False))
     ]["raw_data_file_short"].to_list()
     hilic_neg_files = [raw_data_dir + "/" + f for f in hilic_neg_files]
-    if not all(Path(f).exists() for f in hilic_neg_files):
-        missing_files = [f for f in hilic_neg_files if not Path(f).exists()]
-        print(f"Warning: Some HILIC negative files do not exist: {missing_files}")
-        assert False, "Some HILIC negative files are missing, please check."
+    if all_expected:
+        if not all(Path(f).exists() for f in hilic_neg_files):
+            missing_files = [f for f in hilic_neg_files if not Path(f).exists()]
+            print(f"Warning: Some HILIC negative files do not exist: {missing_files}")
+            assert False, "Some HILIC negative files are missing, please check."
+    hilic_neg_files = [f for f in hilic_neg_files if Path(f).exists()]
     print(f"Total HILIC negative files: {len(hilic_neg_files)}")
 
     # Must be set for the script to run
-    processed_data_dir = "/Users/heal742/Library/CloudStorage/OneDrive-PNNL/Documents/_DMS_data/_NMDC/_massive/_bioscales_lcms/processed_20250908"
+    processed_data_dir = "/Users/heal742/Library/CloudStorage/OneDrive-PNNL/Documents/_DMS_data/_NMDC/_massive/_bioscales_lcms/processed_20251010"
     corems_rp_toml = "/Users/heal742/LOCAL/05_NMDC/02_MetaMS/data_processing/_bioscales_lcms_metabolomics/metadata/bioscales_rp_corems.toml"
     corems_hilic_toml = "/Users/heal742/LOCAL/05_NMDC/02_MetaMS/data_processing/_bioscales_lcms_metabolomics/metadata/bioscales_hilic_corems.toml"
     db_location = "/Users/heal742/LOCAL/05_NMDC/02_MetaMS/metams/test_data/test_lcms_metab_data/20250407_database.msp"
@@ -191,9 +200,9 @@ if __name__ == "__main__":
     assert Path(scan_translator_path).exists(), f"Scan translator file does not exist: {scan_translator_path}"
 
     # Optional arguments
-    cores = 1
+    cores = 5
     output_dir = "output"
-    batch_size = 50
+    batch_size = 100
 
     files = [rp_pos_files, rp_neg_files, hilic_pos_files, hilic_neg_files]
     output_dirs = ["rp_pos", "rp_neg", "hilic_pos", "hilic_neg"]

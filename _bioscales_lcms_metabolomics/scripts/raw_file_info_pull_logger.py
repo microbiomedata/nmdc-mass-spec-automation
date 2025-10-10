@@ -43,7 +43,7 @@ def get_raw_file_info_single(
             raise ValueError("Raw file parsing not implemented. Please use mzML files.")
         elif file_in.suffix.lower() == ".mzml":
             parser = MZMLSpectraParser(file_in)
-        myLCMSobj = parser.get_lcms_obj(spectra='ms1') #TODO KRH: Fix this bug in corems; should be able to parse mzML with spectra='none'
+        myLCMSobj = parser.get_lcms_obj(spectra='none')
 
         # Get file metadata
         instrument_info = parser.get_instrument_info()
