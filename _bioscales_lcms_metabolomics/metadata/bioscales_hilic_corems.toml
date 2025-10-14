@@ -27,6 +27,7 @@ include_fragment_types = false
 export_profile_spectra = false
 export_eics = false
 export_unprocessed_ms1 = false
+export_only_relevant_mass_spectra = true
 verbose_processing = false
 ph_inten_min_rel = 0.001
 ph_persis_min_rel = 0.001

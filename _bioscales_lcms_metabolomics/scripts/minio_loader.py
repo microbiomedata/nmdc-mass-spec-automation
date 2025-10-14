@@ -6,22 +6,9 @@
 # MINIO_SECRET_KEY
 
 import os
-import hashlib
 from minio import Minio
 from minio.error import S3Error
 from tqdm import tqdm
-
-def calculate_file_checksums(file_path):
-    """Calculate MD5 and SHA256 checksums for a file."""
-    md5_hash = hashlib.md5()
-    sha256_hash = hashlib.sha256()
-    
-    with open(file_path, 'rb') as f:
-        for chunk in iter(lambda: f.read(8192), b""):
-            md5_hash.update(chunk)
-            sha256_hash.update(chunk)
-    
-    return md5_hash.hexdigest(), sha256_hash.hexdigest()
 
 def upload_files(minio_client, bucket_name, directory, folder_name):
     # Collect all files
@@ -39,30 +26,14 @@ def upload_files(minio_client, bucket_name, directory, folder_name):
         try:
             minio_client.stat_object(bucket_name, object_name)
             tqdm.write(f"Object {object_name} already exists. Skipping.")
-            os.remove(file_path)
-            tqdm.write(f"Deleted local file: {file_path}")
             continue
         except S3Error as e:
             if e.code != 'NoSuchKey':
                 tqdm.write(f"Error checking if object exists: {e}")
                 continue
         try:
-            # Calculate checksums
-            md5_checksum, sha256_checksum = calculate_file_checksums(file_path)
-            
-            # Create metadata with checksums
-            metadata = {
-                'checksum-md5': md5_checksum,
-                'checksum-sha256': sha256_checksum
-            }
-            
-            minio_client.fput_object(bucket_name, object_name, file_path, metadata=metadata)
+            minio_client.fput_object(bucket_name, object_name, file_path)
             tqdm.write(f"Uploaded {file_path} to {bucket_name}/{object_name}")
-            
-            # Delete local file after successful upload
-            os.remove(file_path)
-            tqdm.write(f"Deleted local file: {file_path}")
-            
         except S3Error as e:
             tqdm.write(f"Failed to upload {file_path} to {bucket_name}/{object_name}")
             tqdm.write(str(e))
@@ -74,8 +45,8 @@ if __name__ == '__main__':
                          secret_key=os.environ["MINIO_SECRET_KEY"],
                          secure=True)
     bucket_name = "metabolomics"  # Specify the bucket name
-    folder_name = "bioscales_11_r2h77870/processed_20250908"  # Specify the folder name within the bucket
-    directory = "/Users/heal742/Library/CloudStorage/OneDrive-PNNL/Documents/_DMS_data/_NMDC/_massive/_bioscales_lcms/processed_20250908"
+    folder_name = "bioscales_11_r2h77870/processed_20251013"  # Specify the folder name within the bucket
+    directory = "/Users/heal742/LOCAL/staging_processed/processed_20251013"
     # Check if the bucket exists
     if not minio_client.bucket_exists(bucket_name):
         print(f"Bucket {bucket_name} does not exist.")

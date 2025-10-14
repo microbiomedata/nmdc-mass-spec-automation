@@ -187,7 +187,7 @@ if __name__ == "__main__":
     print(f"Total HILIC negative files: {len(hilic_neg_files)}")
 
     # Must be set for the script to run
-    processed_data_dir = "/Users/heal742/Library/CloudStorage/OneDrive-PNNL/Documents/_DMS_data/_NMDC/_massive/_bioscales_lcms/processed_20251010"
+    processed_data_dir = "/Users/heal742/LOCAL/staging_processed/processed_20251013"
     corems_rp_toml = "/Users/heal742/LOCAL/05_NMDC/02_MetaMS/data_processing/_bioscales_lcms_metabolomics/metadata/bioscales_rp_corems.toml"
     corems_hilic_toml = "/Users/heal742/LOCAL/05_NMDC/02_MetaMS/data_processing/_bioscales_lcms_metabolomics/metadata/bioscales_hilic_corems.toml"
     db_location = "/Users/heal742/LOCAL/05_NMDC/02_MetaMS/metams/test_data/test_lcms_metab_data/20250407_database.msp"
@@ -202,7 +202,7 @@ if __name__ == "__main__":
     # Optional arguments
     cores = 5
     output_dir = "output"
-    batch_size = 100
+    batch_size = 50
 
     files = [rp_pos_files, rp_neg_files, hilic_pos_files, hilic_neg_files]
     output_dirs = ["rp_pos", "rp_neg", "hilic_pos", "hilic_neg"]
