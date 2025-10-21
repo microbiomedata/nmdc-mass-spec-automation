@@ -18,11 +18,12 @@ wget --spider -r -nd ftp://massive-ftp.ucsd.edu/v08/MSV000095476/raw -o _ecofab_
 Next download the raw files using the `_ecofab_lcms_11_ev70y104/scripts/file_puller.py`.
 This will download files to `/Users/heal742/Library/CloudStorage/OneDrive-PNNL/Documents/_DMS_data/_NMDC/_massive/_ecofab_lcms/to_process` and write a file `_ecofab_lcms_11_ev70y104/ftp_locs.csv` with the ftp locations of the files that were downloaded and the raw file name.  Note that this will not download files that do not have "MS2" in the file name (this removes the QC files and those collected in only MS1).
 
-# WIP below, still need to be updated for this study
+# Inspect raw data files' metadata
 To get start and end times, instrument details using `scripts/raw_file_info_pull_logger.py` script (writes `_ecofab_lcms_11_ev70y104/raw_file_info_TIMESTAMP.csv` and `_ecofab_lcms_11_ev70y104/processing_errors_TIMESTAMP.csv`).
 Inspect the output csv files to make sure everything looks good and determine if we need to generate any new configurations or instrument records.
 
 # Sample mapping and metadata generation input file prep
+
 Files are mapped to exisiting NMDC biosamples, configurations, and instruments in the script `_bioscales_lcms_metabolomics/scripts/biosample_mapper.py`.
 Output are written to `_bioscales_lcms_metabolomics/metadata/mapped_biosamples.json`.
 

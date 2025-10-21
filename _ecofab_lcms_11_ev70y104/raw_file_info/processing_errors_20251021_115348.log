@@ -1,0 +1,7 @@
+2025-10-21 11:53:48,117 - INFO - Found 154 files to process
+2025-10-21 11:53:48,117 - INFO - Results will be written to: /Users/heal742/LOCAL/05_NMDC/02_MetaMS/data_processing/_ecofab_lcms_11_ev70y104/raw_file_info/raw_file_info_20251021_115348.csv
+2025-10-21 11:53:48,117 - INFO - Errors will be logged to: /Users/heal742/LOCAL/05_NMDC/02_MetaMS/data_processing/_ecofab_lcms_11_ev70y104/raw_file_info/processing_errors_20251021_115348.csv
+2025-10-21 11:56:02,445 - INFO - Processing complete!
+2025-10-21 11:56:02,445 - INFO - Successfully processed: 154 files
+2025-10-21 11:56:02,445 - INFO - Failed to process: 0 files
+2025-10-21 11:56:02,445 - INFO - Results saved to: /Users/heal742/LOCAL/05_NMDC/02_MetaMS/data_processing/_ecofab_lcms_11_ev70y104/raw_file_info/raw_file_info_20251021_115348.csv
