@@ -1,0 +1,50 @@
+{
+    "study": {
+        "name": "example_study",
+        "id": "nmdc:sty-11-example",
+        "description": "Example NMDC metabolomics study configuration",
+        "massive_id": "v07/MSV000012345",
+        "file_type": ".raw",
+        "file_filters": ["pos", "neg", "hilic", "rp"]
+    },
+    "paths": {
+        "base_directory": "/path/to/your/data_processing",
+        "raw_data_directory": "/path/to/raw/data",
+        "processed_data_directory": "/path/to/processed/data"
+    },
+    "minio": {
+        "endpoint": "admin.nmdcdemo.emsl.pnl.gov",
+        "secure": true,
+        "bucket": "metabolomics"
+    },
+    "configurations": [
+        {
+            "name": "hilic_pos",
+            "file_filter": ["hilic", "pos"],
+            "corems_toml": "/path/to/hilic_pos_corems.toml",
+            "msp_file": "/path/to/database.msp",
+            "scan_translator": "/path/to/scan_translator.toml",
+            "cores": 5
+        },
+        {
+            "name": "hilic_neg",
+            "file_filter": ["hilic", "neg"],
+            "corems_toml": "/path/to/hilic_neg_corems.toml",
+            "msp_file": "/path/to/database.msp",
+            "scan_translator": "/path/to/scan_translator.toml",
+            "cores": 5
+        },
+        {
+            "name": "rp_pos",
+            "file_filter": ["rp", "pos"],
+            "corems_toml": "/path/to/rp_pos_corems.toml", 
+            "msp_file": "/path/to/database.msp",
+            "scan_translator": "/path/to/scan_translator.toml",
+            "cores": 5
+        }
+    ],
+    "workflow": {
+        "batch_size": 25,
+        "docker_image": "local-metams:latest"
+    }
+}
