@@ -52,7 +52,6 @@
         }
     ],
     "workflow": {
-        "batch_size": 25,
-        "docker_image": "local-metams:latest"
+        "batch_size": 25
     }
 }
