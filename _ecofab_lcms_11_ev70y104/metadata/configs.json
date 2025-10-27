@@ -1,0 +1,28 @@
+{
+  "configuration_set": [
+    {
+      "id": "nmdc:mscon-11-xxc60w21",
+      "type": "nmdc:MassSpectrometryConfiguration",
+      "name": "JGI/LBNL Standard Metabolomics Method, positive @20 CE",
+      "description": "Mass spectrometry configuration for LC-MS metabolomics data for standard JGI/LBNL Metabolomics analysis, positive polarity. This configuration uses an Orbitrap mass spectrometer with data-dependent acquisition with HCD fragmentation at 20 eV",
+      "protocol_link": {
+        "type": "nmdc:Protocol",
+        "url": "https://www.protocols.io/view/jgi-lbnl-metabolomics-standard-lc-ms-ms-esi-method-kxygxydwkl8j/v1",
+        "name": "JGI/LBNL Metabolomics - Standard LC-MS/MS ESI Method - Polar HILIC-Z"
+      },
+      "mass_spectrometry_acquisition_strategy": "data_dependent_acquisition",
+      "resolution_categories": [
+        "high"
+      ],
+      "mass_analyzers": [
+        "Orbitrap"
+      ],
+      "ionization_source": "electrospray_ionization",
+      "mass_spectrum_collection_modes": [
+        "centroid"
+      ],
+      "polarity_mode": "positive"
+    }
+  ],
+  "@type": "Database"
+}

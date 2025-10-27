@@ -46,7 +46,7 @@ if __name__ == "__main__":
     ftp_df.to_csv("_bioscales_lcms_metabolomics/bioscales_ftp_locs.csv", index=False)
 
     # Define the directory to save downloaded files
-    download_dir = '/Users/heal742/Library/CloudStorage/OneDrive-PNNL/Documents/_DMS_data/_NMDC/_massive/_bioscales_lcms/to_process'
+    download_dir = '/Volumes/LaCie/nmdc_data/_bioscales_lcms/raw'
     
     # Ensure the download directory exists
     os.makedirs(download_dir, exist_ok=True)
