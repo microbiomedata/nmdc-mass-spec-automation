@@ -52,3 +52,5 @@ These use the configurations and mapped biosamples generated in the previous ste
 
 # Shell script to run the batches: `_bioscales_lcms_metabolomics/scripts/bioscales_metams_wdl_runner.sh`
 `bash /Users/heal742/LOCAL/05_NMDC/02_MetaMS/data_processing/_bioscales_lcms_metabolomics/scripts/bioscales_metams_wdl_runner.sh`
+
+# Metadata generation

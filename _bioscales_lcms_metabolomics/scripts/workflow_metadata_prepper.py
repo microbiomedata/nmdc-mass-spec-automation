@@ -10,7 +10,12 @@ def add_raw_data_file(mapped_df, raw_data_dir):
 
 def add_processed_data_directory(mapped_df, processed_data_dir):
     # Add processed_data_directory column by prefixing with the processed_data_dir
-    mapped_df['processed_data_directory'] = processed_data_dir + mapped_df['raw_data_file_short'] + '.corems/'
+    # remove any trailing .mzML (case-insensitive) before appending .corems
+    mapped_df['processed_data_directory'] = (
+        processed_data_dir
+        + mapped_df['raw_data_file_short'].str.replace(r'(?i)\.mzml$', '', regex=True)
+        + '.corems'
+    )
     return mapped_df
 
 def add_instrument_times(mapped_df, file_info_file, serial_numbers_to_remove=None):
@@ -52,13 +57,6 @@ def separate_by_config(mapped_df):
             (mapped_df['mass_spec_configuration_name_short'] == mass_spec) & 
             (mapped_df['chromat_configuration_name'] == chromat) 
         ]
-        # Remove rows where processed_data_directory does not exist in operating system at path directed
-        for i, r in subset_df.iterrows():
-            pass
-            #if not os.path.exists(r['processed_data_directory']):
-            #    subset_df = subset_df.drop(i)
-            #
-            #TODO KRH: Figure this out - outside of OneDrive / use staging area
         if len(subset_df) == 0:
             print(f"No valid rows for configuration {mass_spec} and {chromat}, skipping.")
             continue
@@ -102,20 +100,21 @@ if __name__ == "__main__":
     )
     mapped_df = add_raw_data_file(
         mapped_df, 
-        raw_data_dir='/Users/heal742/Library/CloudStorage/OneDrive-PNNL/Documents/_DMS_data/_NMDC/_massive/_bioscales_lcms/to_process/'
+        raw_data_dir='/Volumes/LaCie/nmdc_data/_bioscales_lcms/raw/'
     )
     mapped_df = add_processed_data_directory(
         mapped_df, 
-        processed_data_dir='/Users/heal742/Library/CloudStorage/OneDrive-PNNL/Documents/_DMS_data/_NMDC/_massive/_bioscales_lcms/processed_20251010/'
+        processed_data_dir='/Volumes/LaCie/nmdc_data/_bioscales_lcms/processed_20251013/'
     )
     mapped_df['processing_institution_workflow'] = "NMDC"
     mapped_df['processing_institution_generation'] = "JGI"
     mapped_df['raw_data_url'] = mapped_df['url']
+    mapped_df['sample_id'] = mapped_df['biosample_id']
 
 
     # Reorder for readability
     final_columns = [
-        'biosample_id',"biosample.associated_studies", "raw_data_file", 'processed_data_directory', 'mass_spec_configuration_name',
+        'sample_id',"biosample.associated_studies", "raw_data_file", 'processed_data_directory', 'mass_spec_configuration_name',
         'chromat_configuration_name', 'instrument_used', 'processing_institution_workflow', 'processing_institution_generation',
         'instrument_analysis_end_date', 'instrument_instance_specifier',
         'raw_data_url'
