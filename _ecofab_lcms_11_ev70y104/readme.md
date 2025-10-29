@@ -32,6 +32,3 @@ The script `_ecofab_lcms_11_ev70y104/scripts/wdl_json_generator.py` will generat
 Output files are written to `_ecofab_lcms_11_ev70y104/wdl_jsons/`.  Note only HILIC POS data are included, so only one batch is needed.
 
 These use the configurations and mapped biosamples generated in the previous steps.
-
-# Shell script to run the batches: `_bioscales_lcms_metabolomics/scripts/bioscales_metams_wdl_runner.sh`
-`bash /Users/heal742/LOCAL/05_NMDC/02_MetaMS/data_processing/_bioscales_lcms_metabolomics/scripts/bioscales_metams_wdl_runner.sh`
