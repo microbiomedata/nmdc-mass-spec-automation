@@ -15,6 +15,9 @@
         "processed_data_directory": "/Volumes/LaCie/nmdc_data/_kroeger_11_dwsv7q78/processed_20251027",
         "wdl_workspace": "/Users/heal742/LOCAL/05_NMDC/02_MetaMS/metams"
     },
+    "virtual_environments": {
+        "corems_env": "/Users/heal742/LOCAL/corems_dev/corems/venv"
+    },
     "minio": {
         "endpoint": "admin.nmdcdemo.emsl.pnl.gov",
         "secure": true,
@@ -75,6 +78,7 @@
         "biosample_attributes_fetched": true,
         "biosample_mapping_script_generated": true,
         "biosample_mapping_completed": true,
+        "raw_data_inspected": true,
         "wdls_generated": true,
         "data_processed": false
     }

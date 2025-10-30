@@ -55,28 +55,40 @@ def main():
     else:
         print("✅ Biosample mapping completed successfully")
     
-    # Step 5: Generate WDL JSON files for processing
-    print("\n5. Generating WDL JSON files...")
+    # Step 5: Inspect raw data files for metadata and QC
+    print("\n5. Inspecting raw data files...")
+    inspection_result = study.raw_data_inspector(
+        cores=4,    # Use multiple cores for faster processing
+        limit=None  # Process all files
+    )
+    if inspection_result:
+        print(f"✅ Raw data inspection completed: {inspection_result}")
+    else:
+        print("⚠️  Raw data inspection completed but no results returned")
+    
+    # Step 6: Generate WDL JSON files for processing
+    print("\n6. Generating WDL JSON files...")
     json_count = study.generate_wdl_jsons()
     print(f"WDL JSON files: {json_count}")
     
-    # Step 6: Generate WDL runner script
-    print("\n6. Generating WDL runner script...")
+    # Step 7: Generate WDL runner script
+    print("\n7. Generating WDL runner script...")
     script_path = study.generate_wdl_runner_script()
     print(f"Generated script: {script_path}")
     
-    # Step 7: Run WDL workflows
-    print("\n7. Running WDL workflows...")
+    # Step 8: Run WDL workflows
+    print("\n8. Running WDL workflows...")
     study.run_wdl_script(script_path)
     assert study.should_skip('data_processed'), "WDL workflows must complete successfully to proceed"
+
+    # Step 9: Upload processed data to MinIO
+    print("\n9. Uploading processed data to MinIO...")
+    #study.upload_to_minio()
            
     print("\n=== NEXT STEPS ===")
-    print("1. Use study.upload_to_minio() to upload processed results")
-    print("2. Use study.download_from_minio() to download results elsewhere")
     #TODO: these next steps don't exist yet
-    print("3. Use study.raw_data_inspector() to review raw data files to get configurations and parameters correct as well as start and end times for metadata")
-    print("4. Make a mapping file that links raw and processed data to NMDC biosample IDs and other necessary input to metadata generation")
-    print("5. Use study.generate_nmdc_submission() to create NMDC submission packages for processed data")
+    print("2. Make a mapping file that links raw and processed data to NMDC biosample IDs and other necessary input to metadata generation")
+    print("3. Use study.generate_nmdc_submission() to create NMDC submission packages for processed data")
     
     print(f"\nStudy directory: {study.study_path}")
     print(f"WDL runner script: {script_path}")

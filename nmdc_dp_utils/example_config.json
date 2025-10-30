@@ -10,7 +10,11 @@
     "paths": {
         "base_directory": "/path/to/your/data_processing",
         "raw_data_directory": "/path/to/raw/data",
-        "processed_data_directory": "/path/to/processed/data"
+        "processed_data_directory": "/path/to/processed/data",
+        "wdl_workspace": "/path/to/wdl/workspace"
+    },
+    "virtual_environments": {
+        "corems_env": "/path/to/corems/venv"
     },
     "minio": {
         "endpoint": "admin.nmdcdemo.emsl.pnl.gov",
@@ -53,6 +57,7 @@
         "biosample_attributes_fetched": false,
         "biosample_mapping_script_generated": false,
         "biosample_mapping_completed": false,
+        "raw_data_inspected": false,
         "wdls_generated": false,
         "data_processed": false
     }

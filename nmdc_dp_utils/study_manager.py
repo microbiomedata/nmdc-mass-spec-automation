@@ -15,6 +15,8 @@ import os
 import json
 import re
 import shutil
+import subprocess
+import sys
 import pandas as pd
 from pathlib import Path
 from minio import Minio
@@ -1239,6 +1241,10 @@ fi
             
             if result.returncode == 0:
                 print("🎉 All WDL workflows completed successfully!")
+                
+                # Move processed output files to the designated location
+                self._move_processed_files(working_dir)
+                
                 self.set_skip_trigger('data_processed', True)
             else:
                 print(f"⚠️  Some workflows failed (exit code: {result.returncode})")
@@ -1262,6 +1268,77 @@ fi
             # Always return to original directory
             os.chdir(original_dir)
             print(f"🔙 Returned to original directory: {original_dir}")
+    
+    def _move_processed_files(self, working_dir: str) -> None:
+        """
+        Move processed output files from working directory to designated processed data location.
+        
+        Searches for directories ending with .corems in the working directory and moves them
+        to the processed data directory specified in the configuration. Only moves directories
+        that contain CSV files (indicating successful processing).
+        
+        Args:
+            working_dir: Directory where WDL workflows were executed and output files created
+            
+        Note:
+            Uses config['paths']['processed_data_directory'] as the destination.
+            Creates the destination directory if it doesn't exist.
+        """
+        import shutil
+        
+        working_path = Path(working_dir)
+        processed_data_dir = self.config['paths'].get('processed_data_directory')
+        
+        if not processed_data_dir:
+            print("⚠️  processed_data_directory not configured - skipping file move")
+            return
+            
+        processed_path = Path(processed_data_dir)
+        
+        # Create processed data directory if it doesn't exist
+        if not processed_path.exists():
+            processed_path.mkdir(parents=True, exist_ok=True)
+            print(f"📁 Created processed data directory: {processed_path}")
+        
+        print(f"🔍 Searching for processed files in: {working_path}")
+        print(f"📁 Moving processed files to: {processed_path}")
+        
+        moved_count = 0
+        
+        # Search for .corems directories recursively
+        for dirpath in working_path.rglob('*'):
+            if dirpath.is_dir() and dirpath.name.endswith('.corems'):
+                # Check that there is a .csv within the directory (indicates successful processing)
+                csv_files = list(dirpath.glob('*.csv'))
+                if not csv_files:
+                    print(f"  ⚠️  No .csv files found in {dirpath.name}, skipping.")
+                    continue
+                
+                # Move the entire .corems directory to processed location
+                destination = processed_path / dirpath.name
+                
+                # Handle case where destination already exists
+                if destination.exists():
+                    print(f"  ⚠️  Destination already exists: {destination.name}, skipping.")
+                    continue
+                
+                try:
+                    shutil.move(str(dirpath), str(destination))
+                    moved_count += 1
+                    print(f"  ✅ Moved {dirpath.name} -> {destination}")
+                except Exception as e:
+                    print(f"  ❌ Failed to move {dirpath.name}: {e}")
+        
+        print(f"📋 Processed file move summary:")
+        print(f"   Files moved: {moved_count}")
+        print(f"   Destination: {processed_path}")
+        
+        if moved_count > 0:
+            # Report total processed files in destination
+            total_corems = len(list(processed_path.glob('*.corems')))
+            print(f"   Total processed files in destination: {total_corems}")
+        else:
+            print("   No processed files were moved")
     
     def get_biosample_attributes(self, study_id: Optional[str] = None) -> str:
         """
@@ -1552,3 +1629,186 @@ fi
             print(f"❌ Error generating mapped files list: {e}")
             import traceback
             traceback.print_exc()
+
+    def raw_data_inspector(self, file_paths=None, cores=1, limit=None):
+        """
+        Run raw data inspection on raw files to extract metadata using CoreMS.
+        
+        This method activates a virtual environment specified in the config and runs
+        a specialized script to extract instrument metadata, scan parameters, and
+        data range information from raw MS files.
+        
+        Args:
+            file_paths (List[str], optional): List of file paths to inspect. 
+                                            If None, uses mapped raw files from metadata.
+            cores (int): Number of cores for parallel processing (default: 1)
+            limit (int, optional): Limit number of files to process (for testing)
+        
+        Returns:
+            str: Path to the output CSV file with inspection results
+        """
+        # Check skip trigger first
+        if self.should_skip('raw_data_inspected'):
+            print("⏭️  Skipping raw data inspection (skip trigger set)")
+            # Try to return existing inspection results
+            output_dir = self.study_path / "raw_file_info"
+            existing_file = output_dir / "raw_file_inspection_results.csv"
+            if existing_file.exists():
+                print(f"📊 Found existing inspection results: {existing_file}")
+                return str(existing_file)
+            return None
+        
+        print("🔍 Starting raw data inspection...")
+        
+        try:
+            # Get virtual environment path from config
+            venv_path = self.config.get('virtual_environments', {}).get('corems_env')
+            if not venv_path:
+                raise ValueError("CoreMS virtual environment path not found in config. Please add 'virtual_environments.corems_env' to your config.")
+            
+            venv_path = Path(venv_path)
+            if not venv_path.exists():
+                raise ValueError(f"Virtual environment not found at: {venv_path}")
+            
+            # Get file paths to inspect
+            if file_paths is None:
+                # Use mapped raw files if available
+                mapped_files_path = self.study_path / "metadata" / "mapped_raw_files.csv"
+                if mapped_files_path.exists():
+                    mapped_df = pd.read_csv(mapped_files_path)
+                    file_paths = mapped_df['raw_file_path'].tolist()
+                    print(f"📋 Using {len(file_paths)} mapped raw files for inspection")
+                else:
+                    # Fallback to all files in raw_data_directory
+                    raw_data_dir = Path(self.config['paths']['raw_data_directory'])
+                    file_paths = []
+                    for ext in ['*.mzML', '*.raw', '*.mzml']:  # Include lowercase variants
+                        file_paths.extend([str(f) for f in raw_data_dir.rglob(ext)])
+                    print(f"📋 Using {len(file_paths)} raw files from data directory for inspection")
+            
+            if not file_paths:
+                print("⚠️  No raw files found to inspect")
+                return None
+            
+            # Set up output directory
+            output_dir = self.study_path / "raw_file_info"
+            output_dir.mkdir(exist_ok=True)
+            
+            # Get script path
+            script_path = Path(__file__).parent / "raw_data_inspector.py"
+            if not script_path.exists():
+                raise ValueError(f"Raw data inspector script not found at: {script_path}")
+            
+            # Prepare command arguments
+            cmd_args = [
+                "--files"] + file_paths + [
+                "--output-dir", str(output_dir),
+                "--cores", str(cores)
+            ]
+            
+            if limit is not None:
+                cmd_args.extend(["--limit", str(limit)])
+            
+            # Activate virtual environment and run script
+            if sys.platform == "win32":
+                # Windows
+                python_exec = venv_path / "Scripts" / "python.exe"
+                activate_script = venv_path / "Scripts" / "activate.bat"
+            else:
+                # Unix/Linux/macOS
+                python_exec = venv_path / "bin" / "python"
+                activate_script = venv_path / "bin" / "activate"
+            
+            if not python_exec.exists():
+                raise ValueError(f"Python executable not found at: {python_exec}")
+            
+            print(f"🐍 Using Python from: {python_exec}")
+            print(f"📁 Output directory: {output_dir}")
+            print(f"🔧 Processing {len(file_paths)} files with {cores} cores")
+            
+            # Build and run command
+            cmd = [str(python_exec), str(script_path)] + cmd_args
+            
+            print(f"⚡ Running command: {' '.join(cmd[:5])}... (truncated)")
+            
+            # Run the command
+            result = subprocess.run(
+                cmd,
+                cwd=str(self.study_path),
+                capture_output=True,
+                text=True,
+                timeout=3600  # 1 hour timeout
+            )
+            
+            if result.returncode == 0:
+                print("✅ Raw data inspection completed successfully!")
+                
+                # Parse output to find the result file path
+                lines = result.stdout.strip().split('\n')
+                output_file_path = None
+                for line in lines:
+                    if "Results:" in line:
+                        output_file_path = line.split("Results:")[-1].strip()
+                        break
+                
+                if output_file_path and Path(output_file_path).exists():
+                    print(f"📊 Results saved to: {output_file_path}")
+                    
+                    # Show summary statistics
+                    try:
+                        results_df = pd.read_csv(output_file_path)
+                        print(f"📈 Inspection summary:")
+                        print(f"   Files processed: {len(results_df)}")
+                        
+                        # Count successful vs failed
+                        failed_count = len(results_df[results_df['error'].notna()])
+                        success_count = len(results_df) - failed_count
+                        print(f"   Successful: {success_count}")
+                        print(f"   Failed: {failed_count}")
+                        
+                        if success_count > 0:
+                            # Show instrument summary if available
+                            if 'instrument_model' in results_df.columns:
+                                instruments = results_df['instrument_model'].value_counts()
+                                print(f"   Instrument models: {dict(instruments)}")
+                    
+                    except Exception as e:
+                        print(f"⚠️  Could not read results summary: {e}")
+                    
+                    # Set skip trigger on successful completion
+                    self.set_skip_trigger('raw_data_inspected', True)
+                    
+                    return output_file_path
+                else:
+                    print("⚠️  Could not find output file path in command output")
+                    print("Standard output:")
+                    print(result.stdout)
+                    return None
+            else:
+                print(f"❌ Raw data inspection failed with return code: {result.returncode}")
+                print("Standard error:")
+                print(result.stderr)
+                print("Standard output:")
+                print(result.stdout)
+                return None
+                
+        except subprocess.TimeoutExpired:
+            print("❌ Raw data inspection timed out after 1 hour")
+            return None
+        except Exception as e:
+            print(f"❌ Error during raw data inspection: {e}")
+            import traceback
+            traceback.print_exc()
+            return None
+    
+    def get_raw_inspection_results_path(self) -> Optional[str]:
+        """
+        Get the path to the raw data inspection results file.
+        
+        Returns:
+            Path to the raw inspection results CSV file if it exists, None otherwise
+        """
+        results_file = self.study_path / "raw_file_info" / "raw_file_inspection_results.csv"
+        if results_file.exists():
+            return str(results_file)
+        return None
