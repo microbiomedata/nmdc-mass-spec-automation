@@ -2,7 +2,7 @@
     "study": {
         "name": "example_study",
         "id": "nmdc:sty-11-example",
-        "description": "Example NMDC metabolomics study configuration",
+        "description": "Example NMDC metabolomics study configuration demonstrating metadata override patterns",
         "massive_id": "v07/MSV000012345",
         "file_type": ".raw",
         "file_filters": ["pos", "neg", "hilic", "rp"]
@@ -30,7 +30,13 @@
             "scan_translator": "/path/to/scan_translator.toml",
             "cores": 5,
             "chromat_configuration_name": "HILIC",
-            "mass_spec_configuration_name": "ESI Orbitrap MS/MS Positive"
+            "mass_spec_configuration_name": "ESI Orbitrap MS/MS Positive",
+            "metadata_overrides": {
+                "mass_spec_configuration_name": {
+                    "CE102040": "JGI/LBNL Standard Metabolomics Method, positive @10,20,40CE",
+                    "CE205060": "JGI/LBNL Standard Metabolomics Method, positive @20,50,60CE"
+                }
+            }
         },
         {
             "name": "hilic_neg",
@@ -40,7 +46,13 @@
             "scan_translator": "/path/to/scan_translator.toml",
             "cores": 5,
             "chromat_configuration_name": "HILIC",
-            "mass_spec_configuration_name": "ESI Orbitrap MS/MS Negative"
+            "mass_spec_configuration_name": "ESI Orbitrap MS/MS Negative",
+            "metadata_overrides": {
+                "mass_spec_configuration_name": {
+                    "CE102040": "JGI/LBNL Standard Metabolomics Method, negative @10,20,40CE",
+                    "CE205060": "JGI/LBNL Standard Metabolomics Method, negative @20,50,60CE"
+                }
+            }
         },
         {
             "name": "rp_pos",
@@ -50,7 +62,73 @@
             "scan_translator": "/path/to/scan_translator.toml",
             "cores": 5,
             "chromat_configuration_name": "C18",
-            "mass_spec_configuration_name": "ESI Orbitrap MS/MS Positive"
+            "mass_spec_configuration_name": "ESI Orbitrap MS/MS Positive",
+            "metadata_overrides": {
+                "mass_spec_configuration_name": {
+                    "CE102040": "JGI/LBNL Standard Metabolomics Method, positive @10,20,40CE",
+                    "CE205060": "JGI/LBNL Standard Metabolomics Method, positive @20,50,60CE"
+                }
+            }
+        },
+        {
+            "name": "multi_instrument_example",
+            "file_filter": ["multi"],
+            "corems_toml": "/path/to/multi_corems.toml",
+            "msp_file": "/path/to/database.msp",
+            "scan_translator": "/path/to/scan_translator.toml",
+            "cores": 5,
+            "instrument_used": "Default Instrument",
+            "chromat_configuration_name": "Default Chromatography",
+            "mass_spec_configuration_name": "Default Mass Spec",
+            "metadata_overrides": {
+                "instrument_used": {
+                    "QE_HF": "Q Exactive HF Orbitrap",
+                    "IDX": "Thermo Orbitrap IQ-X Tribrid",
+                    "QTOF": "Agilent Q-TOF"
+                },
+                "chromat_configuration_name": {
+                    "_HILIC_": "JGI/LBNL Metabolomics Standard LC Method - Polar HILIC-Z",
+                    "_C18_": "JGI/LBNL Metabolomics Standard LC Method - Nonpolar C18",
+                    "_PFPP_": "JGI/LBNL Metabolomics Standard LC Method - PFPP"
+                },
+                "mass_spec_configuration_name": {
+                    "CE102040_POS": "JGI/LBNL Standard Metabolomics Method, positive @10,20,40CE",
+                    "CE102040_NEG": "JGI/LBNL Standard Metabolomics Method, negative @10,20,40CE",
+                    "CE205060_POS": "JGI/LBNL Standard Metabolomics Method, positive @20,50,60CE",
+                    "CE205060_NEG": "JGI/LBNL Standard Metabolomics Method, negative @20,50,60CE"
+                }
+            }
+        },
+        {
+            "name": "soil_microbiome_example",
+            "file_filter": ["soil"],
+            "corems_toml": "/path/to/soil_corems.toml",
+            "msp_file": "/path/to/database.msp",
+            "scan_translator": "/path/to/scan_translator.toml",
+            "cores": 5,
+            "chromat_configuration_name": "C18",
+            "mass_spec_configuration_name": "ESI Orbitrap MS/MS",
+            "sample_type": "Unknown",
+            "processing_method": "Standard",
+            "extraction_method": "Default",
+            "metadata_overrides": {
+                "sample_type": {
+                    "bulk_soil": "Bulk Soil",
+                    "rhizosphere": "Rhizosphere Soil", 
+                    "root_endo": "Root Endosphere",
+                    "leaf_endo": "Leaf Endosphere"
+                },
+                "processing_method": {
+                    "freeze_dry": "Freeze Drying Protocol",
+                    "air_dry": "Air Drying Protocol",
+                    "fresh_proc": "Fresh Sample Processing"
+                },
+                "extraction_method": {
+                    "methanol_ext": "Methanol-Water Extraction",
+                    "chloroform_ext": "Chloroform-Methanol Extraction",
+                    "solid_phase": "Solid Phase Extraction"
+                }
+            }
         }
     ],
     "workflow": {

@@ -2108,14 +2108,56 @@ fi
             
             # Apply configuration-specific metadata (with fallback to defaults)
             config_df['instrument_used'] = config.get('instrument_used', default_instrument)
-            config_df['mass_spec_configuration_name'] = config.get('mass_spec_configuration_name', default_mass_spec)
             config_df['chromat_configuration_name'] = config.get('chromat_configuration_name', default_chromat)
+            config_df['mass_spec_configuration_name'] = config.get('mass_spec_configuration_name', default_mass_spec)
+            
+            # Apply pattern-based metadata overrides
+            metadata_overrides = config.get('metadata_overrides', {})
+            if metadata_overrides:
+                for metadata_field, pattern_mapping in metadata_overrides.items():
+                    if pattern_mapping:
+                        # Apply pattern-specific overrides based on filename patterns
+                        def get_override_value(filename, field_name, mapping, fallback_value):
+                            for pattern, override_value in mapping.items():
+                                if pattern in filename:
+                                    return override_value
+                            # Return current value if no pattern matches
+                            return fallback_value
+                        
+                        # Get current values as fallback
+                        current_values = config_df[metadata_field] if metadata_field in config_df.columns else config.get(metadata_field, 'Unknown')
+                        config_df[metadata_field] = config_df['raw_data_file_short'].apply(
+                            lambda filename: get_override_value(filename, metadata_field, pattern_mapping, current_values)
+                        )
             
             config_dfs[config_name] = config_df
             
-            # Report results
+            # Report results with pattern-based differentiation if applicable
             filter_desc = f"filters {file_filters}" if file_filters else "no filters (all files)"
-            metadata_desc = f"chromat='{config_df['chromat_configuration_name'].iloc[0]}', ms='{config_df['mass_spec_configuration_name'].iloc[0]}'"
+            chromat_config = config_df['chromat_configuration_name'].iloc[0]
+            
+            # Check for pattern-based overrides in any metadata field
+            metadata_overrides = config.get('metadata_overrides', {})
+            override_summaries = []
+            
+            for metadata_field, pattern_mapping in metadata_overrides.items():
+                if pattern_mapping and metadata_field in config_df.columns:
+                    unique_values = config_df[metadata_field].unique()
+                    if len(unique_values) > 1:
+                        # Multiple values due to pattern-based overrides
+                        value_breakdown = config_df[metadata_field].value_counts()
+                        field_desc = ", ".join([f"{count} files with {val[:25]}..." if len(val) > 25 else f"{count} files with {val}" 
+                                              for val, count in value_breakdown.items()])
+                        override_summaries.append(f"{metadata_field}: {field_desc}")
+            
+            if override_summaries:
+                # Multiple metadata configurations due to pattern-based overrides
+                metadata_desc = f"chromat='{chromat_config}', Pattern-based overrides: {'; '.join(override_summaries)}"
+            else:
+                # Single metadata configuration
+                ms_config = config_df['mass_spec_configuration_name'].iloc[0]
+                metadata_desc = f"chromat='{chromat_config}', ms='{ms_config}'"
+                
             print(f"✅ Configuration '{config_name}': {len(config_df)} files match {filter_desc} ({metadata_desc})")
         
         # Fallback: if no configurations worked, create single dataset with defaults

@@ -35,7 +35,13 @@
             "scan_translator": "/Users/heal742/LOCAL/05_NMDC/02_MetaMS/data_processing/_bioscales_lcms_metabolomics/metadata/bioscales_scan_translator.toml",
             "cores": 5,
             "chromat_configuration_name": "HILIC",
-            "mass_spec_configuration_name": "ESI Orbitrap MS/MS Positive"
+            "mass_spec_configuration_name": "ESI Orbitrap MS/MS Positive",
+            "metadata_overrides": {
+                "mass_spec_configuration_name": {
+                    "CE102040": "JGI/LBNL Standard Metabolomics Method, positive @10,20,40CE",
+                    "CE205060": "JGI/LBNL Standard Metabolomics Method, positive @20,50,60CE"
+                }
+            }
         },
         {
             "name": "hilic_neg",
@@ -48,7 +54,13 @@
             "scan_translator": "/Users/heal742/LOCAL/05_NMDC/02_MetaMS/data_processing/_bioscales_lcms_metabolomics/metadata/bioscales_scan_translator.toml",
             "cores": 5,
             "chromat_configuration_name": "HILIC",
-            "mass_spec_configuration_name": "ESI Orbitrap MS/MS Negative"
+            "mass_spec_configuration_name": "ESI Orbitrap MS/MS Negative",
+            "metadata_overrides": {
+                "mass_spec_configuration_name": {
+                    "CE102040": "JGI/LBNL Standard Metabolomics Method, negative @10,20,40CE",
+                    "CE205060": "JGI/LBNL Standard Metabolomics Method, negative @20,50,60CE"
+                }
+            }
         },
         {
             "name": "rp_pos",
@@ -61,7 +73,13 @@
             "scan_translator": "/Users/heal742/LOCAL/05_NMDC/02_MetaMS/data_processing/_bioscales_lcms_metabolomics/metadata/bioscales_scan_translator.toml",
             "cores": 5,
             "chromat_configuration_name": "C18",
-            "mass_spec_configuration_name": "ESI Orbitrap MS/MS Positive"
+            "mass_spec_configuration_name": "ESI Orbitrap MS/MS Positive",
+            "metadata_overrides": {
+                "mass_spec_configuration_name": {
+                    "CE102040": "JGI/LBNL Standard Metabolomics Method, positive @10,20,40CE",
+                    "CE205060": "JGI/LBNL Standard Metabolomics Method, positive @20,50,60CE"
+                }
+            }
         },
         {
             "name": "rp_neg",
@@ -74,7 +92,13 @@
             "scan_translator": "/Users/heal742/LOCAL/05_NMDC/02_MetaMS/data_processing/_bioscales_lcms_metabolomics/metadata/bioscales_scan_translator.toml",
             "cores": 5,
             "chromat_configuration_name": "C18",
-            "mass_spec_configuration_name": "ESI Orbitrap MS/MS Negative"
+            "mass_spec_configuration_name": "ESI Orbitrap MS/MS Negative",
+            "metadata_overrides": {
+                "mass_spec_configuration_name": {
+                    "CE102040": "JGI/LBNL Standard Metabolomics Method, negative @10,20,40CE",
+                    "CE205060": "JGI/LBNL Standard Metabolomics Method, negative @20,50,60CE"
+                }
+            }
         }
     ],
     "workflow": {
@@ -100,7 +124,7 @@
         "biosample_mapping_completed": true,
         "raw_data_inspected": true,
         "wdls_generated": true,
-        "data_processed": true,
+        "data_processed": false,
         "metadata_mapping_generated": true,
         "metadata_packages_generated": false,
         "metadata_submitted_dev": false,
