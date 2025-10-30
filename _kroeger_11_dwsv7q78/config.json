@@ -5,12 +5,15 @@
         "description": "Microbial regulation of soil water repellency to control soil degradation",
         "massive_id": "v07/MSV000094090",
         "file_type": ".raw",
-        "file_filters": ["msms"]
+        "file_filters": [
+            "msms"
+        ]
     },
     "paths": {
         "base_directory": "/Users/heal742/LOCAL/05_NMDC/02_MetaMS/data_processing",
         "raw_data_directory": "/Volumes/LaCie/nmdc_data/_kroeger_11_dwsv7q78/raw",
-        "processed_data_directory": "/Volumes/LaCie/nmdc_data/_kroeger_11_dwsv7q78/processed_20251027"
+        "processed_data_directory": "/Volumes/LaCie/nmdc_data/_kroeger_11_dwsv7q78/processed_20251027",
+        "wdl_workspace": "/Users/heal742/LOCAL/05_NMDC/02_MetaMS/metams"
     },
     "minio": {
         "endpoint": "admin.nmdcdemo.emsl.pnl.gov",
@@ -20,38 +23,59 @@
     "configurations": [
         {
             "name": "hilic_pos",
-            "file_filter": ["HILICZ", "pos"],
-            "corems_toml": "/Users/heal742/LOCAL/05_NMDC/02_MetaMS/data_processing/_ecofab_lcms_11_ev70y104_new/metadata/ecofab_hilic_pos_corems.toml",
+            "file_filter": [
+                "HILICZ",
+                "_POS_"
+            ],
+            "corems_toml": "/Users/heal742/LOCAL/05_NMDC/02_MetaMS/data_processing/_bioscales_lcms_metabolomics/metadata/bioscales_hilic_corems.toml",
             "msp_file": "/Users/heal742/LOCAL/05_NMDC/02_MetaMS/metams/test_data/test_lcms_metab_data/20250407_database.msp",
-            "scan_translator": "/Users/heal742/LOCAL/05_NMDC/02_MetaMS/data_processing/_ecofab_lcms_11_ev70y104_new/metadata/ecofab_scan_translator.toml",
+            "scan_translator": "/Users/heal742/LOCAL/05_NMDC/02_MetaMS/data_processing/_bioscales_lcms_metabolomics/metadata/bioscales_scan_translator.toml",
             "cores": 5
         },
         {
             "name": "hilic_neg",
-            "file_filter": ["HILICZ", "neg"],
-            "corems_toml": "/Users/heal742/LOCAL/05_NMDC/02_MetaMS/data_processing/_ecofab_lcms_11_ev70y104_new/metadata/ecofab_hilic_neg_corems.toml",
+            "file_filter": [
+                "HILICZ",
+                "_NEG_"
+            ],
+            "corems_toml": "/Users/heal742/LOCAL/05_NMDC/02_MetaMS/data_processing/_bioscales_lcms_metabolomics/metadata/bioscales_hilic_corems.toml",
             "msp_file": "/Users/heal742/LOCAL/05_NMDC/02_MetaMS/metams/test_data/test_lcms_metab_data/20250407_database.msp",
-            "scan_translator": "/Users/heal742/LOCAL/05_NMDC/02_MetaMS/data_processing/_ecofab_lcms_11_ev70y104_new/metadata/ecofab_scan_translator.toml",
+            "scan_translator": "/Users/heal742/LOCAL/05_NMDC/02_MetaMS/data_processing/_bioscales_lcms_metabolomics/metadata/bioscales_scan_translator.toml",
             "cores": 5
         },
         {
             "name": "rp_pos",
-            "file_filter": ["C18", "pos"],
+            "file_filter": [
+                "C18",
+                "_POS_"
+            ],
             "corems_toml": "/Users/heal742/LOCAL/05_NMDC/02_MetaMS/data_processing/_bioscales_lcms_metabolomics/metadata/bioscales_rp_corems.toml",
             "msp_file": "/Users/heal742/LOCAL/05_NMDC/02_MetaMS/metams/test_data/test_lcms_metab_data/20250407_database.msp",
-            "scan_translator": "/Users/heal742/LOCAL/05_NMDC/02_MetaMS/data_processing/_ecofab_lcms_11_ev70y104_new/metadata/ecofab_scan_translator.toml",
+            "scan_translator": "/Users/heal742/LOCAL/05_NMDC/02_MetaMS/data_processing/_bioscales_lcms_metabolomics/metadata/bioscales_scan_translator.toml",
             "cores": 5
         },
         {
             "name": "rp_neg",
-            "file_filter": ["C18", "neg"],
+            "file_filter": [
+                "C18",
+                "_NEG_"
+            ],
             "corems_toml": "/Users/heal742/LOCAL/05_NMDC/02_MetaMS/data_processing/_bioscales_lcms_metabolomics/metadata/bioscales_rp_corems.toml",
             "msp_file": "/Users/heal742/LOCAL/05_NMDC/02_MetaMS/metams/test_data/test_lcms_metab_data/20250407_database.msp",
-            "scan_translator": "/Users/heal742/LOCAL/05_NMDC/02_MetaMS/data_processing/_ecofab_lcms_11_ev70y104_new/metadata/ecofab_scan_translator.toml",
+            "scan_translator": "/Users/heal742/LOCAL/05_NMDC/02_MetaMS/data_processing/_bioscales_lcms_metabolomics/metadata/bioscales_scan_translator.toml",
             "cores": 5
         }
     ],
     "workflow": {
         "batch_size": 25
+    },
+    "skip_triggers": {
+        "study_structure_created": true,
+        "raw_data_downloaded": true,
+        "biosample_attributes_fetched": true,
+        "biosample_mapping_script_generated": true,
+        "biosample_mapping_completed": false,
+        "wdls_generated": false,
+        "data_processed": false
     }
 }

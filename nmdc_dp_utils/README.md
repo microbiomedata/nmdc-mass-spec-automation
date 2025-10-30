@@ -21,7 +21,7 @@ This reusable system provides a standardized way to manage NMDC metabolomics stu
 
 ## Configuration
 
-Each study needs a `config.json` file. Use `nmdc_dp_utils/config_template.json` as a starting point.
+Each study needs a `config.json` file. Use `nmdc_dp_utils/example_config.json` as a starting point.
 
 ### Key Configuration Fields:
 
@@ -30,6 +30,17 @@ Each study needs a `config.json` file. Use `nmdc_dp_utils/config_template.json` 
 - **`paths.raw_data_directory`**: Where to download raw files
 - **`paths.processed_data_directory`**: Where processed files are stored
 - **`configurations`**: List of processing configurations (pos/neg, different methods)
+
+### Skip Triggers
+
+The system includes skip triggers to avoid repeating completed workflow steps when rerunning:
+
+- **`skip_triggers.study_structure_created`**: Skip directory creation if already done
+- **`skip_triggers.raw_data_downloaded`**: Skip FTP discovery and download if raw data is ready
+- **`skip_triggers.wdls_generated`**: Skip WDL JSON generation if files already exist
+- **`skip_triggers.data_processed`**: Skip WDL workflow execution if data is already processed
+
+These triggers are automatically set to `true` when steps complete successfully. To rerun a step, manually set its trigger to `false` in the config file.
 
 ## Usage
 

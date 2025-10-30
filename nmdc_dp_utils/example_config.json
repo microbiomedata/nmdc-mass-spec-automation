@@ -46,5 +46,14 @@
     "workflow": {
         "batch_size": 25,
         "docker_image": "local-metams:latest"
+    },
+    "skip_triggers": {
+        "study_structure_created": false,
+        "raw_data_downloaded": false,
+        "biosample_attributes_fetched": false,
+        "biosample_mapping_script_generated": false,
+        "biosample_mapping_completed": false,
+        "wdls_generated": false,
+        "data_processed": false
     }
 }

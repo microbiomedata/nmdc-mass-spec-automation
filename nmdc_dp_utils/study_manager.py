@@ -14,6 +14,7 @@ while maintaining flexibility for study-specific requirements.
 import os
 import json
 import re
+import shutil
 import pandas as pd
 from pathlib import Path
 from minio import Minio
@@ -79,7 +80,54 @@ class NMDCStudyManager:
             json.JSONDecodeError: If the file contains invalid JSON
         """
         with open(config_path, 'r') as f:
-            return json.load(f)
+            config = json.load(f)
+        
+        # Initialize skip_triggers if not present
+        if 'skip_triggers' not in config:
+            config['skip_triggers'] = {
+                'study_structure_created': False,
+                'raw_data_downloaded': False,
+                'biosample_attributes_fetched': False,
+                'biosample_mapping_script_generated': False,
+                'biosample_mapping_completed': False,
+                'wdls_generated': False,
+                'data_processed': False
+            }
+        
+        # Store config path for later updates
+        self.config_path = config_path
+        return config
+    
+    def should_skip(self, trigger_name: str) -> bool:
+        """
+        Check if a workflow step should be skipped based on trigger.
+        
+        Args:
+            trigger_name: Name of the skip trigger to check
+            
+        Returns:
+            True if the step should be skipped, False otherwise
+        """
+        return self.config.get('skip_triggers', {}).get(trigger_name, False)
+    
+    def set_skip_trigger(self, trigger_name: str, value: bool, save: bool = True):
+        """
+        Set a skip trigger value and optionally save to config file.
+        
+        Args:
+            trigger_name: Name of the skip trigger to set
+            value: Boolean value to set
+            save: Whether to save the updated config to file
+        """
+        if 'skip_triggers' not in self.config:
+            self.config['skip_triggers'] = {}
+        
+        self.config['skip_triggers'][trigger_name] = value
+        
+        if save and hasattr(self, 'config_path'):
+            with open(self.config_path, 'w') as f:
+                json.dump(self.config, f, indent=4)
+            print(f"Updated skip trigger '{trigger_name}' to {value}")
     
     def _init_minio_client(self) -> Optional[Minio]:
         """
@@ -115,6 +163,10 @@ class NMDCStudyManager:
         Additional subdirectories are created for each processing configuration
         specified in the config file.
         """
+        if self.should_skip('study_structure_created'):
+            print("Skipping study structure creation (already created)")
+            return
+            
         directories = [
             self.study_path,
             self.study_path / "scripts",
@@ -132,6 +184,7 @@ class NMDCStudyManager:
             directory.mkdir(parents=True, exist_ok=True)
         
         print(f"Created study structure for {self.study_name} at {self.study_path}")
+        self.set_skip_trigger('study_structure_created', True)
     
     def get_study_info(self) -> Dict:
         """
@@ -397,6 +450,15 @@ class NMDCStudyManager:
             >>> ftp_df = manager.get_massive_ftp_urls()
             >>> print(f"Found {len(ftp_df)} filtered files (original dataset may have had many more)")
         """
+        if self.should_skip('raw_data_downloaded'):
+            print("Skipping MASSIVE FTP URL discovery (raw data already downloaded)")
+            # Return existing FTP data if available
+            ftp_csv = self.study_path / f"{self.study_name}_massive_ftp_locs.csv"
+            if ftp_csv.exists():
+                return pd.read_csv(ftp_csv)
+            else:
+                return pd.DataFrame(columns=['ftp_location', 'raw_data_file_short'])
+                
         if massive_id is None:
             massive_id = self.config['study']['massive_id']
             
@@ -468,6 +530,19 @@ class NMDCStudyManager:
             Files are downloaded using urllib.request.urlretrieve for reliability.
             Existing files with matching names are skipped to avoid re-downloading.
         """
+        if self.should_skip('raw_data_downloaded'):
+            print("Skipping raw data download (already downloaded)")
+            # Return list of existing files if directory exists
+            if download_dir is None:
+                download_dir = self.config['paths']['raw_data_directory']
+            if os.path.exists(download_dir):
+                file_type = self.config['study'].get('file_type', '.raw')
+                existing_files = [os.path.join(download_dir, f) for f in os.listdir(download_dir) 
+                                if f.endswith(file_type)]
+                print(f"Found {len(existing_files)} existing {file_type} files")
+                return existing_files
+            return []
+            
         if download_dir is None:
             download_dir = self.config['paths']['raw_data_directory']
         
@@ -522,6 +597,28 @@ class NMDCStudyManager:
                 tqdm.write(f"Error downloading {file_name}: {e}")
         
         print(f"Downloaded {len([f for f in downloaded_files if os.path.exists(f)])} files successfully")
+        
+        # Write CSV of downloaded file names for biosample mapping
+        if len(downloaded_files) > 0:
+            downloaded_files_csv = self.study_path / "metadata" / "downloaded_files.csv"
+            os.makedirs(downloaded_files_csv.parent, exist_ok=True)
+            
+            # Create DataFrame with downloaded file information
+            file_data = []
+            for file_path in downloaded_files:
+                if os.path.exists(file_path):
+                    file_data.append({
+                        'file_path': file_path,
+                        'file_name': os.path.basename(file_path),
+                        'file_size_bytes': os.path.getsize(file_path) if os.path.exists(file_path) else 0
+                    })
+            
+            if file_data:
+                download_df = pd.DataFrame(file_data)
+                download_df.to_csv(downloaded_files_csv, index=False)
+                print(f"📄 Downloaded files list saved to: {downloaded_files_csv}")
+            
+            self.set_skip_trigger('raw_data_downloaded', True)
         return downloaded_files
     
     def _download_file_wget(self, ftp_location: str, download_path: str):
@@ -723,6 +820,22 @@ class NMDCStudyManager:
             >>> json_count = manager.generate_wdl_jsons(batch_size=25)
             >>> print(f"Created {json_count} WDL JSON files")
         """
+        if self.should_skip('wdls_generated'):
+            print("Skipping WDL JSON generation (already generated)")
+            # Count existing JSON files
+            wdl_jsons_path = self.study_path / "wdl_jsons"
+            if wdl_jsons_path.exists():
+                json_count = len(list(wdl_jsons_path.rglob("*.json")))
+                print(f"Found {json_count} existing WDL JSON files")
+                return json_count
+            return 0
+            
+        # Always empty the wdl_jsons directory first
+        wdl_jsons_path = self.study_path / "wdl_jsons"
+        if wdl_jsons_path.exists():
+            shutil.rmtree(wdl_jsons_path)
+        wdl_jsons_path.mkdir(parents=True, exist_ok=True)
+
         raw_data_dir = self.config['paths']['raw_data_directory']
         
         # Get the configured file type extension
@@ -797,4 +910,548 @@ class NMDCStudyManager:
                 print(f"  ✓ Created batch {batch_num} with {len(batch_files)} files")
         
         print(f"\n📋 SUMMARY: Created {json_count} WDL JSON files total")
+        if json_count > 0:
+            self.set_skip_trigger('wdls_generated', True)
         return json_count
+    
+    def generate_wdl_runner_script(self, workflow_name: str = "metaMS_lcms_metabolomics", 
+                                  script_name: Optional[str] = None) -> str:
+        """
+        Generate a shell script to run all WDL JSON files using miniwdl.
+        
+        Creates a bash script that discovers all JSON files in the study's wdl_jsons
+        directory and runs them sequentially using miniwdl. The script includes
+        progress reporting and error handling.
+        
+        Args:
+            workflow_name: Name of the WDL workflow file (without .wdl extension)
+            script_name: Name for the generated script file. Defaults to 
+                        '{study_name}_wdl_runner.sh'
+        
+        Returns:
+            Path to the generated shell script file
+            
+        Example:
+            >>> script_path = manager.generate_wdl_runner_script()
+            >>> print(f"Generated script: {script_path}")
+            
+        Note:
+            The generated script expects to be run from a directory containing
+            a 'wdl/' subdirectory with the workflow file. Use run_wdl_script()
+            to execute from the appropriate location.
+        """
+        if script_name is None:
+            script_name = f"{self.study_name}_wdl_runner.sh"
+            
+        script_path = self.study_path / "scripts" / script_name
+        
+        # Get absolute path to the wdl_jsons directory
+        wdl_jsons_dir = self.study_path / "wdl_jsons"
+        
+        print("🔍 Validating WDL JSON files...")
+        
+        # Check if wdl_jsons directory exists
+        if not wdl_jsons_dir.exists():
+            print(f"❌ WDL JSON directory not found: {wdl_jsons_dir}")
+            print("Run generate_wdl_jsons() first to create JSON files")
+            raise FileNotFoundError(f"WDL JSON directory not found: {wdl_jsons_dir}")
+        
+        # Find all JSON files
+        json_files = list(wdl_jsons_dir.rglob("*.json"))
+        if not json_files:
+            print(f"❌ No JSON files found in: {wdl_jsons_dir}")
+            print("Run generate_wdl_jsons() first to create JSON files")
+            raise FileNotFoundError(f"No JSON files found in: {wdl_jsons_dir}")
+        
+        print(f"✅ Found {len(json_files)} JSON files")
+        
+        # Validate each JSON file and check referenced files
+        missing_files = []
+        corrupted_jsons = []
+        
+        for json_file in json_files:
+            try:
+                with open(json_file, 'r') as f:
+                    json_data = json.load(f)
+                
+                # Check for file paths in the JSON
+                file_paths_key = "lcmsMetabolomics.runMetaMSLCMSMetabolomics.file_paths"
+                if file_paths_key in json_data:
+                    file_paths = json_data[file_paths_key]
+                    for file_path in file_paths:
+                        if not Path(file_path).exists():
+                            missing_files.append(file_path)
+                
+                # Check for other referenced files
+                config_files = [
+                    "lcmsMetabolomics.runMetaMSLCMSMetabolomics.corems_toml_path",
+                    "lcmsMetabolomics.runMetaMSLCMSMetabolomics.msp_file_path", 
+                    "lcmsMetabolomics.runMetaMSLCMSMetabolomics.scan_translator_path"
+                ]
+                
+                for config_key in config_files:
+                    if config_key in json_data:
+                        config_path = json_data[config_key]
+                        if not Path(config_path).exists():
+                            missing_files.append(config_path)
+                            
+            except json.JSONDecodeError as e:
+                corrupted_jsons.append(f"{json_file}: {e}")
+            except Exception as e:
+                corrupted_jsons.append(f"{json_file}: {e}")
+        
+        # Report any issues found
+        if corrupted_jsons:
+            print("❌ Corrupted JSON files found:")
+            for error in corrupted_jsons:
+                print(f"  • {error}")
+            raise ValueError("Corrupted JSON files detected")
+        
+        if missing_files:
+            print("❌ Missing referenced files:")
+            unique_missing = list(set(missing_files))
+            for missing_file in unique_missing[:10]:  # Show first 10
+                print(f"  • {missing_file}")
+            if len(unique_missing) > 10:
+                print(f"  ... and {len(unique_missing) - 10} more files")
+            print("\nPlease ensure all raw data files and configuration files exist")
+            raise FileNotFoundError(f"Missing {len(unique_missing)} referenced files")
+        
+        print("✅ All JSON files and referenced files validated")
+        
+        script_content = f"""#!/bin/bash
+
+# WDL Runner Script for {self.study_name}
+# Generated automatically by NMDC Study Manager
+
+# Base directory for the JSON files
+BASE_DIR="{wdl_jsons_dir}"
+
+# Count total batch files
+NUM_BATCHES=$(find "${{BASE_DIR}}" -type f -name '*.json' | wc -l)
+
+echo "Found $NUM_BATCHES JSON files to process for study: {self.study_name}"
+echo "Study ID: {self.study_id}"
+echo "========================"
+
+# Check if WDL file exists in current directory
+WDL_FILE="wdl/{workflow_name}.wdl"
+if [ ! -f "$WDL_FILE" ]; then
+    echo "ERROR: WDL file not found: $WDL_FILE"
+    echo "Please run this script from a directory containing the wdl/ subdirectory"
+    exit 1
+fi
+
+echo "Using WDL workflow: $WDL_FILE"
+echo "========================"
+
+# Initialize counters
+SUCCESS_COUNT=0
+FAILED_COUNT=0
+
+# Iterate over all JSON files, sorted by name
+for JSON_FILE in $(find "${{BASE_DIR}}" -type f -name '*.json' | sort); do
+    BATCH_NAME=$(basename "$JSON_FILE")
+    echo "Processing batch: $BATCH_NAME"
+    echo "File: $JSON_FILE"
+    
+    # Run miniwdl with the JSON file
+    if miniwdl run "$WDL_FILE" -i "$JSON_FILE" --verbose --no-cache --copy-input-files; then
+        echo "✓ SUCCESS: Completed batch $BATCH_NAME"
+        ((SUCCESS_COUNT++))
+    else
+        echo "✗ FAILED: Batch $BATCH_NAME failed with exit code $?"
+        ((FAILED_COUNT++))
+        echo "Continuing with next batch..."
+    fi
+    
+    echo "------------------------"
+done
+
+echo "========================"
+echo "WORKFLOW SUMMARY:"
+echo "  Total batches: $NUM_BATCHES"
+echo "  Successful: $SUCCESS_COUNT"
+echo "  Failed: $FAILED_COUNT"
+echo "  Study: {self.study_name} ({self.study_id})"
+
+if [ $FAILED_COUNT -eq 0 ]; then
+    echo "🎉 All batches completed successfully!"
+    exit 0
+else
+    echo "⚠️  Some batches failed. Check logs above for details."
+    exit 1
+fi
+"""
+
+        # Write the script file
+        with open(script_path, 'w') as f:
+            f.write(script_content)
+        
+        # Make the script executable
+        os.chmod(script_path, 0o755)
+        
+        print(f"Generated WDL runner script: {script_path}")
+        print("Made script executable (chmod +x)")
+        print(f"Script expects to find WDL file at: wdl/{workflow_name}.wdl")
+        
+        return str(script_path)
+    
+    def run_wdl_script(self, script_path: str, working_directory: Optional[str] = None) -> int:
+        """
+        Execute the WDL runner script with comprehensive error handling.
+        
+        Handles all validation, error checking, workspace detection, Docker verification,
+        venv activation, and execution of WDL workflows. Sets the data_processed trigger 
+        on successful completion.
+        
+        Args:
+            script_path: Path to the shell script to execute
+            working_directory: Directory to run the script from. If not provided,
+                             uses 'wdl_workspace' from config paths.
+        
+        Returns:
+            Exit code from the script execution (0 for success, non-zero for failure)
+            
+        Note:
+            This method handles all error cases internally and provides comprehensive
+            feedback. It will automatically set the data_processed trigger on success.
+        """
+        import subprocess
+        
+        # Check if already processed
+        if self.should_skip('data_processed'):
+            print("Skipping WDL workflow execution (data already processed)")
+            return 0
+        
+        # Determine working directory
+        if working_directory is None:
+            if 'wdl_workspace' not in self.config.get('paths', {}):
+                print("❌ WDL workspace not configured")
+                print("To run workflows, add 'wdl_workspace' to config paths:")
+                print('  "paths": { "wdl_workspace": "/path/to/wdl/workspace" }')
+                return 1
+            working_directory = self.config['paths']['wdl_workspace']
+        
+        script_path = Path(script_path)
+        working_dir = Path(working_directory)
+        
+        # Validate script exists
+        if not script_path.exists():
+            print(f"❌ Script not found: {script_path}")
+            return 1
+            
+        # Validate working directory exists
+        if not working_dir.exists():
+            print(f"❌ Working directory not found: {working_dir}")
+            return 1
+        
+        # Check if WDL directory exists in working directory
+        wdl_dir = working_dir / "wdl"
+        if not wdl_dir.exists():
+            print(f"⚠️  WARNING: WDL directory not found at {wdl_dir}")
+            print("The script may fail if it cannot find the workflow files")
+        
+        # Check if Docker is running
+        print("🐳 Checking Docker availability...")
+        try:
+            docker_check = subprocess.run(['docker', 'info'], 
+                                        capture_output=True, text=True, timeout=10)
+            if docker_check.returncode != 0:
+                print("❌ Docker is not running or not available")
+                print("Please start Docker Desktop and try again")
+                print("You can check Docker status with: docker info")
+                return 1
+            print("✅ Docker is running")
+        except subprocess.TimeoutExpired:
+            print("❌ Docker check timed out - Docker may not be running")
+            print("Please start Docker Desktop and try again")
+            return 1
+        except FileNotFoundError:
+            print("❌ Docker command not found")
+            print("Please install Docker Desktop and try again")
+            return 1
+        except Exception as e:
+            print(f"❌ Error checking Docker: {e}")
+            return 1
+        
+        # Check if venv exists and can be activated
+        venv_dir = working_dir / "venv"
+        if not venv_dir.exists():
+            print(f"❌ Virtual environment not found at: {venv_dir}")
+            print("Please create a virtual environment:")
+            print(f"  cd {working_dir}")
+            print("  python -m venv venv")
+            print("  source venv/bin/activate")
+            print("  pip install -r requirements.txt")
+            return 1
+        
+        venv_python = venv_dir / "bin" / "python"
+        if not venv_python.exists():
+            print(f"❌ Virtual environment Python not found at: {venv_python}")
+            print("Virtual environment may be corrupted. Please recreate it.")
+            return 1
+        
+        print(f"✅ Virtual environment found at: {venv_dir}")
+        
+        print(f"🚀 Running WDL workflows from: {working_dir}")
+        print("This will take a long time for large datasets...")
+        
+        # Store current directory
+        original_dir = os.getcwd()
+        
+        try:
+            print(f"📁 Changing to working directory: {working_dir}")
+            os.chdir(working_dir)
+            
+            print(f"⚡ Executing script with venv activation: {script_path}")
+            print("=" * 50)
+            
+            # Create a command that activates venv and runs the script
+            activate_and_run = f"source venv/bin/activate && {script_path}"
+            
+            # Run the script with bash to handle source command
+            result = subprocess.run(['bash', '-c', activate_and_run], 
+                                  capture_output=False,  # Let output go to console
+                                  text=True)
+            
+            print("=" * 50)
+            print(f"📊 Script execution completed with exit code: {result.returncode}")
+            
+            if result.returncode == 0:
+                print("🎉 All WDL workflows completed successfully!")
+                self.set_skip_trigger('data_processed', True)
+            else:
+                print(f"⚠️  Some workflows failed (exit code: {result.returncode})")
+                print("Check the logs above for details.")
+                print("You can run the script manually later:")
+                print(f"  cd {working_dir}")
+                print("  source venv/bin/activate")
+                print(f"  {script_path}")
+            
+            return result.returncode
+            
+        except Exception as e:
+            print(f"❌ Error executing script: {e}")
+            print("You can run the script manually later:")
+            print(f"  cd {working_dir}")
+            print("  source venv/bin/activate")
+            print(f"  {script_path}")
+            return 1
+            
+        finally:
+            # Always return to original directory
+            os.chdir(original_dir)
+            print(f"🔙 Returned to original directory: {original_dir}")
+    
+    def get_biosample_attributes(self, study_id: Optional[str] = None) -> str:
+        """
+        Fetch biosample attributes from NMDC API and save to CSV file.
+        
+        Uses the nmdc_api_utilities package to query biosamples associated with 
+        the study ID and saves the attributes to a CSV file in the study's 
+        metadata directory. Includes skip trigger to avoid re-downloading.
+        
+        Args:
+            study_id: NMDC study ID (e.g., 'nmdc:sty-11-dwsv7q78'). 
+                     Uses config['study']['id'] if not provided.
+        
+        Returns:
+            Path to the generated biosample attributes CSV file
+            
+        Note:
+            This method sets a skip trigger 'biosample_attributes_fetched' to
+            avoid re-downloading on subsequent runs. The CSV file is saved as
+            'biosample_attributes.csv' in the study's metadata directory.
+        """
+        from nmdc_api_utilities.biosample_search import BiosampleSearch
+        
+        # Check skip trigger
+        if self.should_skip('biosample_attributes_fetched'):
+            print("Skipping biosample attributes fetch (already downloaded)")
+            biosample_csv = self.study_path / "metadata" / "biosample_attributes.csv"
+            if biosample_csv.exists():
+                return str(biosample_csv)
+        
+        if study_id is None:
+            study_id = self.config['study']['id']
+        
+        print(f"🔍 Fetching biosample attributes for study: {study_id}")
+        
+        try:
+            # Use nmdc_api_utilities to fetch biosamples
+            biosample_search = BiosampleSearch()
+            biosamples = biosample_search.get_record_by_filter(
+                filter=f'{{"associated_studies":"{study_id}"}}',
+                max_page_size=1000,
+                fields="id,name,samp_name,description,gold_biosample_identifiers,insdc_biosample_identifiers,submitter_id",
+                all_pages=True,
+            )
+            
+            if not biosamples:
+                print(f"❌ No biosamples found for study {study_id}")
+                print("Please verify the study ID and check if biosamples are available in NMDC")
+                raise ValueError(f"No biosamples found for study {study_id}")
+            
+            print(f"✅ Found {len(biosamples)} biosamples")
+            
+            # Convert to DataFrame
+            biosample_df = pd.DataFrame(biosamples)
+            
+            # Create metadata directory if it doesn't exist
+            metadata_dir = self.study_path / "metadata"
+            metadata_dir.mkdir(parents=True, exist_ok=True)
+            
+            # Save to CSV
+            biosample_csv = metadata_dir / "biosample_attributes.csv"
+            biosample_df.to_csv(biosample_csv, index=False)
+            
+            print(f"💾 Saved biosample attributes to: {biosample_csv}")
+            print(f"📊 Columns available: {list(biosample_df.columns)}")
+            
+            # Set skip trigger
+            self.set_skip_trigger('biosample_attributes_fetched', True)
+            
+            return str(biosample_csv)
+            
+        except Exception as e:
+            print(f"❌ Error fetching biosample data: {e}")
+            print("Please check your internet connection and verify the study ID")
+            print("Make sure nmdc_api_utilities package is installed: pip install nmdc-api-utilities")
+            raise
+    
+    def generate_biosample_mapping_script(self, script_name: Optional[str] = None, 
+                                         template_path: Optional[str] = None) -> str:
+        """
+        Generate a study-specific script for mapping raw files to biosamples.
+        
+        Creates a customizable Python script that maps raw data files to NMDC
+        biosamples using a template file. The generated script includes template 
+        parsing logic that should be customized for each study's file naming conventions.
+        
+        Args:
+            script_name: Name for the generated script. Defaults to 
+                        'map_raw_files_to_biosamples.py'
+            template_path: Path to template file. Defaults to 
+                          'nmdc_dp_utils/templates/biosample_mapping_script_template.py'
+        
+        Returns:
+            Path to the generated mapping script
+            
+        Note:
+            The generated script is based on a template that needs customization 
+            for each study's specific file naming patterns and biosample attributes.
+        """
+        if self.should_skip('biosample_mapping_script_generated'):
+            print("Skipping biosample mapping script generation (already generated)")
+            script_path = self.study_path / "scripts" / (script_name or "map_raw_files_to_biosamples.py")
+            if script_path.exists():
+                return str(script_path)
+        
+        if script_name is None:
+            script_name = "map_raw_files_to_biosamples.py"
+            
+        if template_path is None:
+            # Use default template relative to this module
+            template_path = Path(__file__).parent / "templates" / "biosample_mapping_script_template.py"
+        else:
+            template_path = Path(template_path)
+            
+        script_path = self.study_path / "scripts" / script_name
+        
+        print(f"� Generating biosample mapping script: {script_path}")
+        print(f"📄 Using template: {template_path}")
+        
+        # Check if template exists
+        if not template_path.exists():
+            raise FileNotFoundError(f"Template file not found: {template_path}")
+        
+        # Read the template
+        with open(template_path, 'r') as f:
+            template_content = f.read()
+        
+        # Format the template with study-specific values
+        script_content = template_content.format(
+            study_name=self.study_name,
+            study_description=self.config['study']['description'],
+            script_name=script_name
+        )
+        
+        # Write the script file
+        with open(script_path, 'w') as f:
+            f.write(script_content)
+        
+        # Make the script executable
+        os.chmod(script_path, 0o755)
+        
+        print(f"Generated biosample mapping script: {script_path}")
+        print("Made script executable (chmod +x)")
+        print("⚠️  Customize the parsing and matching logic for your study")
+        
+        self.set_skip_trigger('biosample_mapping_script_generated', True)
+        return str(script_path)
+    
+    def run_biosample_mapping_script(self, script_path: Optional[str] = None) -> bool:
+        """
+        Execute the biosample mapping script.
+        
+        Runs the study-specific biosample mapping script and reports success/failure.
+        Sets skip trigger on successful completion.
+        
+        Args:
+            script_path: Path to the mapping script. Defaults to 
+                        'scripts/map_raw_files_to_biosamples.py'
+        
+        Returns:
+            True if mapping completed successfully, False otherwise
+            
+        Note:
+            This method automatically sets the 'biosample_mapping_completed' 
+            trigger on successful completion.
+        """
+        import subprocess
+        import sys
+        
+        if self.should_skip('biosample_mapping_completed'):
+            print("Skipping biosample mapping (already completed)")
+            return True
+        
+        if script_path is None:
+            script_path = self.study_path / "scripts" / "map_raw_files_to_biosamples.py"
+        else:
+            script_path = Path(script_path)
+        
+        if not script_path.exists():
+            print(f"❌ Mapping script not found: {script_path}")
+            print("Run generate_biosample_mapping_script() first")
+            return False
+        
+        print(f"🔗 Running biosample mapping script: {script_path}")
+        
+        # Store current directory
+        original_dir = os.getcwd()
+        
+        try:
+            # Run the mapping script
+            result = subprocess.run([sys.executable, str(script_path)], 
+                                  capture_output=False,  # Let output go to console
+                                  text=True,
+                                  cwd=self.base_path)  # Run from base directory
+            
+            if result.returncode == 0:
+                print("✅ Biosample mapping completed successfully!")
+                self.set_skip_trigger('biosample_mapping_completed', True)
+                return True
+            else:
+                print(f"⚠️  Biosample mapping script exited with code: {result.returncode}")
+                print("This may indicate unmatched files or multiple matches that need review")
+                print("Check the mapping file and customize the script as needed")
+                return False
+                
+        except Exception as e:
+            print(f"❌ Error running mapping script: {e}")
+            return False
+            
+        finally:
+            # Always return to original directory
+            os.chdir(original_dir)
