@@ -104,6 +104,7 @@
         "metadata_mapping_generated": true,
         "metadata_packages_generated": false,
         "metadata_submitted_dev": false,
-        "metadata_submitted_prod": false
+        "metadata_submitted_prod": false,
+        "metadata_generated": false
     }
 }

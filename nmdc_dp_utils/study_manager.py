@@ -1962,11 +1962,34 @@ fi
             # Add sample_id (alias for biosample_id)
             merged_df['sample_id'] = merged_df['biosample_id']
             
-            # Add biosample.associated_studies
-            merged_df['biosample.associated_studies'] = self.config['study']['id']
+            # Add biosample.associated_studies (must be in brackets as a list)
+            merged_df['biosample.associated_studies'] = f"['{self.config['study']['id']}']"
             
-            # Add raw_data_url (placeholder for now)
-            merged_df['raw_data_url'] = metadata_config.get('raw_data_url_base', '') + merged_df['raw_data_file_short']
+            # Add raw_data_url using proper MASSIVE download format
+            massive_id = self.config['study']['massive_id']
+            file_type = self.config['study'].get('file_type', '.raw')
+            
+            # Construct proper MASSIVE download URLs using the same logic as bioscales
+            def construct_massive_url(filename):
+                import urllib.parse
+                # Extract just the MSV part (remove version prefix like v07/)
+                if 'MSV' in massive_id:
+                    msv_part = 'MSV' + massive_id.split('MSV')[1]
+                else:
+                    msv_part = massive_id
+                
+                # Construct the file path: MSV.../raw/filename
+                file_path = f"{msv_part}/raw/{filename}"
+                encoded_path = urllib.parse.quote(file_path, safe='')
+                https_url = f"https://massive.ucsd.edu/ProteoSAFe/DownloadResultFile?file=f.{encoded_path}&forceDownload=true"
+                
+                # Validate URL format
+                if not https_url.startswith("https://massive.ucsd.edu/ProteoSAFe/DownloadResultFile?file=f.MSV"):
+                    raise ValueError(f"Invalid MASSIVE URL format generated: {https_url}")
+                
+                return https_url
+            
+            merged_df['raw_data_url'] = merged_df['raw_data_file_short'].apply(construct_massive_url)
             
             # Create output directory
             output_dir = self.study_path / "metadata" / "metadata_gen_input_csvs"
