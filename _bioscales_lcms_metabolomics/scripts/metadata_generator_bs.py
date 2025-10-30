@@ -1,3 +1,5 @@
+import os
+
 from nmdc_ms_metadata_gen.lcms_metab_metadata_generator import LCMSMetabolomicsMetadataGenerator
 
 
@@ -22,6 +24,11 @@ if __name__ == "__main__":
     }]
 
     for metadata_input in metadata_inputs:
+        # Check if the output_file exists, if so, skip to next
+        if os.path.exists(metadata_input["output_file"]):
+            print(f"Output file {metadata_input['output_file']} already exists, skipping...")
+            continue
+
         # Start the metadata generation setup
         generator = LCMSMetabolomicsMetadataGenerator(
             metadata_file=metadata_input["metadata_file"],

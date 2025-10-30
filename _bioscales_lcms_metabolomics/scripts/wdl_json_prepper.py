@@ -112,7 +112,7 @@ def generate_batch_jsons(
 
 
 if __name__ == "__main__":
-    raw_data_dir = "/Users/heal742/LOCAL/staging"
+    raw_data_dir = "/Volumes/LaCie/nmdc_data/_bioscales_lcms/raw/"
     all_expected = False
 
     # Read in the metadata file
@@ -187,7 +187,7 @@ if __name__ == "__main__":
     print(f"Total HILIC negative files: {len(hilic_neg_files)}")
 
     # Must be set for the script to run
-    processed_data_dir = "/Users/heal742/LOCAL/staging_processed/processed_20251013"
+    processed_data_dir = "/Volumes/LaCie/nmdc_data/_bioscales_lcms/processed_20251013/"
     corems_rp_toml = "/Users/heal742/LOCAL/05_NMDC/02_MetaMS/data_processing/_bioscales_lcms_metabolomics/metadata/bioscales_rp_corems.toml"
     corems_hilic_toml = "/Users/heal742/LOCAL/05_NMDC/02_MetaMS/data_processing/_bioscales_lcms_metabolomics/metadata/bioscales_hilic_corems.toml"
     db_location = "/Users/heal742/LOCAL/05_NMDC/02_MetaMS/metams/test_data/test_lcms_metab_data/20250407_database.msp"

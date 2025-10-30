@@ -111,6 +111,8 @@ if __name__ == "__main__":
     mapped_df['raw_data_url'] = mapped_df['url']
     mapped_df['sample_id'] = mapped_df['biosample_id']
 
+    # Fix instrument_used values - if instrument_used == QExactHF03, change it to "Thermo Orbitrap Q-Exactive"
+    mapped_df['instrument_used'] = mapped_df['instrument_used'].replace({'QExactHF03': 'Thermo Orbitrap Q-Exactive'})
 
     # Reorder for readability
     final_columns = [
@@ -125,6 +127,36 @@ if __name__ == "__main__":
         if col not in mapped_df.columns:
             raise ValueError(f"Column {col} is missing from the final DataFrame.")
     
+        'sample_id',"biosample.associated_studies", "raw_data_file", 'processed_data_directory', 'mass_spec_configuration_name',
+    # Check raw_data_file existence and processed_data_directory validity,
+    # move any rows with missing files to missing_files_df instead of raising errors.
+    def _processed_dir_valid(d):
+        try:
+            if not isinstance(d, str) or not os.path.exists(d):
+                return False
+            files = os.listdir(d)
+            toml = any(f.lower().endswith('.toml') for f in files)
+            csv = any(f.lower().endswith('.csv') for f in files)
+            hdf5 = any(f.lower().endswith('.hdf5') for f in files)
+            return toml and csv and hdf5
+        except Exception:
+            return False
+
+    raw_exists_mask = mapped_df['raw_data_file'].apply(lambda p: isinstance(p, str) and os.path.exists(p))
+    proc_ok_mask = mapped_df['processed_data_directory'].apply(_processed_dir_valid)
+
+    ok_mask = raw_exists_mask & proc_ok_mask
+
+    # Rows with any missing/raw/processed files go to missing_files_df
+    missing_files_df = mapped_df.loc[~ok_mask].copy().reset_index(drop=True)
+    mapped_df = mapped_df.loc[ok_mask].copy().reset_index(drop=True)
+
+    print(f"Moved {len(missing_files_df)} rows with missing files to missing_files_df; {len(mapped_df)} rows remain for processing.")
+    if len(missing_files_df) > 0:
+        print("Examples of missing entries (raw_data_file, processed_data_directory):")
+        print(missing_files_df[['raw_data_file', 'processed_data_directory']].head(10))
+
+
     # Separate out into 4 dataframes based on mass_spec_configuration_name and chromat_configuration_name, remove rows that are not present in the processed data directory
     # and write out four separate csv files
     mapped_dfs = separate_by_config(mapped_df)

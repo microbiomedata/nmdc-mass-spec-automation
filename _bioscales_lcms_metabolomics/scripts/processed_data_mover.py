@@ -37,7 +37,7 @@ def move_corems_dirs(input_dir, output_dir):
 if __name__ == "__main__":
     # Must be set for the script to run
     input_dir = "/Users/heal742/LOCAL/05_NMDC/02_MetaMS/metams"
-    output_dir = "/Users/heal742/Library/CloudStorage/OneDrive-PNNL/Documents/_DMS_data/_NMDC/_massive/_bioscales_lcms/processed_20251010"
+    output_dir = "/Volumes/LaCie/nmdc_data/_bioscales_lcms/processed_20251013"
     move_corems_dirs(input_dir, output_dir)
 
     # Report how many directories are in the output directory

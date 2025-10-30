@@ -46,7 +46,7 @@ if __name__ == '__main__':
                          secure=True)
     bucket_name = "metabolomics"  # Specify the bucket name
     folder_name = "bioscales_11_r2h77870/processed_20251013"  # Specify the folder name within the bucket
-    directory = "/Users/heal742/LOCAL/staging_processed/processed_20251015_RPNeg"
+    directory = "/Volumes/LaCie/nmdc_data/_bioscales_lcms/processed_20251013"
     # Check if the bucket exists
     if not minio_client.bucket_exists(bucket_name):
         print(f"Bucket {bucket_name} does not exist.")
