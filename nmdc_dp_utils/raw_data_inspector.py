@@ -51,114 +51,173 @@ def setup_logging(out_dir: Path) -> Path:
     return log_file
 
 
-def get_raw_file_info_single(file_path: Path) -> Optional[Dict]:
+def get_raw_file_info_single(file_path: Path, max_retries: int = 3, retry_delay: float = 5.0) -> Optional[Dict]:
     """
-    Extract metadata from a single raw or mzML file.
+    Extract metadata from a single mass spectrometry file using CoreMS with retry logic.
 
     Args:
-        file_path: Path to the raw or mzML file
+        file_path: Path to the mass spectrometry file (.raw or .mzML)
+        max_retries: Maximum number of retry attempts for transient errors
+        retry_delay: Delay in seconds between retry attempts
 
     Returns:
         Dictionary containing file metadata, or None if processing failed
     """
-    try:
-        if not COREMS_AVAILABLE:
-            # Basic file info only
-            return {
-                "file_name": file_path.name,
-                "file_path": str(file_path),
-                "file_size_bytes": file_path.stat().st_size,
-                "file_extension": file_path.suffix.lower(),
-                "creation_time": datetime.fromtimestamp(file_path.stat().st_ctime).isoformat(),
-                "error": "CoreMS not available - limited metadata only"
-            }
-        
-        if file_path.suffix.lower() == ".raw":
-            parser = ImportMassSpectraThermoMSFileReader(file_path)
-        elif file_path.suffix.lower() == ".mzml":
-            parser = MZMLSpectraParser(file_path)
-        else:
-            raise ValueError(f"Unsupported file format: {file_path.suffix}")
-        
-        # Get LCMS object
-        lcms_obj = parser.get_lcms_obj(spectra='none')
+    import time
+    
+    for attempt in range(max_retries + 1):
+        try:
+            return _extract_file_metadata(file_path)
+        except Exception as e:
+            error_msg = str(e).lower()
+            
+            # Check if this is a retryable error (file access issues)
+            retryable_errors = [
+                "unable to access the raw file using the rawfile reader",
+                "unable to access the raw file using the rawfilereader class",
+                "rawfilereader",
+                "file is locked",
+                "sharing violation", 
+                "access denied",
+                "permission denied",
+                "device or resource busy",
+                "file in use",
+                "temporarily unavailable"
+            ]
+            
+            is_retryable = any(retryable_error in error_msg for retryable_error in retryable_errors)
+            
+            if is_retryable and attempt < max_retries:
+                logging.warning(f"Retryable error processing {file_path.name} (attempt {attempt + 1}/{max_retries + 1}): {str(e)}")
+                logging.info(f"Waiting {retry_delay} seconds before retry...")
+                time.sleep(retry_delay)
+                continue
+            else:
+                # Final attempt failed or non-retryable error
+                final_error_msg = f"Error processing {file_path.name} after {attempt + 1} attempts: {str(e)}"
+                logging.error(final_error_msg)
+                return {
+                    "file_name": file_path.name,
+                    "file_path": str(file_path),
+                    "file_size_bytes": file_path.stat().st_size if file_path.exists() else 0,
+                    "file_extension": file_path.suffix.lower(),
+                    "error": final_error_msg,
+                    "creation_time": datetime.fromtimestamp(file_path.stat().st_ctime).isoformat() if file_path.exists() else None,
+                    # Set required fields to None to indicate failure
+                    "write_time": None,
+                    "instrument_model": None,
+                    "instrument_name": None,
+                    "instrument_serial_number": None,
+                }
+    
+    # Should never reach here, but just in case
+    return None
 
-        # Get instrument metadata
-        instrument_info = parser.get_instrument_info()
-        serial_number = instrument_info.get("serial_number", "Unknown")
-        instrument_model = instrument_info.get("model", "Unknown")
-        instrument_name = instrument_info.get("name", "Unknown")
+
+def _extract_file_metadata(file_path: Path) -> Dict:
+    """
+    Internal function to extract metadata from a file (no retry logic).
+    
+    Args:
+        file_path: Path to the mass spectrometry file
         
-        # Get scan information
-        scan_types = list(set(lcms_obj.scan_df['ms_format'].to_list()))
-        scan_levels = list(set(lcms_obj.scan_df['ms_level'].to_list()))
+    Returns:
+        Dictionary containing file metadata
         
-        # Get data ranges
-        mz_min = lcms_obj.scan_df['scan_window_lower'].min()
-        mz_max = lcms_obj.scan_df['scan_window_upper'].max()
-        rt_min = lcms_obj.scan_df['scan_time'].min()
-        rt_max = lcms_obj.scan_df['scan_time'].max()
-        
-        # Extract collision energies from scan text (if available)
-        collision_energies = []
-        if 'scan_text' in lcms_obj.scan_df.columns:
-            ce_series = lcms_obj.scan_df['scan_text'].str.extract(r'@hcd(\d+)\.')[0].dropna()
-            collision_energies = list(set(ce_series.unique().tolist()))
-        else:
-            # For .raw files, collision energies might not be in scan_text
-            collision_energies = ["Unknown"]
-        
-        # Get polarity information
-        polarity = list(set(lcms_obj.scan_df['polarity'].tolist()))
-        
-        # Get file creation time
-        write_time = parser.get_creation_time()
-        
-        # Compile metadata
-        file_info = {
+    Raises:
+        Exception: If file processing fails
+    """
+    if not COREMS_AVAILABLE:
+        # Basic file info only
+        return {
             "file_name": file_path.name,
             "file_path": str(file_path),
             "file_size_bytes": file_path.stat().st_size,
             "file_extension": file_path.suffix.lower(),
-            "instrument_model": instrument_model,
-            "instrument_name": instrument_name,
-            "instrument_serial_number": serial_number,
-            "scan_types": str(scan_types),
-            "scan_levels": str(scan_levels),
-            "collision_energies": str(collision_energies),
-            "polarity": str(polarity),
-            "mz_min": float(mz_min) if pd.notna(mz_min) else None,
-            "mz_max": float(mz_max) if pd.notna(mz_max) else None,
-            "rt_min": float(rt_min) if pd.notna(rt_min) else None,
-            "rt_max": float(rt_max) if pd.notna(rt_max) else None,
-            "write_time": write_time,
-            "total_scans": len(lcms_obj.scan_df),
             "creation_time": datetime.fromtimestamp(file_path.stat().st_ctime).isoformat(),
+            "error": "CoreMS not available - limited metadata only"
         }
-        
-        return file_info
-        
-    except Exception as e:
-        error_msg = f"Error processing {file_path.name}: {str(e)}"
+    
+    if file_path.suffix.lower() == ".raw":
+        parser = ImportMassSpectraThermoMSFileReader(file_path)
+    elif file_path.suffix.lower() == ".mzml":
+        parser = MZMLSpectraParser(file_path)
+    else:
+        raise ValueError(f"Unsupported file format: {file_path.suffix}")
+    
+    # Get LCMS object
+    lcms_obj = parser.get_lcms_obj(spectra='none')
+
+    # Get instrument metadata
+    instrument_info = parser.get_instrument_info()
+    serial_number = instrument_info.get("serial_number", "Unknown")
+    instrument_model = instrument_info.get("model", "Unknown")
+    instrument_name = instrument_info.get("name", "Unknown")
+    
+    # Get scan information
+    scan_types = list(set(lcms_obj.scan_df['ms_format'].to_list()))
+    scan_levels = list(set(lcms_obj.scan_df['ms_level'].to_list()))
+    
+    # Get data ranges
+    mz_min = lcms_obj.scan_df['scan_window_lower'].min()
+    mz_max = lcms_obj.scan_df['scan_window_upper'].max()
+    rt_min = lcms_obj.scan_df['scan_time'].min()
+    rt_max = lcms_obj.scan_df['scan_time'].max()
+    
+    # Extract collision energies from scan text (if available)
+    collision_energies = []
+    if 'scan_text' in lcms_obj.scan_df.columns:
+        ce_series = lcms_obj.scan_df['scan_text'].str.extract(r'@hcd(\d+)\.')[0].dropna()
+        collision_energies = list(set(ce_series.unique().tolist()))
+    else:
+        # For .raw files, collision energies might not be in scan_text
+        collision_energies = ["Unknown"]
+    
+    # Get polarity information
+    polarity = list(set(lcms_obj.scan_df['polarity'].tolist()))
+    
+    # Get file creation time
+    write_time = parser.get_creation_time()
+    
+    # Validate that we got a write_time - this is critical for metadata generation
+    if write_time is None:
+        error_msg = f"Failed to extract write_time from {file_path.name} - file may be corrupted or unsupported format"
         logging.error(error_msg)
-        return {
-            "file_name": file_path.name,
-            "file_path": str(file_path),
-            "file_size_bytes": file_path.stat().st_size if file_path.exists() else 0,
-            "file_extension": file_path.suffix.lower(),
-            "error": str(e),
-            "creation_time": datetime.fromtimestamp(file_path.stat().st_ctime).isoformat() if file_path.exists() else None,
-        }
+        raise ValueError(error_msg)
+    
+    # Compile metadata
+    file_info = {
+        "file_name": file_path.name,
+        "file_path": str(file_path),
+        "file_size_bytes": file_path.stat().st_size,
+        "file_extension": file_path.suffix.lower(),
+        "instrument_model": instrument_model,
+        "instrument_name": instrument_name,
+        "instrument_serial_number": serial_number,
+        "scan_types": str(scan_types),
+        "scan_levels": str(scan_levels),
+        "collision_energies": str(collision_energies),
+        "polarity": str(polarity),
+        "mz_min": float(mz_min) if pd.notna(mz_min) else None,
+        "mz_max": float(mz_max) if pd.notna(mz_max) else None,
+        "rt_min": float(rt_min) if pd.notna(rt_min) else None,
+        "rt_max": float(rt_max) if pd.notna(rt_max) else None,
+        "write_time": write_time,
+        "total_scans": len(lcms_obj.scan_df),
+        "creation_time": datetime.fromtimestamp(file_path.stat().st_ctime).isoformat(),
+    }
+    
+    return file_info
 
 
 def process_file_wrapper(args) -> Optional[Dict]:
     """Wrapper function for parallel processing"""
-    file_path, output_file, error_file = args
+    file_path, output_file, error_file, max_retries, retry_delay = args
     
     if not file_path.is_file():
         return None
     
-    result = get_raw_file_info_single(file_path)
+    result = get_raw_file_info_single(file_path, max_retries=max_retries, retry_delay=retry_delay)
     
     if result is not None:
         # Write successful result immediately
@@ -205,16 +264,20 @@ def inspect_raw_files(
     file_paths: List[str],
     output_dir: str,
     cores: int = 1,
-    limit: Optional[int] = None
+    limit: Optional[int] = None,
+    max_retries: int = 3,
+    retry_delay: float = 5.0
 ) -> str:
     """
-    Process multiple raw files and extract metadata.
+    Process multiple raw files and extract metadata with retry logic.
     
     Args:
         file_paths: List of file paths to process
         output_dir: Output directory for results
         cores: Number of cores for parallel processing
         limit: Optional limit on number of files to process
+        max_retries: Maximum number of retry attempts for transient errors
+        retry_delay: Delay in seconds between retry attempts
     
     Returns:
         Path to the output CSV file
@@ -255,7 +318,7 @@ def inspect_raw_files(
     logging.info(f"CoreMS available: {COREMS_AVAILABLE}")
 
     # Prepare arguments for processing
-    process_args = [(file_path, output_file, error_file) for file_path in file_list]
+    process_args = [(file_path, output_file, error_file, max_retries, retry_delay) for file_path in file_list]
     
     successful_count = 0
     
@@ -300,6 +363,8 @@ def main():
     parser.add_argument("--output-dir", required=True, help="Output directory for results")
     parser.add_argument("--cores", type=int, default=1, help="Number of cores for parallel processing")
     parser.add_argument("--limit", type=int, help="Limit number of files to process (for testing)")
+    parser.add_argument("--max-retries", type=int, default=3, help="Maximum number of retry attempts for transient errors")
+    parser.add_argument("--retry-delay", type=float, default=5.0, help="Delay in seconds between retry attempts")
     
     args = parser.parse_args()
     
@@ -307,7 +372,9 @@ def main():
         file_paths=args.files,
         output_dir=args.output_dir,
         cores=args.cores,
-        limit=args.limit
+        limit=args.limit,
+        max_retries=args.max_retries,
+        retry_delay=args.retry_delay
     )
     
     print(f"✅ Raw data inspection completed. Results: {output_file}")

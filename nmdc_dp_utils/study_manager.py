@@ -1630,7 +1630,7 @@ fi
             import traceback
             traceback.print_exc()
 
-    def raw_data_inspector(self, file_paths=None, cores=1, limit=None):
+    def raw_data_inspector(self, file_paths=None, cores=1, limit=None, max_retries=3, retry_delay=5.0):
         """
         Run raw data inspection on raw files to extract metadata using CoreMS.
         
@@ -1643,6 +1643,8 @@ fi
                                             If None, uses mapped raw files from metadata.
             cores (int): Number of cores for parallel processing (default: 1)
             limit (int, optional): Limit number of files to process (for testing)
+            max_retries (int): Maximum number of retry attempts for transient errors (default: 3)
+            retry_delay (float): Delay in seconds between retry attempts (default: 5.0)
         
         Returns:
             str: Path to the output CSV file with inspection results
@@ -1703,7 +1705,9 @@ fi
             cmd_args = [
                 "--files"] + file_paths + [
                 "--output-dir", str(output_dir),
-                "--cores", str(cores)
+                "--cores", str(cores),
+                "--max-retries", str(max_retries),
+                "--retry-delay", str(retry_delay)
             ]
             
             if limit is not None:
@@ -1812,3 +1816,305 @@ fi
         if results_file.exists():
             return str(results_file)
         return None
+    
+    def generate_metadata_mapping_files(self) -> bool:
+        """
+        Generate metadata mapping files for NMDC submission.
+        
+        Creates workflow metadata CSV files separated by configuration that include:
+        - Raw data file paths and processed data directories
+        - Instrument information and analysis timestamps
+        - Configuration-specific metadata for NMDC submission
+        
+        Returns:
+            True if successful, False otherwise
+        """
+        if self.should_skip('metadata_mapping_generated'):
+            print("⏭️  Skipping metadata mapping generation (skip trigger set)")
+            return True
+        
+        print("📋 Generating metadata mapping files...")
+        
+        try:
+            # Check prerequisites
+            biosample_mapping_file = self.study_path / f"{self.study_name}_raw_file_biosample_mapping.csv"
+            if not biosample_mapping_file.exists():
+                print(f"❌ Biosample mapping file not found: {biosample_mapping_file}")
+                return False
+            
+            raw_inspection_results = self.get_raw_inspection_results_path()
+            if not raw_inspection_results:
+                print("❌ Raw data inspection results not found. Run raw_data_inspector first.")
+                return False
+            
+            # Load the mapped files
+            mapped_df = pd.read_csv(biosample_mapping_file)
+            
+            # Filter for only high and medium confidence matches
+            mapped_df = mapped_df[mapped_df['match_confidence'].isin(['high', 'medium'])].copy()
+            
+            if len(mapped_df) == 0:
+                print("❌ No high or medium confidence biosample matches found")
+                return False
+            
+            # Extract raw_data_file_short for merging
+            mapped_df['raw_data_file_short'] = mapped_df['raw_file_name']
+            
+            # Add raw data file paths
+            raw_data_dir = self.config['paths']['raw_data_directory']
+            if not raw_data_dir.endswith('/'):
+                raw_data_dir += '/'
+            mapped_df['raw_data_file'] = raw_data_dir + mapped_df['raw_data_file_short']
+            
+            # Add processed data directories
+            processed_data_dir = self.config['paths']['processed_data_directory']
+            if not processed_data_dir.endswith('/'):
+                processed_data_dir += '/'
+            mapped_df['processed_data_directory'] = (
+                processed_data_dir +
+                mapped_df['raw_data_file_short'].str.replace(r'(?i)\.(raw|mzml)$', '', regex=True) +
+                '.corems'
+            )
+            
+            # Add instrument times from raw inspection results
+            file_info_df = pd.read_csv(raw_inspection_results)
+            
+            # Filter out files with errors or missing critical metadata
+            initial_count = len(file_info_df)
+            
+            # Remove files with errors
+            if 'error' in file_info_df.columns:
+                error_mask = file_info_df['error'].notna()
+                if error_mask.any():
+                    error_files = file_info_df[error_mask]['file_name'].tolist()
+                    print(f"⚠️  Excluding {len(error_files)} files with processing errors:")
+                    for f in error_files[:5]:  # Show first 5
+                        print(f"   - {f}")
+                    if len(error_files) > 5:
+                        print(f"   ... and {len(error_files) - 5} more")
+                    file_info_df = file_info_df[~error_mask]
+            
+            # Remove files with missing write_time (critical for metadata)
+            null_time_mask = file_info_df['write_time'].isna()
+            if null_time_mask.any():
+                null_time_files = file_info_df[null_time_mask]['file_name'].tolist()
+                print(f"⚠️  Excluding {len(null_time_files)} files with missing write_time:")
+                for f in null_time_files:
+                    print(f"   - {f}")
+                file_info_df = file_info_df[~null_time_mask]
+            
+            final_count = len(file_info_df)
+            if final_count != initial_count:
+                print(f"📊 Raw inspection results: {initial_count} → {final_count} files (excluded {initial_count - final_count} with errors)")
+            
+            if final_count == 0:
+                print("❌ No valid files remaining after filtering - check raw data inspection results")
+                return False
+            
+            # Process remaining valid files
+            file_info_df['instrument_instance_specifier'] = file_info_df['instrument_serial_number'].astype(str)
+            file_info_df['instrument_analysis_end_date'] = pd.to_datetime(file_info_df["write_time"]).dt.strftime('%Y-%m-%dT%H:%M:%SZ')
+            file_info_df['raw_data_file_short'] = file_info_df['file_name']
+            
+            # Remove unwanted serial numbers
+            serial_numbers_to_remove = self.config.get('metadata', {}).get('serial_numbers_to_remove', [])
+            if serial_numbers_to_remove:
+                file_info_df['instrument_instance_specifier'] = file_info_df['instrument_instance_specifier'].replace(serial_numbers_to_remove, pd.NA)
+            
+            print(f"Unique instrument_instance_specifier values: {file_info_df['instrument_instance_specifier'].unique()}")
+            # Only show date range for valid dates
+            valid_dates = file_info_df['instrument_analysis_end_date'].dropna()
+            if len(valid_dates) > 0:
+                print(f"Date range: {valid_dates.min()} to {valid_dates.max()}")
+            else:
+                print("No valid dates found")
+            
+            # Keep only relevant columns for merging
+            file_info_df = file_info_df[['raw_data_file_short', 'instrument_analysis_end_date', 'instrument_instance_specifier']]
+            
+            # Merge instrument information
+            merged_df = pd.merge(mapped_df, file_info_df, on='raw_data_file_short', how='left')
+            
+            # Validate merge didn't change row count
+            if len(merged_df) != len(mapped_df):
+                print(f"❌ Merge error: expected {len(mapped_df)} rows, got {len(merged_df)}")
+                return False
+            
+            # Check for files that didn't get instrument metadata
+            missing_metadata = merged_df['instrument_analysis_end_date'].isna().sum()
+            if missing_metadata > 0:
+                print(f"⚠️  {missing_metadata} files missing instrument metadata (may not be in raw inspection results)")
+                missing_files = merged_df[merged_df['instrument_analysis_end_date'].isna()]['raw_data_file_short'].tolist()
+                for f in missing_files[:5]:  # Show first 5
+                    print(f"   - {f}")
+                if len(missing_files) > 5:
+                    print(f"   ... and {len(missing_files) - 5} more")
+                
+                # Remove files without metadata for metadata generation
+                merged_df = merged_df[merged_df['instrument_analysis_end_date'].notna()].copy()
+                print(f"📊 Proceeding with {len(merged_df)} files that have complete metadata")
+            
+            # Add common metadata from config that applies to all files
+            metadata_config = self.config.get('metadata', {})
+            merged_df['processing_institution_workflow'] = metadata_config.get('processing_institution_workflow', 'EMSL')
+            merged_df['processing_institution_generation'] = metadata_config.get('processing_institution_generation', 'EMSL')
+            
+            # Add sample_id (alias for biosample_id)
+            merged_df['sample_id'] = merged_df['biosample_id']
+            
+            # Add biosample.associated_studies
+            merged_df['biosample.associated_studies'] = self.config['study']['id']
+            
+            # Add raw_data_url (placeholder for now)
+            merged_df['raw_data_url'] = metadata_config.get('raw_data_url_base', '') + merged_df['raw_data_file_short']
+            
+            # Create output directory
+            output_dir = self.study_path / "metadata" / "metadata_gen_input_csvs"
+            output_dir.mkdir(parents=True, exist_ok=True)
+            
+            # Clear existing files
+            for f in output_dir.glob("*.csv"):
+                f.unlink()
+            
+            # Generate configuration-specific CSV files
+            config_dfs = self._separate_files_by_configuration(merged_df, metadata_config)
+            
+            if not config_dfs:
+                print("❌ No files matched any configuration filters")
+                return False
+            
+            # Define final columns
+            final_columns = [
+                'sample_id', 'biosample.associated_studies', 'raw_data_file', 'processed_data_directory', 
+                'mass_spec_configuration_name', 'chromat_configuration_name', 'instrument_used', 
+                'processing_institution_workflow', 'processing_institution_generation',
+                'instrument_analysis_end_date', 'instrument_instance_specifier', 'raw_data_url'
+            ]
+            
+            # Write configuration-specific CSV files
+            files_written = 0
+            total_files = 0
+            
+            for config_name, config_df in config_dfs.items():
+                # Validate required columns exist
+                missing_cols = [col for col in final_columns if col not in config_df.columns]
+                if missing_cols:
+                    print(f"❌ Skipping {config_name}: missing columns {missing_cols}")
+                    continue
+                
+                # Check for empty dataframe
+                if len(config_df) == 0:
+                    print(f"⚠️  Skipping {config_name}: no files after filtering")
+                    continue
+                
+                # Write the CSV file
+                try:
+                    output_df = config_df[final_columns].copy()
+                    output_file = output_dir / f"{config_name}_metadata.csv"
+                    output_df.to_csv(output_file, index=False)
+                    
+                    files_written += 1
+                    total_files += len(output_df)
+                    
+                    # Show sample of metadata applied
+                    sample_chromat = output_df['chromat_configuration_name'].iloc[0]
+                    sample_ms = output_df['mass_spec_configuration_name'].iloc[0]
+                    print(f"✅ {config_name}_metadata.csv: {len(output_df)} files ({sample_chromat}, {sample_ms})")
+                    
+                except Exception as e:
+                    print(f"❌ Error writing {config_name}_metadata.csv: {e}")
+                    continue
+            
+            if files_written == 0:
+                print("❌ No metadata files were successfully written")
+                return False
+            
+            # Mark as completed and report success
+            self.set_skip_trigger('metadata_mapping_generated', True)
+            print(f"📋 Successfully generated {files_written} metadata files with {total_files} total entries")
+            print(f"   Output directory: {output_dir}")
+            return True
+            
+        except Exception as e:
+            print(f"❌ Error generating metadata mapping files: {e}")
+            import traceback
+            traceback.print_exc()
+            return False
+    
+    def _separate_files_by_configuration(self, merged_df: pd.DataFrame, metadata_config: dict) -> dict:
+        """
+        Separate files by configuration and apply configuration-specific metadata.
+        
+        Args:
+            merged_df: DataFrame with merged biosample and raw file metadata
+            metadata_config: Global metadata configuration from config file
+            
+        Returns:
+            Dictionary mapping configuration names to DataFrames with applied metadata
+        """
+        config_dfs = {}
+        
+        # Get default metadata values
+        default_instrument = metadata_config.get('instrument_used', 'Unknown')
+        default_mass_spec = metadata_config.get('mass_spec_configuration_name', 'Unknown') 
+        default_chromat = metadata_config.get('chromat_configuration_name', 'Unknown')
+        
+        print(f"📊 Separating {len(merged_df)} files into configurations...")
+        
+        for config in self.config.get('configurations', []):
+            config_name = config['name']
+            file_filters = config.get('file_filter', [])
+            
+            # Filter files for this configuration using AND logic (all filters must match)
+            if file_filters:
+                matching_indices = []
+                for idx, row in merged_df.iterrows():
+                    filename = row['raw_data_file_short'].lower()
+                    if all(filter_term.lower() in filename for filter_term in file_filters):
+                        matching_indices.append(idx)
+                
+                if matching_indices:
+                    config_df = merged_df.loc[matching_indices].copy()
+                else:
+                    print(f"⚠️  Configuration '{config_name}': No files match filters {file_filters}")
+                    continue
+            else:
+                # No filters specified - include all files
+                config_df = merged_df.copy()
+                print(f"ℹ️  Configuration '{config_name}': No filters specified, including all files")
+            
+            # Apply configuration-specific metadata (with fallback to defaults)
+            config_df['instrument_used'] = config.get('instrument_used', default_instrument)
+            config_df['mass_spec_configuration_name'] = config.get('mass_spec_configuration_name', default_mass_spec)
+            config_df['chromat_configuration_name'] = config.get('chromat_configuration_name', default_chromat)
+            
+            config_dfs[config_name] = config_df
+            
+            # Report results
+            filter_desc = f"filters {file_filters}" if file_filters else "no filters (all files)"
+            metadata_desc = f"chromat='{config_df['chromat_configuration_name'].iloc[0]}', ms='{config_df['mass_spec_configuration_name'].iloc[0]}'"
+            print(f"✅ Configuration '{config_name}': {len(config_df)} files match {filter_desc} ({metadata_desc})")
+        
+        # Fallback: if no configurations worked, create single dataset with defaults
+        if not config_dfs:
+            print("⚠️  No configurations matched any files - creating fallback configuration")
+            fallback_df = merged_df.copy()
+            fallback_df['instrument_used'] = default_instrument
+            fallback_df['mass_spec_configuration_name'] = default_mass_spec
+            fallback_df['chromat_configuration_name'] = default_chromat
+            config_dfs['all_data'] = fallback_df
+            print(f"📋 Fallback configuration: {len(fallback_df)} files with default metadata")
+        
+        return config_dfs
+    
+    def generate_nmdc_submission_packages(self) -> bool:
+        """
+        Needs to be implemented.
+        """
+        raise NotImplementedError("generate_nmdc_submission_packages() is not yet implemented.")
+    
+    def submit_metadata_packages(self, environment: str = 'dev') -> bool:
+        """
+        Needs to be implemented.
+        """
+        raise NotImplementedError("submit_metadata_packages() is not yet implemented.")

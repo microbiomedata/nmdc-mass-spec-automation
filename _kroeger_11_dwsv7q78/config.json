@@ -33,7 +33,9 @@
             "corems_toml": "/Users/heal742/LOCAL/05_NMDC/02_MetaMS/data_processing/_bioscales_lcms_metabolomics/metadata/bioscales_hilic_corems.toml",
             "msp_file": "/Users/heal742/LOCAL/05_NMDC/02_MetaMS/metams/test_data/test_lcms_metab_data/20250407_database.msp",
             "scan_translator": "/Users/heal742/LOCAL/05_NMDC/02_MetaMS/data_processing/_bioscales_lcms_metabolomics/metadata/bioscales_scan_translator.toml",
-            "cores": 5
+            "cores": 5,
+            "chromat_configuration_name": "HILIC",
+            "mass_spec_configuration_name": "ESI Orbitrap MS/MS Positive"
         },
         {
             "name": "hilic_neg",
@@ -44,7 +46,9 @@
             "corems_toml": "/Users/heal742/LOCAL/05_NMDC/02_MetaMS/data_processing/_bioscales_lcms_metabolomics/metadata/bioscales_hilic_corems.toml",
             "msp_file": "/Users/heal742/LOCAL/05_NMDC/02_MetaMS/metams/test_data/test_lcms_metab_data/20250407_database.msp",
             "scan_translator": "/Users/heal742/LOCAL/05_NMDC/02_MetaMS/data_processing/_bioscales_lcms_metabolomics/metadata/bioscales_scan_translator.toml",
-            "cores": 5
+            "cores": 5,
+            "chromat_configuration_name": "HILIC",
+            "mass_spec_configuration_name": "ESI Orbitrap MS/MS Negative"
         },
         {
             "name": "rp_pos",
@@ -55,7 +59,9 @@
             "corems_toml": "/Users/heal742/LOCAL/05_NMDC/02_MetaMS/data_processing/_bioscales_lcms_metabolomics/metadata/bioscales_rp_corems.toml",
             "msp_file": "/Users/heal742/LOCAL/05_NMDC/02_MetaMS/metams/test_data/test_lcms_metab_data/20250407_database.msp",
             "scan_translator": "/Users/heal742/LOCAL/05_NMDC/02_MetaMS/data_processing/_bioscales_lcms_metabolomics/metadata/bioscales_scan_translator.toml",
-            "cores": 5
+            "cores": 5,
+            "chromat_configuration_name": "C18",
+            "mass_spec_configuration_name": "ESI Orbitrap MS/MS Positive"
         },
         {
             "name": "rp_neg",
@@ -66,11 +72,25 @@
             "corems_toml": "/Users/heal742/LOCAL/05_NMDC/02_MetaMS/data_processing/_bioscales_lcms_metabolomics/metadata/bioscales_rp_corems.toml",
             "msp_file": "/Users/heal742/LOCAL/05_NMDC/02_MetaMS/metams/test_data/test_lcms_metab_data/20250407_database.msp",
             "scan_translator": "/Users/heal742/LOCAL/05_NMDC/02_MetaMS/data_processing/_bioscales_lcms_metabolomics/metadata/bioscales_scan_translator.toml",
-            "cores": 5
+            "cores": 5,
+            "chromat_configuration_name": "C18",
+            "mass_spec_configuration_name": "ESI Orbitrap MS/MS Negative"
         }
     ],
     "workflow": {
         "batch_size": 25
+    },
+    "metadata": {
+        "instrument_used": "Q Exactive Orbitrap",
+        "processing_institution_workflow": "EMSL",
+        "processing_institution_generation": "EMSL",
+        "chromat_configuration_name": "HILIC",
+        "mass_spec_configuration_name": "ESI Orbitrap MS/MS",
+        "raw_data_url_base": "https://massive.ucsd.edu/ProteoSAFe/result.jsp?view=download_detail&task=",
+        "serial_numbers_to_remove": [
+            "Unknown",
+            "Exactive Series slot #1"
+        ]
     },
     "skip_triggers": {
         "study_structure_created": true,
@@ -80,6 +100,10 @@
         "biosample_mapping_completed": true,
         "raw_data_inspected": true,
         "wdls_generated": true,
-        "data_processed": false
+        "data_processed": true,
+        "metadata_mapping_generated": true,
+        "metadata_packages_generated": false,
+        "metadata_submitted_dev": false,
+        "metadata_submitted_prod": false
     }
 }

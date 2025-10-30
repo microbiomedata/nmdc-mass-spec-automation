@@ -1,9 +1,9 @@
 {
     "lcmsMetabolomics.runMetaMSLCMSMetabolomics.file_paths": [
-        "/Volumes/LaCie/nmdc_data/_kroeger_11_dwsv7q78/raw/20210819_JGI-AK_MK_506588_SoilWaterRep_final_QE-139_HILICZ_USHXG01490_NEG_MSMS_28_S29-D30_A_Rg70to1050-CE102040-soil-S1_Run41.raw",
-        "/Volumes/LaCie/nmdc_data/_kroeger_11_dwsv7q78/raw/20210819_JGI-AK_MK_506588_SoilWaterRep_final_QE-139_HILICZ_USHXG01490_NEG_MSMS_4_S17-D30_A_Rg70to1050-CE102040-soil-S1_Run60.raw",
+        "/Volumes/LaCie/nmdc_data/_kroeger_11_dwsv7q78/raw/20210819_JGI-AK_MK_506588_SoilWaterRep_final_QE-139_HILICZ_USHXG01490_NEG_MSMS_6_S17-D30_C_Rg70to1050-CE102040-soil-S1_Run170.raw",
         "/Volumes/LaCie/nmdc_data/_kroeger_11_dwsv7q78/raw/20210819_JGI-AK_MK_506588_SoilWaterRep_final_QE-139_HILICZ_USHXG01490_NEG_MSMS_30_S29-D30_C_Rg70to1050-CE102040-soil-S1_Run182.raw",
-        "/Volumes/LaCie/nmdc_data/_kroeger_11_dwsv7q78/raw/20210819_JGI-AK_MK_506588_SoilWaterRep_final_QE-139_HILICZ_USHXG01490_NEG_MSMS_3_S16-D30_C_Rg70to1050-CE102040-soil-S1_Run194.raw"
+        "/Volumes/LaCie/nmdc_data/_kroeger_11_dwsv7q78/raw/20210819_JGI-AK_MK_506588_SoilWaterRep_final_QE-139_HILICZ_USHXG01490_NEG_MSMS_2_S16-D30_B_Rg70to1050-CE205060-soil-S1_Run155.raw",
+        "/Volumes/LaCie/nmdc_data/_kroeger_11_dwsv7q78/raw/20210819_JGI-AK_MK_506588_SoilWaterRep_final_QE-139_HILICZ_USHXG01490_NEG_MSMS_29_S29-D30_B_Rg70to1050-CE205060-soil-S1_Run106.raw"
     ],
     "lcmsMetabolomics.runMetaMSLCMSMetabolomics.output_directory": "output",
     "lcmsMetabolomics.runMetaMSLCMSMetabolomics.corems_toml_path": "/Users/heal742/LOCAL/05_NMDC/02_MetaMS/data_processing/_bioscales_lcms_metabolomics/metadata/bioscales_hilic_corems.toml",

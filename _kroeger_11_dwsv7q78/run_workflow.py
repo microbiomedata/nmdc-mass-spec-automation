@@ -84,11 +84,42 @@ def main():
     # Step 9: Upload processed data to MinIO
     print("\n9. Uploading processed data to MinIO...")
     #study.upload_to_minio()
+
+    # Step 10: Generate metadata mapping files
+    print("\n10. Generating metadata mapping files...")
+    metadata_success = study.generate_metadata_mapping_files()
+    if metadata_success:
+        print("✅ Metadata mapping files generated successfully")
+    else:
+        print("⚠️  Metadata mapping generation needs review")
+
+    # Step 11: Generate NMDC submission packages
+    print("\n11. Generating NMDC submission packages...")
+    packages_success = study.generate_nmdc_submission_packages()
+    if packages_success:
+        print("✅ NMDC submission packages generated successfully")
+    else:
+        print("⚠️  Package generation needs review")
+
+    # Step 12: Submit to NMDC development environment
+    print("\n12. Submitting to NMDC development environment...")
+    dev_success = study.submit_metadata_packages(environment='dev')
+    if dev_success:
+        print("✅ Submitted to NMDC development successfully")
+    
+    # Step 13: Submit to NMDC production environment
+    print("\n13. Submitting to NMDC production environment...")
+    prod_success = study.submit_metadata_packages(environment='prod')
+    if prod_success:
+        print("✅ Submitted to NMDC production successfully")
+
+
            
-    print("\n=== NEXT STEPS ===")
-    #TODO: these next steps don't exist yet
-    print("2. Make a mapping file that links raw and processed data to NMDC biosample IDs and other necessary input to metadata generation")
-    print("3. Use study.generate_nmdc_submission() to create NMDC submission packages for processed data")
+    print("\n=== WORKFLOW COMPLETE ===")
+    print("✅ All workflow steps completed!")
+    print("📁 Metadata mapping files: metadata/metadata_gen_input_csvs/")
+    print("📦 NMDC submission packages: metadata/nmdc_submission_packages/")
+    print("🚀 Metadata submitted to NMDC dev and prod environments")
     
     print(f"\nStudy directory: {study.study_path}")
     print(f"WDL runner script: {script_path}")

@@ -28,7 +28,9 @@
             "corems_toml": "/path/to/hilic_pos_corems.toml",
             "msp_file": "/path/to/database.msp",
             "scan_translator": "/path/to/scan_translator.toml",
-            "cores": 5
+            "cores": 5,
+            "chromat_configuration_name": "HILIC",
+            "mass_spec_configuration_name": "ESI Orbitrap MS/MS Positive"
         },
         {
             "name": "hilic_neg",
@@ -36,7 +38,9 @@
             "corems_toml": "/path/to/hilic_neg_corems.toml",
             "msp_file": "/path/to/database.msp",
             "scan_translator": "/path/to/scan_translator.toml",
-            "cores": 5
+            "cores": 5,
+            "chromat_configuration_name": "HILIC",
+            "mass_spec_configuration_name": "ESI Orbitrap MS/MS Negative"
         },
         {
             "name": "rp_pos",
@@ -44,12 +48,23 @@
             "corems_toml": "/path/to/rp_pos_corems.toml", 
             "msp_file": "/path/to/database.msp",
             "scan_translator": "/path/to/scan_translator.toml",
-            "cores": 5
+            "cores": 5,
+            "chromat_configuration_name": "C18",
+            "mass_spec_configuration_name": "ESI Orbitrap MS/MS Positive"
         }
     ],
     "workflow": {
         "batch_size": 25,
         "docker_image": "local-metams:latest"
+    },
+    "metadata": {
+        "instrument_used": "Instrument Model Name",
+        "processing_institution_workflow": "Institution Name",
+        "processing_institution_generation": "Institution Name",
+        "chromat_configuration_name": "Chromatography Method",
+        "mass_spec_configuration_name": "Mass Spec Configuration",
+        "raw_data_url_base": "https://massive.ucsd.edu/ProteoSAFe/result.jsp?view=download_detail&task=",
+        "serial_numbers_to_remove": ["Unknown", "Generic Serial"]
     },
     "skip_triggers": {
         "study_structure_created": false,
@@ -59,6 +74,10 @@
         "biosample_mapping_completed": false,
         "raw_data_inspected": false,
         "wdls_generated": false,
-        "data_processed": false
+        "data_processed": false,
+        "metadata_mapping_generated": false,
+        "metadata_packages_generated": false,
+        "metadata_submitted_dev": false,
+        "metadata_submitted_prod": false
     }
 }
