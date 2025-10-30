@@ -156,18 +156,23 @@ def match_to_biosamples(raw_files_info, biosample_df):
             day = complex_match.group(2)  # e.g., '30'
             rep = complex_match.group(3)  # e.g., 'A'
             
-            # Build expected biosample name pattern
-            column_desc = 'hydrophilic' if column_type == 'hilic' else 'hydrophobic'
-            expected_name = f"{extracted_sample}_{rep}_D{day} {column_desc}"
+            # Build the expected biosample name pattern (ignoring analytical method)
+            # The hydrophobic/hydrophilic refers to soil properties, not analytical column
+            base_pattern = f"{extracted_sample}_{rep}_D{day}"
             
-            # Look for exact match
-            exact_matches = biosample_df[biosample_df['name'].str.contains(
-                re.escape(expected_name), case=False, na=False)]
+            # Look for any biosample name that starts with this pattern
+            pattern_matches = biosample_df[biosample_df['name'].str.contains(
+                f"^{re.escape(base_pattern)}", case=False, na=False)]
             
-            if len(exact_matches) == 1:
-                mapping['biosample_id'] = exact_matches.iloc[0]['id']
-                mapping['biosample_name'] = exact_matches.iloc[0]['name']
+            if len(pattern_matches) == 1:
+                mapping['biosample_id'] = pattern_matches.iloc[0]['id']
+                mapping['biosample_name'] = pattern_matches.iloc[0]['name']
                 mapping['match_confidence'] = 'high'
+                mappings.append(mapping)
+                continue
+            elif len(pattern_matches) > 1:
+                # Multiple matches - this shouldn't happen with proper biosample naming
+                mapping['match_confidence'] = 'multiple_matches'
                 mappings.append(mapping)
                 continue
         

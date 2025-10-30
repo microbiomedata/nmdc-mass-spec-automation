@@ -836,20 +836,39 @@ class NMDCStudyManager:
             shutil.rmtree(wdl_jsons_path)
         wdl_jsons_path.mkdir(parents=True, exist_ok=True)
 
-        raw_data_dir = self.config['paths']['raw_data_directory']
+        # Use mapped files list if available (only files that map to biosamples)
+        mapped_files_csv = self.study_path / "metadata" / "mapped_raw_files.csv"
         
-        # Get the configured file type extension
-        file_type = self.config['study'].get('file_type', '.raw')
-        
-        # Get list of files matching the configured file type
-        file_pattern = f"*{file_type}"
-        raw_files = list(Path(raw_data_dir).rglob(file_pattern))
+        if mapped_files_csv.exists():
+            print("📋 Using mapped raw files list (only biosample-mapped files will be processed)")
+            import pandas as pd
+            mapped_df = pd.read_csv(mapped_files_csv)
+            raw_files = [Path(file_path) for file_path in mapped_df['raw_file_path'] 
+                        if Path(file_path).exists()]
+            print(f"Loaded {len(raw_files)} mapped files from {mapped_files_csv}")
+            
+            # Show mapping statistics
+            high_conf = len(mapped_df[mapped_df['match_confidence'] == 'high'])
+            med_conf = len(mapped_df[mapped_df['match_confidence'] == 'medium'])
+            print(f"  High confidence matches: {high_conf}")
+            print(f"  Medium confidence matches: {med_conf}")
+        else:
+            print("⚠️  Mapped files list not found - using all raw files")
+            print("   Run biosample mapping first to filter files by biosample mapping")
+            
+            raw_data_dir = self.config['paths']['raw_data_directory']
+            
+            # Get the configured file type extension
+            file_type = self.config['study'].get('file_type', '.raw')
+            
+            # Get list of files matching the configured file type
+            file_pattern = f"*{file_type}"
+            raw_files = list(Path(raw_data_dir).rglob(file_pattern))
+            print(f"Found {len(raw_files)} {file_type} files in {raw_data_dir}")
         
         # Filter out processed files
         if processed_files:
             raw_files = [f for f in raw_files if str(f) not in processed_files]
-        
-        print(f"Found {len(raw_files)} {file_type} files in {raw_data_dir}")
         
         # Create batches for each configuration
         json_count = 0
@@ -1440,6 +1459,10 @@ fi
             
             if result.returncode == 0:
                 print("✅ Biosample mapping completed successfully!")
+                
+                # Generate filtered file list for WDL processing
+                self._generate_mapped_files_list()
+                
                 self.set_skip_trigger('biosample_mapping_completed', True)
                 return True
             else:
@@ -1455,3 +1478,77 @@ fi
         finally:
             # Always return to original directory
             os.chdir(original_dir)
+            
+    def _generate_mapped_files_list(self) -> None:
+        """
+        Generate a list of raw data files that successfully mapped to biosamples.
+        
+        Creates a CSV file containing only the files with high and medium confidence
+        matches to NMDC biosamples. This filtered list is used by generate_wdl_jsons()
+        to ensure only mappable files are processed.
+        
+        Output file: metadata/mapped_raw_files.csv
+        Columns: raw_file_path, biosample_id, biosample_name, match_confidence
+        """
+        import pandas as pd
+        
+        # Load the biosample mapping file
+        mapping_file = self.study_path / f"{self.study_name}_raw_file_biosample_mapping.csv"
+        if not mapping_file.exists():
+            print(f"⚠️  Mapping file not found: {mapping_file}")
+            return
+            
+        try:
+            mapping_df = pd.read_csv(mapping_file)
+            
+            # Filter for only high and medium confidence matches
+            mapped_df = mapping_df[mapping_df['match_confidence'].isin(['high', 'medium'])].copy()
+            
+            if len(mapped_df) == 0:
+                print("⚠️  No high or medium confidence matches found - no files will be processed")
+                return
+            
+            # Get the full file paths from the downloaded files list
+            downloaded_files_csv = self.study_path / "metadata" / "downloaded_files.csv"
+            if downloaded_files_csv.exists():
+                downloaded_df = pd.read_csv(downloaded_files_csv)
+                
+                # Match by filename to get full paths
+                mapped_df = mapped_df.merge(
+                    downloaded_df[['file_name', 'file_path']], 
+                    left_on='raw_file_name', 
+                    right_on='file_name', 
+                    how='left'
+                )
+                
+                # Select and rename columns for output
+                output_df = mapped_df[['file_path', 'biosample_id', 'biosample_name', 'match_confidence']].copy()
+                output_df = output_df.rename(columns={'file_path': 'raw_file_path'})
+            else:
+                # Fallback if downloaded_files.csv doesn't exist
+                print("⚠️  downloaded_files.csv not found - using relative paths")
+                raw_data_dir = self.config['paths']['raw_data_directory']
+                mapped_df['raw_file_path'] = mapped_df['raw_file_name'].apply(
+                    lambda x: str(Path(raw_data_dir) / x)
+                )
+                output_df = mapped_df[['raw_file_path', 'biosample_id', 'biosample_name', 'match_confidence']].copy()
+            
+            # Save the filtered file list
+            output_file = self.study_path / "metadata" / "mapped_raw_files.csv"
+            output_df.to_csv(output_file, index=False)
+            
+            # Report statistics
+            total_files = len(mapping_df)
+            high_conf = len(mapped_df[mapped_df['match_confidence'] == 'high'])
+            med_conf = len(mapped_df[mapped_df['match_confidence'] == 'medium'])
+            
+            print(f"📋 Generated filtered file list: {output_file}")
+            print(f"   Total mapped files: {len(output_df)} of {total_files} ({len(output_df)/total_files*100:.1f}%)")
+            print(f"   High confidence: {high_conf}")
+            print(f"   Medium confidence: {med_conf}")
+            print(f"   Files excluded: {total_files - len(output_df)} (control samples + unmapped)")
+            
+        except Exception as e:
+            print(f"❌ Error generating mapped files list: {e}")
+            import traceback
+            traceback.print_exc()
