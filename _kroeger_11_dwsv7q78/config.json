@@ -123,12 +123,9 @@
         "biosample_mapping_script_generated": true,
         "biosample_mapping_completed": true,
         "raw_data_inspected": true,
-        "wdls_generated": true,
-        "data_processed": false,
         "metadata_mapping_generated": true,
+        "data_processed": false,
         "metadata_packages_generated": false,
         "metadata_submitted_dev": false,
-        "metadata_submitted_prod": false,
-        "metadata_generated": false
+        "metadata_submitted_prod": false    }
     }
-}

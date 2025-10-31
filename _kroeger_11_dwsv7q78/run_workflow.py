@@ -59,29 +59,22 @@ def main():
     print("\n5. Inspecting raw data files...")
     inspection_result = study.raw_data_inspector(
         cores=4,    # Use multiple cores for faster processing
-        limit=None  # Process all files
-        
+        limit=None  # Process all files  
     )
-    if inspection_result:
-        print(f"✅ Raw data inspection completed: {inspection_result}")
-    else:
-        print("⚠️  Raw data inspection completed but no results returned")
+    assert study.should_skip('raw_data_inspected'), "Raw data inspection must complete successfully to proceed"
+    assert inspection_result, "Raw data inspection did not return any results."
 
     # Step 6: Generate metadata mapping files with URL validation
     print("\n6. Generating metadata mapping files with URL validation...")
     metadata_success = study.generate_metadata_mapping_files()
-    if metadata_success:
-        print("✅ Metadata mapping files generated and URLs validated successfully")
-    else:
-        print("⚠️  Metadata mapping generation needs review")
+    assert study.should_skip('metadata_mapping_generated'), "Metadata mapping generation must complete successfully to proceed"
+    assert metadata_success, "Metadata mapping generation failed."
 
-    # Step 7: Generate WDL JSON files for processing
+    # Step 7: Generate WDL JSON files for processing, make runner script, and process them
     print("\n7. Generating WDL JSON files...")
     json_count = study.generate_wdl_jsons()
     print(f"WDL JSON files: {json_count}")
-
-    # Step 8: Generate WDL runner script
-    print("\n8. Generating WDL runner script...")
+    print("\n...Generating WDL runner script...")
     script_path = study.generate_wdl_runner_script()
     print(f"Generated script: {script_path}")
 
