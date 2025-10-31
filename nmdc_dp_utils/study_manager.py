@@ -1630,7 +1630,7 @@ fi
             import traceback
             traceback.print_exc()
 
-    def raw_data_inspector(self, file_paths=None, cores=1, limit=None, max_retries=3, retry_delay=5.0):
+    def raw_data_inspector(self, file_paths=None, cores=1, limit=None, max_retries=10, retry_delay=10.0):
         """
         Run raw data inspection on raw files to extract metadata using CoreMS.
         
@@ -1965,31 +1965,67 @@ fi
             # Add biosample.associated_studies (must be in brackets as a list)
             merged_df['biosample.associated_studies'] = f"['{self.config['study']['id']}']"
             
-            # Add raw_data_url using proper MASSIVE download format
-            massive_id = self.config['study']['massive_id']
-            file_type = self.config['study'].get('file_type', '.raw')
+            # Add raw_data_url using configurable URL construction
+            use_massive_urls = self.config.get('metadata', {}).get('use_massive_urls', True)
             
-            # Construct proper MASSIVE download URLs using the same logic as bioscales
-            def construct_massive_url(filename):
-                import urllib.parse
-                # Extract just the MSV part (remove version prefix like v07/)
-                if 'MSV' in massive_id:
-                    msv_part = 'MSV' + massive_id.split('MSV')[1]
+            if use_massive_urls:
+                # Load FTP URLs to get correct directory structure
+                ftp_file = self.study_path / f"{self.study_name}_massive_ftp_locs.csv"
+                if ftp_file.exists():
+                    ftp_df = pd.read_csv(ftp_file)
+                    # Create mapping from filename to full FTP path
+                    ftp_mapping = dict(zip(ftp_df['raw_data_file_short'], ftp_df['ftp_location']))
                 else:
-                    msv_part = massive_id
+                    print("⚠️  FTP URLs file not found - using simplified path structure")
+                    ftp_mapping = {}
                 
-                # Construct the file path: MSV.../raw/filename
-                file_path = f"{msv_part}/raw/{filename}"
-                encoded_path = urllib.parse.quote(file_path, safe='')
-                https_url = f"https://massive.ucsd.edu/ProteoSAFe/DownloadResultFile?file=f.{encoded_path}&forceDownload=true"
+                # Construct MASSIVE download URLs
+                massive_id = self.config['study']['massive_id']
                 
-                # Validate URL format
-                if not https_url.startswith("https://massive.ucsd.edu/ProteoSAFe/DownloadResultFile?file=f.MSV"):
-                    raise ValueError(f"Invalid MASSIVE URL format generated: {https_url}")
+                def construct_massive_url(filename):
+                    import urllib.parse
+                    import re
+                    
+                    # Extract just the MSV part (remove version prefix like v07/)
+                    if 'MSV' in massive_id:
+                        msv_part = 'MSV' + massive_id.split('MSV')[1]
+                    else:
+                        msv_part = massive_id
+                    
+                    # Get the full directory path from FTP URL if available
+                    if filename in ftp_mapping:
+                        ftp_url = ftp_mapping[filename]
+                        # Extract path after MSV number: /raw/directory/rawdata/filename.raw
+                        match = re.search(rf'{re.escape(msv_part)}(.+)/{re.escape(filename)}', ftp_url)
+                        if match:
+                            relative_path = match.group(1)  # e.g., /raw/20210819_JGI-AK_MK_506588.../rawdata
+                            # Construct the file path: MSV.../full/path/filename
+                            file_path = f"{msv_part}{relative_path}/{filename}"
+                        else:
+                            print(f"⚠️  Could not extract directory structure for {filename}")
+                            file_path = f"{msv_part}/raw/{filename}"
+                    else:
+                        # Fallback to simple structure
+                        file_path = f"{msv_part}/raw/{filename}"
+                    
+                    encoded_path = urllib.parse.quote(file_path, safe='')
+                    https_url = f"https://massive.ucsd.edu/ProteoSAFe/DownloadResultFile?file=f.{encoded_path}&forceDownload=true"
+                    
+                    # Validate URL format
+                    if not https_url.startswith("https://massive.ucsd.edu/ProteoSAFe/DownloadResultFile?file=f.MSV"):
+                        raise ValueError(f"Invalid MASSIVE URL format generated: {https_url}")
+                    
+                    return https_url
                 
-                return https_url
-            
-            merged_df['raw_data_url'] = merged_df['raw_data_file_short'].apply(construct_massive_url)
+                merged_df['raw_data_url'] = merged_df['raw_data_file_short'].apply(construct_massive_url)
+                
+                # Validate at least 5 URLs to ensure they're accessible
+                print("🔍 Validating MASSIVE URL accessibility...")
+                self._validate_massive_urls(merged_df['raw_data_url'].head(5).tolist())
+            else:
+                # Use placeholder URLs for future implementation
+                merged_df['raw_data_url'] = 'placeholder://raw_data/' + merged_df['raw_data_file_short']
+                print("⚠️  Using placeholder URLs - configure alternative URL construction method")
             
             # Create output directory
             output_dir = self.study_path / "metadata" / "metadata_gen_input_csvs"
@@ -2171,6 +2207,68 @@ fi
             print(f"📋 Fallback configuration: {len(fallback_df)} files with default metadata")
         
         return config_dfs
+    
+    def _validate_massive_urls(self, urls: List[str], max_attempts: int = 5) -> bool:
+        """
+        Validate MASSIVE URLs to ensure they're accessible.
+        
+        Args:
+            urls: List of URLs to validate
+            max_attempts: Maximum number of URLs to test
+            
+        Returns:
+            True if at least one URL is accessible, False otherwise
+            
+        Raises:
+            ValueError: If no URLs are accessible
+        """
+        import urllib.request
+        import urllib.error
+        import ssl
+        
+        # Create SSL context that ignores certificate verification for MASSIVE
+        ssl_context = ssl.create_default_context()
+        ssl_context.check_hostname = False
+        ssl_context.verify_mode = ssl.CERT_NONE
+        
+        successful_urls = 0
+        total_tested = min(len(urls), max_attempts)
+        
+        for i, url in enumerate(urls[:max_attempts]):
+            try:
+                # Use HEAD request to check accessibility without downloading
+                req = urllib.request.Request(url, method='HEAD')
+                response = urllib.request.urlopen(req, context=ssl_context, timeout=15)
+                
+                if response.status == 200:
+                    successful_urls += 1
+                    print(f"✅ URL {i+1}/{total_tested}: Accessible (Status: {response.status})")
+                    
+                    # Check if it looks like a file download
+                    content_type = response.headers.get('Content-Type', '')
+                    content_length = response.headers.get('Content-Length')
+                    if content_length:
+                        print(f"   File size: {int(content_length):,} bytes")
+                else:
+                    print(f"⚠️  URL {i+1}/{total_tested}: Unexpected status {response.status}")
+                    
+            except urllib.error.HTTPError as e:
+                print(f"❌ URL {i+1}/{total_tested}: HTTP {e.code} - {e.reason}")
+                if e.code == 404:
+                    print("   This file may not exist in the MASSIVE dataset")
+            except Exception as e:
+                print(f"❌ URL {i+1}/{total_tested}: {type(e).__name__}: {e}")
+        
+        if successful_urls == 0:
+            raise ValueError(f"None of the {total_tested} tested MASSIVE URLs are accessible. "
+                           "Check the MASSIVE dataset ID and file paths.")
+        elif successful_urls < total_tested // 2:
+            print(f"⚠️  Warning: Only {successful_urls}/{total_tested} URLs are accessible. "
+                  "Some files may not be available in MASSIVE.")
+        else:
+            print(f"✅ URL validation passed: {successful_urls}/{total_tested} URLs accessible")
+            
+        return True
     
     def generate_nmdc_submission_packages(self) -> bool:
         """

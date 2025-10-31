@@ -141,7 +141,7 @@
         "processing_institution_generation": "Institution Name",
         "chromat_configuration_name": "Chromatography Method",
         "mass_spec_configuration_name": "Mass Spec Configuration",
-        "raw_data_url_base": "https://massive.ucsd.edu/ProteoSAFe/result.jsp?view=download_detail&task=",
+        "use_massive_urls": true,
         "serial_numbers_to_remove": ["Unknown", "Generic Serial"]
     },
     "skip_triggers": {

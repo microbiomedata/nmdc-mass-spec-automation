@@ -34,8 +34,8 @@
             "msp_file": "/Users/heal742/LOCAL/05_NMDC/02_MetaMS/metams/test_data/test_lcms_metab_data/20250407_database.msp",
             "scan_translator": "/Users/heal742/LOCAL/05_NMDC/02_MetaMS/data_processing/_bioscales_lcms_metabolomics/metadata/bioscales_scan_translator.toml",
             "cores": 5,
-            "chromat_configuration_name": "HILIC",
-            "mass_spec_configuration_name": "ESI Orbitrap MS/MS Positive",
+            "chromat_configuration_name": "JGI/LBNL Metabolomics Standard LC Method - Polar HILIC-Z",
+            "mass_spec_configuration_name": "N/A, should be overwritten",
             "metadata_overrides": {
                 "mass_spec_configuration_name": {
                     "CE102040": "JGI/LBNL Standard Metabolomics Method, positive @10,20,40CE",
@@ -53,8 +53,8 @@
             "msp_file": "/Users/heal742/LOCAL/05_NMDC/02_MetaMS/metams/test_data/test_lcms_metab_data/20250407_database.msp",
             "scan_translator": "/Users/heal742/LOCAL/05_NMDC/02_MetaMS/data_processing/_bioscales_lcms_metabolomics/metadata/bioscales_scan_translator.toml",
             "cores": 5,
-            "chromat_configuration_name": "HILIC",
-            "mass_spec_configuration_name": "ESI Orbitrap MS/MS Negative",
+            "chromat_configuration_name": "JGI/LBNL Metabolomics Standard LC Method - Polar HILIC-Z",
+            "mass_spec_configuration_name": "N/A, should be overwritten",
             "metadata_overrides": {
                 "mass_spec_configuration_name": {
                     "CE102040": "JGI/LBNL Standard Metabolomics Method, negative @10,20,40CE",
@@ -72,8 +72,8 @@
             "msp_file": "/Users/heal742/LOCAL/05_NMDC/02_MetaMS/metams/test_data/test_lcms_metab_data/20250407_database.msp",
             "scan_translator": "/Users/heal742/LOCAL/05_NMDC/02_MetaMS/data_processing/_bioscales_lcms_metabolomics/metadata/bioscales_scan_translator.toml",
             "cores": 5,
-            "chromat_configuration_name": "C18",
-            "mass_spec_configuration_name": "ESI Orbitrap MS/MS Positive",
+            "chromat_configuration_name": "JGI/LBNL Metabolomics Standard LC Method - Nonpolar C18",
+            "mass_spec_configuration_name": "N/A, should be overwritten",
             "metadata_overrides": {
                 "mass_spec_configuration_name": {
                     "CE102040": "JGI/LBNL Standard Metabolomics Method, positive @10,20,40CE",
@@ -91,8 +91,8 @@
             "msp_file": "/Users/heal742/LOCAL/05_NMDC/02_MetaMS/metams/test_data/test_lcms_metab_data/20250407_database.msp",
             "scan_translator": "/Users/heal742/LOCAL/05_NMDC/02_MetaMS/data_processing/_bioscales_lcms_metabolomics/metadata/bioscales_scan_translator.toml",
             "cores": 5,
-            "chromat_configuration_name": "C18",
-            "mass_spec_configuration_name": "ESI Orbitrap MS/MS Negative",
+            "chromat_configuration_name": "JGI/LBNL Metabolomics Standard LC Method - Nonpolar C18",
+            "mass_spec_configuration_name": "N/A, should be overwritten",
             "metadata_overrides": {
                 "mass_spec_configuration_name": {
                     "CE102040": "JGI/LBNL Standard Metabolomics Method, negative @10,20,40CE",
@@ -106,11 +106,11 @@
     },
     "metadata": {
         "instrument_used": "Q Exactive Orbitrap",
-        "processing_institution_workflow": "EMSL",
-        "processing_institution_generation": "EMSL",
-        "chromat_configuration_name": "HILIC",
-        "mass_spec_configuration_name": "ESI Orbitrap MS/MS",
-        "raw_data_url_base": "https://massive.ucsd.edu/ProteoSAFe/result.jsp?view=download_detail&task=",
+        "processing_institution_workflow": "NDMC",
+        "processing_institution_generation": "JGI",
+        "chromat_configuration_name": "N/A, should be overwritten",
+        "mass_spec_configuration_name": "N/A, should be overwritten",
+        "use_massive_urls": true,
         "serial_numbers_to_remove": [
             "Unknown",
             "Exactive Series slot #1"

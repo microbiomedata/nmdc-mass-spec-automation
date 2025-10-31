@@ -34,13 +34,13 @@ def main():
     ftp_df = study.get_massive_ftp_urls()
     if not study.should_skip('raw_data_downloaded'):
         assert len(ftp_df) > 0, "No FTP URLs found in MASSIVE dataset."
-    
-    # Step 3: Download raw data from MASSIVe
+
+    # Step 3: Download a subset of raw data from MASSIVE based on configured file patterns
     print("\n3. Downloading raw data from MASSIVE...")
     downloaded_files = study.download_from_massive()
     print(f"Available files: {len(downloaded_files)}")
 
-    # Step 4: Map raw data files to biosamples
+    # Step 4: Map raw data files to biosamples by generating mapping script and running it
     print("\n4. Mapping raw data files to biosamples...")
     biosample_csv = study.get_biosample_attributes()
     print(f"Biosample attributes saved to: {biosample_csv}")
@@ -60,38 +60,41 @@ def main():
     inspection_result = study.raw_data_inspector(
         cores=4,    # Use multiple cores for faster processing
         limit=None  # Process all files
+        
     )
     if inspection_result:
         print(f"✅ Raw data inspection completed: {inspection_result}")
     else:
         print("⚠️  Raw data inspection completed but no results returned")
-    
-    # Step 6: Generate WDL JSON files for processing
-    print("\n6. Generating WDL JSON files...")
+
+    # Step 6: Generate metadata mapping files with URL validation
+    print("\n6. Generating metadata mapping files with URL validation...")
+    metadata_success = study.generate_metadata_mapping_files()
+    if metadata_success:
+        print("✅ Metadata mapping files generated and URLs validated successfully")
+    else:
+        print("⚠️  Metadata mapping generation needs review")
+
+    # Step 7: Generate WDL JSON files for processing
+    print("\n7. Generating WDL JSON files...")
     json_count = study.generate_wdl_jsons()
     print(f"WDL JSON files: {json_count}")
-    
-    # Step 7: Generate WDL runner script
-    print("\n7. Generating WDL runner script...")
+
+    # Step 8: Generate WDL runner script
+    print("\n8. Generating WDL runner script...")
     script_path = study.generate_wdl_runner_script()
     print(f"Generated script: {script_path}")
-    
-    # Step 8: Run WDL workflows
-    print("\n8. Running WDL workflows...")
+
+    # Step 9: Run WDL workflows
+    print("\n9. Running WDL workflows...")
     study.run_wdl_script(script_path)
     assert study.should_skip('data_processed'), "WDL workflows must complete successfully to proceed"
 
-    # Step 9: Upload processed data to MinIO
-    print("\n9. Uploading processed data to MinIO...")
+    # Step 10: Upload processed data to MinIO
+    print("\n10. Uploading processed data to MinIO...")
     #study.upload_to_minio()
 
-    # Step 10: Generate metadata mapping files
-    print("\n10. Generating metadata mapping files...")
-    metadata_success = study.generate_metadata_mapping_files()
-    if metadata_success:
-        print("✅ Metadata mapping files generated successfully")
-    else:
-        print("⚠️  Metadata mapping generation needs review")
+
 
     # Step 11: Generate NMDC submission packages
     print("\n11. Generating NMDC submission packages...")
