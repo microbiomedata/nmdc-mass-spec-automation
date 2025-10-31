@@ -1844,7 +1844,16 @@ fi
             output_dir = self.study_path / "raw_file_info"
             output_dir.mkdir(parents=True, exist_ok=True)
             
-            return self._run_raw_data_inspector_docker(file_paths, output_dir, cores, limit, max_retries, retry_delay, docker_image)
+            result = self._run_raw_data_inspector_docker(file_paths, output_dir, cores, limit, max_retries, retry_delay, docker_image)
+            
+            # Set the skip trigger on successful completion
+            if result is not None:
+                print("✅ Raw data inspection completed successfully!")
+                self.set_skip_trigger('raw_data_inspected', True)
+                return result
+            else:
+                print("❌ Raw data inspection failed")
+                return None
                 
         except Exception as e:
             print(f"❌ Error during raw data inspection: {e}")
