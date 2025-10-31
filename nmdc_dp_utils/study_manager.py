@@ -131,6 +131,56 @@ class NMDCStudyManager:
                 json.dump(self.config, f, indent=4)
             print(f"Updated skip trigger '{trigger_name}' to {value}")
     
+    def reset_all_triggers(self, save: bool = True):
+        """
+        Reset all skip triggers to False, allowing all workflow steps to run again.
+        
+        This method sets all existing skip triggers to False, effectively resetting
+        the workflow state to allow re-running all steps from the beginning.
+        
+        Args:
+            save: Whether to save the config file after resetting triggers (default: True)
+            
+        Note:
+            This is useful when you want to re-run the entire workflow or when 
+            troubleshooting issues that require reprocessing from scratch.
+            
+        Example:
+            >>> manager = NMDCStudyManager('config.json')
+            >>> manager.reset_all_triggers()
+            🔄 Reset 5 skip triggers to False:
+               • raw_data_downloaded: False
+               • biosample_mapping_completed: False
+               • data_processed: False
+               • biosample_attributes_fetched: False
+               • raw_data_inspected: False
+            All workflow steps will now run when executed
+        """
+        if 'skip_triggers' not in self.config:
+            self.config['skip_triggers'] = {}
+            print("No skip triggers found - nothing to reset")
+            return
+        
+        # Get list of current triggers before resetting
+        current_triggers = list(self.config['skip_triggers'].keys())
+        
+        if not current_triggers:
+            print("No skip triggers found - nothing to reset")
+            return
+        
+        # Reset all triggers to False
+        for trigger_name in current_triggers:
+            self.config['skip_triggers'][trigger_name] = False
+        
+        if save and hasattr(self, 'config_path'):
+            with open(self.config_path, 'w') as f:
+                json.dump(self.config, f, indent=4)
+        
+        print(f"🔄 Reset {len(current_triggers)} skip triggers to False:")
+        for trigger in current_triggers:
+            print(f"   • {trigger}: False")
+        print("All workflow steps will now run when executed")
+    
     def _init_minio_client(self) -> Optional[Minio]:
         """
         Initialize MinIO client using environment variables.
@@ -785,8 +835,7 @@ class NMDCStudyManager:
         print(f"Downloaded {downloaded_count} new files")
         return downloaded_count
     
-    def generate_wdl_jsons(self, batch_size: int = 50, 
-                          processed_files: Optional[List[str]] = None) -> int:
+    def generate_wdl_jsons(self, batch_size: int = 50) -> int:
         """
         Generate WDL workflow JSON configuration files for batch processing.
         
@@ -797,8 +846,6 @@ class NMDCStudyManager:
         
         Args:
             batch_size: Maximum number of files per batch (default: 50)
-            processed_files: List of file paths to exclude from processing
-                           (useful for resuming interrupted workflows)
             
         Returns:
             Total number of JSON configuration files created across all
@@ -822,7 +869,7 @@ class NMDCStudyManager:
             >>> json_count = manager.generate_wdl_jsons(batch_size=25)
             >>> print(f"Created {json_count} WDL JSON files")
         """
-        if self.should_skip('wdls_generated'):
+        if self.should_skip('data_processed'):
             print("Skipping WDL JSON generation (already generated)")
             # Count existing JSON files
             wdl_jsons_path = self.study_path / "wdl_jsons"
@@ -831,7 +878,10 @@ class NMDCStudyManager:
                 print(f"Found {json_count} existing WDL JSON files")
                 return json_count
             return 0
-            
+
+        # Always try to move data from the processing site to the processed site before regenerating jsons
+        self._move_processed_files(self.config['paths']['wdl_workspace'])
+        
         # Always empty the wdl_jsons directory first
         wdl_jsons_path = self.study_path / "wdl_jsons"
         if wdl_jsons_path.exists():
@@ -868,9 +918,46 @@ class NMDCStudyManager:
             raw_files = list(Path(raw_data_dir).rglob(file_pattern))
             print(f"Found {len(raw_files)} {file_type} files in {raw_data_dir}")
         
-        # Filter out processed files
-        if processed_files:
-            raw_files = [f for f in raw_files if str(f) not in processed_files]
+        # Filter out already-processed files by checking for corresponding .corems directories
+        processed_data_dir = self.config['paths'].get('processed_data_directory')
+        if processed_data_dir:
+            processed_path = Path(processed_data_dir)
+            if processed_path.exists():
+                initial_count = len(raw_files)
+                unprocessed_files = []
+                
+                print(f"🔍 Checking for already-processed files in: {processed_path}")
+                
+                for raw_file in raw_files:
+                    # Get the base name without extension (e.g., sample1.raw -> sample1)
+                    base_name = raw_file.stem
+                    
+                    # Check if corresponding .corems directory exists
+                    corems_dir = processed_path / f"{base_name}.corems"
+                    
+                    if corems_dir.exists() and corems_dir.is_dir():
+                        # Check if the .corems directory contains CSV files (indicates successful processing)
+                        csv_files = list(corems_dir.glob('*.csv'))
+                        if csv_files:
+                            continue  # Skip this file - already processed
+                    
+                    # File is not processed or processing incomplete
+                    unprocessed_files.append(raw_file)
+                
+                excluded_count = initial_count - len(unprocessed_files)
+                raw_files = unprocessed_files
+                
+                if excluded_count > 0:
+                    print(f"📊 Excluded {excluded_count} already-processed files")
+                    print(f"   Remaining unprocessed files: {len(raw_files)}")
+                else:
+                    print(f"✅ No processed files found - all {len(raw_files)} files will be included")
+            else:
+                print(f"⚠️  Processed data directory not found: {processed_path}")
+                print("   All files will be included for processing")
+        else:
+            print("⚠️  processed_data_directory not configured in config")
+            print("   All files will be included for processing")
         
         # Create batches for each configuration
         json_count = 0
@@ -931,8 +1018,6 @@ class NMDCStudyManager:
                 print(f"  ✓ Created batch {batch_num} with {len(batch_files)} files")
         
         print(f"\n📋 SUMMARY: Created {json_count} WDL JSON files total")
-        if json_count > 0:
-            self.set_skip_trigger('wdls_generated', True)
         return json_count
     
     def generate_wdl_runner_script(self, workflow_name: str = "metaMS_lcms_metabolomics", 
@@ -961,6 +1046,17 @@ class NMDCStudyManager:
             a 'wdl/' subdirectory with the workflow file. Use run_wdl_script()
             to execute from the appropriate location.
         """
+        if self.should_skip('data_processed'):
+            print("Skipping WDL runner script generation (data already processed)")
+            script_path = self.study_path / "scripts" / f"{self.study_name}_wdl_runner.sh"
+            if script_path.exists():
+                print(f"Found existing script: {script_path}")
+                return str(script_path)
+            else:
+                print("No existing script found.")
+                return ""
+
+
         if script_name is None:
             script_name = f"{self.study_name}_wdl_runner.sh"
             
@@ -1419,33 +1515,35 @@ fi
     def generate_biosample_mapping_script(self, script_name: Optional[str] = None, 
                                          template_path: Optional[str] = None) -> str:
         """
-        Generate a study-specific script for mapping raw files to biosamples.
+        Generate a study-specific TEMPLATE script for mapping raw files to biosamples.
         
-        Creates a customizable Python script that maps raw data files to NMDC
-        biosamples using a template file. The generated script includes template 
-        parsing logic that should be customized for each study's file naming conventions.
+        Creates a customizable Python template script that maps raw data files to NMDC
+        biosamples using a template file. The generated script is clearly labeled as a 
+        TEMPLATE and includes parsing logic that MUST be customized for each study's 
+        specific file naming conventions.
         
         Args:
             script_name: Name for the generated script. Defaults to 
-                        'map_raw_files_to_biosamples.py'
+                        'map_raw_files_to_biosamples_TEMPLATE.py'
             template_path: Path to template file. Defaults to 
                           'nmdc_dp_utils/templates/biosample_mapping_script_template.py'
         
         Returns:
-            Path to the generated mapping script
+            Path to the generated TEMPLATE script
             
         Note:
-            The generated script is based on a template that needs customization 
-            for each study's specific file naming patterns and biosample attributes.
+            The generated script is labeled as _TEMPLATE to prevent accidental use
+            without customization. Users should copy to a new filename and modify
+            the parsing logic for their study's specific file naming patterns.
         """
         if self.should_skip('biosample_mapping_script_generated'):
             print("Skipping biosample mapping script generation (already generated)")
-            script_path = self.study_path / "scripts" / (script_name or "map_raw_files_to_biosamples.py")
+            script_path = self.study_path / "scripts" / (script_name or "map_raw_files_to_biosamples_TEMPLATE.py")
             if script_path.exists():
                 return str(script_path)
         
         if script_name is None:
-            script_name = "map_raw_files_to_biosamples.py"
+            script_name = "map_raw_files_to_biosamples_TEMPLATE.py"
             
         if template_path is None:
             # Use default template relative to this module
@@ -1455,7 +1553,7 @@ fi
             
         script_path = self.study_path / "scripts" / script_name
         
-        print(f"� Generating biosample mapping script: {script_path}")
+        print(f"📝 Generating biosample mapping TEMPLATE script: {script_path}")
         print(f"📄 Using template: {template_path}")
         
         # Check if template exists
@@ -1480,9 +1578,12 @@ fi
         # Make the script executable
         os.chmod(script_path, 0o755)
         
-        print(f"Generated biosample mapping script: {script_path}")
+        print(f"📝 Generated biosample mapping TEMPLATE script: {script_path}")
         print("Made script executable (chmod +x)")
-        print("⚠️  Customize the parsing and matching logic for your study")
+        print("🔥 IMPORTANT: This is a TEMPLATE file - customize it for your study!")
+        print("   1. Copy to a new filename (remove _TEMPLATE)")
+        print("   2. Modify the parsing and matching logic for your specific file naming patterns")
+        print("   3. Test with a small subset of files before running on the full dataset")
         
         self.set_skip_trigger('biosample_mapping_script_generated', True)
         return str(script_path)
@@ -1495,8 +1596,9 @@ fi
         Sets skip trigger on successful completion.
         
         Args:
-            script_path: Path to the mapping script. Defaults to 
-                        'scripts/map_raw_files_to_biosamples.py'
+            script_path: Path to the customized mapping script (NOT the template). 
+                        Looks for 'scripts/map_raw_files_to_biosamples.py' by default.
+                        Will not run template files (_TEMPLATE) directly.
         
         Returns:
             True if mapping completed successfully, False otherwise
@@ -1506,20 +1608,45 @@ fi
             trigger on successful completion.
         """
         import subprocess
-        import sys
         
         if self.should_skip('biosample_mapping_completed'):
             print("Skipping biosample mapping (already completed)")
             return True
         
         if script_path is None:
-            script_path = self.study_path / "scripts" / "map_raw_files_to_biosamples.py"
+            # Check for both template and non-template versions
+            template_script = self.study_path / "scripts" / "map_raw_files_to_biosamples_TEMPLATE.py"
+            regular_script = self.study_path / "scripts" / "map_raw_files_to_biosamples.py"
+            
+            if regular_script.exists():
+                script_path = regular_script
+            elif template_script.exists():
+                print("❌ Found only TEMPLATE script - you must customize it first!")
+                print(f"Template script: {template_script}")
+                print("📝 To use it:")
+                print("   1. Copy the template to a new filename (remove _TEMPLATE)")
+                print("   2. Customize the parsing logic for your study")
+                print("   3. Run this function again with the customized script path")
+                return False
+            else:
+                print(f"❌ No mapping script found. Run generate_biosample_mapping_script() first")
+                return False
         else:
             script_path = Path(script_path)
         
+        # Check if user is trying to run the template directly
+        if '_TEMPLATE' in script_path.name:
+            print("❌ Cannot run TEMPLATE script directly!")
+            print(f"Template script: {script_path}")
+            print("📝 You must customize the template first:")
+            print("   1. Copy the template to a new filename (remove _TEMPLATE)")
+            print("   2. Customize the parsing logic for your study")
+            print("   3. Run this function again with the customized script path")
+            return False
+        
         if not script_path.exists():
             print(f"❌ Mapping script not found: {script_path}")
-            print("Run generate_biosample_mapping_script() first")
+            print("Make sure you've customized and saved the script from the template")
             return False
         
         print(f"🔗 Running biosample mapping script: {script_path}")
@@ -1632,22 +1759,31 @@ fi
 
     def raw_data_inspector(self, file_paths=None, cores=1, limit=None, max_retries=10, retry_delay=10.0):
         """
-        Run raw data inspection on raw files to extract metadata using CoreMS.
+        Run raw data inspection on raw files to extract metadata using CoreMS in Docker.
         
-        This method activates a virtual environment specified in the config and runs
-        a specialized script to extract instrument metadata, scan parameters, and
-        data range information from raw MS files.
+        This method runs a specialized script to extract instrument metadata, scan parameters, 
+        and data range information from raw MS files using a Docker container.
+        
+        IMPORTANT: .raw files require single-core processing to prevent crashes due to file
+        locking issues with the Thermo RawFileReader in Docker containers. This method 
+        automatically forces cores=1 when .raw files are detected.
         
         Args:
             file_paths (List[str], optional): List of file paths to inspect. 
                                             If None, uses mapped raw files from metadata.
-            cores (int): Number of cores for parallel processing (default: 1)
+            cores (int): Number of cores for parallel processing (default: 1).
+                        Automatically forced to 1 for .raw files to prevent crashes.
             limit (int, optional): Limit number of files to process (for testing)
-            max_retries (int): Maximum number of retry attempts for transient errors (default: 3)
-            retry_delay (float): Delay in seconds between retry attempts (default: 5.0)
+            max_retries (int): Maximum number of retry attempts for transient errors (default: 10)
+            retry_delay (float): Delay in seconds between retry attempts (default: 10.0)
         
         Returns:
             str: Path to the output CSV file with inspection results
+            
+        Configuration Required:
+            "docker": {
+                "raw_data_inspector_image": "microbiomedata/metams:3.3.3"
+            }
         """
         # Check skip trigger first
         if self.should_skip('raw_data_inspected'):
@@ -1662,16 +1798,17 @@ fi
         
         print("🔍 Starting raw data inspection...")
         
+        # Check Docker configuration first
+        docker_image = self.config.get('docker', {}).get('raw_data_inspector_image')
+        if not docker_image:
+            print("❌ Docker image not configured.")
+            print("Please add 'docker.raw_data_inspector_image' to your config:")
+            print('  "docker": {')
+            print('    "raw_data_inspector_image": "microbiomedata/metams:3.3.3"')
+            print('  }')
+            return None
+        
         try:
-            # Get virtual environment path from config
-            venv_path = self.config.get('virtual_environments', {}).get('corems_env')
-            if not venv_path:
-                raise ValueError("CoreMS virtual environment path not found in config. Please add 'virtual_environments.corems_env' to your config.")
-            
-            venv_path = Path(venv_path)
-            if not venv_path.exists():
-                raise ValueError(f"Virtual environment not found at: {venv_path}")
-            
             # Get file paths to inspect
             if file_paths is None:
                 # Use mapped raw files if available
@@ -1692,117 +1829,243 @@ fi
                 print("⚠️  No raw files found to inspect")
                 return None
             
+            # Check for .raw files and force single core processing to prevent crashes
+            has_raw_files = any(str(fp).lower().endswith('.raw') for fp in file_paths)
+            original_cores = cores
+            if has_raw_files and cores > 1:
+                cores = 1
+                print(f"⚠️  Detected .raw files - forcing single core processing (requested: {original_cores} → using: 1)")
+                print("   Reason: Multi-core processing of .raw files in Docker causes crashes")
+                print("   due to file locking issues with Thermo RawFileReader library")
+            elif has_raw_files:
+                print("✅ .raw files detected - single core processing already configured")
+            
             # Set up output directory
             output_dir = self.study_path / "raw_file_info"
-            output_dir.mkdir(exist_ok=True)
+            output_dir.mkdir(parents=True, exist_ok=True)
             
-            # Get script path
-            script_path = Path(__file__).parent / "raw_data_inspector.py"
-            if not script_path.exists():
-                raise ValueError(f"Raw data inspector script not found at: {script_path}")
-            
-            # Prepare command arguments
-            cmd_args = [
-                "--files"] + file_paths + [
-                "--output-dir", str(output_dir),
-                "--cores", str(cores),
-                "--max-retries", str(max_retries),
-                "--retry-delay", str(retry_delay)
-            ]
-            
-            if limit is not None:
-                cmd_args.extend(["--limit", str(limit)])
-            
-            # Activate virtual environment and run script
-            if sys.platform == "win32":
-                # Windows
-                python_exec = venv_path / "Scripts" / "python.exe"
-                activate_script = venv_path / "Scripts" / "activate.bat"
-            else:
-                # Unix/Linux/macOS
-                python_exec = venv_path / "bin" / "python"
-                activate_script = venv_path / "bin" / "activate"
-            
-            if not python_exec.exists():
-                raise ValueError(f"Python executable not found at: {python_exec}")
-            
-            print(f"🐍 Using Python from: {python_exec}")
-            print(f"📁 Output directory: {output_dir}")
-            print(f"🔧 Processing {len(file_paths)} files with {cores} cores")
-            
-            # Build and run command
-            cmd = [str(python_exec), str(script_path)] + cmd_args
-            
-            print(f"⚡ Running command: {' '.join(cmd[:5])}... (truncated)")
-            
-            # Run the command
-            result = subprocess.run(
-                cmd,
-                cwd=str(self.study_path),
-                capture_output=True,
-                text=True,
-                timeout=3600  # 1 hour timeout
-            )
-            
-            if result.returncode == 0:
-                print("✅ Raw data inspection completed successfully!")
+            return self._run_raw_data_inspector_docker(file_paths, output_dir, cores, limit, max_retries, retry_delay, docker_image)
                 
-                # Parse output to find the result file path
-                lines = result.stdout.strip().split('\n')
-                output_file_path = None
-                for line in lines:
-                    if "Results:" in line:
-                        output_file_path = line.split("Results:")[-1].strip()
-                        break
-                
-                if output_file_path and Path(output_file_path).exists():
-                    print(f"📊 Results saved to: {output_file_path}")
-                    
-                    # Show summary statistics
-                    try:
-                        results_df = pd.read_csv(output_file_path)
-                        print(f"📈 Inspection summary:")
-                        print(f"   Files processed: {len(results_df)}")
-                        
-                        # Count successful vs failed
-                        failed_count = len(results_df[results_df['error'].notna()])
-                        success_count = len(results_df) - failed_count
-                        print(f"   Successful: {success_count}")
-                        print(f"   Failed: {failed_count}")
-                        
-                        if success_count > 0:
-                            # Show instrument summary if available
-                            if 'instrument_model' in results_df.columns:
-                                instruments = results_df['instrument_model'].value_counts()
-                                print(f"   Instrument models: {dict(instruments)}")
-                    
-                    except Exception as e:
-                        print(f"⚠️  Could not read results summary: {e}")
-                    
-                    # Set skip trigger on successful completion
-                    self.set_skip_trigger('raw_data_inspected', True)
-                    
-                    return output_file_path
-                else:
-                    print("⚠️  Could not find output file path in command output")
-                    print("Standard output:")
-                    print(result.stdout)
-                    return None
-            else:
-                print(f"❌ Raw data inspection failed with return code: {result.returncode}")
-                print("Standard error:")
-                print(result.stderr)
-                print("Standard output:")
-                print(result.stdout)
-                return None
-                
-        except subprocess.TimeoutExpired:
-            print("❌ Raw data inspection timed out after 1 hour")
-            return None
         except Exception as e:
             print(f"❌ Error during raw data inspection: {e}")
             import traceback
             traceback.print_exc()
+            return None
+    
+    def _run_raw_data_inspector_docker(self, file_paths, output_dir, cores, limit, max_retries, retry_delay, docker_image):
+        """Run raw data inspector using Docker container."""
+        print(f"🐳 Using Docker image: {docker_image}")
+        
+        # Check if Docker is available
+        try:
+            docker_check = subprocess.run(['docker', '--version'], 
+                                        capture_output=True, text=True, timeout=10)
+            if docker_check.returncode != 0:
+                raise RuntimeError("Docker is not available")
+            print(f"✅ Docker available: {docker_check.stdout.strip()}")
+        except (subprocess.TimeoutExpired, FileNotFoundError):
+            raise RuntimeError("Docker is not installed or not available")
+        
+        # Get script path
+        script_path = Path(__file__).parent / "raw_data_inspector.py"
+        if not script_path.exists():
+            raise ValueError(f"Raw data inspector script not found at: {script_path}")
+        
+        # Prepare volume mounts - we need to mount all parent directories of the file paths
+        # to ensure the files are accessible within the container
+        mount_points = set()
+        
+        # Add all unique parent directories of raw files
+        for file_path in file_paths:
+            file_path_obj = Path(file_path).resolve()
+            # Find the deepest common ancestor that makes sense for mounting
+            # For now, let's mount the entire raw_data_directory
+            raw_data_dir = Path(self.config['paths']['raw_data_directory']).resolve()
+            mount_points.add(str(raw_data_dir))
+        
+        # Always mount the output directory and script directory
+        mount_points.add(str(output_dir.resolve()))
+        mount_points.add(str(script_path.parent.resolve()))
+        
+        # Build Docker volume arguments
+        volume_args = []
+        container_file_paths = []
+        
+        for mount_point in mount_points:
+            container_path = f"/mnt{mount_point}"
+            volume_args.extend(["-v", f"{mount_point}:{container_path}"])
+            
+        # Convert file paths to container paths
+        raw_data_dir = Path(self.config['paths']['raw_data_directory']).resolve()
+        for file_path in file_paths:
+            file_path_obj = Path(file_path).resolve()
+            # Replace the raw_data_dir with the container mount point
+            container_file_path = str(file_path_obj).replace(str(raw_data_dir), f"/mnt{raw_data_dir}")
+            container_file_paths.append(container_file_path)
+        
+        # Convert output directory to container path
+        container_output_dir = f"/mnt{output_dir.resolve()}"
+        
+        # Convert script path to container path
+        container_script_path = f"/mnt{script_path.resolve()}"
+        
+        # Prepare command arguments
+        cmd_args = [
+            "--files"] + container_file_paths + [
+            "--output-dir", container_output_dir,
+            "--cores", str(cores),
+            "--max-retries", str(max_retries),
+            "--retry-delay", str(retry_delay)
+        ]
+        
+        if limit is not None:
+            cmd_args.extend(["--limit", str(limit)])
+        
+        print(f"📁 Output directory: {output_dir}")
+        print(f"🔧 Processing {len(file_paths)} files with {cores} cores")
+        print(f"📦 Volume mounts: {len(mount_points)} directories")
+        
+        # Show mount point details for debugging
+        print(f"🗂️  Mount points:")
+        for i, mount_point in enumerate(mount_points, 1):
+            print(f"   {i}. {mount_point} → /mnt{mount_point}")
+        
+        # Build Docker command
+        docker_cmd = [
+            "docker", "run", "--rm",
+            "--user", f"{os.getuid()}:{os.getgid()}",  # Run as current user to avoid permission issues
+        ] + volume_args + [
+            docker_image,
+            "python", container_script_path
+        ] + cmd_args
+        
+        print("⚡ Running Docker command...")
+        print(f"   Image: {docker_image}")
+        print(f"   Script: {container_script_path}")
+        print(f"   Files: {len(container_file_paths)} files")
+        print(f"   Cores: {cores}")
+        print(f"   Max retries: {max_retries}")
+        print(f"   Retry delay: {retry_delay}s")
+        if limit:
+            print(f"   Limit: {limit} files")
+        
+        print(f"\n🐳 Docker command preview:")
+        cmd_preview = " ".join(docker_cmd[:8]) + " ... " + " ".join(docker_cmd[-3:])
+        print(f"   {cmd_preview}")
+        
+        print(f"\n🔄 Starting raw data inspection (this may take several minutes)...")
+        print(f"💡 Processing files in batches - watch for progress updates below:")
+        print("=" * 70)
+        
+        # Run the Docker command with real-time output
+        result = subprocess.run(
+            docker_cmd,
+            cwd=str(self.study_path),
+            capture_output=False,  # Let output go directly to console for real-time feedback
+            text=True,
+            timeout=3600  # 1 hour timeout
+        )
+        
+        print("=" * 70)
+        print(f"📊 Docker execution completed with exit code: {result.returncode}")
+        
+        # Since we used capture_output=False, we need to check the output file directly
+        if result.returncode == 0:
+            # Look for the output file
+            default_output = output_dir / "raw_file_inspection_results.csv"
+            if default_output.exists():
+                return self._process_inspection_results_from_file(default_output)
+            else:
+                print(f"⚠️  Expected output file not found: {default_output}")
+                return None
+        else:
+            print(f"❌ Docker execution failed with exit code: {result.returncode}")
+            return None
+
+    def _process_inspection_results_from_file(self, output_file):
+        """Process inspection results from output CSV file."""
+        try:
+            import pandas as pd
+            print(f"📋 Reading inspection results from: {output_file}")
+            
+            # Read the CSV file
+            df = pd.read_csv(output_file)
+            print(f"✅ Successfully loaded {len(df)} inspection results")
+            
+            # Show a preview of the results
+            if len(df) > 0:
+                print("📊 Results preview:")
+                print(f"   Columns: {list(df.columns)}")
+                print(f"   Sample records: {min(3, len(df))}")
+                for i in range(min(3, len(df))):
+                    filename = df.iloc[i].get('filename', 'Unknown')
+                    print(f"     {i+1}. {filename}")
+            
+            return df
+        except Exception as e:
+            print(f"❌ Failed to read inspection results: {e}")
+            return None
+    
+
+    
+    def _process_inspection_results(self, result, output_dir):
+        """Process the results from raw data inspection (common for both Docker and venv methods)."""
+        if result.returncode == 0:
+            print("✅ Raw data inspection completed successfully!")
+            
+            # Parse output to find the result file path
+            lines = result.stdout.strip().split('\n')
+            output_file_path = None
+            for line in lines:
+                if "Results:" in line:
+                    output_file_path = line.split("Results:")[-1].strip()
+                    break
+            
+            # If not found in stdout, use default path
+            if not output_file_path or not Path(output_file_path).exists():
+                default_output = output_dir / "raw_file_inspection_results.csv"
+                if default_output.exists():
+                    output_file_path = str(default_output)
+            
+            if output_file_path and Path(output_file_path).exists():
+                print(f"📊 Results saved to: {output_file_path}")
+                
+                # Show summary statistics
+                try:
+                    results_df = pd.read_csv(output_file_path)
+                    print("📈 Inspection summary:")
+                    print(f"   Files processed: {len(results_df)}")
+                    
+                    # Count successful vs failed
+                    failed_count = len(results_df[results_df['error'].notna()])
+                    success_count = len(results_df) - failed_count
+                    print(f"   Successful: {success_count}")
+                    print(f"   Failed: {failed_count}")
+                    
+                    if success_count > 0:
+                        # Show instrument summary if available
+                        if 'instrument_model' in results_df.columns:
+                            instruments = results_df['instrument_model'].value_counts()
+                            print(f"   Instrument models: {dict(instruments)}")
+                
+                except Exception as e:
+                    print(f"⚠️  Could not read results summary: {e}")
+                
+                # Set skip trigger on successful completion
+                self.set_skip_trigger('raw_data_inspected', True)
+                
+                return output_file_path
+            else:
+                print("⚠️  Could not find output file")
+                print("Standard output:")
+                print(result.stdout)
+                return None
+        else:
+            print(f"❌ Raw data inspection failed with return code: {result.returncode}")
+            print("Standard error:")
+            print(result.stderr)
+            print("Standard output:")
+            print(result.stdout)
             return None
     
     def get_raw_inspection_results_path(self) -> Optional[str]:

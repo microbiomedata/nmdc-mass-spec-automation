@@ -2,6 +2,8 @@
 
 This reusable system provides a standardized way to manage NMDC metabolomics studies, including:
 - Downloading files from MASSIVE datasets using dataset IDs
+- Docker-based raw data inspection for metadata extraction
+- Biosample mapping with confidence scoring
 - Uploading/downloading files to/from MinIO
 - Generating WDL JSON files for processing
 - Managing consistent directory structures
@@ -10,10 +12,16 @@ This reusable system provides a standardized way to manage NMDC metabolomics stu
 
 1. **Install dependencies**:
    ```bash
-   pip install pandas requests minio tqdm
+   pip install nmdc-api-utilities minio
    ```
 
-2. **Set MinIO environment variables**:
+2. **Install Docker**:
+   ```bash
+   # Pull the MetaMS Docker image for raw data inspection
+   docker pull microbiomedata/metams:3.3.3
+   ```
+
+3. **Set MinIO environment variables** (optional, for data upload/download):
    ```bash
    export MINIO_ACCESS_KEY="your_access_key"
    export MINIO_SECRET_KEY="your_secret_key"

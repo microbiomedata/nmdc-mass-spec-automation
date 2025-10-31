@@ -215,15 +215,23 @@ def process_file_wrapper(args) -> Optional[Dict]:
     file_path, output_file, error_file, max_retries, retry_delay = args
     
     if not file_path.is_file():
+        print(f"⚠️  File not found: {file_path.name}")
         return None
+    
+    print(f"🔍 Processing: {file_path.name} ({file_path.stat().st_size / (1024*1024):.1f} MB)")
     
     result = get_raw_file_info_single(file_path, max_retries=max_retries, retry_delay=retry_delay)
     
     if result is not None:
         # Write successful result immediately
         write_result_to_csv(result, output_file)
+        if result.get('error'):
+            print(f"❌ {file_path.name}: {result.get('error')}")
+        else:
+            print(f"✅ {file_path.name}: {result.get('total_scans', 'N/A')} scans, {result.get('instrument_model', 'Unknown')} instrument")
         return result
     else:
+        print(f"❌ {file_path.name}: Processing failed completely")
         # Log error
         with open(error_file, 'a', newline='') as f:
             writer = csv.writer(f)
@@ -312,23 +320,61 @@ def inspect_raw_files(
     if limit is not None:
         file_list = file_list[:limit]
     
+    print("=" * 70)
+    print("🔬 RAW DATA INSPECTOR - STARTING ANALYSIS")
+    print("=" * 70)
+    print(f"📊 Processing Configuration:")
+    print(f"   Files to inspect: {len(file_list)}")
+    print(f"   Processing cores: {cores}")
+    print(f"   Max retries per file: {max_retries}")
+    print(f"   Retry delay: {retry_delay}s")
+    print(f"   CoreMS available: {COREMS_AVAILABLE}")
+    if limit:
+        print(f"   File limit: {limit}")
+    
+    print(f"\n📁 Output Configuration:")
+    print(f"   Results file: {output_file}")
+    print(f"   Error log: {error_file}")
+    print(f"   Processing log: {log_file}")
+    
     logging.info(f"Found {len(file_list)} files to inspect")
     logging.info(f"Results will be written to: {output_file}")
     logging.info(f"Errors will be logged to: {error_file}")
     logging.info(f"CoreMS available: {COREMS_AVAILABLE}")
 
+    print("\n🔍 File List Preview:")
+    for i, file_path in enumerate(file_list[:5], 1):
+        size_mb = file_path.stat().st_size / (1024*1024)
+        print(f"   {i}. {file_path.name} ({size_mb:.1f} MB)")
+    if len(file_list) > 5:
+        print(f"   ... and {len(file_list) - 5} more files")
+    
+    print("\n🚀 Starting file processing...")
+    print("=" * 70)
+
     # Prepare arguments for processing
     process_args = [(file_path, output_file, error_file, max_retries, retry_delay) for file_path in file_list]
     
     successful_count = 0
+    start_time = datetime.now()
     
     if cores == 1:
-        # Sequential processing
-        for args in tqdm(process_args, desc="Inspecting files", unit="file"):
+        print("🔄 Sequential processing mode")
+        # Sequential processing without tqdm to avoid conflicts with our custom output
+        for i, args in enumerate(process_args, 1):
+            print(f"\n📋 [{i}/{len(process_args)}] Processing batch...")
             result = process_file_wrapper(args)
             if result and not result.get('error'):
                 successful_count += 1
+            
+            # Show progress every 5 files or at key milestones
+            if i % 5 == 0 or i in [1, len(process_args)]:
+                elapsed = (datetime.now() - start_time).total_seconds()
+                rate = i / elapsed if elapsed > 0 else 0
+                eta = (len(process_args) - i) / rate if rate > 0 else 0
+                print(f"📈 Progress: {i}/{len(process_args)} ({i/len(process_args)*100:.1f}%) | Rate: {rate:.1f} files/sec | ETA: {eta/60:.1f}min")
     else:
+        print(f"⚡ Parallel processing mode with {cores} cores")
         # Parallel processing
         with Pool(processes=cores) as pool:
             results = list(tqdm(
@@ -341,10 +387,20 @@ def inspect_raw_files(
         successful_count = sum(1 for result in results if result and not result.get('error'))
     
     # Final summary
+    elapsed_total = (datetime.now() - start_time).total_seconds()
     failed_count = len(file_list) - successful_count
-    logging.info(f"Inspection complete!")
+    
+    print("=" * 70)
+    print("📋 PROCESSING COMPLETE - FINAL SUMMARY")
+    print("=" * 70)
+    logging.info("Inspection complete!")
     logging.info(f"Successfully processed: {successful_count} files")
     logging.info(f"Failed to process: {failed_count} files")
+    
+    print(f"✅ Successfully processed: {successful_count} files")
+    print(f"❌ Failed to process: {failed_count} files")
+    print(f"⏱️  Total processing time: {elapsed_total/60:.1f} minutes")
+    print(f"📊 Average rate: {len(file_list)/elapsed_total:.2f} files/sec")
     
     if successful_count > 0:
         logging.info(f"Results saved to: {output_file}")

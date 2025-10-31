@@ -13,8 +13,8 @@
         "processed_data_directory": "/path/to/processed/data",
         "wdl_workspace": "/path/to/wdl/workspace"
     },
-    "virtual_environments": {
-        "corems_env": "/path/to/corems/venv"
+    "docker": {
+        "raw_data_inspector_image": "microbiomedata/metams:3.3.3"
     },
     "minio": {
         "endpoint": "admin.nmdcdemo.emsl.pnl.gov",
