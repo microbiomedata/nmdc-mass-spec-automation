@@ -1,9 +1,9 @@
 {
     "study": {
-        "name": "kroeger_11_dwsv7q78",
-        "id": "nmdc:sty-11-dwsv7q78",
-        "description": "Microbial regulation of soil water repellency to control soil degradation",
-        "massive_id": "v07/MSV000094090",
+        "name": "singer_11_46aje659",
+        "id": "nmdc:sty-11-46aje659",
+        "description": "Panicgrass rhizosphere soil microbial communities from growth chamber in LBNL, Berkeley, California, USA",
+        "massive_id": "v07/MSV000094782/",
         "file_type": ".raw",
         "file_filters": [
             "msms"
@@ -11,18 +11,18 @@
     },
     "paths": {
         "base_directory": "/Users/heal742/LOCAL/05_NMDC/02_MetaMS/data_processing",
-        "raw_data_directory": "/Volumes/LaCie/nmdc_data/_kroeger_11_dwsv7q78/raw",
-        "processed_data_directory": "/Volumes/LaCie/nmdc_data/_kroeger_11_dwsv7q78/processed_20251027",
+        "raw_data_directory": "/Volumes/LaCie/nmdc_data/_singer_11_46aje659/raw",
+        "processed_data_directory": "/Volumes/LaCie/nmdc_data/_singer_11_46aje659/processed_20251031",
         "wdl_workspace": "/Users/heal742/LOCAL/05_NMDC/02_MetaMS/metams"
-    },
-    "docker": {
-        "raw_data_inspector_image": "microbiomedata/metams:3.3.3"
     },
     "minio": {
         "endpoint": "admin.nmdcdemo.emsl.pnl.gov",
         "secure": true,
         "bucket": "metabolomics",
-        "processed_data_folder": "kroeger_11_dwsv7q78/processed_20251027"
+        "processed_data_folder": "singer_11_46aje659/processed_20251031"
+    },
+    "docker": {
+        "raw_data_inspector_image": "microbiomedata/metams:3.3.3"
     },
     "configurations": [
         {
@@ -125,7 +125,7 @@
         "biosample_mapping_completed": true,
         "raw_data_inspected": true,
         "metadata_mapping_generated": true,
-        "data_processed": true,
+        "data_processed": false,
         "processed_data_uploaded_to_minio": false,
         "metadata_packages_generated": false,
         "metadata_submitted_dev": false,

@@ -2542,6 +2542,69 @@ fi
             
         return True
     
+    def upload_processed_data_to_minio(self) -> bool:
+        """
+        Upload processed data files to MinIO object storage.
+        
+        Uploads all processed data files from the configured processed_data_directory
+        to MinIO using the study name as the folder structure. Only uploads files
+        that don't already exist in MinIO.
+        
+        Returns:
+            True if upload completed successfully, False otherwise
+            
+        Note:
+            Uses config paths for source directory and MinIO settings.
+            Creates folder structure: bucket/study_name/processed_data/
+        """
+        if not self.minio_client:
+            print("❌ MinIO client not initialized")
+            print("Set MINIO_ACCESS_KEY and MINIO_SECRET_KEY environment variables")
+            return False
+        
+        processed_data_dir = self.config['paths'].get('processed_data_directory')
+        if not processed_data_dir:
+            print("❌ processed_data_directory not configured")
+            return False
+        
+        processed_path = Path(processed_data_dir)
+        if not processed_path.exists():
+            print(f"❌ Processed data directory not found: {processed_path}")
+            return False
+        
+        # Check if there are any processed files
+        processed_files = list(processed_path.rglob("*.csv")) + list(processed_path.rglob("*.json"))
+        if not processed_files:
+            print(f"⚠️  No processed files found in {processed_path}")
+            return True  # Not an error, just nothing to upload
+        
+        bucket_name = self.config['minio']['bucket']
+        folder_name = self.config['minio']['processed_data_folder']
+        
+        print(f"📤 Uploading processed data to MinIO...")
+        print(f"   Source: {processed_path}")
+        print(f"   Destination: {bucket_name}/{folder_name}")
+        
+        try:
+            uploaded_count = self.upload_to_minio(
+                local_directory=str(processed_path),
+                bucket_name=bucket_name,
+                folder_name=folder_name
+            )
+            
+            if uploaded_count > 0:
+                print(f"✅ Successfully uploaded {uploaded_count} processed files to MinIO")
+                self.set_skip_trigger('processed_data_uploaded_to_minio', True)
+                return True
+            else:
+                print("ℹ️  All processed files already exist in MinIO")
+                self.set_skip_trigger('processed_data_uploaded_to_minio', True)
+                return True
+                
+        except Exception as e:
+            print(f"❌ Error uploading to MinIO: {e}")
+            return False
+
     def generate_nmdc_submission_packages(self) -> bool:
         """
         Needs to be implemented.

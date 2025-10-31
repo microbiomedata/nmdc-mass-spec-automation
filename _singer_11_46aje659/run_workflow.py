@@ -1,10 +1,7 @@
 #!/usr/bin/env python3
 """
-Kroeger study workflow runner.
+Singer study workflow runner.
 Run this from the root directory: /Users/heal742/LOCAL/05_NMDC/02_MetaMS/data_processing
-
-Study: Microbial regulation of soil water repellency to control soil degradation
-MASSIVE ID: MSV000094090
 """
 
 import sys
@@ -16,10 +13,10 @@ sys.path.append(str(Path.cwd() / "nmdc_dp_utils"))
 from study_manager import NMDCStudyManager
 
 def main():
-    """Run the Kroeger study workflow."""
-    
-    # Initialize study manager with the Kroeger config (assuming run from root directory)
-    config_path = Path.cwd() / "_kroeger_11_dwsv7q78" / "config.json"
+    """Run the study workflow."""
+
+    # Initialize study manager with the Singer config (assuming run from root directory)
+    config_path = Path.cwd() / "_singer_11_46aje659" / "config.json"
     study = NMDCStudyManager(str(config_path))
     
     print(f"=== {study.study_name.upper()} WORKFLOW ===")
@@ -40,7 +37,7 @@ def main():
     downloaded_files = study.download_from_massive()
     print(f"Available files: {len(downloaded_files)}")
 
-    # Step 4: Map raw data files to biosamples by generating mapping script and running it
+    # Step 4: Map raw data files to biosamples by generating a template mapping script, modifying it accordingly, and running it
     print("\n4. Mapping raw data files to biosamples...")
     biosample_csv = study.get_biosample_attributes()
     print(f"Biosample attributes saved to: {biosample_csv}")
@@ -50,19 +47,17 @@ def main():
     
     mapping_success = study.run_biosample_mapping_script()
     if not mapping_success:
-        print("⚠️  Biosample mapping needs manual review - check the mapping file and customize the script")
-        print("   Re-run after making changes to improve matching")
+        assert False, "Biosample mapping failed."
     else:
         print("✅ Biosample mapping completed successfully")
     
     # Step 5: Inspect raw data files for metadata and QC
     print("\n5. Inspecting raw data files...")
-    inspection_result = study.raw_data_inspector(
-        cores=4,    # Use multiple cores for faster processing
+    _ = study.raw_data_inspector(
+        cores=1,    # Single core for .raw files to prevent Docker crashes
         limit=None  # Process all files  
     )
     assert study.should_skip('raw_data_inspected'), "Raw data inspection must complete successfully to proceed"
-    assert inspection_result, "Raw data inspection did not return any results."
 
     # Step 6: Generate metadata mapping files with URL validation
     print("\n6. Generating metadata mapping files with URL validation...")
@@ -91,39 +86,6 @@ def main():
     else:
         print("⚠️  MinIO upload failed or was skipped")
     assert study.should_skip('processed_data_uploaded_to_minio'), "Processed data upload to MinIO must complete successfully to proceed"
-
-    # Step 10: Generate NMDC submission packages
-    print("\n10. Generating NMDC submission packages...")
-    packages_success = study.generate_nmdc_submission_packages()
-    if packages_success:
-        print("✅ NMDC submission packages generated successfully")
-    else:
-        print("⚠️  Package generation needs review")
-
-    # Step 11: Submit to NMDC development environment
-    print("\n11. Submitting to NMDC development environment...")
-    dev_success = study.submit_metadata_packages(environment='dev')
-    if dev_success:
-        print("✅ Submitted to NMDC development successfully")
-    
-    # Step 12: Submit to NMDC production environment
-    print("\n12. Submitting to NMDC production environment...")
-    prod_success = study.submit_metadata_packages(environment='prod')
-    if prod_success:
-        print("✅ Submitted to NMDC production successfully")
-
-
-           
-    print("\n=== WORKFLOW COMPLETE ===")
-    print("✅ All workflow steps completed!")
-    print("📁 Metadata mapping files: metadata/metadata_gen_input_csvs/")
-    print("📦 NMDC submission packages: metadata/nmdc_submission_packages/")
-    print("🚀 Metadata submitted to NMDC dev and prod environments")
-    
-    print(f"\nStudy directory: {study.study_path}")
-    print(f"WDL runner script: {script_path}")
-    print(f"Current skip triggers: {study.config.get('skip_triggers', {})}")
-    print("\nTo reset workflow and start over, set skip triggers to false in config.json")
 
 if __name__ == "__main__":
     main()

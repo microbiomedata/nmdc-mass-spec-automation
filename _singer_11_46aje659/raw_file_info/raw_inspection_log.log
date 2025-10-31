@@ -1,0 +1,9 @@
+2025-10-31 19:06:55,811 - INFO - Found 252 files to inspect
+2025-10-31 19:06:55,811 - INFO - Results will be written to: /mnt/Users/heal742/LOCAL/05_NMDC/02_MetaMS/data_processing/_singer_11_46aje659/raw_file_info/raw_file_inspection_results.csv
+2025-10-31 19:06:55,812 - INFO - Errors will be logged to: /mnt/Users/heal742/LOCAL/05_NMDC/02_MetaMS/data_processing/_singer_11_46aje659/raw_file_info/raw_file_inspection_errors.csv
+2025-10-31 19:06:55,812 - INFO - CoreMS available: True
+2025-10-31 19:17:55,150 - INFO - Inspection complete!
+2025-10-31 19:17:55,152 - INFO - Successfully processed: 252 files
+2025-10-31 19:17:55,152 - INFO - Failed to process: 0 files
+2025-10-31 19:17:55,152 - INFO - Results saved to: /mnt/Users/heal742/LOCAL/05_NMDC/02_MetaMS/data_processing/_singer_11_46aje659/raw_file_info/raw_file_inspection_results.csv
+2025-10-31 19:17:55,153 - INFO - Processing log saved to: /mnt/Users/heal742/LOCAL/05_NMDC/02_MetaMS/data_processing/_singer_11_46aje659/raw_file_info/raw_inspection_log.log
