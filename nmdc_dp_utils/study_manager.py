@@ -774,6 +774,7 @@ class NMDCStudyManager:
                     continue
 
             try:
+                print(f"Uploading {file_path}")
                 self.minio_client.fput_object(bucket_name, object_name, str(file_path))
                 uploaded_count += 1
             except S3Error as e:
