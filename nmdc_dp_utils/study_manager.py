@@ -879,9 +879,6 @@ class NMDCStudyManager:
                 return json_count
             return 0
 
-        # Always try to move data from the processing site to the processed site before regenerating jsons
-        self._move_processed_files(self.config['paths']['wdl_workspace'])
-        
         # Always empty the wdl_jsons directory first
         wdl_jsons_path = self.study_path / "wdl_jsons"
         if wdl_jsons_path.exists():
@@ -1216,39 +1213,40 @@ fi
     
     def run_wdl_script(self, script_path: str, working_directory: Optional[str] = None) -> int:
         """
-        Execute the WDL runner script with comprehensive error handling.
+        Execute WDL workflows by downloading the workflow file from GitHub and running 
+        it from a study-level workflow directory.
         
-        Handles all validation, error checking, workspace detection, Docker verification,
-        venv activation, and execution of WDL workflows. Sets the data_processed trigger 
-        on successful completion.
+        This method creates a workflow execution directory within the study, downloads
+        the WDL file from GitHub, sets up a Python virtual environment, and executes
+        the workflows directly without needing an external workspace.
         
         Args:
             script_path: Path to the shell script to execute
-            working_directory: Directory to run the script from. If not provided,
-                             uses 'wdl_workspace' from config paths.
+            working_directory: Optional override for execution directory. If not provided,
+                             creates 'wdl_execution' directory within the study.
         
         Returns:
             Exit code from the script execution (0 for success, non-zero for failure)
             
         Note:
-            This method handles all error cases internally and provides comprehensive
-            feedback. It will automatically set the data_processed trigger on success.
+            - Downloads WDL file from: https://github.com/microbiomedata/metaMS/blob/master/wdl/metaMS_lcms_metabolomics.wdl
+            - Creates study-level execution environment 
+            - No file moving required - processed data goes directly to configured location
         """
         import subprocess
+        import urllib.request
+        import ssl
         
         # Check if already processed
         if self.should_skip('data_processed'):
             print("Skipping WDL workflow execution (data already processed)")
             return 0
         
-        # Determine working directory
+        # Set up working directory within study
         if working_directory is None:
-            if 'wdl_workspace' not in self.config.get('paths', {}):
-                print("❌ WDL workspace not configured")
-                print("To run workflows, add 'wdl_workspace' to config paths:")
-                print('  "paths": { "wdl_workspace": "/path/to/wdl/workspace" }')
-                return 1
-            working_directory = self.config['paths']['wdl_workspace']
+            working_directory = self.study_path / "wdl_execution"
+        else:
+            working_directory = Path(working_directory)
         
         script_path = Path(script_path)
         working_dir = Path(working_directory)
@@ -1257,17 +1255,60 @@ fi
         if not script_path.exists():
             print(f"❌ Script not found: {script_path}")
             return 1
-            
-        # Validate working directory exists
-        if not working_dir.exists():
-            print(f"❌ Working directory not found: {working_dir}")
-            return 1
         
-        # Check if WDL directory exists in working directory
+        # Create working directory structure
+        working_dir.mkdir(parents=True, exist_ok=True)
         wdl_dir = working_dir / "wdl"
-        if not wdl_dir.exists():
-            print(f"⚠️  WARNING: WDL directory not found at {wdl_dir}")
-            print("The script may fail if it cannot find the workflow files")
+        wdl_dir.mkdir(parents=True, exist_ok=True)
+        
+        print(f"📁 WDL execution directory: {working_dir}")
+        
+        # Download WDL file from GitHub
+        wdl_url = "https://raw.githubusercontent.com/microbiomedata/metaMS/master/wdl/metaMS_lcms_metabolomics.wdl"
+        wdl_file = wdl_dir / "metaMS_lcms_metabolomics.wdl"
+        
+        if not wdl_file.exists():
+            print("📥 Downloading WDL file from GitHub...")
+            print(f"   URL: {wdl_url}")
+            print(f"   Destination: {wdl_file}")
+            
+            try:
+                # Create SSL context that handles certificate issues on macOS
+                ssl_context = ssl.create_default_context()
+                ssl_context.check_hostname = False
+                ssl_context.verify_mode = ssl.CERT_NONE
+                
+                # Try with urllib first
+                try:
+                    with urllib.request.urlopen(wdl_url, context=ssl_context) as response:
+                        wdl_content = response.read().decode('utf-8')
+                except Exception:
+                    # Fallback: try using subprocess with curl (often works better on macOS)
+                    print("   Retrying with curl...")
+                    result = subprocess.run([
+                        'curl', '-L', '-k', '--silent', '--show-error', wdl_url
+                    ], capture_output=True, text=True, timeout=30)
+                    
+                    if result.returncode != 0:
+                        raise Exception(f"curl failed: {result.stderr}")
+                    
+                    wdl_content = result.stdout
+                
+                # Validate we got actual WDL content
+                if not wdl_content.strip() or 'workflow' not in wdl_content.lower():
+                    raise Exception("Downloaded content doesn't appear to be a valid WDL file")
+                
+                with open(wdl_file, 'w') as f:
+                    f.write(wdl_content)
+                
+                print("✅ WDL file downloaded successfully")
+            except Exception as e:
+                print(f"❌ Failed to download WDL file: {e}")
+                print("You can manually download the file with:")
+                print(f"  curl -L -k '{wdl_url}' > '{wdl_file}'")
+                return 1
+        else:
+            print(f"✅ WDL file already exists: {wdl_file}")
         
         # Check if Docker is running
         print("🐳 Checking Docker availability...")
@@ -1277,39 +1318,71 @@ fi
             if docker_check.returncode != 0:
                 print("❌ Docker is not running or not available")
                 print("Please start Docker Desktop and try again")
-                print("You can check Docker status with: docker info")
                 return 1
             print("✅ Docker is running")
         except subprocess.TimeoutExpired:
             print("❌ Docker check timed out - Docker may not be running")
-            print("Please start Docker Desktop and try again")
             return 1
         except FileNotFoundError:
-            print("❌ Docker command not found")
-            print("Please install Docker Desktop and try again")
+            print("❌ Docker command not found - please install Docker Desktop")
             return 1
         except Exception as e:
             print(f"❌ Error checking Docker: {e}")
             return 1
         
-        # Check if venv exists and can be activated
-        venv_dir = working_dir / "venv"
-        if not venv_dir.exists():
-            print(f"❌ Virtual environment not found at: {venv_dir}")
-            print("Please create a virtual environment:")
-            print(f"  cd {working_dir}")
-            print("  python -m venv venv")
-            print("  source venv/bin/activate")
-            print("  pip install -r requirements.txt")
+        # Use the base directory virtual environment
+        base_venv_dir = self.base_path / "venv"
+        venv_python = base_venv_dir / "bin" / "python"
+        
+        if not base_venv_dir.exists():
+            print(f"❌ Virtual environment not found at: {base_venv_dir}")
+            print("Please ensure you have a virtual environment set up in the base directory")
+            print("Run: python -m venv venv && source venv/bin/activate && pip install -r requirements.txt")
             return 1
         
-        venv_python = venv_dir / "bin" / "python"
         if not venv_python.exists():
-            print(f"❌ Virtual environment Python not found at: {venv_python}")
-            print("Virtual environment may be corrupted. Please recreate it.")
+            print(f"❌ Python executable not found in venv: {venv_python}")
             return 1
         
-        print(f"✅ Virtual environment found at: {venv_dir}")
+        print(f"✅ Using existing virtual environment: {base_venv_dir}")
+        
+        # Check if required WDL packages are installed
+        print("📦 Checking WDL dependencies...")
+        try:
+            result = subprocess.run([
+                str(venv_python), "-c", "import WDL; import docker; print('OK')"
+            ], capture_output=True, text=True, timeout=10)
+            
+            if result.returncode == 0:
+                print("✅ WDL dependencies available")
+            else:
+                raise subprocess.CalledProcessError(result.returncode, "import check")
+                
+        except (subprocess.CalledProcessError, subprocess.TimeoutExpired):
+            print("⚠️  WDL dependencies missing or corrupted. Installing...")
+            try:
+                # Force reinstall the WDL packages
+                subprocess.run([
+                    str(venv_python), "-m", "pip", "install", "--force-reinstall", 
+                    "miniwdl", "docker"
+                ], check=True, capture_output=True, text=True, timeout=60)
+                
+                # Verify the installation worked (miniwdl installs as WDL package)
+                verify_result = subprocess.run([
+                    str(venv_python), "-c", "import WDL; import docker; print('Installation verified')"
+                ], capture_output=True, text=True, timeout=10)
+                
+                if verify_result.returncode == 0:
+                    print("✅ WDL dependencies installed and verified")
+                else:
+                    print(f"❌ Installation verification failed: {verify_result.stderr}")
+                    return 1
+                    
+            except subprocess.CalledProcessError as e:
+                print(f"❌ Failed to install dependencies: {e}")
+                if hasattr(e, 'stderr') and e.stderr:
+                    print(f"Error details: {e}")
+                return 1
         
         print(f"🚀 Running WDL workflows from: {working_dir}")
         print("This will take a long time for large datasets...")
@@ -1321,11 +1394,11 @@ fi
             print(f"📁 Changing to working directory: {working_dir}")
             os.chdir(working_dir)
             
-            print(f"⚡ Executing script with venv activation: {script_path}")
+            print(f"⚡ Executing script with base venv: {script_path}")
             print("=" * 50)
             
-            # Create a command that activates venv and runs the script
-            activate_and_run = f"source venv/bin/activate && {script_path}"
+            # Create a command that activates the base venv and runs the script
+            activate_and_run = f"source {base_venv_dir}/bin/activate && {script_path}"
             
             # Run the script with bash to handle source command
             result = subprocess.run(['bash', '-c', activate_and_run], 
@@ -1338,8 +1411,9 @@ fi
             if result.returncode == 0:
                 print("🎉 All WDL workflows completed successfully!")
                 
-                # Move processed output files to the designated location
-                self._move_processed_files(working_dir)
+                # Move processed output files from working directory to designated processed data location
+                print("📁 Moving processed files to configured location...")
+                self._move_processed_files(str(working_dir))
                 
                 self.set_skip_trigger('data_processed', True)
             else:
@@ -1347,7 +1421,7 @@ fi
                 print("Check the logs above for details.")
                 print("You can run the script manually later:")
                 print(f"  cd {working_dir}")
-                print("  source venv/bin/activate")
+                print(f"  source {base_venv_dir}/bin/activate")
                 print(f"  {script_path}")
             
             return result.returncode
@@ -1356,7 +1430,7 @@ fi
             print(f"❌ Error executing script: {e}")
             print("You can run the script manually later:")
             print(f"  cd {working_dir}")
-            print("  source venv/bin/activate")
+            print(f"  source {base_venv_dir}/bin/activate")
             print(f"  {script_path}")
             return 1
             

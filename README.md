@@ -8,7 +8,7 @@ This repository contains utilities for managing NMDC (National Microbiome Data C
 - **Study Structure Setup**: Automated directory structure creation
 - **Raw Data Discovery**: MASSIVE dataset integration and download
 - **Biosample Mapping**: Intelligent mapping of raw files to NMDC biosamples
-- **WDL Workflow Generation**: Automated batch processing configuration
+- **Self-Contained WDL Workflows**: GitHub-integrated execution within study directories
 - **MinIO Integration**: Cloud storage management for processed data
 
 ### Quality Control & Analysis
@@ -66,6 +66,7 @@ data_processing/
 │   ├── config.json           # Study configuration
 │   ├── metadata/            # Biosample mappings, file lists
 │   ├── raw_file_info/       # Raw file inspection results (NEW!)
+│   ├── wdl_execution/       # Self-contained WDL workflow execution (NEW!)
 │   └── ...
 └── mappings/                  # Biosample mapping templates
 ```
@@ -112,11 +113,17 @@ Study configurations are JSON files containing:
         "massive_id": "MSV000000000"
     },
     "paths": {
+        "base_directory": "/path/to/data_processing",
         "raw_data_directory": "/path/to/raw/data",
         "processed_data_directory": "/path/to/processed/data"
     },
     "virtual_environments": {
         "corems_env": "/path/to/corems/venv"
+    },
+    "minio": {
+        "enabled": true,
+        "bucket": "nmdc-processed-data",
+        "processed_data_folder": "study_name/LC-MS/{config_name}/"
     },
     "configurations": [
         {
@@ -137,7 +144,7 @@ Study configurations are JSON files containing:
 ## Workflow Integration
 
 ```python
-# Complete workflow with quality control
+# Complete workflow with quality control and self-contained WDL execution
 study_manager = NMDCStudyManager("config.json")
 
 # 1. Map files to biosamples
@@ -149,34 +156,40 @@ study_manager._generate_mapped_files_list()
 # 3. NEW: Inspect raw files for QC
 inspection_results = study_manager.raw_data_inspector(cores=4)
 
-# 4. Process only mapped files
+# 4. Process only mapped files with self-contained WDL workflows
 study_manager.generate_wdl_jsons()
-study_manager.run_wdl_workflows()
+study_manager.run_wdl_script()  # Downloads WDL from GitHub, executes in study directory
+
+# 5. Upload processed data to MinIO (if configured)
+study_manager.upload_to_minio()
 ```
 
 ## Recent Updates
 
 ### Version 2024.12 (NEW!)
-- ✨ **Raw Data Inspector**: Comprehensive MS file metadata extraction
-- 🔄 **Virtual Environment Support**: Multi-environment workflow management
+- ✨ **Self-Contained WDL Workflows**: GitHub-integrated execution within study directories
+- 🔄 **Raw Data Inspector**: Comprehensive MS file metadata extraction
+- � **Virtual Environment Support**: Multi-environment workflow management
 - 📊 **Enhanced Error Tracking**: Detailed logging and error analysis
 - 🚀 **Parallel Processing**: Multi-core raw file analysis
 - 📋 **Filtered Processing**: Process only biosample-mapped files
 - 🔧 **Template System**: Maintainable biosample mapping scripts
+- ☁️ **MinIO Integration**: Configurable cloud storage with processed data upload
 
 ### Previous Updates
 - Biosample mapping simplification (4-column output)
 - Automated processed file management
 - WDL workflow optimization
-- MinIO cloud storage integration
+- Configuration simplification (removed external workspace dependencies)
 
 ## Requirements
 
 - Python 3.8+
 - pandas, pathlib, subprocess
+- miniwdl (for WDL workflow execution)
+- docker (for workflow containerization)
 - CoreMS (separate environment for raw inspection)
 - MinIO client for cloud storage
-- WDL workflow engine for processing
 
 ## Documentation
 

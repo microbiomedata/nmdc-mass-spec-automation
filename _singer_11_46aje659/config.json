@@ -12,8 +12,7 @@
     "paths": {
         "base_directory": "/Users/heal742/LOCAL/05_NMDC/02_MetaMS/data_processing",
         "raw_data_directory": "/Volumes/LaCie/nmdc_data/_singer_11_46aje659/raw",
-        "processed_data_directory": "/Volumes/LaCie/nmdc_data/_singer_11_46aje659/processed_20251031",
-        "wdl_workspace": "/Users/heal742/LOCAL/05_NMDC/02_MetaMS/metams"
+        "processed_data_directory": "/Volumes/LaCie/nmdc_data/_singer_11_46aje659/processed_20251031"
     },
     "minio": {
         "endpoint": "admin.nmdcdemo.emsl.pnl.gov",

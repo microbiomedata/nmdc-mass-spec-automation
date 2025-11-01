@@ -6,4 +6,9 @@ venv/
 __pycache__/
 .env
 
+# WDL workflow execution artifacts
+*/wdl_execution/
+*/_LAST/
+*/202[0-9]*/
+
 _ecofab_lcms_11_ev70y104/RawData.xlsx

@@ -1,0 +1,22 @@
+{
+    "lcmsMetabolomics.runMetaMSLCMSMetabolomics.file_paths": [
+        "/Volumes/LaCie/nmdc_data/_singer_11_46aje659/raw/20220203_JGI-AK-TH_ES_504603_EcoPod_final_IDX_C18_USDAY59443_POS_MSMS_3_B-D-0_1_Rg80to1200-CE102040-root-G3-S1_Run40.raw",
+        "/Volumes/LaCie/nmdc_data/_singer_11_46aje659/raw/20220203_JGI-AK-TH_ES_504603_EcoPod_final_IDX_C18_USDAY59443_POS_MSMS_43_A-C-4_1_Rg80to1200-CE102040-root-F12-S1_Run22.raw",
+        "/Volumes/LaCie/nmdc_data/_singer_11_46aje659/raw/20220203_JGI-AK-TH_ES_504603_EcoPod_final_IDX_C18_USDAY59443_POS_MSMS_76_B-C-7_2_Rg80to1200-CE102040-root-F21-S1_Run149.raw",
+        "/Volumes/LaCie/nmdc_data/_singer_11_46aje659/raw/20220203_JGI-AK-TH_ES_504603_EcoPod_final_IDX_C18_USDAY59443_POS_MSMS_67_B-C-5_1_Rg80to1200-CE102040-root-I22-S1_Run46.raw",
+        "/Volumes/LaCie/nmdc_data/_singer_11_46aje659/raw/20220203_JGI-AK-TH_ES_504603_EcoPod_final_IDX_C18_USDAY59443_POS_MSMS_15_A-C-2_2_Rg80to1200-CE102040-root-F2-S1_Run140.raw",
+        "/Volumes/LaCie/nmdc_data/_singer_11_46aje659/raw/20220203_JGI-AK-TH_ES_504603_EcoPod_final_IDX_C18_USDAY59443_POS_MSMS_6_A-C-0_2_Rg80to1200-CE102040-root-I5-S1_Run128.raw",
+        "/Volumes/LaCie/nmdc_data/_singer_11_46aje659/raw/20220203_JGI-AK-TH_ES_504603_EcoPod_final_IDX_C18_USDAY59443_POS_MSMS_55_A-D-4_2_Rg80to1200-CE102040-root-A15-S1_Run152.raw",
+        "/Volumes/LaCie/nmdc_data/_singer_11_46aje659/raw/20220203_JGI-AK-TH_ES_504603_EcoPod_final_IDX_C18_USDAY59443_POS_MSMS_52_B-D-4_5_Rg80to1200-CE102040-root-C13-S1_Run240.raw",
+        "/Volumes/LaCie/nmdc_data/_singer_11_46aje659/raw/20220203_JGI-AK-TH_ES_504603_EcoPod_final_IDX_C18_USDAY59443_POS_MSMS_48_A-C-4_2_Rg80to1200-CE102040-root-C11-S1_Run99.raw",
+        "/Volumes/LaCie/nmdc_data/_singer_11_46aje659/raw/20220203_JGI-AK-TH_ES_504603_EcoPod_final_IDX_C18_USDAY59443_POS_MSMS_17_A-C-2_3_Rg80to1200-CE102040-root-G2-S1_Run172.raw",
+        "/Volumes/LaCie/nmdc_data/_singer_11_46aje659/raw/20220203_JGI-AK-TH_ES_504603_EcoPod_final_IDX_C18_USDAY59443_POS_MSMS_23_A-D-2_3_Rg80to1200-CE102040-root-I4-S1_Run190.raw",
+        "/Volumes/LaCie/nmdc_data/_singer_11_46aje659/raw/20220203_JGI-AK-TH_ES_504603_EcoPod_final_IDX_C18_USDAY59443_POS_MSMS_68_A-D-5_3_Rg80to1200-CE102040-root-A25-S1_Run184.raw",
+        "/Volumes/LaCie/nmdc_data/_singer_11_46aje659/raw/20220203_JGI-AK-TH_ES_504603_EcoPod_final_IDX_C18_USDAY59443_POS_MSMS_61_A-D-5_1_Rg80to1200-CE102040-root-F22-S1_Run19.raw"
+    ],
+    "lcmsMetabolomics.runMetaMSLCMSMetabolomics.output_directory": "output",
+    "lcmsMetabolomics.runMetaMSLCMSMetabolomics.corems_toml_path": "/Users/heal742/LOCAL/05_NMDC/02_MetaMS/data_processing/_bioscales_lcms_metabolomics/metadata/bioscales_rp_corems.toml",
+    "lcmsMetabolomics.runMetaMSLCMSMetabolomics.msp_file_path": "/Users/heal742/LOCAL/05_NMDC/02_MetaMS/metams/test_data/test_lcms_metab_data/20250407_database.msp",
+    "lcmsMetabolomics.runMetaMSLCMSMetabolomics.scan_translator_path": "/Users/heal742/LOCAL/05_NMDC/02_MetaMS/data_processing/_bioscales_lcms_metabolomics/metadata/bioscales_scan_translator.toml",
+    "lcmsMetabolomics.runMetaMSLCMSMetabolomics.cores": 5
+}

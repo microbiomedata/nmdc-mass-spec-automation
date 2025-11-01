@@ -12,8 +12,7 @@
     "paths": {
         "base_directory": "/Users/heal742/LOCAL/05_NMDC/02_MetaMS/data_processing",
         "raw_data_directory": "/Volumes/LaCie/nmdc_data/_kroeger_11_dwsv7q78/raw",
-        "processed_data_directory": "/Volumes/LaCie/nmdc_data/_kroeger_11_dwsv7q78/processed_20251027",
-        "wdl_workspace": "/Users/heal742/LOCAL/05_NMDC/02_MetaMS/metams"
+        "processed_data_directory": "/Volumes/LaCie/nmdc_data/_kroeger_11_dwsv7q78/processed_20240723"
     },
     "docker": {
         "raw_data_inspector_image": "microbiomedata/metams:3.3.3"
