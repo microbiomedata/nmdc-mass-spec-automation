@@ -763,7 +763,16 @@ class NMDCStudyManager:
             # Create object name preserving directory structure
             relative_path = file_path.relative_to(local_path)
             object_name = f"{folder_name}/{relative_path}".replace("\\", "/")
-            
+
+            # Check if the object already exists in MinIO and if so, skip
+            try:
+                self.minio_client.stat_object(bucket_name, object_name)
+                continue
+            except S3Error as e:
+                if e.code != "NoSuchKey":
+                    print(f"Error checking existence of {object_name}: {e}")
+                    continue
+
             try:
                 self.minio_client.fput_object(bucket_name, object_name, str(file_path))
                 uploaded_count += 1
@@ -839,10 +848,12 @@ class NMDCStudyManager:
         """
         Generate WDL workflow JSON configuration files for batch processing.
         
-        Creates JSON files for each processing configuration defined in the config,
-        organizing raw data files into batches of the specified size. Files are
-        filtered for each configuration based on the configuration name (e.g.,
-        'hilic_pos' will only include files with 'hilic' and 'pos' in the filename).
+        First moves any processed data from previous WDL execution attempts to ensure
+        the processed data directory is up-to-date, then creates JSON files for each 
+        processing configuration defined in the config, organizing raw data files into 
+        batches of the specified size. Files are filtered for each configuration based 
+        on the configuration name (e.g., 'hilic_pos' will only include files with 
+        'hilic' and 'pos' in the filename).
         
         Args:
             batch_size: Maximum number of files per batch (default: 50)
@@ -864,6 +875,8 @@ class NMDCStudyManager:
             JSON files are created in the study's wdl_jsons directory, organized
             by configuration name (e.g., wdl_jsons/hilic_pos/batch1.json).
             Each JSON follows the MetaMS WDL workflow input specification.
+            Automatically moves processed data from previous runs and cleans up 
+            WDL execution directories before generating new configurations.
             
         Example:
             >>> json_count = manager.generate_wdl_jsons(batch_size=25)
@@ -878,6 +891,13 @@ class NMDCStudyManager:
                 print(f"Found {json_count} existing WDL JSON files")
                 return json_count
             return 0
+
+        # First, move any processed data from previous WDL execution attempts
+        # This ensures the processed data directory is up-to-date before we check for already-processed files
+        wdl_execution_dir = self.study_path / "wdl_execution"
+        if wdl_execution_dir.exists():
+            print("📁 Moving any processed data from previous WDL execution...")
+            self._move_processed_files(str(wdl_execution_dir))
 
         # Always empty the wdl_jsons directory first
         wdl_jsons_path = self.study_path / "wdl_jsons"
@@ -915,6 +935,12 @@ class NMDCStudyManager:
             raw_files = list(Path(raw_data_dir).rglob(file_pattern))
             print(f"Found {len(raw_files)} {file_type} files in {raw_data_dir}")
         
+        # Remove any problem_files (from config) from list of raw_files
+        problem_files = self.config.get('problem_files', [])
+        if problem_files:
+            initial_count = len(raw_files)
+            raw_files = [f for f in raw_files if f.name not in problem_files]
+
         # Filter out already-processed files by checking for corresponding .corems directories
         processed_data_dir = self.config['paths'].get('processed_data_directory')
         if processed_data_dir:
@@ -943,7 +969,12 @@ class NMDCStudyManager:
                 
                 excluded_count = initial_count - len(unprocessed_files)
                 raw_files = unprocessed_files
-                
+
+                if not raw_files:
+                    print("⚠️  All files have been processed already - no files left to process")
+                    # set skip trigger for data_processed
+                    self.set_skip_trigger('data_processed', True)
+                    return
                 if excluded_count > 0:
                     print(f"📊 Excluded {excluded_count} already-processed files")
                     print(f"   Remaining unprocessed files: {len(raw_files)}")
@@ -1419,19 +1450,23 @@ fi
             else:
                 print(f"⚠️  Some workflows failed (exit code: {result.returncode})")
                 print("Check the logs above for details.")
-                print("You can run the script manually later:")
-                print(f"  cd {working_dir}")
-                print(f"  source {base_venv_dir}/bin/activate")
-                print(f"  {script_path}")
+                
+                # Still move any processed files that were completed successfully
+                print("📁 Moving any completed processed files...")
+                self._move_processed_files(str(working_dir), clean_up=False)
+                
+                print("To re-run failed workflows, use run_wdl_script() again - it will recreate the execution environment.")
             
             return result.returncode
             
         except Exception as e:
             print(f"❌ Error executing script: {e}")
-            print("You can run the script manually later:")
-            print(f"  cd {working_dir}")
-            print(f"  source {base_venv_dir}/bin/activate")
-            print(f"  {script_path}")
+            
+            # Still try to move any completed processed files
+            print("📁 Attempting to move any completed processed files...")
+            self._move_processed_files(str(working_dir))
+            
+            print("To retry, use run_wdl_script() again - it will recreate the execution environment.")
             return 1
             
         finally:
@@ -1439,20 +1474,87 @@ fi
             os.chdir(original_dir)
             print(f"🔙 Returned to original directory: {original_dir}")
     
-    def _move_processed_files(self, working_dir: str) -> None:
+    def _cleanup_wdl_execution_dir(self, working_dir: str) -> bool:
+        """
+        Clean up the current study's WDL execution directory after successful file moves.
+        
+        Removes the temporary WDL execution directory and all its contents after
+        processed files have been moved to their final destination. This helps
+        keep the study directory clean and prevents large temporary files from
+        accumulating.
+        
+        Args:
+            working_dir: Path to the WDL execution directory to clean up
+            
+        Returns:
+            True if cleanup was successful, False otherwise
+            
+        Note:
+            Only removes directories that:
+            1. Contain 'wdl_execution' in the path
+            2. Are within the current study's directory structure
+            3. Are called only after successful file moves
+        """
+        import shutil
+        
+        working_path = Path(working_dir)
+        
+        # Safety check 1: only clean up directories that are clearly WDL execution directories
+        if 'wdl_execution' not in str(working_path):
+            print(f"⚠️  Skipping cleanup - directory doesn't appear to be a WDL execution directory: {working_path}")
+            return False
+        
+        # Safety check 2: ensure this is within the current study's directory structure
+        try:
+            working_path.relative_to(self.study_path)
+        except ValueError:
+            print(f"⚠️  Skipping cleanup - directory is not within current study path: {working_path}")
+            print(f"   Current study path: {self.study_path}")
+            return False
+        
+        if not working_path.exists():
+            print(f"📁 WDL execution directory already cleaned up: {working_path}")
+            return True
+        
+        try:
+            print(f"🧹 Cleaning up WDL execution directory for study {self.study_name}: {working_path}")
+            
+            # Count files/directories before removal for reporting
+            total_items = sum(1 for _ in working_path.rglob('*'))
+            
+            # Remove the entire directory tree
+            shutil.rmtree(working_path)
+            
+            print(f"✅ Successfully removed WDL execution directory ({total_items} items cleaned up)")
+            return True
+            
+        except Exception as e:
+            print(f"❌ Failed to clean up WDL execution directory: {e}")
+            print(f"   You may want to manually remove: {working_path}")
+            return False
+
+    def _move_processed_files(self, working_dir: str, clean_up: bool = True) -> None:
         """
         Move processed output files from working directory to designated processed data location.
         
         Searches for directories ending with .corems in the working directory and moves them
         to the processed data directory specified in the configuration. Only moves directories
-        that contain CSV files (indicating successful processing).
+        that contain CSV files (indicating successful processing) and validates that the 
+        .corems directories belong to this study by matching filenames with raw data files.
+        
+        After attempting to move files, optionally cleans up the WDL execution directory
+        to keep the study directory clean and prevent accumulation of large temporary files.
+        Cleanup occurs only if clean_up is True.
         
         Args:
             working_dir: Directory where WDL workflows were executed and output files created
+            clean_up: Whether to remove the WDL execution directory after attempting file moves (default: True)
             
         Note:
             Uses config['paths']['processed_data_directory'] as the destination.
             Creates the destination directory if it doesn't exist.
+            Validates .corems directory names match raw files from this study to prevent
+            moving files from other studies that might be in the working directory.
         """
         import shutil
         
@@ -1473,15 +1575,29 @@ fi
         print(f"🔍 Searching for processed files in: {working_path}")
         print(f"📁 Moving processed files to: {processed_path}")
         
+        # Get list of raw files for this study to validate .corems directories belong to this study
+        raw_data_dir = self.config['paths'].get('raw_data_directory')
+        study_raw_files = set()
+        if raw_data_dir and Path(raw_data_dir).exists():
+            file_type = self.config['study'].get('file_type', '.raw')
+            raw_files = list(Path(raw_data_dir).rglob(f"*{file_type}"))
+            study_raw_files = {f.stem for f in raw_files}  # Get filenames without extension
+        
         moved_count = 0
         
-        # Search for .corems directories recursively
+        # Search for .corems directories recursively within the working directory only
         for dirpath in working_path.rglob('*'):
             if dirpath.is_dir() and dirpath.name.endswith('.corems'):
                 # Check that there is a .csv within the directory (indicates successful processing)
                 csv_files = list(dirpath.glob('*.csv'))
                 if not csv_files:
                     print(f"  ⚠️  No .csv files found in {dirpath.name}, skipping.")
+                    continue
+                
+                # Validate this .corems directory belongs to our study by checking the filename
+                corems_filename = dirpath.name.replace('.corems', '')
+                if study_raw_files and corems_filename not in study_raw_files:
+                    print(f"  ⚠️  {dirpath.name} does not match any raw files for study {self.study_name}, skipping.")
                     continue
                 
                 # Move the entire .corems directory to processed location
@@ -1509,6 +1625,12 @@ fi
             print(f"   Total processed files in destination: {total_corems}")
         else:
             print("   No processed files were moved")
+        
+        # Optionally clean up the WDL execution directory after attempting to move files
+        if clean_up:
+            self._cleanup_wdl_execution_dir(working_dir)
+        else:
+            print("🧹 Skipping cleanup of WDL execution directory (clean_up=False)")
     
     def get_biosample_attributes(self, study_id: Optional[str] = None) -> str:
         """

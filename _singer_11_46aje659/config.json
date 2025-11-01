@@ -124,10 +124,13 @@
         "biosample_mapping_completed": true,
         "raw_data_inspected": true,
         "metadata_mapping_generated": true,
-        "data_processed": false,
+        "data_processed": true,
         "processed_data_uploaded_to_minio": false,
         "metadata_packages_generated": false,
         "metadata_submitted_dev": false,
         "metadata_submitted_prod": false
-    }
+    },
+    "problem_files": [
+        "20220203_JGI-AK-TH_ES_504603_EcoPod_final_IDX_C18_USDAY59443_POS_MSMS_37_B-C-3_1_Rg80to1200-CE102040-root-I12-S1_Run78.raw"
+    ]
 }
