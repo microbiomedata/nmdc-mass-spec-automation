@@ -16,7 +16,7 @@ def main():
     """Run the study workflow."""
 
     # Initialize study manager with the Singer config (assuming run from root directory)
-    config_path = Path.cwd() / "_singer_11_46aje659" / "config.json"
+    config_path = Path.cwd() / "studies" / "singer_11_46aje659" / "singer_config.json"
     study = NMDCStudyManager(str(config_path))
     
     print(f"=== {study.study_name.upper()} WORKFLOW ===")

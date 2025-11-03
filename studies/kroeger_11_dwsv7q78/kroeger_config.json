@@ -121,7 +121,7 @@
         "biosample_attributes_fetched": true,
         "biosample_mapping_script_generated": true,
         "biosample_mapping_completed": true,
-        "raw_data_inspected": false,
+        "raw_data_inspected": true,
         "metadata_mapping_generated": true,
         "data_processed": true,
         "processed_data_uploaded_to_minio": false,

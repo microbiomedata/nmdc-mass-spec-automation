@@ -256,7 +256,7 @@ def main():
     print("=== SINGER_11_46AJE659 - RAW FILE TO BIOSAMPLE MAPPING ===")
     
     # Initialize study manager
-    config_path = Path.cwd() / "_singer_11_46aje659" / "config.json"
+    config_path = Path.cwd() / "studies" / "singer_11_46aje659" / "singer_config.json"
     if not config_path.exists():
         print(f"❌ Config file not found: {config_path}")
         print("Please run this script from the data_processing root directory")

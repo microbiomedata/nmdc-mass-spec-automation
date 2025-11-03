@@ -52,8 +52,8 @@ See `example_config.json` for comprehensive examples showing:
 
 ```json
 {
-    "name": "multi_instrument",
-    "file_filter": ["experiment"],
+    "name": "multi_instrument_hilic",
+    "file_filter": ["HILIC"],
     "instrument_used": "Default Instrument",
     "mass_spec_configuration_name": "Default MS Config",
     "chromat_configuration_name": "Default Chromat Config",
@@ -65,49 +65,23 @@ See `example_config.json` for comprehensive examples showing:
         "mass_spec_configuration_name": {
             "CE102040": "Method @10,20,40CE",
             "CE205060": "Method @20,50,60CE"
-        },
-        "chromat_configuration_name": {
-            "_HILIC_": "HILIC Chromatography",
-            "_C18_": "C18 Chromatography"
         }
     }
 }
 ```
 
 **Result**: Each file gets metadata values based on multiple patterns in its filename:
-- Filename: `experiment_QE_HF_HILIC_CE102040_sample1.raw`
+- Filename: `QE_HF_HILIC_CE102040_sample1.raw`
   - instrument_used: "Q Exactive HF Orbitrap" (matches "QE_HF")
   - mass_spec_configuration_name: "Method @10,20,40CE" (matches "CE102040")
-  - chromat_configuration_name: "HILIC Chromatography" (matches "_HILIC_")
+  - chromat_configuration_name: "Default Chromat Config" (matches "HILIC")
 
-## Example 3: Study-Specific Overrides
-
-```json
-{
-    "name": "soil_study",
-    "file_filter": ["soil"],
-    "sample_type": "Unknown",
-    "processing_method": "Standard",
-    "metadata_overrides": {
-        "sample_type": {
-            "bulk": "Bulk Soil",
-            "rhizo": "Rhizosphere",
-            "root": "Root Endosphere"
-        },
-        "processing_method": {
-            "freeze_dry": "Freeze Drying",
-            "air_dry": "Air Drying",
-            "fresh": "Fresh Processing"
-        }
-    }
-}
-```
 
 ## Pattern Matching Rules
 
 1. **Case Sensitive**: Patterns are matched exactly as specified
 2. **First Match Wins**: If multiple patterns match a filename, the first match in the configuration order is used
-3. **Fallback**: If no patterns match, the default value from the configuration is used
+3. **Fallback**: If no patterns match, the default value from the configuration is used.  If this is unexpected, ensure that default values will not pass validation.
 4. **Substring Matching**: Patterns are matched as substrings within the filename
 
 ## Usage Tips
@@ -116,27 +90,3 @@ See `example_config.json` for comprehensive examples showing:
 2. **Test Patterns**: Use descriptive patterns that won't accidentally match unintended files
 3. **Default Values**: Always provide default values for fields that use overrides
 4. **Validation**: The system will report how many files match each pattern during processing
-
-## Migration from Legacy Systems
-
-If you have existing collision energy mappings using `mass_spec_ce_mapping`, they can be converted to the new system:
-
-**Old Format**:
-```json
-"mass_spec_ce_mapping": {
-    "CE102040": "Method @10,20,40CE",
-    "CE205060": "Method @20,50,60CE"
-}
-```
-
-**New Format**:
-```json
-"metadata_overrides": {
-    "mass_spec_configuration_name": {
-        "CE102040": "Method @10,20,40CE",
-        "CE205060": "Method @20,50,60CE"
-    }
-}
-```
-
-The functionality is identical, but the new system is more flexible and can handle any metadata field.

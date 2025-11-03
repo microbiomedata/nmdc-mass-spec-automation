@@ -7,18 +7,17 @@
         "file_type": ".raw",
         "file_filters": [
             "msms"
-        ]
+        ],
+        "processed_data_date_tag": "20251031"
     },
     "paths": {
         "base_directory": "/Users/heal742/LOCAL/05_NMDC/02_MetaMS/data_processing",
-        "raw_data_directory": "/Volumes/LaCie/nmdc_data/_singer_11_46aje659/raw",
-        "processed_data_directory": "/Volumes/LaCie/nmdc_data/_singer_11_46aje659/processed_20251031"
+        "data_directory": "/Volumes/LaCie/nmdc_data"
     },
     "minio": {
         "endpoint": "admin.nmdcdemo.emsl.pnl.gov",
         "secure": true,
-        "bucket": "metabolomics",
-        "processed_data_folder": "singer_11_46aje659/processed_20251031"
+        "bucket": "metabolomics"
     },
     "docker": {
         "raw_data_inspector_image": "microbiomedata/metams:3.3.3"

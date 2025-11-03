@@ -62,7 +62,7 @@ class NMDCStudyManager:
         self.study_name = self.config['study']['name']
         self.study_id = self.config['study']['id']
         self.base_path = Path(self.config['paths']['base_directory'])
-        self.study_path = self.base_path / f"{self.study_name}"
+        self.study_path = self.base_path / "studies" / f"{self.study_name}"
         
         # Construct dynamic paths from data_directory
         self.data_directory = Path(self.config['paths']['data_directory'])
@@ -2867,7 +2867,7 @@ fi
             return True  # Not an error, just nothing to upload
         
         bucket_name = self.config['minio']['bucket']
-        folder_name = self.config['minio']['processed_data_folder']
+        folder_name = self.config['study']['name'] + "/processed_" + self.config['study']['processed_data_date_tag']
         
         print(f"📤 Uploading processed data to MinIO...")
         print(f"   Source: {processed_path}")

@@ -19,7 +19,7 @@ def main():
     """Run the Kroeger study workflow."""
     
     # Initialize study manager with the Kroeger config (assuming run from root directory)
-    config_path = Path.cwd() / "kroeger_11_dwsv7q78" / "kroeger_config.json"
+    config_path = Path.cwd() / "studies" / "kroeger_11_dwsv7q78" / "kroeger_config.json"
     study = NMDCStudyManager(str(config_path))
     
     print(f"=== {study.study_name.upper()} WORKFLOW ===")
