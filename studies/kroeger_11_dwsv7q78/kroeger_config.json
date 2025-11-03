@@ -7,12 +7,12 @@
         "file_type": ".raw",
         "file_filters": [
             "msms"
-        ]
+        ],
+        "processed_data_date_tag": "20251027"
     },
     "paths": {
         "base_directory": "/Users/heal742/LOCAL/05_NMDC/02_MetaMS/data_processing",
-        "raw_data_directory": "/Volumes/LaCie/nmdc_data/_kroeger_11_dwsv7q78/raw",
-        "processed_data_directory": "/Volumes/LaCie/nmdc_data/_kroeger_11_dwsv7q78/processed_20251027"
+        "data_directory": "/Volumes/LaCie/nmdc_data"
     },
     "docker": {
         "raw_data_inspector_image": "microbiomedata/metams:3.3.3"
@@ -20,8 +20,7 @@
     "minio": {
         "endpoint": "admin.nmdcdemo.emsl.pnl.gov",
         "secure": true,
-        "bucket": "metabolomics",
-        "processed_data_folder": "kroeger_11_dwsv7q78/processed_20251027"
+        "bucket": "metabolomics"
     },
     "configurations": [
         {
@@ -122,7 +121,7 @@
         "biosample_attributes_fetched": true,
         "biosample_mapping_script_generated": true,
         "biosample_mapping_completed": true,
-        "raw_data_inspected": true,
+        "raw_data_inspected": false,
         "metadata_mapping_generated": true,
         "data_processed": true,
         "processed_data_uploaded_to_minio": false,

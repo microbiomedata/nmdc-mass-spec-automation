@@ -62,7 +62,18 @@ class NMDCStudyManager:
         self.study_name = self.config['study']['name']
         self.study_id = self.config['study']['id']
         self.base_path = Path(self.config['paths']['base_directory'])
-        self.study_path = self.base_path / f"_{self.study_name}"
+        self.study_path = self.base_path / f"{self.study_name}"
+        
+        # Construct dynamic paths from data_directory
+        self.data_directory = Path(self.config['paths']['data_directory'])
+        self.raw_data_directory = self.data_directory / f"{self.study_name}" / "raw"
+        
+        # Construct processed_data_directory with date tag
+        processed_date_tag = self.config['study'].get('processed_data_date_tag', '')
+        if processed_date_tag:
+            self.processed_data_directory = self.data_directory / f"{self.study_name}" / f"processed_{processed_date_tag}"
+        else:
+            self.processed_data_directory = self.data_directory / f"{self.study_name}" / "processed"
         
         # Initialize MinIO client if credentials available
         self.minio_client = self._init_minio_client()
@@ -254,8 +265,8 @@ class NMDCStudyManager:
             'file_filters': self.config['study'].get('file_filters', []),
             'num_configurations': len(self.config.get('configurations', [])),
             'configuration_names': [c['name'] for c in self.config.get('configurations', [])],
-            'raw_data_directory': self.config['paths'].get('raw_data_directory', 'Not configured'),
-            'processed_data_directory': self.config['paths'].get('processed_data_directory', 'Not configured'),
+            'raw_data_directory': str(self.raw_data_directory),
+            'processed_data_directory': str(self.processed_data_directory),
             'minio_enabled': self.minio_client is not None
         }
         return info
@@ -567,7 +578,7 @@ class NMDCStudyManager:
                      either CSV format (with 'ftp_location' column) or plain text
                      format (one URL per line). Optional if massive_id provided.
             download_dir: Local directory to download files to. Uses 
-                         config['paths']['raw_data_directory'] if not provided.
+                         self.raw_data_directory if not provided.
             massive_id: MASSIVE dataset ID to query directly. Uses
                        config['study']['massive_id'] if not provided.
             
@@ -586,7 +597,7 @@ class NMDCStudyManager:
             print("Skipping raw data download (already downloaded)")
             # Return list of existing files if directory exists
             if download_dir is None:
-                download_dir = self.config['paths']['raw_data_directory']
+                download_dir = self.raw_data_directory
             if os.path.exists(download_dir):
                 file_type = self.config['study'].get('file_type', '.raw')
                 existing_files = [os.path.join(download_dir, f) for f in os.listdir(download_dir) 
@@ -596,7 +607,7 @@ class NMDCStudyManager:
             return []
             
         if download_dir is None:
-            download_dir = self.config['paths']['raw_data_directory']
+            download_dir = self.raw_data_directory
         
         # Get FTP URLs either from file or by querying MASSIVE
         if massive_id:
@@ -926,7 +937,7 @@ class NMDCStudyManager:
             print("⚠️  Mapped files list not found - using all raw files")
             print("   Run biosample mapping first to filter files by biosample mapping")
             
-            raw_data_dir = self.config['paths']['raw_data_directory']
+            raw_data_dir = self.raw_data_directory
             
             # Get the configured file type extension
             file_type = self.config['study'].get('file_type', '.raw')
@@ -943,7 +954,7 @@ class NMDCStudyManager:
             raw_files = [f for f in raw_files if f.name not in problem_files]
 
         # Filter out already-processed files by checking for corresponding .corems directories
-        processed_data_dir = self.config['paths'].get('processed_data_directory')
+        processed_data_dir = self.processed_data_directory
         if processed_data_dir:
             processed_path = Path(processed_data_dir)
             if processed_path.exists():
@@ -1552,7 +1563,7 @@ fi
             clean_up: Whether to remove the WDL execution directory after attempting file moves (default: True)
             
         Note:
-            Uses config['paths']['processed_data_directory'] as the destination.
+            Uses self.processed_data_directory as the destination.
             Creates the destination directory if it doesn't exist.
             Validates .corems directory names match raw files from this study to prevent
             moving files from other studies that might be in the working directory.
@@ -1560,7 +1571,7 @@ fi
         import shutil
         
         working_path = Path(working_dir)
-        processed_data_dir = self.config['paths'].get('processed_data_directory')
+        processed_data_dir = self.processed_data_directory
         
         if not processed_data_dir:
             print("⚠️  processed_data_directory not configured - skipping file move")
@@ -1577,7 +1588,7 @@ fi
         print(f"📁 Moving processed files to: {processed_path}")
         
         # Get list of raw files for this study to validate .corems directories belong to this study
-        raw_data_dir = self.config['paths'].get('raw_data_directory')
+        raw_data_dir = self.raw_data_directory
         study_raw_files = set()
         if raw_data_dir and Path(raw_data_dir).exists():
             file_type = self.config['study'].get('file_type', '.raw')
@@ -1928,7 +1939,7 @@ fi
             else:
                 # Fallback if downloaded_files.csv doesn't exist
                 print("⚠️  downloaded_files.csv not found - using relative paths")
-                raw_data_dir = self.config['paths']['raw_data_directory']
+                raw_data_dir = self.raw_data_directory
                 mapped_df['raw_file_path'] = mapped_df['raw_file_name'].apply(
                     lambda x: str(Path(raw_data_dir) / x)
                 )
@@ -1995,16 +2006,6 @@ fi
         
         print("🔍 Starting raw data inspection...")
         
-        # Check Docker configuration first
-        docker_image = self.config.get('docker', {}).get('raw_data_inspector_image')
-        if not docker_image:
-            print("❌ Docker image not configured.")
-            print("Please add 'docker.raw_data_inspector_image' to your config:")
-            print('  "docker": {')
-            print('    "raw_data_inspector_image": "microbiomedata/metams:3.3.3"')
-            print('  }')
-            return None
-        
         try:
             # Get file paths to inspect
             if file_paths is None:
@@ -2016,7 +2017,7 @@ fi
                     print(f"📋 Using {len(file_paths)} mapped raw files for inspection")
                 else:
                     # Fallback to all files in raw_data_directory
-                    raw_data_dir = Path(self.config['paths']['raw_data_directory'])
+                    raw_data_dir = Path(self.raw_data_directory)
                     file_paths = []
                     for ext in ['*.mzML', '*.raw', '*.mzml']:  # Include lowercase variants
                         file_paths.extend([str(f) for f in raw_data_dir.rglob(ext)])
@@ -2026,8 +2027,66 @@ fi
                 print("⚠️  No raw files found to inspect")
                 return None
             
+            # Check for previous inspection results and filter out successfully inspected files
+            output_dir = self.study_path / "raw_file_info"
+            output_dir.mkdir(parents=True, exist_ok=True)
+            existing_results_file = output_dir / "raw_file_inspection_results.csv"
+            
+            previous_results_df = None
+            files_to_inspect = file_paths
+            
+            if existing_results_file.exists():
+                print(f"📂 Found previous inspection results: {existing_results_file}")
+                try:
+                    previous_results_df = pd.read_csv(existing_results_file)
+                    
+                    # Identify successfully inspected files (those with numeric rt_max values)
+                    # Store just the filenames, not full paths
+                    successful_filenames = set()
+                    for _, row in previous_results_df.iterrows():
+                        try:
+                            # Check if rt_max is a valid number (not NaN, not error message)
+                            rt_max = pd.to_numeric(row.get('rt_max'), errors='coerce')
+                            if pd.notna(rt_max) and isinstance(rt_max, (int, float)):
+                                # Extract just the filename from the path
+                                file_path = row['file_path']
+                                filename = Path(file_path).name
+                                successful_filenames.add(filename)
+                        except Exception:
+                            continue
+                    
+                    # Filter out successfully inspected files by comparing filenames
+                    files_to_inspect = [fp for fp in file_paths if Path(fp).name not in successful_filenames]
+                    
+                    print(f"✅ Previously inspected: {len(successful_filenames)} files")
+                    print(f"🔄 Need to inspect: {len(files_to_inspect)} files (new or previously failed)")
+                    
+                    if len(files_to_inspect) == 0:
+                        print("🎉 All files have been successfully inspected!")
+                        # Set skip trigger
+                        self.set_skip_trigger('raw_data_inspected', True)
+                        return str(existing_results_file)
+                        
+                except Exception as e:
+                    print(f"⚠️  Error reading previous results: {e}")
+                    print("   Will inspect all files")
+                    files_to_inspect = file_paths
+                    previous_results_df = None
+            else:
+                print("📋 No previous inspection results found - inspecting all files")
+            
+            # Now check Docker configuration since we have files to inspect
+            docker_image = self.config.get('docker', {}).get('raw_data_inspector_image')
+            if not docker_image:
+                print("❌ Docker image not configured.")
+                print("Please add 'docker.raw_data_inspector_image' to your config:")
+                print('  "docker": {')
+                print('    "raw_data_inspector_image": "microbiomedata/metams:3.3.3"')
+                print('  }')
+                return None
+            
             # Check for .raw files and force single core processing to prevent crashes
-            has_raw_files = any(str(fp).lower().endswith('.raw') for fp in file_paths)
+            has_raw_files = any(str(fp).lower().endswith('.raw') for fp in files_to_inspect)
             original_cores = cores
             if has_raw_files and cores > 1:
                 cores = 1
@@ -2037,11 +2096,43 @@ fi
             elif has_raw_files:
                 print("✅ .raw files detected - single core processing already configured")
             
-            # Set up output directory
-            output_dir = self.study_path / "raw_file_info"
-            output_dir.mkdir(parents=True, exist_ok=True)
+            # Run inspection on files that need it
+            result = self._run_raw_data_inspector_docker(files_to_inspect, output_dir, cores, limit, max_retries, retry_delay, docker_image)
             
-            result = self._run_raw_data_inspector_docker(file_paths, output_dir, cores, limit, max_retries, retry_delay, docker_image)
+            # Merge previous and new results if we had previous results
+            if result is not None and previous_results_df is not None:
+                print("🔗 Merging previous and new inspection results...")
+                try:
+                    new_results_df = pd.read_csv(result)
+                    
+                    # Combine the dataframes, keeping new results for any duplicates
+                    # First, get file paths from new results
+                    new_file_paths = set(new_results_df['file_path'].tolist())
+                    
+                    # Keep only previous results that weren't re-inspected
+                    previous_to_keep = previous_results_df[
+                        ~previous_results_df['file_path'].isin(new_file_paths)
+                    ]
+                    
+                    # Combine previous and new results
+                    combined_df = pd.concat([previous_to_keep, new_results_df], ignore_index=True)
+                    
+                    # Sort by file path for consistency
+                    combined_df = combined_df.sort_values('file_path').reset_index(drop=True)
+                    
+                    # Write combined results back to the main results file
+                    combined_df.to_csv(existing_results_file, index=False)
+                    
+                    print(f"✅ Combined results saved: {existing_results_file}")
+                    print(f"   Previous results retained: {len(previous_to_keep)}")
+                    print(f"   New/updated results: {len(new_results_df)}")
+                    print(f"   Total files in results: {len(combined_df)}")
+                    
+                    result = str(existing_results_file)
+                    
+                except Exception as e:
+                    print(f"⚠️  Error merging results: {e}")
+                    print("   Using new results only")
             
             # Set the skip trigger on successful completion
             if result is not None:
@@ -2086,7 +2177,7 @@ fi
             file_path_obj = Path(file_path).resolve()
             # Find the deepest common ancestor that makes sense for mounting
             # For now, let's mount the entire raw_data_directory
-            raw_data_dir = Path(self.config['paths']['raw_data_directory']).resolve()
+            raw_data_dir = Path(self.raw_data_directory).resolve()
             mount_points.add(str(raw_data_dir))
         
         # Always mount the output directory and script directory
@@ -2102,7 +2193,7 @@ fi
             volume_args.extend(["-v", f"{mount_point}:{container_path}"])
             
         # Convert file paths to container paths
-        raw_data_dir = Path(self.config['paths']['raw_data_directory']).resolve()
+        raw_data_dir = Path(self.raw_data_directory).resolve()
         for file_path in file_paths:
             file_path_obj = Path(file_path).resolve()
             # Replace the raw_data_dir with the container mount point
@@ -2330,13 +2421,13 @@ fi
             mapped_df['raw_data_file_short'] = mapped_df['raw_file_name']
             
             # Add raw data file paths
-            raw_data_dir = self.config['paths']['raw_data_directory']
+            raw_data_dir = str(self.raw_data_directory)
             if not raw_data_dir.endswith('/'):
                 raw_data_dir += '/'
             mapped_df['raw_data_file'] = raw_data_dir + mapped_df['raw_data_file_short']
             
             # Add processed data directories
-            processed_data_dir = self.config['paths']['processed_data_directory']
+            processed_data_dir = str(self.processed_data_directory)
             if not processed_data_dir.endswith('/'):
                 processed_data_dir += '/'
             mapped_df['processed_data_directory'] = (
@@ -2759,7 +2850,7 @@ fi
             print("Set MINIO_ACCESS_KEY and MINIO_SECRET_KEY environment variables")
             return False
         
-        processed_data_dir = self.config['paths'].get('processed_data_directory')
+        processed_data_dir = self.processed_data_directory
         if not processed_data_dir:
             print("❌ processed_data_directory not configured")
             return False

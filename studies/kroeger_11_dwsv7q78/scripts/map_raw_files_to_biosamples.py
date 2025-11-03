@@ -222,7 +222,7 @@ def main():
     print("=== KROEGER_11_DWSV7Q78 - RAW FILE TO BIOSAMPLE MAPPING ===")
     
     # Initialize study manager
-    config_path = Path.cwd() / "_kroeger_11_dwsv7q78" / "config.json"
+    config_path = Path.cwd() / "kroeger_11_dwsv7q78" / "kroeger_config.json"
     if not config_path.exists():
         print(f"❌ Config file not found: {config_path}")
         print("Please run this script from the data_processing root directory")
