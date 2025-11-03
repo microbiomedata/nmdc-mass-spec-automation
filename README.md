@@ -1,205 +1,145 @@
-# NMDC Data Processing Utilities
+# NMDC Metabolomics Data Processing System
 
-This repository contains utilities for managing NMDC (National Microbiome Data Collaborative) metabolomics studies, including automated data discovery, processing workflows, and quality control analysis.
+A standardized workflow system for processing NMDC (National Microbiome Data Collaborative) metabolomics studies from raw data discovery through NMDC metadata submission.
 
-## Features
+## Overview
 
-### Core Workflow Management
-- **Study Structure Setup**: Automated directory structure creation
-- **Raw Data Discovery**: MASSIVE dataset integration and download
-- **Biosample Mapping**: Intelligent mapping of raw files to NMDC biosamples
-- **Self-Contained WDL Workflows**: GitHub-integrated execution within study directories
-- **MinIO Integration**: Cloud storage management for processed data
+This system provides automated workflows for LC-MS and GC-MS metabolomics data processing, including:
 
-### Quality Control & Analysis
-- **Raw Data Inspector**: Comprehensive metadata extraction from MS files (NEW!)
-- **File Filtering**: Process only biosample-mapped files for efficiency
-- **Error Tracking**: Detailed logging and error management
-- **Progress Monitoring**: Real-time processing status and statistics
+- Consistent and configurable study setup
+- Automated data discovery and download from MASSIVE repositories
+- Docker-based raw data inspection
+- Biosample mapping with confidence scoring
+- WDL workflow generation and execution using MetaMS pipelines
+- MinIO object storage integration
+- NMDC metadata package generation and submission
+
+## Prerequisites
+
+**Required Software:**
+- Python 3.8 or higher
+- Docker Desktop
+- Git
+
+**System Requirements:**
+- Adequate storage for raw data (typically 50-500 GB per study)
+- Internet connectivity for MASSIVE downloads, Docker operations, and MinIO access
+- MinIO credentials (for cloud storage operations)
+
+## Installation
+
+### 1. Clone Repository and Install Dependencies
+
+```bash
+git clone <repository-url>
+cd data_processing
+python -m venv venv
+source venv/bin/activate  # On Windows: venv\Scripts\activate
+pip install -r requirements.txt
+```
+
+### 2. Configure Docker
+
+Pull the MetaMS Docker image for raw data inspection:
+
+```bash
+docker pull microbiomedata/metams:3.3.3
+```
+
+### 3. Set Up Environment Variables
+
+Create a `.env` file in the project root:
+
+```bash
+MINIO_ACCESS_KEY="your_access_key"
+MINIO_SECRET_KEY="your_secret_key"
+```
 
 ## Quick Start
 
-### 1. Basic Study Setup
+### Complete Workflow Example
+
 ```python
 from nmdc_dp_utils.study_manager import NMDCStudyManager
 
-# Initialize with your study configuration
-study_manager = NMDCStudyManager("path/to/your/config.json")
+# Initialize study manager
+study = NMDCStudyManager("studies/your_study/config.json")
 
-# Run complete workflow
-study_manager.run_biosample_mapping_script()
-study_manager.generate_wdl_jsons()
+# Step 1: Create directory structure
+study.create_study_structure()
+
+# Step 2: Discover and download raw data
+ftp_df = study.get_massive_ftp_urls()
+downloaded_files = study.download_from_massive()
+
+# Step 3: Map files to biosamples
+biosample_csv = study.get_biosample_attributes()
+mapping_script = study.generate_biosample_mapping_script()
+study.run_biosample_mapping_script()
+
+# Step 4: Inspect raw data
+inspection_results = study.raw_data_inspector(cores=4)
+
+# Step 5: Generate WDL configurations
+json_count = study.generate_wdl_jsons(batch_size=25)
+
+# Step 6: Run processing workflows
+script_path = study.generate_wdl_runner_script()
+study.run_wdl_script(script_path)
+
+# Step 7: Upload to MinIO (if configured)
+study.upload_processed_data_to_minio()
 ```
 
-### 2. Raw Data Quality Control (NEW!)
-```python
-# Extract comprehensive metadata from raw files
-inspection_results = study_manager.raw_data_inspector(
-    cores=4,     # Parallel processing
-    limit=None   # Process all files
-)
+### Using Automated Workflow Scripts
 
-# Results include instrument info, scan parameters, data ranges, etc.
+Each study can include a `run_workflow.py` script for automated execution:
+
+```bash
+cd data_processing
+python studies/kroeger_11_dwsv7q78/run_workflow.py
 ```
 
-### 3. Filtered Processing
-```python
-# Generate list of only biosample-mapped files
-study_manager._generate_mapped_files_list()
-
-# Process only the mapped files (saves compute time)
-study_manager.run_wdl_workflows()
-```
-
-## Directory Structure
+## Repository Structure
 
 ```
 data_processing/
-├── nmdc_dp_utils/              # Core utilities
-│   ├── study_manager.py        # Main workflow manager
-│   ├── raw_data_inspector.py   # Raw file metadata extraction (NEW!)
-│   ├── raw_data_inspector.md   # Raw inspector documentation (NEW!)
+├── nmdc_dp_utils/              # Core system modules
+│   ├── study_manager.py        # Main workflow orchestration
+│   ├── raw_data_inspector.py   # Docker-based raw file inspection
+│   ├── README.md               # Detailed system documentation
+│   ├── raw_data_inspector.md   # Raw inspection documentation
+│   └── templates/              # Biosample mapping templates
+├── studies/                    # Individual study directories
+│   ├── kroeger_11_dwsv7q78/   # Example: complete LC-MS workflow
+│   ├── singer_11_46aje659/    # Example: lipidomics study
 │   └── ...
-├── configurations/             # Study configuration templates
-├── example_scripts/            # Usage examples
-├── _study_folders/            # Individual study data
-│   ├── config.json           # Study configuration
-│   ├── metadata/            # Biosample mappings, file lists
-│   ├── raw_file_info/       # Raw file inspection results (NEW!)
-│   ├── wdl_execution/       # Self-contained WDL workflow execution (NEW!)
-│   └── ...
-└── mappings/                  # Biosample mapping templates
+├── requirements.txt            # Python dependencies
+├── checklist.md               # Data processing evaluation checklist
+└── README.md                  # This file
 ```
 
-## New Raw Data Inspector
+### Study Directory Structure
 
-The raw data inspector extracts comprehensive metadata from MS files including:
+Each study creates the following structure:
 
-- 🔬 **Instrument Information**: Model, serial number, name
-- 📊 **Scan Parameters**: MS levels, scan types, collision energies
-- 📈 **Data Ranges**: m/z ranges, retention time windows
-- ⚡ **Polarity Information**: Positive/negative mode detection
-- 📅 **Timestamps**: File creation and modification times
-- ❌ **Error Tracking**: Failed file analysis with detailed logs
-
-### Setup Requirements
-1. Add CoreMS virtual environment path to your config:
-```json
-{
-    "virtual_environments": {
-        "corems_env": "/path/to/corems/venv"
-    }
-}
+```
+studies/your_study/
+├── config.json                     # Study configuration
+├── run_workflow.py                 # Automated workflow runner
+├── scripts/                        # Generated and custom scripts
+│   └── map_raw_files_to_biosamples.py
+├── metadata/                       # Biosample and mapping data
+│   ├── biosample_attributes.csv
+│   ├── mapped_raw_files.csv
+│   └── downloaded_files.csv
+├── raw_file_info/                 # Raw data inspection results
+│   └── raw_file_inspection_results.csv
+├── wdl_jsons/                     # Generated WDL configurations
+│   ├── hilic_pos/
+│   └── hilic_neg/
+└── wdl_execution/                 # Temporary WDL execution directory
 ```
 
-2. Install CoreMS in separate environment:
-```bash
-python -m venv /path/to/corems/venv
-source /path/to/corems/venv/bin/activate
-pip install corems pandas tqdm
-```
-
-See `nmdc_dp_utils/raw_data_inspector.md` for complete documentation.
-
-## Configuration
-
-Study configurations are JSON files containing:
-
-```json
-{
-    "study": {
-        "name": "study_name",
-        "id": "nmdc:sty-11-xxxxxxxx",
-        "massive_id": "MSV000000000"
-    },
-    "paths": {
-        "base_directory": "/path/to/data_processing",
-        "raw_data_directory": "/path/to/raw/data",
-        "processed_data_directory": "/path/to/processed/data"
-    },
-    "virtual_environments": {
-        "corems_env": "/path/to/corems/venv"
-    },
-    "minio": {
-        "enabled": true,
-        "bucket": "nmdc-processed-data",
-        "processed_data_folder": "study_name/LC-MS/{config_name}/"
-    },
-    "configurations": [
-        {
-            "name": "hilic_pos",
-            "file_filter": ["HILIC", "_POS_"],
-            "cores": 4
-        }
-    ]
-}
-```
-
-## Example Studies
-
-- `_bioscales_lcms_metabolomics/`: Large-scale LC-MS metabolomics
-- `_emp_500_gcms_metabolomics/`: GC-MS batch processing example
-- `_kroeger_11_dwsv7q78/`: Complete workflow with raw inspection
-
-## Workflow Integration
-
-```python
-# Complete workflow with quality control and self-contained WDL execution
-study_manager = NMDCStudyManager("config.json")
-
-# 1. Map files to biosamples
-study_manager.run_biosample_mapping_script()
-
-# 2. Generate filtered file list
-study_manager._generate_mapped_files_list()
-
-# 3. NEW: Inspect raw files for QC
-inspection_results = study_manager.raw_data_inspector(cores=4)
-
-# 4. Process only mapped files with self-contained WDL workflows
-study_manager.generate_wdl_jsons()
-study_manager.run_wdl_script()  # Downloads WDL from GitHub, executes in study directory
-
-# 5. Upload processed data to MinIO (if configured)
-study_manager.upload_to_minio()
-```
-
-## Recent Updates
-
-### Version 2024.12 (NEW!)
-- ✨ **Self-Contained WDL Workflows**: GitHub-integrated execution within study directories
-- 🔄 **Raw Data Inspector**: Comprehensive MS file metadata extraction
-- � **Virtual Environment Support**: Multi-environment workflow management
-- 📊 **Enhanced Error Tracking**: Detailed logging and error analysis
-- 🚀 **Parallel Processing**: Multi-core raw file analysis
-- 📋 **Filtered Processing**: Process only biosample-mapped files
-- 🔧 **Template System**: Maintainable biosample mapping scripts
-- ☁️ **MinIO Integration**: Configurable cloud storage with processed data upload
-
-### Previous Updates
-- Biosample mapping simplification (4-column output)
-- Automated processed file management
-- WDL workflow optimization
-- Configuration simplification (removed external workspace dependencies)
-
-## Requirements
-
-- Python 3.8+
-- pandas, pathlib, subprocess
-- miniwdl (for WDL workflow execution)
-- docker (for workflow containerization)
-- CoreMS (separate environment for raw inspection)
-- MinIO client for cloud storage
-
-## Documentation
-
-- `nmdc_dp_utils/raw_data_inspector.md` - Raw file inspection guide
-- `example_scripts/` - Usage examples and integration patterns
-- Individual study folders contain specific README files
-
-## Support
-
-For issues or questions:
-1. Check the documentation in `docs/`
-2. Review example scripts in `example_scripts/`
-3. Examine working configurations in study folders
+### For More Information
+Refer to the individual study README files and the detailed documentation in `nmdc_dp_utils/README.md` and `nmdc_dp_utils/metadata_overrides_examples.md`.
