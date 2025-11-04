@@ -8,7 +8,8 @@
         "file_filters": [
             "msms"
         ],
-        "processed_data_date_tag": "20251031"
+        "processed_data_date_tag": "20251031",
+        "workflow_type": "LCMS Metabolomics"
     },
     "paths": {
         "base_directory": "/Users/heal742/LOCAL/05_NMDC/02_MetaMS/data_processing",
@@ -104,8 +105,8 @@
         "batch_size": 25
     },
     "metadata": {
-        "instrument_used": "Q Exactive Orbitrap",
-        "processing_institution_workflow": "NDMC",
+        "instrument_used": "Thermo Orbitrap Q-Exactive",
+        "processing_institution_workflow": "NMDC",
         "processing_institution_generation": "JGI",
         "chromat_configuration_name": "N/A, should be overwritten",
         "mass_spec_configuration_name": "N/A, should be overwritten",
@@ -124,8 +125,8 @@
         "raw_data_inspected": true,
         "metadata_mapping_generated": true,
         "data_processed": true,
-        "processed_data_uploaded_to_minio": false,
-        "metadata_packages_generated": false,
+        "processed_data_uploaded_to_minio": true,
+        "metadata_packages_generated": true,
         "metadata_submitted_dev": false,
         "metadata_submitted_prod": false
     },

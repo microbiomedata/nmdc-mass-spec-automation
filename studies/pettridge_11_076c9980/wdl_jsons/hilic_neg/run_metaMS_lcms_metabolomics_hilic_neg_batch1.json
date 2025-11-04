@@ -1,0 +1,29 @@
+{
+    "lcmsMetabolomics.runMetaMSLCMSMetabolomics.file_paths": [
+        "/Volumes/LaCie/nmdc_data/pettridge_11_076c9980/raw/20190103_KBL_JP_502924_Soil_13CFlux_QE-139_HILIC_USHGX01163_NEG_MSMS_GRE-MB-110_statanox-12C-anox-44-000_2_Rg70to1050-CE102040-83-S1_Run186.mzML",
+        "/Volumes/LaCie/nmdc_data/pettridge_11_076c9980/raw/20190103_KBL_JP_502924_Soil_13CFlux_QE-139_HILIC_USHGX01163_NEG_MSMS_GRE-MB-178_flux8day-12C-oxic-44-000_5_Rg70to1050-CE102040-116-S1_Run401.mzML",
+        "/Volumes/LaCie/nmdc_data/pettridge_11_076c9980/raw/20190103_KBL_JP_502924_Soil_13CFlux_QE-139_HILIC_USHGX01163_NEG_MSMS_GRE-MB-170_flux4day-12C-oxic-44-000_4_Rg70to1050-CE102040-108-S1_Run375.mzML",
+        "/Volumes/LaCie/nmdc_data/pettridge_11_076c9980/raw/20190103_KBL_JP_502924_Soil_13CFlux_QE-139_HILIC_USHGX01163_NEG_MSMS_GRE-MB-173_flux4day-12C-oxic-44-000_3_Rg70to1050-CE102040-111-S1_Run323.mzML",
+        "/Volumes/LaCie/nmdc_data/pettridge_11_076c9980/raw/20190103_KBL_JP_502924_Soil_13CFlux_QE-139_HILIC_USHGX01163_NEG_MSMS_GRE-MB-169_flux4day-12C-oxic-44-000_1_Rg70to1050-CE102040-107-S1_Run120.mzML",
+        "/Volumes/LaCie/nmdc_data/pettridge_11_076c9980/raw/20190103_KBL_JP_502924_Soil_13CFlux_QE-139_HILIC_USHGX01163_NEG_MSMS_GRE-MB-112_statanox-12C-anox-44-000_3_Rg70to1050-CE102040-85-S1_Run268.mzML",
+        "/Volumes/LaCie/nmdc_data/pettridge_11_076c9980/raw/20190103_KBL_JP_502924_Soil_13CFlux_QE-139_HILIC_USHGX01163_NEG_MSMS_GRE-MB-174_flux8day-12C-oxic-44-000_1_Rg70to1050-CE102040-112-S1_Run123.mzML",
+        "/Volumes/LaCie/nmdc_data/pettridge_11_076c9980/raw/20190103_KBL_JP_502924_Soil_13CFlux_QE-139_HILIC_USHGX01163_NEG_MSMS_GRE-MB-111_statanox-12C-anox-44-000_5_Rg70to1050-CE102040-84-S1_Run393.mzML",
+        "/Volumes/LaCie/nmdc_data/pettridge_11_076c9980/raw/20190103_KBL_JP_502924_Soil_13CFlux_QE-139_HILIC_USHGX01163_NEG_MSMS_GRE-MB-172_flux4day-12C-oxic-44-000_5_Rg70to1050-CE102040-110-S1_Run404.mzML",
+        "/Volumes/LaCie/nmdc_data/pettridge_11_076c9980/raw/20190103_KBL_JP_502924_Soil_13CFlux_QE-139_HILIC_USHGX01163_NEG_MSMS_GRE-MB-177_flux8day-12C-oxic-44-000_3_Rg70to1050-CE102040-115-S1_Run265.mzML",
+        "/Volumes/LaCie/nmdc_data/pettridge_11_076c9980/raw/20190103_KBL_JP_502924_Soil_13CFlux_QE-139_HILIC_USHGX01163_NEG_MSMS_GRE-MB-176_flux8day-12C-oxic-44-000_4_Rg70to1050-CE102040-114-S1_Run358.mzML",
+        "/Volumes/LaCie/nmdc_data/pettridge_11_076c9980/raw/20190103_KBL_JP_502924_Soil_13CFlux_QE-139_HILIC_USHGX01163_NEG_MSMS_GRE-MB-082_statoxic-12C-oxic-44-000_5_Rg70to1050-CE102040-64-S1_Run407.mzML",
+        "/Volumes/LaCie/nmdc_data/pettridge_11_076c9980/raw/20190103_KBL_JP_502924_Soil_13CFlux_QE-139_HILIC_USHGX01163_NEG_MSMS_GRE-MB-084_statoxic-12C-oxic-44-000_3_Rg70to1050-CE102040-66-S1_Run259.mzML",
+        "/Volumes/LaCie/nmdc_data/pettridge_11_076c9980/raw/20190103_KBL_JP_502924_Soil_13CFlux_QE-139_HILIC_USHGX01163_NEG_MSMS_GRE-MB-171_flux4day-12C-oxic-44-000_2_Rg70to1050-CE102040-109-S1_Run221.mzML",
+        "/Volumes/LaCie/nmdc_data/pettridge_11_076c9980/raw/20190103_KBL_JP_502924_Soil_13CFlux_QE-139_HILIC_USHGX01163_NEG_MSMS_GRE-MB-109_statanox-12C-anox-44-000_1_Rg70to1050-CE102040-82-S1_Run94.mzML",
+        "/Volumes/LaCie/nmdc_data/pettridge_11_076c9980/raw/20190103_KBL_JP_502924_Soil_13CFlux_QE-139_HILIC_USHGX01163_NEG_MSMS_GRE-MB-081_statoxic-12C-oxic-44-000_1_Rg70to1050-CE102040-63-S1_Run79.mzML",
+        "/Volumes/LaCie/nmdc_data/pettridge_11_076c9980/raw/20190103_KBL_JP_502924_Soil_13CFlux_QE-139_HILIC_USHGX01163_NEG_MSMS_GRE-MB-080_statoxic-12C-oxic-44-000_4_Rg70to1050-CE102040-62-S1_Run378.mzML",
+        "/Volumes/LaCie/nmdc_data/pettridge_11_076c9980/raw/20190103_KBL_JP_502924_Soil_13CFlux_QE-139_HILIC_USHGX01163_NEG_MSMS_GRE-MB-083_statoxic-12C-oxic-44-000_2_Rg70to1050-CE102040-65-S1_Run137.mzML",
+        "/Volumes/LaCie/nmdc_data/pettridge_11_076c9980/raw/20190103_KBL_JP_502924_Soil_13CFlux_QE-139_HILIC_USHGX01163_NEG_MSMS_GRE-MB-108_statanox-12C-anox-44-000_4_Rg70to1050-CE102040-81-S1_Run367.mzML",
+        "/Volumes/LaCie/nmdc_data/pettridge_11_076c9980/raw/20190103_KBL_JP_502924_Soil_13CFlux_QE-139_HILIC_USHGX01163_NEG_MSMS_GRE-MB-175_flux8day-12C-oxic-44-000_2_Rg70to1050-CE102040-113-S1_Run201.mzML"
+    ],
+    "lcmsMetabolomics.runMetaMSLCMSMetabolomics.output_directory": "output",
+    "lcmsMetabolomics.runMetaMSLCMSMetabolomics.corems_toml_path": "/Users/heal742/LOCAL/05_NMDC/02_MetaMS/data_processing/studies/_bioscales_lcms_metabolomics/metadata/bioscales_hilic_corems.toml",
+    "lcmsMetabolomics.runMetaMSLCMSMetabolomics.msp_file_path": "/Users/heal742/LOCAL/05_NMDC/02_MetaMS/metams/test_data/test_lcms_metab_data/20250407_database.msp",
+    "lcmsMetabolomics.runMetaMSLCMSMetabolomics.scan_translator_path": "/Users/heal742/LOCAL/05_NMDC/02_MetaMS/data_processing/studies/_bioscales_lcms_metabolomics/metadata/bioscales_scan_translator.toml",
+    "lcmsMetabolomics.runMetaMSLCMSMetabolomics.cores": 5
+}

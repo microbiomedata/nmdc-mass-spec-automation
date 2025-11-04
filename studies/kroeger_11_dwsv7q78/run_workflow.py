@@ -93,8 +93,8 @@ def main():
     assert study.should_skip('processed_data_uploaded_to_minio'), "Processed data upload to MinIO must complete successfully to proceed"
 
     # Step 10: Generate NMDC submission packages
-    print("\n10. Generating NMDC submission packages...")
-    packages_success = study.generate_nmdc_submission_packages()
+    print("\n10. Generating NMDC submission packages for workflow metadata...")
+    packages_success = study.generate_nmdc_metadata_for_workflow()
     if packages_success:
         print("✅ NMDC submission packages generated successfully")
     else:

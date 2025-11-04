@@ -15,8 +15,8 @@ from study_manager import NMDCStudyManager
 def main():
     """Run the study workflow."""
 
-    # Initialize study manager with the Singer config (assuming run from root directory)
-    config_path = Path.cwd() / "studies" / "singer_11_46aje659" / "singer_config.json"
+    # Initialize study manager with the Pettridge config (assuming run from root directory)
+    config_path = Path.cwd() / "studies" / "pettridge_11_076c9980" / "pettridge_config.json"
     study = NMDCStudyManager(str(config_path))
     
     print(f"=== {study.study_name.upper()} WORKFLOW ===")
@@ -86,11 +86,6 @@ def main():
     else:
         print("⚠️  MinIO upload failed or was skipped")
     assert study.should_skip('processed_data_uploaded_to_minio'), "Processed data upload to MinIO must complete successfully to proceed"
-
-    # Step 10: Generate NMDC metadata
-    print("\n10. Generating NMDC metadata submission packages...")
-    metadata_packages_success = study.generate_nmdc_metadata_for_workflow()
-    assert metadata_packages_success, "NMDC metadata package generation failed."
 
 if __name__ == "__main__":
     main()

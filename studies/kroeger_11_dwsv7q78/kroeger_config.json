@@ -8,7 +8,8 @@
         "file_filters": [
             "msms"
         ],
-        "processed_data_date_tag": "20251027"
+        "processed_data_date_tag": "20251027",
+        "workflow_type": "LCMS Metabolomics"
     },
     "paths": {
         "base_directory": "/Users/heal742/LOCAL/05_NMDC/02_MetaMS/data_processing",
@@ -109,6 +110,7 @@
         "processing_institution_generation": "JGI",
         "chromat_configuration_name": "N/A, should be overwritten",
         "mass_spec_configuration_name": "N/A, should be overwritten",
+        "existing_data_objects": ["nmdc:dobj-11-7kab3m51"],
         "use_massive_urls": true,
         "serial_numbers_to_remove": [
             "Unknown",
@@ -124,7 +126,7 @@
         "raw_data_inspected": true,
         "metadata_mapping_generated": true,
         "data_processed": true,
-        "processed_data_uploaded_to_minio": false,
+        "processed_data_uploaded_to_minio": true,
         "metadata_packages_generated": false,
         "metadata_submitted_dev": false,
         "metadata_submitted_prod": false
