@@ -24,6 +24,8 @@ from minio.error import S3Error
 from tqdm import tqdm
 from typing import Dict, List, Optional
 
+from nmdc_ms_metadata_gen.lcms_metab_metadata_generator import LCMSMetabolomicsMetadataGenerator
+
 class NMDCStudyManager:
     """
     A configurable class for managing NMDC metabolomics study data workflows.
@@ -122,6 +124,33 @@ class NMDCStudyManager:
             True if the step should be skipped, False otherwise
         """
         return self.config.get('skip_triggers', {}).get(trigger_name, False)
+    
+    def _check_workflow_type(self, required_type: str, method_name: str) -> None:
+        """
+        Validate that the configured workflow type matches the required type.
+        
+        Args:
+            required_type: The workflow type required for the calling method
+            method_name: Name of the method calling this check (for error messages)
+            
+        Raises:
+            ValueError: If workflow_type is not configured or doesn't match required_type
+        """
+        workflow_type = self.config.get('study', {}).get('workflow_type')
+        
+        if not workflow_type:
+            raise ValueError(
+                f"{method_name}() requires 'workflow_type' to be set in config['study']. "
+                f"Currently supported types: 'LCMS Metabolomics'. "
+                f"Please add '\"workflow_type\": \"<type>\"' to your config file."
+            )
+        
+        if workflow_type != required_type:
+            raise NotImplementedError(
+                f"{method_name}() is not yet implemented for workflow type '{workflow_type}'. "
+                f"Currently only '{required_type}' is supported. "
+                f"Additional workflow types will be added in future versions."
+            )
     
     def set_skip_trigger(self, trigger_name: str, value: bool, save: bool = True):
         """
@@ -867,12 +896,19 @@ class NMDCStudyManager:
         on the configuration name (e.g., 'hilic_pos' will only include files with 
         'hilic' and 'pos' in the filename).
         
+        Currently supported workflow types:
+        - LCMS Metabolomics
+        
         Args:
             batch_size: Maximum number of files per batch (default: 50)
             
         Returns:
             Total number of JSON configuration files created across all
             processing configurations
+            
+        Raises:
+            ValueError: If workflow_type is not set in config
+            NotImplementedError: If workflow_type is not yet supported
             
         File Filtering per Configuration:
             Each configuration can specify its own file_filter list to determine
@@ -894,6 +930,9 @@ class NMDCStudyManager:
             >>> json_count = manager.generate_wdl_jsons(batch_size=25)
             >>> print(f"Created {json_count} WDL JSON files")
         """
+        # Check that workflow type is supported
+        self._check_workflow_type('LCMS Metabolomics', 'generate_wdl_jsons')
+        
         if self.should_skip('data_processed'):
             print("Skipping WDL JSON generation (already generated)")
             # Count existing JSON files
@@ -1069,6 +1108,9 @@ class NMDCStudyManager:
         directory and runs them sequentially using miniwdl. The script includes
         progress reporting and error handling.
         
+        Currently supported workflow types:
+        - LCMS Metabolomics
+        
         Args:
             workflow_name: Name of the WDL workflow file (without .wdl extension)
             script_name: Name for the generated script file. Defaults to 
@@ -1076,6 +1118,10 @@ class NMDCStudyManager:
         
         Returns:
             Path to the generated shell script file
+            
+        Raises:
+            ValueError: If workflow_type is not set in config
+            NotImplementedError: If workflow_type is not yet supported
             
         Example:
             >>> script_path = manager.generate_wdl_runner_script()
@@ -1086,6 +1132,9 @@ class NMDCStudyManager:
             a 'wdl/' subdirectory with the workflow file. Use run_wdl_script()
             to execute from the appropriate location.
         """
+        # Check that workflow type is supported
+        self._check_workflow_type('LCMS Metabolomics', 'generate_wdl_runner_script')
+        
         if self.should_skip('data_processed'):
             print("Skipping WDL runner script generation (data already processed)")
             script_path = self.study_path / "scripts" / f"{self.study_name}_wdl_runner.sh"
@@ -2386,9 +2435,19 @@ fi
         - Instrument information and analysis timestamps
         - Configuration-specific metadata for NMDC submission
         
+        Currently supported workflow types:
+        - LCMS Metabolomics
+        
         Returns:
             True if successful, False otherwise
+            
+        Raises:
+            ValueError: If workflow_type is not set in config
+            NotImplementedError: If workflow_type is not yet supported
         """
+        # Check that workflow type is supported
+        self._check_workflow_type('LCMS Metabolomics', 'generate_metadata_mapping_files')
+        
         if self.should_skip('metadata_mapping_generated'):
             print("⏭️  Skipping metadata mapping generation (skip trigger set)")
             return True
@@ -2586,6 +2645,14 @@ fi
                 # Use placeholder URLs for future implementation
                 merged_df['raw_data_url'] = 'placeholder://raw_data/' + merged_df['raw_data_file_short']
                 print("⚠️  Using placeholder URLs - configure alternative URL construction method")
+            
+            # Remove any files marked as problematic in config from metadata generation csvs
+            problem_files = self.config.get('problem_files', [])
+            if problem_files:
+                initial_count = len(merged_df)
+                merged_df = merged_df[~merged_df['raw_data_file_short'].isin(problem_files)].copy()
+                removed_count = initial_count - len(merged_df)
+                print(f"⚠️  Removed {removed_count} problematic files from metadata generation")
             
             # Create output directory
             output_dir = self.study_path / "metadata" / "metadata_gen_input_csvs"
@@ -2845,6 +2912,10 @@ fi
             Uses config paths for source directory and MinIO settings.
             Creates folder structure: bucket/study_name/processed_data/
         """
+        if self.should_skip('processed_data_uploaded_to_minio'):
+            print("⏭️  Skipping processed data upload to MinIO (skip trigger set)")
+            return True
+
         if not self.minio_client:
             print("❌ MinIO client not initialized")
             print("Set MINIO_ACCESS_KEY and MINIO_SECRET_KEY environment variables")
@@ -2893,12 +2964,146 @@ fi
             print(f"❌ Error uploading to MinIO: {e}")
             return False
 
-    def generate_nmdc_submission_packages(self) -> bool:
+    def generate_nmdc_metadata_for_workflow(self) -> bool:
         """
-        Needs to be implemented.
+        Generate NMDC metadata packages for workflow submission.
+        
+        Creates workflow metadata JSON files for NMDC submission using the
+        nmdc-ms-metadata-gen package. Generates one metadata package per
+        configuration, using the metadata mapping CSV files created by
+        generate_metadata_mapping_files().
+        
+        Currently supported workflow types:
+        - LCMS Metabolomics
+        
+        Returns:
+            True if metadata generation completed successfully, False otherwise
+            
+        Raises:
+            ValueError: If workflow_type is not set in config
+            NotImplementedError: If workflow_type is not yet supported
+            
+        Note:
+            Requires nmdc-ms-metadata-gen package to be installed.
+            Uses processed_data_url from MinIO configuration or constructs from
+            MinIO endpoint, bucket, and study name.
+            Validates metadata against NMDC schema both locally and via API.
         """
-        raise NotImplementedError("generate_nmdc_submission_packages() is not yet implemented.")
-    
+        # Check that workflow type is supported
+        self._check_workflow_type('LCMS Metabolomics', 'generate_nmdc_metadata_for_workflow')
+        
+        if self.should_skip('metadata_packages_generated'):
+            print("Skipping NMDC metadata generation (already generated)")
+            return True
+        
+        print("Generating NMDC metadata packages...")
+        
+        
+        # Check for metadata mapping input files
+        input_csv_dir = self.study_path / "metadata" / "metadata_gen_input_csvs"
+        if not input_csv_dir.exists() or not any(input_csv_dir.glob("*.csv")):
+            print("ERROR: No metadata mapping CSV files found")
+            print(f"Expected location: {input_csv_dir}")
+            print("Run generate_metadata_mapping_files() first")
+            return False
+        
+        # Build URL from MinIO config
+        minio_config = self.config.get('minio', {})
+        endpoint = minio_config.get('endpoint', '')
+        bucket = minio_config.get('bucket', '')
+        
+        # Construct folder path from study name and date tag
+        processed_date_tag = self.config['study'].get('processed_data_date_tag', '')
+        if processed_date_tag:
+            folder_path = f"{self.study_name}/processed_{processed_date_tag}"
+        else:
+            folder_path = f"{self.study_name}/processed"
+        
+        # Build URL
+        processed_data_url = f"https://nmdcdemo.emsl.pnnl.gov/{bucket}/{folder_path}/"
+        print(f"Constructed processed data URL: {processed_data_url}")
+        
+        # Get existing data objects from config (if any)
+        existing_data_objects = self.config.get('metadata', {}).get('existing_data_objects', [])
+        
+        # Create output directory for workflow metadata JSON files
+        output_dir = self.study_path / "metadata" / "nmdc_submission_packages"
+        output_dir.mkdir(parents=True, exist_ok=True)
+        
+        # Process each metadata mapping CSV file
+        csv_files = list(input_csv_dir.glob("*.csv"))
+        print(f"Found {len(csv_files)} metadata mapping files to process")
+        
+        success_count = 0
+        failed_files = []
+        
+        for csv_file in csv_files:
+            # Derive output filename from input (e.g., hilic_pos_metadata.csv -> workflow_metadata_hilic_pos.json)
+            config_name = csv_file.stem.replace('_metadata', '')
+            output_file = output_dir / f"workflow_metadata_{config_name}.json"
+            
+            # Skip if output already exists
+            if output_file.exists():
+                print(f"Output file already exists, skipping: {output_file.name}")
+                success_count += 1
+                continue
+            
+            print(f"\nProcessing: {csv_file.name}")
+            print(f"Output: {output_file.name}")
+            
+            try:
+                # Initialize metadata generator
+                generator = LCMSMetabolomicsMetadataGenerator(
+                    metadata_file=str(csv_file),
+                    database_dump_json_path=str(output_file),
+                    process_data_url=processed_data_url,
+                    existing_data_objects=existing_data_objects
+                )
+                
+                # Run metadata generation
+                metadata = generator.run()
+                
+                # Validate without API first (fast local validation)
+                print("  Validating metadata (local)...")
+                validate_local = generator.validate_nmdc_database(json=metadata, use_api=False)
+                if validate_local.get("result") != "All Okay!":
+                    print(f"  WARNING: Local validation issues: {validate_local}")
+                    failed_files.append((csv_file.name, "Local validation failed"))
+                    continue
+                
+                print(f"  SUCCESS: {output_file.name}")
+                success_count += 1
+                
+            except Exception as e:
+                print(f"  ERROR: Failed to generate metadata: {e}")
+                failed_files.append((csv_file.name, str(e)))
+                import traceback
+                traceback.print_exc()
+        
+        # Report results
+        print(f"\n{'='*60}")
+        print("NMDC Metadata Generation Summary")
+        print(f"{'='*60}")
+        print(f"Total files processed: {len(csv_files)}")
+        print(f"Successful: {success_count}")
+        print(f"Failed: {len(failed_files)}")
+        
+        if failed_files:
+            print("\nFailed files:")
+            for filename, error in failed_files:
+                print(f"  - {filename}: {error}")
+        
+        print(f"\nMetadata packages saved to: {output_dir}")
+        
+        # Set skip trigger only if all files succeeded
+        if success_count == len(csv_files):
+            self.set_skip_trigger('metadata_packages_generated', True)
+            print("\nAll metadata packages generated successfully!")
+            return True
+        else:
+            print("\nSome metadata packages failed - review errors above")
+            return False
+
     def submit_metadata_packages(self, environment: str = 'dev') -> bool:
         """
         Needs to be implemented.
