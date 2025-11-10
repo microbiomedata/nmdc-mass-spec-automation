@@ -45,7 +45,7 @@ python _kroeger_11_dwsv7q78/run_workflow.py
 
 2. **Create Directory Structure**:
    ```python
-   study.create_study_structure()
+   study.create_workflow_structure()
    ```
 
 3. **Discover and Download Data**:

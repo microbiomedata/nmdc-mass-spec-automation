@@ -58,7 +58,7 @@ from nmdc_dp_utils.study_manager import NMDCWorkflowManager
 study = NMDCWorkflowManager("studies/your_study/config.json")
 
 # Step 1: Create directory structure
-study.create_study_structure()
+study.create_workflow_structure()
 
 # Step 2: Discover and download raw data
 ftp_df = study.get_massive_ftp_urls()

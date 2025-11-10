@@ -32,10 +32,10 @@ load_dotenv()
 
 class NMDCWorkflowManager:
     """
-    A configurable class for managing NMDC metabolomics study data workflows.
+    A configurable class for managing NMDC mass spectrometry data workflows.
     
     This class provides a unified interface for:
-    - Setting up standardized study directory structures
+    - Setting up standardized workflow directory structures
     - Discovering and downloading raw data from MASSIVE datasets
     - Uploading/downloading processed data to/from MinIO object storage
     - Generating WDL workflow configuration files for batch processing
@@ -45,7 +45,7 @@ class NMDCWorkflowManager:
     
     Example:
         >>> manager = NMDCWorkflowManager('config.json')
-        >>> manager.create_study_structure()
+        >>> manager.create_workflow_structure()
         >>> ftp_df = manager.get_massive_ftp_urls()
         >>> manager.download_from_massive()
         >>> manager.generate_wdl_jsons()
@@ -53,10 +53,10 @@ class NMDCWorkflowManager:
     
     def __init__(self, config_path: str):
         """
-        Initialize the study manager with a configuration file.
+        Initialize the workflow manager with a configuration file.
         
         Args:
-            config_path: Path to the JSON configuration file containing study metadata,
+            config_path: Path to the JSON configuration file containing study and workflow metadata,
                         paths, MinIO settings, and processing configurations.
                         
         Raises:
@@ -65,10 +65,11 @@ class NMDCWorkflowManager:
             KeyError: If required configuration fields are missing
         """
         self.config = self.load_config(config_path)
+        self.workflow_name = self.config['workflow']['name']
         self.study_name = self.config['study']['name']
         self.study_id = self.config['study']['id']
         self.base_path = Path(self.config['paths']['base_directory'])
-        self.study_path = self.base_path / "studies" / f"{self.study_name}"
+        self.workflow_path = self.base_path / "studies" / f"{self.workflow_name}"
         
         # Construct dynamic paths from data_directory
         self.data_directory = Path(self.config['paths']['data_directory'])
@@ -246,12 +247,12 @@ class NMDCWorkflowManager:
             print("MinIO credentials not found in environment variables")
             return None
     
-    def create_study_structure(self):
+    def create_workflow_structure(self):
         """
-        Create the standard directory structure for a study.
+        Create the standard directory structure for a workflow for a study.
         
-        Creates the following directories under the study path:
-        - scripts/: Study-specific scripts and utilities
+        Creates the following directories under the workflow path:
+        - scripts/: Workflow-specific scripts and utilities
         - metadata/: Configuration files and study metadata
         - wdl_jsons/: Generated WDL workflow configuration files
         - raw_file_info/: Information about raw data files
@@ -264,35 +265,36 @@ class NMDCWorkflowManager:
             return
             
         directories = [
-            self.study_path,
-            self.study_path / "scripts",
-            self.study_path / "metadata",
-            self.study_path / "wdl_jsons",
-            self.study_path / "raw_file_info",
+            self.workflow_path,
+            self.workflow_path / "scripts",
+            self.workflow_path / "metadata",
+            self.workflow_path / "wdl_jsons",
+            self.workflow_path / "raw_file_info",
         ]
         
         # Add configuration-specific directories
         if 'configurations' in self.config:
             for config in self.config['configurations']:
-                directories.append(self.study_path / "wdl_jsons" / config['name'])
+                directories.append(self.workflow_path / "wdl_jsons" / config['name'])
         
         for directory in directories:
             directory.mkdir(parents=True, exist_ok=True)
         
-        print(f"Created study structure for {self.study_name} at {self.study_path}")
+        print(f"Created study structure for {self.workflow_name} at {self.workflow_path}")
         self.set_skip_trigger('study_structure_created', True)
     
-    def get_study_info(self) -> Dict:
+    def get_workflow_info(self) -> Dict:
         """
-        Get summary information about the study configuration.
+        Get summary information about the workflow configuration.
         
         Returns:
-            Dictionary containing study metadata, paths, and configuration summary
+            Dictionary containing workflow metadata, paths, and configuration summary
         """
         info = {
+            'workflow_name': self.workflow_name,
             'study_name': self.study_name,
             'study_id': self.study_id,
-            'study_path': str(self.study_path),
+            'workflow_path': str(self.workflow_path),
             'massive_id': self.config['study'].get('massive_id', 'Not configured'),
             'file_type': self.config['study'].get('file_type', '.raw'),
             'file_filters': self.config['study'].get('file_filters', []),
@@ -326,7 +328,7 @@ class NMDCWorkflowManager:
         """
         import ftplib
         
-        log_file = self.study_path / f"{self.study_name}_massive_ftp_locs.txt"
+        log_file = self.workflow_path / f"{self.workflow_name}_massive_ftp_locs.txt"
         
         print(f"Crawling MASSIVE FTP directory for dataset: {massive_id}")
         print("This may take several minutes...")
@@ -441,12 +443,12 @@ class NMDCWorkflowManager:
             ALL files of the configured type are returned (potentially thousands).
         """
         if log_file is None:
-            log_file = self.study_path / f"{self.study_name}_massive_ftp_locs.txt"
+            log_file = self.workflow_path / f"{self.workflow_name}_massive_ftp_locs.txt"
         
         if output_file is None:
-            output_file = f"{self.study_name}_massive_ftp_locs.csv"
+            output_file = f"{self.workflow_name}_massive_ftp_locs.csv"
         
-        output_path = self.study_path / output_file
+        output_path = self.workflow_path / output_file
         
         print(f"Parsing FTP log file: {log_file}")
         
@@ -549,7 +551,7 @@ class NMDCWorkflowManager:
         if self.should_skip('raw_data_downloaded'):
             print("Skipping MASSIVE FTP URL discovery (raw data already downloaded)")
             # Return existing FTP data if available
-            ftp_csv = self.study_path / f"{self.study_name}_massive_ftp_locs.csv"
+            ftp_csv = self.workflow_path / f"{self.workflow_name}_massive_ftp_locs.csv"
             if ftp_csv.exists():
                 return pd.read_csv(ftp_csv)
             else:
@@ -646,7 +648,7 @@ class NMDCWorkflowManager:
         if massive_id:
             ftp_df = self.get_massive_ftp_urls(massive_id)
         elif ftp_file:
-            ftp_path = self.study_path / ftp_file
+            ftp_path = self.workflow_path / ftp_file
             if ftp_path.suffix == '.csv':
                 ftp_df = pd.read_csv(ftp_path)
             else:
@@ -696,7 +698,7 @@ class NMDCWorkflowManager:
         
         # Write CSV of downloaded file names for biosample mapping
         if len(downloaded_files) > 0:
-            downloaded_files_csv = self.study_path / "metadata" / "downloaded_files.csv"
+            downloaded_files_csv = self.workflow_path / "metadata" / "downloaded_files.csv"
             os.makedirs(downloaded_files_csv.parent, exist_ok=True)
             
             # Create DataFrame with downloaded file information
@@ -940,7 +942,7 @@ class NMDCWorkflowManager:
         if self.should_skip('data_processed'):
             print("Skipping WDL JSON generation (already generated)")
             # Count existing JSON files
-            wdl_jsons_path = self.study_path / "wdl_jsons"
+            wdl_jsons_path = self.workflow_path / "wdl_jsons"
             if wdl_jsons_path.exists():
                 json_count = len(list(wdl_jsons_path.rglob("*.json")))
                 print(f"Found {json_count} existing WDL JSON files")
@@ -949,19 +951,19 @@ class NMDCWorkflowManager:
 
         # First, move any processed data from previous WDL execution attempts
         # This ensures the processed data directory is up-to-date before we check for already-processed files
-        wdl_execution_dir = self.study_path / "wdl_execution"
+        wdl_execution_dir = self.workflow_path / "wdl_execution"
         if wdl_execution_dir.exists():
             print("📁 Moving any processed data from previous WDL execution...")
             self._move_processed_files(str(wdl_execution_dir))
 
         # Always empty the wdl_jsons directory first
-        wdl_jsons_path = self.study_path / "wdl_jsons"
+        wdl_jsons_path = self.workflow_path / "wdl_jsons"
         if wdl_jsons_path.exists():
             shutil.rmtree(wdl_jsons_path)
         wdl_jsons_path.mkdir(parents=True, exist_ok=True)
 
         # Use mapped files list if available (only files that map to biosamples)
-        mapped_files_csv = self.study_path / "metadata" / "mapped_raw_files.csv"
+        mapped_files_csv = self.workflow_path / "metadata" / "mapped_raw_files.csv"
         
         if mapped_files_csv.exists():
             print("📋 Using mapped raw files list (only biosample-mapped files will be processed)")
@@ -1046,7 +1048,7 @@ class NMDCWorkflowManager:
         json_count = 0
         for config in self.config.get('configurations', []):
             config_name = config['name']
-            config_dir = self.study_path / "wdl_jsons" / config_name
+            config_dir = self.workflow_path / "wdl_jsons" / config_name
             config_dir.mkdir(parents=True, exist_ok=True)
             
             # Filter files for this specific configuration
@@ -1141,7 +1143,7 @@ class NMDCWorkflowManager:
         
         if self.should_skip('data_processed'):
             print("Skipping WDL runner script generation (data already processed)")
-            script_path = self.study_path / "scripts" / f"{self.study_name}_wdl_runner.sh"
+            script_path = self.workflow_path / "scripts" / f"{self.workflow_name}_wdl_runner.sh"
             if script_path.exists():
                 print(f"Found existing script: {script_path}")
                 return str(script_path)
@@ -1151,12 +1153,12 @@ class NMDCWorkflowManager:
 
 
         if script_name is None:
-            script_name = f"{self.study_name}_wdl_runner.sh"
+            script_name = f"{self.workflow_name}_wdl_runner.sh"
             
-        script_path = self.study_path / "scripts" / script_name
+        script_path = self.workflow_path / "scripts" / script_name
         
         # Get absolute path to the wdl_jsons directory
-        wdl_jsons_dir = self.study_path / "wdl_jsons"
+        wdl_jsons_dir = self.workflow_path / "wdl_jsons"
         
         print("🔍 Validating WDL JSON files...")
         
@@ -1340,7 +1342,7 @@ fi
         
         # Set up working directory within study
         if working_directory is None:
-            working_directory = self.study_path / "wdl_execution"
+            working_directory = self.workflow_path / "wdl_execution"
         else:
             working_directory = Path(working_directory)
         
@@ -1571,10 +1573,10 @@ fi
         
         # Safety check 2: ensure this is within the current study's directory structure
         try:
-            working_path.relative_to(self.study_path)
+            working_path.relative_to(self.workflow_path)
         except ValueError:
             print(f"⚠️  Skipping cleanup - directory is not within current study path: {working_path}")
-            print(f"   Current study path: {self.study_path}")
+            print(f"   Current study path: {self.workflow_path}")
             return False
         
         if not working_path.exists():
@@ -1722,7 +1724,7 @@ fi
         # Check skip trigger
         if self.should_skip('biosample_attributes_fetched'):
             print("Skipping biosample attributes fetch (already downloaded)")
-            biosample_csv = self.study_path / "metadata" / "biosample_attributes.csv"
+            biosample_csv = self.workflow_path / "metadata" / "biosample_attributes.csv"
             if biosample_csv.exists():
                 return str(biosample_csv)
         
@@ -1752,7 +1754,7 @@ fi
             biosample_df = pd.DataFrame(biosamples)
             
             # Create metadata directory if it doesn't exist
-            metadata_dir = self.study_path / "metadata"
+            metadata_dir = self.workflow_path / "metadata"
             metadata_dir.mkdir(parents=True, exist_ok=True)
             
             # Save to CSV
@@ -1799,7 +1801,7 @@ fi
         """
         if self.should_skip('biosample_mapping_script_generated'):
             print("Skipping biosample mapping script generation (already generated)")
-            script_path = self.study_path / "scripts" / (script_name or "map_raw_files_to_biosamples_TEMPLATE.py")
+            script_path = self.workflow_path / "scripts" / (script_name or "map_raw_files_to_biosamples_TEMPLATE.py")
             if script_path.exists():
                 return str(script_path)
         
@@ -1812,7 +1814,7 @@ fi
         else:
             template_path = Path(template_path)
             
-        script_path = self.study_path / "scripts" / script_name
+        script_path = self.workflow_path / "scripts" / script_name
         
         print(f"📝 Generating biosample mapping TEMPLATE script: {script_path}")
         print(f"📄 Using template: {template_path}")
@@ -1877,8 +1879,8 @@ fi
         
         if script_path is None:
             # Check for both template and non-template versions
-            template_script = self.study_path / "scripts" / "map_raw_files_to_biosamples_TEMPLATE.py"
-            regular_script = self.study_path / "scripts" / "map_raw_files_to_biosamples.py"
+            template_script = self.workflow_path / "scripts" / "map_raw_files_to_biosamples_TEMPLATE.py"
+            regular_script = self.workflow_path / "scripts" / "map_raw_files_to_biosamples.py"
             
             if regular_script.exists():
                 script_path = regular_script
@@ -2114,7 +2116,7 @@ fi
         context = {}
         
         # Load biosample attributes
-        biosample_csv = self.study_path / "metadata" / "biosample_attributes.csv"
+        biosample_csv = self.workflow_path / "metadata" / "biosample_attributes.csv"
         if not biosample_csv.exists():
             raise FileNotFoundError(f"❌ Biosample attributes not found at {biosample_csv}. Run get_biosample_attributes() first.")
         
@@ -2138,7 +2140,7 @@ fi
             raise RuntimeError(f"❌ Error loading biosample attributes: {e}")
         
         # Load downloaded files
-        downloaded_files_csv = self.study_path / "metadata" / "downloaded_files.csv"
+        downloaded_files_csv = self.workflow_path / "metadata" / "downloaded_files.csv"
         if not downloaded_files_csv.exists():
             raise FileNotFoundError(f"❌ Downloaded files list not found at: {downloaded_files_csv}")
         
@@ -2305,7 +2307,7 @@ fi
         )
         
         # Save the script
-        script_path = self.study_path / "scripts" / "map_raw_files_to_biosamples.py"
+        script_path = self.workflow_path / "scripts" / "map_raw_files_to_biosamples.py"
         with open(script_path, 'w') as f:
             f.write(final_script)
         
@@ -2329,8 +2331,8 @@ fi
         print("🔧 Executing generated functions on real data...")
         
         # Load real data from CSV files
-        downloaded_files_path = self.study_path / "metadata" / "downloaded_files.csv"
-        biosample_path = self.study_path / "metadata" / "biosample_attributes.csv"
+        downloaded_files_path = self.workflow_path / "metadata" / "downloaded_files.csv"
+        biosample_path = self.workflow_path / "metadata" / "biosample_attributes.csv"
         
         if not downloaded_files_path.exists():
             print(f"❌ Missing file: {downloaded_files_path}")
@@ -2595,7 +2597,7 @@ NO explanations, NO other text. ONLY the two function definitions with imports."
                 return False, results
             
             # Load and analyze mapping results
-            mapping_file = self.study_path / f"{self.study_name}_raw_file_biosample_mapping.csv"
+            mapping_file = self.workflow_path / f"{self.study_name}_raw_file_biosample_mapping.csv"
             if not mapping_file.exists():
                 results['error'] = "Mapping file not created"
                 return False, results
@@ -2626,7 +2628,7 @@ NO explanations, NO other text. ONLY the two function definitions with imports."
             # Biosample coverage
             if 'biosample_id' in mapping_df.columns:
                 mapped_biosamples = mapping_df[mapping_df['biosample_id'].notna()]['biosample_id'].nunique()
-                biosample_csv = self.study_path / "metadata" / "biosample_attributes.csv"
+                biosample_csv = self.workflow_path / "metadata" / "biosample_attributes.csv"
                 total_biosamples = len(pd.read_csv(biosample_csv))
                 results['biosample_coverage'] = (mapped_biosamples / total_biosamples * 100) if total_biosamples > 0 else 0
             
@@ -2663,7 +2665,7 @@ NO explanations, NO other text. ONLY the two function definitions with imports."
         import pandas as pd
         
         # Load the biosample mapping file
-        mapping_file = self.study_path / f"{self.study_name}_raw_file_biosample_mapping.csv"
+        mapping_file = self.workflow_path / f"{self.study_name}_raw_file_biosample_mapping.csv"
         if not mapping_file.exists():
             print(f"⚠️  Mapping file not found: {mapping_file}")
             return
@@ -2679,7 +2681,7 @@ NO explanations, NO other text. ONLY the two function definitions with imports."
                 return
             
             # Get the full file paths from the downloaded files list
-            downloaded_files_csv = self.study_path / "metadata" / "downloaded_files.csv"
+            downloaded_files_csv = self.workflow_path / "metadata" / "downloaded_files.csv"
             if downloaded_files_csv.exists():
                 downloaded_df = pd.read_csv(downloaded_files_csv)
                 
@@ -2704,7 +2706,7 @@ NO explanations, NO other text. ONLY the two function definitions with imports."
                 output_df = mapped_df[['raw_file_path', 'biosample_id', 'biosample_name', 'match_confidence']].copy()
             
             # Save the filtered file list
-            output_file = self.study_path / "metadata" / "mapped_raw_files.csv"
+            output_file = self.workflow_path / "metadata" / "mapped_raw_files.csv"
             output_df.to_csv(output_file, index=False)
             
             # Report statistics
@@ -2755,7 +2757,7 @@ NO explanations, NO other text. ONLY the two function definitions with imports."
         if self.should_skip('raw_data_inspected'):
             print("⏭️  Skipping raw data inspection (skip trigger set)")
             # Try to return existing inspection results
-            output_dir = self.study_path / "raw_file_info"
+            output_dir = self.workflow_path / "raw_file_info"
             existing_file = output_dir / "raw_file_inspection_results.csv"
             if existing_file.exists():
                 print(f"📊 Found existing inspection results: {existing_file}")
@@ -2768,7 +2770,7 @@ NO explanations, NO other text. ONLY the two function definitions with imports."
             # Get file paths to inspect
             if file_paths is None:
                 # Use mapped raw files if available
-                mapped_files_path = self.study_path / "metadata" / "mapped_raw_files.csv"
+                mapped_files_path = self.workflow_path / "metadata" / "mapped_raw_files.csv"
                 if mapped_files_path.exists():
                     mapped_df = pd.read_csv(mapped_files_path)
                     file_paths = mapped_df['raw_file_path'].tolist()
@@ -2786,7 +2788,7 @@ NO explanations, NO other text. ONLY the two function definitions with imports."
                 return None
             
             # Check for previous inspection results and filter out successfully inspected files
-            output_dir = self.study_path / "raw_file_info"
+            output_dir = self.workflow_path / "raw_file_info"
             output_dir.mkdir(parents=True, exist_ok=True)
             existing_results_file = output_dir / "raw_file_inspection_results.csv"
             
@@ -3015,7 +3017,7 @@ NO explanations, NO other text. ONLY the two function definitions with imports."
         # Run the Docker command with real-time output
         result = subprocess.run(
             docker_cmd,
-            cwd=str(self.study_path),
+            cwd=str(self.workflow_path),
             capture_output=False,  # Let output go directly to console for real-time feedback
             text=True,
             timeout=3600  # 1 hour timeout
@@ -3130,7 +3132,7 @@ NO explanations, NO other text. ONLY the two function definitions with imports."
         Returns:
             Path to the raw inspection results CSV file if it exists, None otherwise
         """
-        results_file = self.study_path / "raw_file_info" / "raw_file_inspection_results.csv"
+        results_file = self.workflow_path / "raw_file_info" / "raw_file_inspection_results.csv"
         if results_file.exists():
             return str(results_file)
         return None
@@ -3165,7 +3167,7 @@ NO explanations, NO other text. ONLY the two function definitions with imports."
         
         try:
             # Check prerequisites
-            biosample_mapping_file = self.study_path / f"{self.study_name}_raw_file_biosample_mapping.csv"
+            biosample_mapping_file = self.workflow_path / f"{self.study_name}_raw_file_biosample_mapping.csv"
             if not biosample_mapping_file.exists():
                 print(f"❌ Biosample mapping file not found: {biosample_mapping_file}")
                 return False
@@ -3298,7 +3300,7 @@ NO explanations, NO other text. ONLY the two function definitions with imports."
             
             if use_massive_urls:
                 # Load FTP URLs to get correct directory structure
-                ftp_file = self.study_path / f"{self.study_name}_massive_ftp_locs.csv"
+                ftp_file = self.workflow_path / f"{self.study_name}_massive_ftp_locs.csv"
                 if ftp_file.exists():
                     ftp_df = pd.read_csv(ftp_file)
                     # Create mapping from filename to full FTP path
@@ -3364,7 +3366,7 @@ NO explanations, NO other text. ONLY the two function definitions with imports."
                 print(f"⚠️  Removed {removed_count} problematic files from metadata generation")
             
             # Create output directory
-            output_dir = self.study_path / "metadata" / "metadata_gen_input_csvs"
+            output_dir = self.workflow_path / "metadata" / "metadata_gen_input_csvs"
             output_dir.mkdir(parents=True, exist_ok=True)
             
             # Clear existing files
@@ -3709,7 +3711,7 @@ NO explanations, NO other text. ONLY the two function definitions with imports."
         
         
         # Check for metadata mapping input files
-        input_csv_dir = self.study_path / "metadata" / "metadata_gen_input_csvs"
+        input_csv_dir = self.workflow_path / "metadata" / "metadata_gen_input_csvs"
         if not input_csv_dir.exists() or not any(input_csv_dir.glob("*.csv")):
             print("ERROR: No metadata mapping CSV files found")
             print(f"Expected location: {input_csv_dir}")
@@ -3736,7 +3738,7 @@ NO explanations, NO other text. ONLY the two function definitions with imports."
         existing_data_objects = self.config.get('metadata', {}).get('existing_data_objects', [])
         
         # Create output directory for workflow metadata JSON files
-        output_dir = self.study_path / "metadata" / "nmdc_submission_packages"
+        output_dir = self.workflow_path / "metadata" / "nmdc_submission_packages"
         output_dir.mkdir(parents=True, exist_ok=True)
         
         # Process each metadata mapping CSV file

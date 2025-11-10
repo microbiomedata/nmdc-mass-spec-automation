@@ -232,7 +232,7 @@ def main():
     
     # Step 1: Check if biosample attributes are available
     print("\\n1. Checking biosample attributes...")
-    biosample_csv = study.study_path / "metadata" / "biosample_attributes.csv"
+    biosample_csv = study.workflow_path / "metadata" / "biosample_attributes.csv"
     if not biosample_csv.exists():
         print("❌ Biosample attributes not found. Run get_biosample_attributes() first.")
         return 1
@@ -246,7 +246,7 @@ def main():
     
     # Step 2: Get list of downloaded raw data files
     print("\\n2. Loading downloaded files list...")
-    downloaded_files_csv = study.study_path / "metadata" / "downloaded_files.csv"
+    downloaded_files_csv = study.workflow_path / "metadata" / "downloaded_files.csv"
     if not downloaded_files_csv.exists():
         print(f"❌ Downloaded files list not found: {downloaded_files_csv}")
         print("Run the download_from_massive() method first to generate this file.")
@@ -295,7 +295,7 @@ def main():
     mapping_df = mapping_df.sort_values('confidence_rank').drop('confidence_rank', axis=1)
     
     # Save simplified mapping file
-    mapping_file = study.study_path / "kroeger_11_dwsv7q78_raw_file_biosample_mapping.csv"
+    mapping_file = study.workflow_path / "kroeger_11_dwsv7q78_raw_file_biosample_mapping.csv"
     mapping_df.to_csv(mapping_file, index=False)
     print(f"💾 Saved mapping to: {mapping_file}")
     
