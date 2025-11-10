@@ -1,7 +1,0 @@
-[ms2]
-scan_filter = "hcd"
-resolution = "high"
-
-[ms2_cid]
-scan_filter = "cid"
-resolution = "low"

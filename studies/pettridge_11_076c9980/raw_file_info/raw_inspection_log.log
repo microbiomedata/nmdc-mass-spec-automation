@@ -1,9 +1,0 @@
-2025-11-03 22:46:40,324 - INFO - Found 40 files to inspect
-2025-11-03 22:46:40,325 - INFO - Results will be written to: /mnt/Users/heal742/LOCAL/05_NMDC/02_MetaMS/data_processing/studies/pettridge_11_076c9980/raw_file_info/raw_file_inspection_results.csv
-2025-11-03 22:46:40,326 - INFO - Errors will be logged to: /mnt/Users/heal742/LOCAL/05_NMDC/02_MetaMS/data_processing/studies/pettridge_11_076c9980/raw_file_info/raw_file_inspection_errors.csv
-2025-11-03 22:46:40,326 - INFO - CoreMS available: True
-2025-11-03 22:47:41,728 - INFO - Inspection complete!
-2025-11-03 22:47:41,728 - INFO - Successfully processed: 40 files
-2025-11-03 22:47:41,728 - INFO - Failed to process: 0 files
-2025-11-03 22:47:41,728 - INFO - Results saved to: /mnt/Users/heal742/LOCAL/05_NMDC/02_MetaMS/data_processing/studies/pettridge_11_076c9980/raw_file_info/raw_file_inspection_results.csv
-2025-11-03 22:47:41,729 - INFO - Processing log saved to: /mnt/Users/heal742/LOCAL/05_NMDC/02_MetaMS/data_processing/studies/pettridge_11_076c9980/raw_file_info/raw_inspection_log.log

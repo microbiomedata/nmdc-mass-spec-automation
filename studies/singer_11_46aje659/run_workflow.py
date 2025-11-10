@@ -50,6 +50,13 @@ def main():
         assert False, "Biosample mapping failed."
     else:
         print("✅ Biosample mapping completed successfully")
+
+# Step 5: LLM-POWERED BIOSAMPLE MAPPING (replaces manual template customization)
+# WIP - uncomment when ready
+    #mapping_success = study.llm_generate_and_refine_mapping_script(
+    #    max_iterations=5,        # Try up to 5 refinement iterations
+    #    use_github_models=True   # Use GitHub Models (set to False for OpenAI)
+    #)
     
     # Step 5: Inspect raw data files for metadata and QC
     print("\n5. Inspecting raw data files...")
