@@ -39,8 +39,8 @@ python _kroeger_11_dwsv7q78/run_workflow.py
 
 1. **Initialize Study Manager**:
    ```python
-   from nmdc_dp_utils.study_manager import NMDCStudyManager
-   study = NMDCStudyManager('_kroeger_11_dwsv7q78/config.json')
+   from nmdc_dp_utils.study_manager import NMDCWorkflowManager
+   study = NMDCWorkflowManager('_kroeger_11_dwsv7q78/config.json')
    ```
 
 2. **Create Directory Structure**:
@@ -133,7 +133,7 @@ export MINIO_SECRET_KEY="your_secret_key"
 
 ```python
 # Check study configuration
-study = NMDCStudyManager('_kroeger_11_dwsv7q78/config.json')
+study = NMDCWorkflowManager('_kroeger_11_dwsv7q78/config.json')
 info = study.get_study_info()
 print(info)
 

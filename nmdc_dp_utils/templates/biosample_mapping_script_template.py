@@ -21,7 +21,7 @@ from pathlib import Path
 # Add the utils directory to path
 sys.path.append(str(Path.cwd() / "nmdc_dp_utils"))
 
-from study_manager import NMDCStudyManager
+from study_manager import NMDCWorkflowManager
 
 
 def extract_sample_info_from_filename(filename):
@@ -195,7 +195,7 @@ def main():
         print("Please run this script from the data_processing root directory")
         return 1
     
-    study = NMDCStudyManager(str(config_path))
+    study = NMDCWorkflowManager(str(config_path))
     
     # Step 1: Check if biosample attributes are available
     print("\\n1. Checking biosample attributes...")

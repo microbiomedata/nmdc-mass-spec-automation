@@ -30,7 +30,7 @@ from nmdc_ms_metadata_gen.lcms_metab_metadata_generator import LCMSMetabolomicsM
 # Load environment variables from .env file
 load_dotenv()
 
-class NMDCStudyManager:
+class NMDCWorkflowManager:
     """
     A configurable class for managing NMDC metabolomics study data workflows.
     
@@ -44,7 +44,7 @@ class NMDCStudyManager:
     file paths, processing configurations, and dataset identifiers.
     
     Example:
-        >>> manager = NMDCStudyManager('config.json')
+        >>> manager = NMDCWorkflowManager('config.json')
         >>> manager.create_study_structure()
         >>> ftp_df = manager.get_massive_ftp_urls()
         >>> manager.download_from_massive()
@@ -190,7 +190,7 @@ class NMDCStudyManager:
             troubleshooting issues that require reprocessing from scratch.
             
         Example:
-            >>> manager = NMDCStudyManager('config.json')
+            >>> manager = NMDCWorkflowManager('config.json')
             >>> manager.reset_all_triggers()
             🔄 Reset 5 skip triggers to False:
                • raw_data_downloaded: False
@@ -541,7 +541,7 @@ class NMDCStudyManager:
             configured correctly for your specific study needs.
             
         Example:
-            >>> manager = NMDCStudyManager('config.json')
+            >>> manager = NMDCWorkflowManager('config.json')
             >>> # Ensure config has: "file_filters": ["pos", "neg", "hilic"]
             >>> ftp_df = manager.get_massive_ftp_urls()
             >>> print(f"Found {len(ftp_df)} filtered files (original dataset may have had many more)")
@@ -2287,7 +2287,7 @@ fi
         
         # Remove any existing placeholder functions from before_main
         # (they're between the imports and main())
-        import_match = re.search(r'(from study_manager import NMDCStudyManager.*?\n)', before_main, re.DOTALL)
+        import_match = re.search(r'(from study_manager import NMDCWorkflowManager.*?\n)', before_main, re.DOTALL)
         if import_match:
             imports_section = before_main[:import_match.end()]
             # Insert our generated functions after imports

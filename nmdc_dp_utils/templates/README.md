@@ -1,6 +1,6 @@
 # NMDC Data Processing Templates
 
-This directory contains template files used by the `NMDCStudyManager` class to generate study-specific scripts and configurations.
+This directory contains template files used by the `NMDCWorkflowManager` class to generate study-specific scripts and configurations.
 
 ## Template Files
 
@@ -16,7 +16,7 @@ Template for generating biosample mapping scripts. This template is used by the 
 **Usage:**
 The template is automatically used when calling:
 ```python
-study = NMDCStudyManager('config.json')
+study = NMDCWorkflowManager('config.json')
 script_path = study.generate_biosample_mapping_script()
 ```
 

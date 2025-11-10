@@ -13,14 +13,14 @@ from pathlib import Path
 # Add the utils directory to path (assuming run from root directory)
 sys.path.append(str(Path.cwd() / "nmdc_dp_utils"))
 
-from study_manager import NMDCStudyManager
+from study_manager import NMDCWorkflowManager
 
 def main():
     """Run the Kroeger study workflow."""
     
     # Initialize study manager with the Kroeger config (assuming run from root directory)
     config_path = Path.cwd() / "studies" / "kroeger_11_dwsv7q78" / "kroeger_config.json"
-    study = NMDCStudyManager(str(config_path))
+    study = NMDCWorkflowManager(str(config_path))
     
     print(f"=== {study.study_name.upper()} WORKFLOW ===")
     print(f"Skip triggers: {study.config.get('skip_triggers', {})}")

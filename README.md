@@ -1,16 +1,16 @@
 # NMDC Metabolomics Data Processing System
 
-A standardized workflow system for processing NMDC (National Microbiome Data Collaborative) metabolomics studies from raw data discovery through NMDC metadata submission.
+A standardized workflow system for processing NMDC (National Microbiome Data Collaborative) mass-spec 'omics studies from raw data retrieval through NMDC metadata submission.
 
 ## Overview
 
-This system provides automated workflows for LC-MS and GC-MS metabolomics data processing, including:
+This system provides automated workflows for mass-spec 'omics data processing, including:
 
 - Consistent and configurable study setup
 - Automated data discovery and download from MASSIVE repositories
 - Docker-based raw data inspection
 - Biosample mapping with confidence scoring
-- WDL workflow generation and execution using MetaMS pipelines
+- WDL workflow generation and data processing using [MetaMS](https://github.com/microbiomedata/metaMS) or [EnviroMS](https://github.com/microbiomedata/enviroms)
 - MinIO object storage integration
 - NMDC metadata package generation and submission
 
@@ -22,7 +22,7 @@ This system provides automated workflows for LC-MS and GC-MS metabolomics data p
 - Git
 
 **System Requirements:**
-- Adequate storage for raw data (typically 50-500 GB per study)
+- Adequate storage for raw data (roughly 50-500 GB per study, but highly variable)
 - Internet connectivity for MASSIVE downloads, Docker operations, and MinIO access
 - MinIO credentials (for cloud storage operations)
 
@@ -38,15 +38,7 @@ source venv/bin/activate  # On Windows: venv\Scripts\activate
 pip install -r requirements.txt
 ```
 
-### 2. Configure Docker
-
-Pull the MetaMS Docker image for raw data inspection:
-
-```bash
-docker pull microbiomedata/metams:3.3.3
-```
-
-### 3. Set Up Environment Variables
+### 2. Set Up Environment Variables
 
 Create a `.env` file in the project root:
 
@@ -60,10 +52,10 @@ MINIO_SECRET_KEY="your_secret_key"
 ### Complete Workflow Example
 
 ```python
-from nmdc_dp_utils.study_manager import NMDCStudyManager
+from nmdc_dp_utils.study_manager import NMDCWorkflowManager
 
 # Initialize study manager
-study = NMDCStudyManager("studies/your_study/config.json")
+study = NMDCWorkflowManager("studies/your_study/config.json")
 
 # Step 1: Create directory structure
 study.create_study_structure()
