@@ -34,7 +34,17 @@ def extract_sample_info_from_filename(filename):
         filename: Raw data filename (e.g., "sample_123_pos.raw")
         
     Returns:
-        Dictionary with extracted sample information
+        Dictionary with extracted sample information containing these REQUIRED keys:
+        - 'raw_filename': str - Original filename
+        - 'sample_id': str or None - Extracted sample identifier
+        - 'treatment': str or None - Treatment code if present
+        - 'replicate': str or None - Replicate number if present
+        - 'ionization_mode': str or None - 'positive' or 'negative'
+        - 'column_type': str or None - Column type (e.g., 'hilic', 'rp')
+        - 'time_point': str or None - Time point if present
+        
+        IMPORTANT: Return a dictionary with ALL these keys, even if values are None.
+        Do not add extra keys without updating this specification.
     """
     # Remove file extension
     base_name = Path(filename).stem
@@ -91,11 +101,34 @@ def match_to_biosamples(raw_files_info, biosample_df):
         biosample_df: DataFrame with NMDC biosample attributes
         
     Returns:
-        DataFrame with mapping between raw files and biosamples
+        DataFrame with mapping between raw files and biosamples.
+        
+        REQUIRED COLUMNS (must match exactly):
+        - 'raw_file_name': str - Filename only (not full path)
+        - 'raw_file_type': str - Designates sample-type data from blanks, QC, extraction controls, etc. 
+        MUST be one of: 'sample', 'blank', 'qc', 'extraction_control', 'unknown'
+        - 'biosample_id': str or None - NMDC biosample ID (e.g., 'nmdc:bsm-...')
+        - 'biosample_name': str or None - Biosample name from NMDC
+        - 'match_confidence': str - MUST be one of: 'high', 'medium', 'low', 'multiple_matches', 'no_match'
+        
+        MATCHING CONFIDENCE GUIDELINES:
+        - 'high': Exact match on unique identifier (e.g., sample ID matches exactly)
+        - 'medium': Strong match with minor uncertainty (e.g., partial ID match)
+        - 'low': Weak match, needs review (e.g., fuzzy matching)
+        - 'multiple_matches': File matches multiple biosamples (ambiguous)
+        - 'no_match': No biosample found for this file
+        
+        DO NOT use any other confidence values. The downstream code expects exactly these values.
+
+        Example output:
+            raw_file_name           raw_file_type       biosample_id           biosample_name    match_confidence
+            sample_001_pos.mzML     sample              nmdc:bsm-11-abc123      Sample 001        high
+            sample_002_neg.mzML     sample              nmdc:bsm-11-xyz789      Sample 002        high
+            sample_003.mzML         sample              None                      None              no_match
+            ambiguous.mzML          unknown             None                      None              multiple_matches
+            blank_001.mzML          blank               None                      None              no_match
+
     """
-    print(f"🔍 Attempting to match {len(raw_files_info)} raw files to biosamples...")
-    print(f"📊 Available biosample columns: {list(biosample_df.columns)}")
-    
     # Show some example biosample data to help with matching
     if 'name' in biosample_df.columns:
         print("📝 Example biosample names:")
@@ -113,6 +146,7 @@ def match_to_biosamples(raw_files_info, biosample_df):
     for raw_info in raw_files_info:
         mapping = {
             'raw_file_name': Path(raw_info['raw_filename']).name,
+            'raw_file_type': None,
             'biosample_id': None,
             'biosample_name': None,
             'match_confidence': 'no_match'
@@ -155,7 +189,7 @@ def main():
     print("=== {study_name.upper()} - RAW FILE TO BIOSAMPLE MAPPING ===")
     
     # Initialize study manager
-    config_path = Path.cwd() / "singer_11_46aje659" / "config.json"
+    config_path = Path("/Users/heal742/LOCAL/05_NMDC/02_MetaMS/data_processing/studies/singer_11_46aje659/singer_config.json")
     if not config_path.exists():
         print(f"❌ Config file not found: {config_path}")
         print("Please run this script from the data_processing root directory")
@@ -241,6 +275,15 @@ def main():
     unmatched_files = len(mapping_df[mapping_df['match_confidence'] == 'no_match'])
     multiple_matches = len(mapping_df[mapping_df['match_confidence'] == 'multiple_matches'])
     
+    # Calculate sample-type statistics
+    sample_files = mapping_df[mapping_df['raw_file_type'] == 'sample']
+    total_sample_files = len(sample_files)
+    sample_file_pct = (total_sample_files / total_files) * 100 if total_files > 0 else 0
+    
+    # Of the sample files, how many mapped to biosamples?
+    sample_matched = len(sample_files[sample_files['match_confidence'].isin(['high', 'medium', 'low'])])
+    sample_match_pct = (sample_matched / total_sample_files) * 100 if total_sample_files > 0 else 0
+    
     # Calculate biosample coverage
     mapped_biosamples = mapping_df[mapping_df['biosample_id'].notna()]['biosample_id'].nunique()
     biosample_coverage_pct = (mapped_biosamples / total_biosamples) * 100 if total_biosamples > 0 else 0
@@ -249,6 +292,9 @@ def main():
     print(f"✅ Successfully matched: {matched_files}")
     print(f"⚠️  Multiple matches: {multiple_matches}")
     print(f"❌ Unmatched files: {unmatched_files}")
+    print(f"\\n🧪 Sample-type Analysis:")
+    print(f"   Sample files: {total_sample_files} ({sample_file_pct:.1f}% of all files)")
+    print(f"   Samples mapped to biosamples: {sample_matched}/{total_sample_files} ({sample_match_pct:.1f}%)")
     print(f"\\n🧬 Biosample Coverage:")
     print(f"   Total biosamples available: {total_biosamples}")
     print(f"   Biosamples with raw data: {mapped_biosamples}")
