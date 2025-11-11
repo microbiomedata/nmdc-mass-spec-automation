@@ -49,7 +49,7 @@ MINIO_SECRET_KEY="your_secret_key"
 
 ## Quick Start
 
-### Complete Workflow Example
+### Workflow Example
 
 ```python
 from nmdc_dp_utils.workflow_manager import NMDCWorkflowManager
@@ -78,63 +78,61 @@ json_count = manager.generate_wdl_jsons()
 script_path = manager.generate_wdl_runner_script()
 manager.run_wdl_script(script_path)
 
-# Step 6: Generate metadata mapping files with URL validation
+# Step 6: Upload to MinIO (if configured)
+manager.upload_processed_data_to_minio()
+
+# Step 7: Generate metadata mapping files with URL validation
 metadata_success = manager.generate_metadata_mapping_files()
 
-# Step 7: Run processing workflows
-
-
-# Step 7: Upload to MinIO (if configured)
-manager.upload_processed_data_to_minio()
-```
-
-### Using Automated Workflow Scripts
-
-Each study can include a `run_workflow.py` script for automated execution:
-
-```bash
-cd data_processing
-python studies/kroeger_11_dwsv7q78/run_workflow.py
+# Step 8: Generate and submit NMDC metadata packages
+manager.generate_nmdc_metadata_packages()
+manager.submit_metadata_to_nmdc(dev=True, prod=False)
 ```
 
 ## Repository Structure
 
 ```
-data_processing/
-├── nmdc_dp_utils/              # Core system modules
-│   ├── study_manager.py        # Main workflow orchestration
-│   ├── raw_data_inspector.py   # Docker-based raw file inspection
-│   ├── README.md               # Detailed system documentation
-│   ├── raw_data_inspector.md   # Raw inspection documentation
-│   └── templates/              # Biosample mapping templates
-├── studies/                    # Individual study directories
-│   ├── kroeger_11_dwsv7q78/   # Example: complete LC-MS workflow
-│   ├── singer_11_46aje659/    # Example: lipidomics study
-│   └── ...
-├── requirements.txt            # Python dependencies
-├── checklist.md               # Data processing evaluation checklist
-└── README.md                  # This file
+nmdc_mass_spec_automation/
+├── nmdc_dp_utils/                  # Core system modules
+│   ├── workflow_manager.py         # Main workflow orchestration class
+│   ├── raw_data_inspector.py       # Docker-based raw file inspection
+│   ├── example_config.json         # Example configuration file
+│   ├── README.md                   # Detailed system documentation
+│   ├── metadata_overrides_examples.md  # Metadata override examples
+│   └── templates/                  # Script templates
+│       ├── biosample_mapping_script_template.py
+│       └── README.md
+├── studies/                        # Individual study/workflow directories
+│   └── kroeger_11_dwsv7q78_lcms_metab/  # Example: complete LC-MS workflow
+├── requirements.txt                # Python dependencies
+└── README.md                       # This file
 ```
 
 ### Study Directory Structure
 
-Each study creates the following structure:
+Each workflow creates the following structure:
 
 ```
-studies/your_study/
-├── config.json                     # Study configuration
-├── run_workflow.py                 # Automated workflow runner
+studies/workflow_name/
+├── workflow_config.json            # Workflow configuration
+├── run_workflow.py                 # Automated workflow runner script
 ├── scripts/                        # Generated and custom scripts
-│   └── map_raw_files_to_biosamples.py
+│   ├── map_raw_files_to_biosamples_TEMPLATE.py
+│   ├── map_raw_files_to_biosamples.py
+│   └── workflow_name_wdl_runner.sh
 ├── metadata/                       # Biosample and mapping data
 │   ├── biosample_attributes.csv
 │   ├── mapped_raw_files.csv
-│   └── downloaded_files.csv
+│   ├── downloaded_files.csv
+│   └── metadata_gen_input_csvs/
 ├── raw_file_info/                 # Raw data inspection results
-│   └── raw_file_inspection_results.csv
+│   ├── raw_file_inspection_results.csv
+│   └── raw_file_inspection_errors.csv
 ├── wdl_jsons/                     # Generated WDL configurations
 │   ├── hilic_pos/
-│   └── hilic_neg/
+│   ├── hilic_neg/
+│   ├── rp_pos/
+│   └── rp_neg/
 └── wdl_execution/                 # Temporary WDL execution directory
 ```
 
