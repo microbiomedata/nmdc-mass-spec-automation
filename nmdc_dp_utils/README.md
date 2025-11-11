@@ -25,16 +25,20 @@ You need Python 3.8+ and Docker installed prior to using this system.
    ```
 
 3. **Set up environment variables** :
-   **Create a `.env` file in the project root directory and add the following environment variables:**
+   **Create a `.env` file in the project root directory and add the environment variables you'll need:**
+
+   **For uploading data to MinIO:**
    ```bash
    MINIO_ACCESS_KEY="your_access_key"
    MINIO_SECRET_KEY="your_secret_key"
-   #TODO KRH: Add NMDC metadata keys here for submitting to dev and prod
    ```
+
+   **For submitting metadata to NMDC:**
+   coming soon!
 
 ## Configuration
 
-Each study needs a `config.json` file. Use `nmdc_dp_utils/example_config.json` as a starting point.
+Each study needs a configuration json. Use `nmdc_dp_utils/example_config.json` as a starting point.
 
 ### Key Configuration Fields:
 
@@ -86,7 +90,7 @@ The system includes skip triggers to avoid repeating completed workflow steps wh
 - **`skip_triggers.metadata_submitted_dev`**: Skip metadata submission to NMDC dev if already done
 - **`skip_triggers.metadata_submitted_prod`**: Skip metadata submission to NMDC production if already done
 
-These triggers are automatically set to `true` when steps complete successfully. To rerun a step, manually set its trigger to `false` in the config file or use the `reset_skip_triggers()` method on the study manager object.
+These triggers are automatically set to `true` when steps complete successfully. To rerun a step, manually set its trigger to `false` in the config file or use the `reset_skip_triggers()` method on the workflow manager object.
 
 ## Directory Structure
 
