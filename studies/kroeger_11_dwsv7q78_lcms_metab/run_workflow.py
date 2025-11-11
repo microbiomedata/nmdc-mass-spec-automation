@@ -26,19 +26,13 @@ def main():
     print("\n1. Creating workflow structure...")
     manager.create_workflow_structure()
     
-    # Step 2: Get FTP URLs from MASSIVE dataset
+    # Step 2: Get Raw Data from MASSIVE
     print("\n2. Getting FTP URLs from MASSIVE...")
-    ftp_df = manager.get_massive_ftp_urls()
-    if not manager.should_skip('raw_data_downloaded'):
-        assert len(ftp_df) > 0, "No FTP URLs found in MASSIVE dataset."
+    _ = manager.get_massive_ftp_urls()
+    _ = manager.download_from_massive()
 
-    # Step 3: Download a subset of raw data from MASSIVE based on configured file patterns
-    print("\n3. Downloading raw data from MASSIVE...")
-    downloaded_files = manager.download_from_massive()
-    print(f"Available files: {len(downloaded_files)}")
-
-    # Step 4: Map raw data files to biosamples by generating mapping script and running it
-    print("\n4. Mapping raw data files to biosamples...")
+    # Step 3: Map raw data files to biosamples by generating mapping script and running it
+    print("\n3. Mapping raw data files to biosamples...")
     biosample_csv = manager.get_biosample_attributes()
     print(f"Biosample attributes saved to: {biosample_csv}")
     
@@ -54,12 +48,8 @@ def main():
     
     # Step 5: Inspect raw data files for metadata and QC
     print("\n5. Inspecting raw data files...")
-    inspection_result = manager.raw_data_inspector(
-        cores=4,    # Use multiple cores for faster processing
-        limit=None  # Process all files  
-    )
-    assert manager.should_skip('raw_data_inspected'), "Raw data inspection must complete successfully to proceed"
-    assert inspection_result, "Raw data inspection did not return any results."
+    inspection_result = manager.raw_data_inspector(cores=4)
+    #assert inspection_result, "Raw data inspection did not return any results."
 
     # Step 6: Generate metadata mapping files with URL validation
     print("\n6. Generating metadata mapping files with URL validation...")

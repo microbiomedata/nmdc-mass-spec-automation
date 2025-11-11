@@ -1,9 +1,9 @@
 #!/usr/bin/env python3
 """
-kroeger_11_dwsv7q78 - Map raw data files to NMDC biosamples
+singer_11_46aje659 - Map raw data files to NMDC biosamples
 
 This script maps raw LC-MS data files to NMDC biosamples for the study:
-"Microbial regulation of soil water repellency to control soil degradation"
+"Panicgrass rhizosphere soil microbial communities from growth chamber in LBNL, Berkeley, California, USA"
 
 The mapping strategy is study-specific and may need to be customized based on:
 - File naming conventions
@@ -11,12 +11,11 @@ The mapping strategy is study-specific and may need to be customized based on:
 - Biosample attributes from NMDC
 
 Run from the root data_processing directory:
-python kroeger_11_dwsv7q78/scripts/map_raw_files_to_biosamples.py
+python singer_11_46aje659/scripts/map_raw_files_to_biosamples_TEMPLATE.py
 """
 
 import sys
 import pandas as pd
-import re
 from pathlib import Path
 
 # Add the utils directory to path
@@ -27,17 +26,27 @@ from study_manager import NMDCWorkflowManager
 
 def extract_sample_info_from_filename(filename):
     """
-    Extract sample information from Kroeger study filename.
+    Extract sample information from raw data filename.
+    
+    CUSTOMIZE THIS FUNCTION based on your study's file naming convention.
     
     Args:
-        filename: Raw data filename
+        filename: Raw data filename (e.g., "sample_123_pos.raw")
         
     Returns:
-        Dictionary with extracted sample information
+        Dictionary with extracted sample information containing these REQUIRED keys:
+        - 'raw_filename': str - Original filename
+        - 'sample_id': str or None - Extracted sample identifier
+        - 'treatment': str or None - Treatment code if present
+        - 'replicate': str or None - Replicate number if present
+        - 'ionization_mode': str or None - 'positive' or 'negative'
+        - 'column_type': str or None - Column type (e.g., 'hilic', 'rp')
+        - 'time_point': str or None - Time point if present
+        
+        IMPORTANT: Return a dictionary with ALL these keys, even if values are None.
+        Do not add extra keys without updating this specification.
     """
-    import re
-    
-    # Remove file extension and get base name
+    # Remove file extension
     base_name = Path(filename).stem
     
     # Initialize sample info dictionary
@@ -51,158 +60,116 @@ def extract_sample_info_from_filename(filename):
         'time_point': None
     }
     
+    # CUSTOMIZE: Parse filename based on your naming convention
+    # Example patterns to look for in singer_11_46aje659:
+    parts = base_name.split('_')
+    
     # Look for ionization mode
-    if 'POS' in base_name:
-        sample_info['ionization_mode'] = 'positive'
-    elif 'NEG' in base_name:
-        sample_info['ionization_mode'] = 'negative'
+    for part in parts:
+        if 'pos' in part.lower():
+            sample_info['ionization_mode'] = 'positive'
+        elif 'neg' in part.lower():
+            sample_info['ionization_mode'] = 'negative'
     
     # Look for column type
-    if 'HILICZ' in base_name:
-        sample_info['column_type'] = 'hilic'
-    elif 'C18' in base_name:
-        sample_info['column_type'] = 'rp'
+    for part in parts:
+        if 'hilic' in part.lower():
+            sample_info['column_type'] = 'hilic'
+        elif 'c18' in part.lower() or 'rp' in part.lower():
+            sample_info['column_type'] = 'rp'
     
-    # Extract sample information using regex patterns
-    # Pattern 1: S##-D##_[A-C] (e.g., S32-D30_A, S40-D89_B)
-    complex_pattern = r'(\w+)-D(\d+)_([ABC])'
-    complex_match = re.search(complex_pattern, base_name)
+    # Extract sample ID (customize this logic)
+    # Look for numeric parts that might be sample IDs
+    for part in parts:
+        if part.isdigit():
+            sample_info['sample_id'] = part
+            break
     
-    if complex_match:
-        sample_info['sample_id'] = complex_match.group(1)  # e.g., 'S32'
-        sample_info['treatment'] = f"D{complex_match.group(2)}"  # e.g., 'D30'
-        sample_info['replicate'] = complex_match.group(3)  # e.g., 'A'
-        return sample_info
-    
-    # Pattern 2: Control samples (ExCtrl, Neg, Sterile-*, QC)
-    control_patterns = [
-        r'ExCtrl',
-        r'Neg-D\d+',
-        r'Sterile-\w+',
-        r'QC'
-    ]
-    
-    for pattern in control_patterns:
-        if re.search(pattern, base_name):
-            match = re.search(pattern, base_name)
-            sample_info['sample_id'] = match.group(0)
-            sample_info['treatment'] = 'control'
-            return sample_info
-    
-    # Pattern 3: Simple sample ID (S##)
-    simple_pattern = r'(S\d+)(?!-)'
-    simple_match = re.search(simple_pattern, base_name)
-    
-    if simple_match:
-        sample_info['sample_id'] = simple_match.group(1)
-        return sample_info
-    
-    # Pattern 4: Pilot study samples
-    pilot_pattern = r'S\d+-D\d+-\w+'
-    if re.search(pilot_pattern, base_name):
-        pilot_match = re.search(r'(S\d+)', base_name)
-        if pilot_match:
-            sample_info['sample_id'] = pilot_match.group(1)
-            sample_info['treatment'] = 'pilot'
+    # Add more parsing logic here based on your file naming patterns
     
     return sample_info
 
 
 def match_to_biosamples(raw_files_info, biosample_df):
     """
-    Match raw file information to NMDC biosamples for Kroeger study.
-    Based on the working mapping logic from the previous detailed analysis.
-    """
-    print(f"🔍 Attempting to match {len(raw_files_info)} raw files to biosamples...")
-    print(f"📊 Available biosample columns: {list(biosample_df.columns)}")
+    Match raw file information to NMDC biosamples.
     
+    CUSTOMIZE THIS FUNCTION to implement study-specific matching logic.
+    
+    Args:
+        raw_files_info: List of dictionaries with raw file information
+        biosample_df: DataFrame with NMDC biosample attributes
+        
+    Returns:
+        DataFrame with mapping between raw files and biosamples.
+        
+        REQUIRED COLUMNS (must match exactly):
+        - 'raw_file_name': str - Filename only (not full path)
+        - 'raw_file_type': str - Designates sample-type data from blanks, QC, extraction controls, etc. 
+        MUST be one of: 'sample', 'blank', 'qc', 'extraction_control', 'unknown'
+        - 'biosample_id': str or None - NMDC biosample ID (e.g., 'nmdc:bsm-...')
+        - 'biosample_name': str or None - Biosample name from NMDC
+        - 'match_confidence': str - MUST be one of: 'high', 'medium', 'low', 'multiple_matches', 'no_match'
+        
+        MATCHING CONFIDENCE GUIDELINES:
+        - 'high': Exact match on unique identifier (e.g., sample ID matches exactly)
+        - 'medium': Strong match with minor uncertainty (e.g., partial ID match)
+        - 'low': Weak match, needs review (e.g., fuzzy matching)
+        - 'multiple_matches': File matches multiple biosamples (ambiguous)
+        - 'no_match': No biosample found for this file
+        
+        DO NOT use any other confidence values. The downstream code expects exactly these values.
+
+        Example output:
+            raw_file_name           raw_file_type       biosample_id           biosample_name    match_confidence
+            sample_001_pos.mzML     sample              nmdc:bsm-11-abc123      Sample 001        high
+            sample_002_neg.mzML     sample              nmdc:bsm-11-xyz789      Sample 002        high
+            sample_003.mzML         sample              None                      None              no_match
+            ambiguous.mzML          unknown             None                      None              multiple_matches
+            blank_001.mzML          blank               None                      None              no_match
+
+    """
+    # Show some example biosample data to help with matching
+    if 'name' in biosample_df.columns:
+        print("📝 Example biosample names:")
+        for i, name in enumerate(biosample_df['name'].head(5)):
+            print(f"  {i+1}. {name}")
+    
+    if 'id' in biosample_df.columns:
+        print("🆔 Example biosample IDs:")
+        for i, biosample_id in enumerate(biosample_df['id'].head(5)):
+            print(f"  {i+1}. {biosample_id}")
+    
+    # Create mapping list
     mappings = []
     
     for raw_info in raw_files_info:
         mapping = {
             'raw_file_name': Path(raw_info['raw_filename']).name,
+            'raw_file_type': None,
             'biosample_id': None,
             'biosample_name': None,
             'match_confidence': 'no_match'
         }
         
-        filename = Path(raw_info['raw_filename']).name
-        sample_id = raw_info.get('sample_id')
-        treatment = raw_info.get('treatment')
-        replicate = raw_info.get('replicate')
-        ionization_mode = raw_info.get('ionization_mode')
-        column_type = raw_info.get('column_type')
+        # CUSTOMIZE: Implement your matching logic here
         
-        # Strategy 1: Control identification (highest priority)
-        control_patterns = ['ExCtrl', 'Neg-', 'Sterile-', 'QC']
-        if any(pattern in filename for pattern in control_patterns):
-            mapping['match_confidence'] = 'control_sample'  
-            mappings.append(mapping)
-            continue
-        
-        # Strategy 2: Pilot study identification
-        if 'pilot' in filename:
-            mapping['match_confidence'] = 'control_sample'
-            mappings.append(mapping)
-            continue
-        
-        # Strategy 3: Extract sample information using complex regex patterns
-        # Pattern for S##-D##_[A-C] (e.g., S32-D30_A, S40-D89_B)
-        complex_pattern = r'(\w\d+)-D(\d+)_([ABC])'
-        complex_match = re.search(complex_pattern, filename)
-        
-        if complex_match:
-            extracted_sample = complex_match.group(1)  # e.g., 'S32'
-            day = complex_match.group(2)  # e.g., '30'
-            rep = complex_match.group(3)  # e.g., 'A'
-            
-            # Build the expected biosample name pattern (ignoring analytical method)
-            # The hydrophobic/hydrophilic refers to soil properties, not analytical column
-            base_pattern = f"{extracted_sample}_{rep}_D{day}"
-            
-            # Look for any biosample name that starts with this pattern
-            pattern_matches = biosample_df[biosample_df['name'].str.contains(
-                f"^{re.escape(base_pattern)}", case=False, na=False)]
-            
-            if len(pattern_matches) == 1:
-                mapping['biosample_id'] = pattern_matches.iloc[0]['id']
-                mapping['biosample_name'] = pattern_matches.iloc[0]['name']
+        # Strategy 1: Match by sample ID in biosample name
+        if raw_info['sample_id'] and 'name' in biosample_df.columns:
+            matches = biosample_df[biosample_df['name'].str.contains(
+                raw_info['sample_id'], case=False, na=False)]
+            if len(matches) == 1:
+                mapping['biosample_id'] = matches.iloc[0]['id']
+                mapping['biosample_name'] = matches.iloc[0]['name']
                 mapping['match_confidence'] = 'high'
-                mappings.append(mapping)
-                continue
-            elif len(pattern_matches) > 1:
-                # Multiple matches - this shouldn't happen with proper biosample naming
+            elif len(matches) > 1:
                 mapping['match_confidence'] = 'multiple_matches'
-                mappings.append(mapping)
-                continue
         
-        # Strategy 4: Simple sample ID matching (S##)
-        simple_pattern = r'(S\d+)(?=[-_\s]|$)'
-        simple_match = re.search(simple_pattern, filename)
+        # Strategy 2: Add more matching strategies here
+        # - Match by treatment codes
+        # - Match by plot numbers
+        # - Match by other metadata fields
         
-        if simple_match:
-            extracted_sample = simple_match.group(1)
-            
-            # Try exact name match first
-            exact_matches = biosample_df[biosample_df['name'] == extracted_sample]
-            if len(exact_matches) == 1:
-                mapping['biosample_id'] = exact_matches.iloc[0]['id']
-                mapping['biosample_name'] = exact_matches.iloc[0]['name']
-                mapping['match_confidence'] = 'medium'
-                mappings.append(mapping)
-                continue
-            
-            # Try contains match
-            contains_matches = biosample_df[biosample_df['name'].str.contains(
-                extracted_sample, case=False, na=False)]
-            if len(contains_matches) == 1:
-                mapping['biosample_id'] = contains_matches.iloc[0]['id']
-                mapping['biosample_name'] = contains_matches.iloc[0]['name']
-                mapping['match_confidence'] = 'medium'
-                mappings.append(mapping)
-                continue
-        
-        # If no match found
         mappings.append(mapping)
     
     mapping_df = pd.DataFrame(mappings)
@@ -219,10 +186,10 @@ def match_to_biosamples(raw_files_info, biosample_df):
 def main():
     """Main function to map raw files to biosamples."""
     
-    print("=== KROEGER_11_DWSV7Q78 - RAW FILE TO BIOSAMPLE MAPPING ===")
+    print("=== {study_name.upper()} - RAW FILE TO BIOSAMPLE MAPPING ===")
     
     # Initialize study manager
-    config_path = Path.cwd() / "studies" / "kroeger_11_dwsv7q78" / "kroeger_config.json"
+    config_path = Path("/Users/heal742/LOCAL/05_NMDC/02_MetaMS/data_processing/studies/singer_11_46aje659/singer_config.json")
     if not config_path.exists():
         print(f"❌ Config file not found: {config_path}")
         print("Please run this script from the data_processing root directory")
@@ -232,7 +199,7 @@ def main():
     
     # Step 1: Check if biosample attributes are available
     print("\\n1. Checking biosample attributes...")
-    biosample_csv = study.workflow_path / "metadata" / "biosample_attributes.csv"
+    biosample_csv = study.study_path / "metadata" / "biosample_attributes.csv"
     if not biosample_csv.exists():
         print("❌ Biosample attributes not found. Run get_biosample_attributes() first.")
         return 1
@@ -246,7 +213,7 @@ def main():
     
     # Step 2: Get list of downloaded raw data files
     print("\\n2. Loading downloaded files list...")
-    downloaded_files_csv = study.workflow_path / "metadata" / "downloaded_files.csv"
+    downloaded_files_csv = study.study_path / "metadata" / "downloaded_files.csv"
     if not downloaded_files_csv.exists():
         print(f"❌ Downloaded files list not found: {downloaded_files_csv}")
         print("Run the download_from_massive() method first to generate this file.")
@@ -295,7 +262,7 @@ def main():
     mapping_df = mapping_df.sort_values('confidence_rank').drop('confidence_rank', axis=1)
     
     # Save simplified mapping file
-    mapping_file = study.workflow_path / "kroeger_11_dwsv7q78_raw_file_biosample_mapping.csv"
+    mapping_file = study.study_path / "{study_name}_raw_file_biosample_mapping.csv"
     mapping_df.to_csv(mapping_file, index=False)
     print(f"💾 Saved mapping to: {mapping_file}")
     
@@ -308,6 +275,15 @@ def main():
     unmatched_files = len(mapping_df[mapping_df['match_confidence'] == 'no_match'])
     multiple_matches = len(mapping_df[mapping_df['match_confidence'] == 'multiple_matches'])
     
+    # Calculate sample-type statistics
+    sample_files = mapping_df[mapping_df['raw_file_type'] == 'sample']
+    total_sample_files = len(sample_files)
+    sample_file_pct = (total_sample_files / total_files) * 100 if total_files > 0 else 0
+    
+    # Of the sample files, how many mapped to biosamples?
+    sample_matched = len(sample_files[sample_files['match_confidence'].isin(['high', 'medium', 'low'])])
+    sample_match_pct = (sample_matched / total_sample_files) * 100 if total_sample_files > 0 else 0
+    
     # Calculate biosample coverage
     mapped_biosamples = mapping_df[mapping_df['biosample_id'].notna()]['biosample_id'].nunique()
     biosample_coverage_pct = (mapped_biosamples / total_biosamples) * 100 if total_biosamples > 0 else 0
@@ -316,6 +292,9 @@ def main():
     print(f"✅ Successfully matched: {matched_files}")
     print(f"⚠️  Multiple matches: {multiple_matches}")
     print(f"❌ Unmatched files: {unmatched_files}")
+    print(f"\\n🧪 Sample-type Analysis:")
+    print(f"   Sample files: {total_sample_files} ({sample_file_pct:.1f}% of all files)")
+    print(f"   Samples mapped to biosamples: {sample_matched}/{total_sample_files} ({sample_match_pct:.1f}%)")
     print(f"\\n🧬 Biosample Coverage:")
     print(f"   Total biosamples available: {total_biosamples}")
     print(f"   Biosamples with raw data: {mapped_biosamples}")

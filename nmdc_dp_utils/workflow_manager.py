@@ -141,11 +141,11 @@ class NMDCWorkflowManager:
         Raises:
             ValueError: If workflow_type is not configured or doesn't match required_type
         """
-        workflow_type = self.config.get('study', {}).get('workflow_type')
+        workflow_type = self.config.get('workflow', {}).get('workflow_type')
         
         if not workflow_type:
             raise ValueError(
-                f"{method_name}() requires 'workflow_type' to be set in config['study']. "
+                f"{method_name}() requires 'workflow_type' to be set in config['workflow']. "
                 f"Currently supported types: 'LCMS Metabolomics'. "
                 f"Please add '\"workflow_type\": \"<type>\"' to your config file."
             )
@@ -295,9 +295,9 @@ class NMDCWorkflowManager:
             'study_name': self.study_name,
             'study_id': self.study_id,
             'workflow_path': str(self.workflow_path),
-            'massive_id': self.config['study'].get('massive_id', 'Not configured'),
-            'file_type': self.config['study'].get('file_type', '.raw'),
-            'file_filters': self.config['study'].get('file_filters', []),
+            'massive_id': self.config['workflow'].get('massive_id', 'Not configured'),
+            'file_type': self.config['workflow'].get('file_type', '.raw'),
+            'file_filters': self.config['workflow'].get('file_filters', []),
             'num_configurations': len(self.config.get('configurations', [])),
             'configuration_names': [c['name'] for c in self.config.get('configurations', [])],
             'raw_data_directory': str(self.raw_data_directory),
@@ -328,7 +328,7 @@ class NMDCWorkflowManager:
         """
         import ftplib
         
-        log_file = self.workflow_path / f"{self.workflow_name}_massive_ftp_locs.txt"
+        log_file = self.workflow_path / "raw_file_info" / "massive_ftp_locs.txt"
         
         print(f"Crawling MASSIVE FTP directory for dataset: {massive_id}")
         print("This may take several minutes...")
@@ -416,7 +416,7 @@ class NMDCWorkflowManager:
         
         Processes the text file created by _crawl_massive_ftp() to extract FTP URLs
         and create a pandas DataFrame with location and filename information.
-        Applies study-specific file filters if configured.
+        Applies workflow-specific file filters if configured.
         
         Args:
             log_file: Path to FTP crawl log file (uses default if not provided)
@@ -428,9 +428,9 @@ class NMDCWorkflowManager:
             - raw_data_file_short: Just the filename portion
             
         File Type and Filtering Details:
-            First filters by config['study']['file_type'] (e.g., '.raw', '.mzml', '.d')
+            First filters by config['workflow']['file_type'] (e.g., '.raw', '.mzml', '.d')
             to collect only files of the specified type. Then uses 
-            config['study']['file_filters'] list to filter filenames. Files are
+            config['workflow']['file_filters'] list to filter filenames. Files are
             KEPT if their filename contains ANY of the filter keywords (OR logic).
             
             Example: file_type = '.raw', file_filters = ['pos', 'neg', 'hilic']
@@ -443,10 +443,10 @@ class NMDCWorkflowManager:
             ALL files of the configured type are returned (potentially thousands).
         """
         if log_file is None:
-            log_file = self.workflow_path / f"{self.workflow_name}_massive_ftp_locs.txt"
+            log_file = self.workflow_path / "raw_file_info" / "massive_ftp_locs.txt"
         
         if output_file is None:
-            output_file = f"{self.workflow_name}_massive_ftp_locs.csv"
+            output_file = "raw_file_info/massive_ftp_locs.csv"
         
         output_path = self.workflow_path / output_file
         
@@ -477,12 +477,12 @@ class NMDCWorkflowManager:
             ftp_df["raw_data_file_short"] = ftp_df["ftp_location"].str.extract(pattern, flags=re.IGNORECASE)[0]
             
             # Apply file filters if specified
-            if 'file_filters' in self.config['study'] and len(ftp_df) > 0:
+            if 'file_filters' in self.config['workflow'] and len(ftp_df) > 0:
                 original_count = len(ftp_df)
-                filter_pattern = '|'.join(self.config['study']['file_filters'])
+                filter_pattern = '|'.join(self.config['workflow']['file_filters'])
                 ftp_df = ftp_df[ftp_df['raw_data_file_short'].str.contains(filter_pattern, na=False, case=False)]
                 print(f"Applied filters ({filter_pattern}), reduced from {original_count} to {len(ftp_df)} files")
-                print(f"Filter criteria: filename must contain ANY of: {self.config['study']['file_filters']}")
+                print(f"Filter criteria: filename must contain ANY of: {self.config['workflow']['file_filters']}")
             elif len(ftp_df) > 0:
                 print(f"⚠️  WARNING: No file_filters configured - returning ALL {len(ftp_df)} files!")
                 print("   Consider adding 'file_filters' to config to avoid downloading unnecessary files")
@@ -507,22 +507,22 @@ class NMDCWorkflowManager:
         
         Performs a three-step process:
         1. Crawls the MASSIVE FTP server to discover files of the configured type
-        2. Filters by file type first (config['study']['file_type'])
-        3. Applies study-specific filters to reduce the dataset to relevant files only
+        2. Filters by file type first (config['workflow']['file_type'])
+        3. Applies workflow-specific filters to reduce the dataset to relevant files only
         
         IMPORTANT - File Type Selection:
-        Uses config['study']['file_type'] to specify which file extension to collect
+        Uses config['workflow']['file_type'] to specify which file extension to collect
         (e.g., '.raw', '.mzml', '.d'). Only files of this type are discovered.
         
         IMPORTANT - File Filtering:
-        The filtering step uses config['study']['file_filters'] to dramatically reduce
+        The filtering step uses config['workflow']['file_filters'] to dramatically reduce
         the number of files from potentially thousands to only those matching your
-        study's specific criteria. Files are kept if their filename contains ANY of
+        workflow's specific criteria. Files are kept if their filename contains ANY of
         the filter keywords (case-insensitive).
         
         Example configuration and filtering:
-        - config['study']['file_type'] = '.raw'  # Only collect .raw files
-        - config['study']['file_filters'] = ['pos', 'neg', 'hilic']
+        - config['workflow']['file_type'] = '.raw'  # Only collect .raw files
+        - config['workflow']['file_filters'] = ['pos', 'neg', 'hilic']
         - File 'sample_hilic_pos_01.raw' → KEPT (is .raw AND contains 'pos' and 'hilic')
         - File 'sample_rp_neutral_01.mzml' → EXCLUDED (wrong file type)
         - File 'sample_rp_neutral_01.raw' → EXCLUDED (right type but no matching keywords)
@@ -530,7 +530,7 @@ class NMDCWorkflowManager:
         
         Args:
             massive_id: MASSIVE dataset ID with version path (e.g., 'v07/MSV000094090').
-                       Uses config['study']['massive_id'] if not provided.
+                       Uses config['workflow']['massive_id'] if not provided.
             
         Returns:
             DataFrame containing FTP locations and file information ONLY for files
@@ -551,14 +551,14 @@ class NMDCWorkflowManager:
         if self.should_skip('raw_data_downloaded'):
             print("Skipping MASSIVE FTP URL discovery (raw data already downloaded)")
             # Return existing FTP data if available
-            ftp_csv = self.workflow_path / f"{self.workflow_name}_massive_ftp_locs.csv"
+            ftp_csv = self.workflow_path / "raw_file_info" / "massive_ftp_locs.csv"
             if ftp_csv.exists():
                 return pd.read_csv(ftp_csv)
             else:
                 return pd.DataFrame(columns=['ftp_location', 'raw_data_file_short'])
                 
         if massive_id is None:
-            massive_id = self.config['study']['massive_id']
+            massive_id = self.config['workflow']['massive_id']
             
         # Step 1: Crawl FTP
         try:
@@ -658,7 +658,7 @@ class NMDCWorkflowManager:
                 ftp_df = self._parse_ftp_file(lines)
         else:
             # Try to use MASSIVE ID from config
-            if 'massive_id' in self.config['study']:
+            if 'massive_id' in self.config['workflow']:
                 ftp_df = self.get_massive_ftp_urls()
             else:
                 raise ValueError("Either ftp_file or massive_id must be provided")
@@ -1739,7 +1739,7 @@ fi
             biosamples = biosample_search.get_record_by_filter(
                 filter=f'{{"associated_studies":"{study_id}"}}',
                 max_page_size=1000,
-                fields="id,name,samp_name,description,gold_biosample_identifiers,insdc_biosample_identifiers,submitter_id",
+                fields="id,name,samp_name,description,gold_biosample_identifiers,insdc_biosample_identifiers,submitter_id,analysis_type",
                 all_pages=True,
             )
             
@@ -2665,7 +2665,7 @@ NO explanations, NO other text. ONLY the two function definitions with imports."
         import pandas as pd
         
         # Load the biosample mapping file
-        mapping_file = self.workflow_path / f"{self.study_name}_raw_file_biosample_mapping.csv"
+        mapping_file = self.workflow_path / "metadata" / "mapped_raw_file_biosample_mapping.csv"
         if not mapping_file.exists():
             print(f"⚠️  Mapping file not found: {mapping_file}")
             return
@@ -2769,7 +2769,7 @@ NO explanations, NO other text. ONLY the two function definitions with imports."
         try:
             # Get file paths to inspect
             if file_paths is None:
-                # Use mapped raw files if available
+                # Use mapped raw files if available (only inspect high/medium confidence mapped files)
                 mapped_files_path = self.workflow_path / "metadata" / "mapped_raw_files.csv"
                 if mapped_files_path.exists():
                     mapped_df = pd.read_csv(mapped_files_path)
@@ -2856,14 +2856,29 @@ NO explanations, NO other text. ONLY the two function definitions with imports."
             elif has_raw_files:
                 print("✅ .raw files detected - single core processing already configured")
             
+            # Use a temporary output file to avoid overwriting existing results
+            if previous_results_df is not None:
+                # Write to temporary file first, then merge
+                temp_output_dir = output_dir / "temp_inspection"
+                temp_output_dir.mkdir(parents=True, exist_ok=True)
+                inspection_output_dir = temp_output_dir
+            else:
+                # No previous results, can write directly
+                inspection_output_dir = output_dir
+            
             # Run inspection on files that need it
-            result = self._run_raw_data_inspector_docker(files_to_inspect, output_dir, cores, limit, max_retries, retry_delay, docker_image)
+            result = self._run_raw_data_inspector_docker(files_to_inspect, inspection_output_dir, cores, limit, max_retries, retry_delay, docker_image)
             
             # Merge previous and new results if we had previous results
             if result is not None and previous_results_df is not None:
                 print("🔗 Merging previous and new inspection results...")
                 try:
-                    new_results_df = pd.read_csv(result)
+                    # result is already a DataFrame from _process_inspection_results_from_file
+                    if isinstance(result, pd.DataFrame):
+                        new_results_df = result
+                    else:
+                        # If it's a file path, read it
+                        new_results_df = pd.read_csv(result)
                     
                     # Combine the dataframes, keeping new results for any duplicates
                     # First, get file paths from new results
@@ -2877,6 +2892,13 @@ NO explanations, NO other text. ONLY the two function definitions with imports."
                     # Combine previous and new results
                     combined_df = pd.concat([previous_to_keep, new_results_df], ignore_index=True)
                     
+                    # Remove any exact duplicates (safety measure)
+                    before_dedup = len(combined_df)
+                    combined_df = combined_df.drop_duplicates(subset=['file_path'], keep='last')
+                    after_dedup = len(combined_df)
+                    if before_dedup != after_dedup:
+                        print(f"⚠️  Removed {before_dedup - after_dedup} duplicate entries")
+                    
                     # Sort by file path for consistency
                     combined_df = combined_df.sort_values('file_path').reset_index(drop=True)
                     
@@ -2888,11 +2910,19 @@ NO explanations, NO other text. ONLY the two function definitions with imports."
                     print(f"   New/updated results: {len(new_results_df)}")
                     print(f"   Total files in results: {len(combined_df)}")
                     
+                    # Clean up temporary directory
+                    if temp_output_dir.exists():
+                        import shutil
+                        shutil.rmtree(temp_output_dir)
+                        print(f"🗑️  Cleaned up temporary inspection directory")
+                    
                     result = str(existing_results_file)
                     
                 except Exception as e:
                     print(f"⚠️  Error merging results: {e}")
                     print("   Using new results only")
+                    import traceback
+                    traceback.print_exc()
             
             # Set the skip trigger on successful completion
             if result is not None:
@@ -3167,7 +3197,7 @@ NO explanations, NO other text. ONLY the two function definitions with imports."
         
         try:
             # Check prerequisites
-            biosample_mapping_file = self.workflow_path / f"{self.study_name}_raw_file_biosample_mapping.csv"
+            biosample_mapping_file = self.workflow_path / "metadata" / "mapped_raw_file_biosample_mapping.csv"
             if not biosample_mapping_file.exists():
                 print(f"❌ Biosample mapping file not found: {biosample_mapping_file}")
                 return False
@@ -3261,6 +3291,8 @@ NO explanations, NO other text. ONLY the two function definitions with imports."
             
             # Keep only relevant columns for merging
             file_info_df = file_info_df[['raw_data_file_short', 'instrument_analysis_end_date', 'instrument_instance_specifier']]
+            # drop duplicates just in case
+            file_info_df = file_info_df.drop_duplicates(subset=['raw_data_file_short'])
             
             # Merge instrument information
             merged_df = pd.merge(mapped_df, file_info_df, on='raw_data_file_short', how='left')

@@ -1,0 +1,4 @@
+2025-11-11 00:45:50,028 - INFO - Found 184 files to inspect
+2025-11-11 00:45:50,028 - INFO - Results will be written to: /mnt/Users/heal742/LOCAL/05_NMDC/07_automation/nmdc_mass_spec_automation/studies/kroeger_11_dwsv7q78_lcms_metab/raw_file_info/raw_file_inspection_results.csv
+2025-11-11 00:45:50,028 - INFO - Errors will be logged to: /mnt/Users/heal742/LOCAL/05_NMDC/07_automation/nmdc_mass_spec_automation/studies/kroeger_11_dwsv7q78_lcms_metab/raw_file_info/raw_file_inspection_errors.csv
+2025-11-11 00:45:50,028 - INFO - CoreMS available: True

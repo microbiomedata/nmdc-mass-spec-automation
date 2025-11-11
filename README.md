@@ -52,35 +52,40 @@ MINIO_SECRET_KEY="your_secret_key"
 ### Complete Workflow Example
 
 ```python
-from nmdc_dp_utils.study_manager import NMDCWorkflowManager
+from nmdc_dp_utils.workflow_manager import NMDCWorkflowManager
 
-# Initialize study manager
-study = NMDCWorkflowManager("studies/your_study/config.json")
+# Initialize workflow manager
+manager = NMDCWorkflowManager("studies/your_study/config.json")
 
 # Step 1: Create directory structure
-study.create_workflow_structure()
+manager.create_workflow_structure()
 
 # Step 2: Discover and download raw data
-ftp_df = study.get_massive_ftp_urls()
-downloaded_files = study.download_from_massive()
+ftp_df = manager.get_massive_ftp_urls()
+downloaded_files = manager.download_from_massive()
 
 # Step 3: Map files to biosamples
-biosample_csv = study.get_biosample_attributes()
-mapping_script = study.generate_biosample_mapping_script()
-study.run_biosample_mapping_script()
+biosample_csv = manager.get_biosample_attributes()
+mapping_script = manager.generate_biosample_mapping_script()
+## Manually edit and run the mapping script as instructed in the generated script
+manager.run_biosample_mapping_script()
 
 # Step 4: Inspect raw data
-inspection_results = study.raw_data_inspector(cores=4)
+inspection_results = manager.raw_data_inspector(cores=4)
 
-# Step 5: Generate WDL configurations
-json_count = study.generate_wdl_jsons(batch_size=25)
+# Step 5: Generate WDL configurations, make runner script and run workflows
+json_count = manager.generate_wdl_jsons()
+script_path = manager.generate_wdl_runner_script()
+manager.run_wdl_script(script_path)
 
-# Step 6: Run processing workflows
-script_path = study.generate_wdl_runner_script()
-study.run_wdl_script(script_path)
+# Step 6: Generate metadata mapping files with URL validation
+metadata_success = manager.generate_metadata_mapping_files()
+
+# Step 7: Run processing workflows
+
 
 # Step 7: Upload to MinIO (if configured)
-study.upload_processed_data_to_minio()
+manager.upload_processed_data_to_minio()
 ```
 
 ### Using Automated Workflow Scripts
