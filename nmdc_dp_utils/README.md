@@ -29,7 +29,7 @@ You need Python 3.8+ and Docker installed prior to using this system.
    ```bash
    MINIO_ACCESS_KEY="your_access_key"
    MINIO_SECRET_KEY="your_secret_key"
-   #TODO KRH: Add NMDC metadata keys here
+   #TODO KRH: Add NMDC metadata keys here for submitting to dev and prod
    ```
 
 ## Configuration
@@ -40,10 +40,14 @@ Each study needs a `config.json` file. Use `nmdc_dp_utils/example_config.json` a
 
 - **`study.name`**: File safe name for the study that will be used in local and MinIO file paths (e.g., "kroeger_11_dwsv7q78")
 - **`study.id`**: Unique NMDC study identifier (e.g., "nmdc:sty-11-xxxxxxxx")
-- **`study.massive_id`**: MASSIVE dataset ID with version (e.g., "v07/MSV000094090")
-- **`study.file_type`**: Type of raw files to download (e.g., ".raw" or ".mzML")
-- **`study.file_filters`**: List of keywords to filter files before downloading (e.g., ["_msms_", "neg", "hilic"])
-- **`study.processed_data_date_tag`**: Date tag to append to processed data folder for the workflow batch (e.g., "20241027")
+- **`study.description`**: Brief description of the study
+- **`workflow.name`**: Name for this specific workflow run (e.g., "kroeger_11_dwsv7q78_lcms_metab")
+- **`workflow.massive_id`**: MASSIVE dataset ID with version (e.g., "v07/MSV000094090")
+- **`workflow.file_type`**: Type of raw files to download (e.g., ".raw" or ".mzML")
+- **`workflow.file_filters`**: List of keywords to filter files before downloading (e.g., ["msms"])
+- **`workflow.processed_data_date_tag`**: Date tag to append to processed data folder for the workflow batch (e.g., "20251027")
+- **`workflow.workflow_type`**: Type of workflow (currently only "LCMS Metabolomics" is supported)
+- **`workflow.batch_size`**: Number of files to process per WDL batch (e.g., 25)
 - **`paths.base_directory`**: Path to base data processing directory
 - **`paths.data_directory`**: Path where raw and processed files are stored, the system will create a study-specific subdirectory here
 - **`minio.bucket`**: Bucket name for MinIO uploads/downloads
@@ -86,14 +90,13 @@ These triggers are automatically set to `true` when steps complete successfully.
 
 ## Directory Structure
 
-The system creates this standard structure for each study:
+The system creates this standard structure for each workflow:
 ```
-_study_name/
+workflow_name/
 ├── scripts/
 ├── metadata/
 ├── wdl_jsons/
 │   ├── hilic_pos/
 │   └── hilic_neg/
 ├── raw_file_info/
-└── study_name_massive_ftp_locs.csv
 ```

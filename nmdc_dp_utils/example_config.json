@@ -2,15 +2,20 @@
     "study": {
         "name": "example_study",
         "id": "nmdc:sty-11-example",
-        "description": "Example NMDC metabolomics study configuration demonstrating metadata override patterns",
+        "description": "Example NMDC metabolomics study configuration demonstrating metadata override patterns"
+    },
+    "workflow": {
+        "name": "example_study_lcms_metab",
         "massive_id": "v07/MSV000012345",
         "file_type": ".raw",
-        "file_filters": ["pos", "neg", "hilic", "rp"]
+        "file_filters": ["pos", "neg", "hilic", "rp"],
+        "processed_data_date_tag": "20251111",
+        "workflow_type": "LCMS Metabolomics",
+        "batch_size": 25
     },
     "paths": {
         "base_directory": "/path/to/base/directory",
-        "raw_data_directory": "/path/to/raw/data",
-        "processed_data_directory": "/path/to/processed/data"
+        "data_directory": "/path/to/data"
     },
     "docker": {
         "raw_data_inspector_image": "microbiomedata/metams:3.3.3"
@@ -132,10 +137,6 @@
             }
         }
     ],
-    "workflow": {
-        "batch_size": 25,
-        "docker_image": "local-metams:latest"
-    },
     "metadata": {
         "instrument_used": "Instrument Model Name",
         "processing_institution_workflow": "Institution Name",
@@ -152,9 +153,9 @@
         "biosample_mapping_script_generated": false,
         "biosample_mapping_completed": false,
         "raw_data_inspected": false,
-        "wdls_generated": false,
-        "data_processed": false,
         "metadata_mapping_generated": false,
+        "data_processed": false,
+        "processed_data_uploaded_to_minio": false,
         "metadata_packages_generated": false,
         "metadata_submitted_dev": false,
         "metadata_submitted_prod": false
