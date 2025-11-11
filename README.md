@@ -115,7 +115,7 @@ Each workflow creates the following structure:
 ```
 studies/workflow_name/
 ├── workflow_config.json            # Workflow configuration
-├── run_workflow.py                 # Automated workflow runner script
+├── run_workflow.py                 # Workflow runner script
 ├── scripts/                        # Generated and custom scripts
 │   ├── map_raw_files_to_biosamples_TEMPLATE.py
 │   ├── map_raw_files_to_biosamples.py
@@ -124,7 +124,7 @@ studies/workflow_name/
 │   ├── biosample_attributes.csv
 │   ├── mapped_raw_files.csv
 │   ├── downloaded_files.csv
-│   └── metadata_gen_input_csvs/
+│   └── metadata_gen_input_csvs/    # Metadata generation input files
 ├── raw_file_info/                 # Raw data inspection results
 │   ├── raw_file_inspection_results.csv
 │   └── raw_file_inspection_errors.csv
