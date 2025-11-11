@@ -2,3 +2,8 @@
 2025-11-11 00:45:50,028 - INFO - Results will be written to: /mnt/Users/heal742/LOCAL/05_NMDC/07_automation/nmdc_mass_spec_automation/studies/kroeger_11_dwsv7q78_lcms_metab/raw_file_info/raw_file_inspection_results.csv
 2025-11-11 00:45:50,028 - INFO - Errors will be logged to: /mnt/Users/heal742/LOCAL/05_NMDC/07_automation/nmdc_mass_spec_automation/studies/kroeger_11_dwsv7q78_lcms_metab/raw_file_info/raw_file_inspection_errors.csv
 2025-11-11 00:45:50,028 - INFO - CoreMS available: True
+2025-11-11 00:53:21,400 - INFO - Inspection complete!
+2025-11-11 00:53:21,400 - INFO - Successfully processed: 184 files
+2025-11-11 00:53:21,400 - INFO - Failed to process: 0 files
+2025-11-11 00:53:21,401 - INFO - Results saved to: /mnt/Users/heal742/LOCAL/05_NMDC/07_automation/nmdc_mass_spec_automation/studies/kroeger_11_dwsv7q78_lcms_metab/raw_file_info/raw_file_inspection_results.csv
+2025-11-11 00:53:21,401 - INFO - Processing log saved to: /mnt/Users/heal742/LOCAL/05_NMDC/07_automation/nmdc_mass_spec_automation/studies/kroeger_11_dwsv7q78_lcms_metab/raw_file_info/raw_inspection_log.log

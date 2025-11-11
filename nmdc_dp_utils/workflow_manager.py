@@ -76,7 +76,7 @@ class NMDCWorkflowManager:
         self.raw_data_directory = self.data_directory / f"{self.study_name}" / "raw"
         
         # Construct processed_data_directory with date tag
-        processed_date_tag = self.config['study'].get('processed_data_date_tag', '')
+        processed_date_tag = self.config['workflow'].get('processed_data_date_tag', '')
         if processed_date_tag:
             self.processed_data_directory = self.data_directory / f"{self.study_name}" / f"processed_{processed_date_tag}"
         else:
@@ -3332,17 +3332,16 @@ NO explanations, NO other text. ONLY the two function definitions with imports."
             
             if use_massive_urls:
                 # Load FTP URLs to get correct directory structure
-                ftp_file = self.workflow_path / f"{self.study_name}_massive_ftp_locs.csv"
+                ftp_file = self.workflow_path / "raw_file_info" / "massive_ftp_locs.csv"
                 if ftp_file.exists():
                     ftp_df = pd.read_csv(ftp_file)
                     # Create mapping from filename to full FTP path
                     ftp_mapping = dict(zip(ftp_df['raw_data_file_short'], ftp_df['ftp_location']))
                 else:
-                    print("⚠️  FTP URLs file not found - using simplified path structure")
-                    ftp_mapping = {}
+                    raise ValueError(f"MASSIVE FTP URLs file not found: {ftp_file}")
                 
                 # Construct MASSIVE download URLs
-                massive_id = self.config['study']['massive_id']
+                massive_id = self.config['workflow']['massive_id']
                 
                 def construct_massive_url(filename):
                     import urllib.parse
@@ -3681,7 +3680,7 @@ NO explanations, NO other text. ONLY the two function definitions with imports."
             return True  # Not an error, just nothing to upload
         
         bucket_name = self.config['minio']['bucket']
-        folder_name = self.config['study']['name'] + "/processed_" + self.config['study']['processed_data_date_tag']
+        folder_name = self.config['study']['name'] + "/processed_" + self.config['workflow']['processed_data_date_tag']
         
         print(f"📤 Uploading processed data to MinIO...")
         print(f"   Source: {processed_path}")
