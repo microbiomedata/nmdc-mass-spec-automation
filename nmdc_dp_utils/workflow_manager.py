@@ -30,6 +30,18 @@ from nmdc_ms_metadata_gen.lcms_metab_metadata_generator import LCMSMetabolomicsM
 # Load environment variables from .env file
 load_dotenv()
 
+WORKFLOW_DICT = {
+    "LCMS Metabolomics":
+    {"wdl_workflow_name": "metaMS_lcms_metabolomics",
+     "wdl_download_location": "https://raw.githubusercontent.com/microbiomedata/metaMS/master/wdl/metaMS_lcms_metabolomics.wdl",
+     "generator_method": "_generate_lcms_metab_wdl"},
+    "LCMS Lipidomics":
+    {"wdl_workflow_name": "metaMS_lcms_lipidomics",
+     "wdl_download_location": "https://raw.githubusercontent.com/microbiomedata/metaMS/master/wdl/metaMS_lcmslipidomics.wdl",
+     "generator_method": "_generate_lcms_lipid_wdl"}
+}
+
+
 class NMDCWorkflowManager:
     """
     A configurable class for managing NMDC mass spectrometry data workflows.
@@ -146,7 +158,7 @@ class NMDCWorkflowManager:
         if not workflow_type:
             raise ValueError(
                 f"{method_name}() requires 'workflow_type' to be set in config['workflow']. "
-                f"Currently supported types: 'LCMS Metabolomics'. "
+                f"Currently supported types: {', '.join(WORKFLOW_DICT.keys())}. "
                 f"Please add '\"workflow_type\": \"<type>\"' to your config file."
             )
         
@@ -901,10 +913,7 @@ class NMDCWorkflowManager:
         batches of the specified size. Files are filtered for each configuration based 
         on the configuration name (e.g., 'hilic_pos' will only include files with 
         'hilic' and 'pos' in the filename).
-        
-        Currently supported workflow types:
-        - LCMS Metabolomics, LCMS Lipidomics
-        
+                
         Args:
             batch_size: Maximum number of files per batch (default: 50)
             
@@ -1068,15 +1077,15 @@ class NMDCWorkflowManager:
             batch_files: List of raw data file paths for this batch
             batch_num: Batch number for naming the output file
         """
-        # Make mapper from workflow type from config to 
-        mapper = {
-            "LCMS Lipidomics":self._generate_lcms_lipid_wdl,
-            "LCMS Metabolomics":self._generate_lcms_metab_wdl
-            }
-
         workflow_type = self.config['workflow']['workflow_type']
-
-        mapper[workflow_type](config, batch_files, batch_num)
+        
+        if workflow_type not in WORKFLOW_DICT:
+            raise ValueError(f"Unsupported workflow type: {workflow_type}. Supported types: {list(WORKFLOW_DICT.keys())}")
+        
+        # Get the generator method name from WORKFLOW_DICT and call it
+        generator_method_name = WORKFLOW_DICT[workflow_type]["generator_method"]
+        generator_method = getattr(self, generator_method_name)
+        generator_method(config, batch_files, batch_num)
 
     def _generate_lcms_metab_wdl(self, config: dict, batch_files: List[Path], batch_num: int):
         """
@@ -1135,10 +1144,6 @@ class NMDCWorkflowManager:
         directory and runs them sequentially using miniwdl. The script includes
         progress reporting and error handling.
         
-        Currently supported workflow types:
-        - LCMS Metabolomics
-        - LCMS Lipidomics
-
         Args:
             script_name: Name for the generated script file. Defaults to 
                         '{study_name}_wdl_runner.sh'
@@ -1159,15 +1164,11 @@ class NMDCWorkflowManager:
             a 'wdl/' subdirectory with the workflow file. Use run_wdl_script()
             to execute from the appropriate location.
         """ 
-        available_workflows = {
-            "LCMS Metabolomics": "metaMS_lcms_metabolomics",
-            "LCMS Lipidomics": "metaMS_lcms_lipidomics"
-        }
 
         workflow_type = self.config['workflow']['workflow_type']
-        if workflow_type not in available_workflows:
+        if workflow_type not in WORKFLOW_DICT.keys():
             raise NotImplementedError(f"WDL runner script generation not implemented for workflow type: {workflow_type}")
-        wdl_workflow_name = available_workflows[workflow_type]
+        wdl_workflow_name = WORKFLOW_DICT[workflow_type]["wdl_workflow_name"]
 
         if self.should_skip('data_processed'):
             print("Skipping WDL runner script generation (data already processed)")
@@ -1356,7 +1357,7 @@ fi
             Exit code from the script execution (0 for success, non-zero for failure)
             
         Note:
-            - Downloads WDL file from: https://github.com/microbiomedata/metaMS/blob/master/wdl/metaMS_lcms_metabolomics.wdl
+            - Downloads WDL file 
             - Creates study-level execution environment 
             - No file moving required - processed data goes directly to configured location
         """
@@ -1391,8 +1392,12 @@ fi
         print(f"📁 WDL execution directory: {working_dir}")
         
         # Download WDL file from GitHub
-        wdl_url = "https://raw.githubusercontent.com/microbiomedata/metaMS/master/wdl/metaMS_lcms_metabolomics.wdl"
-        wdl_file = wdl_dir / "metaMS_lcms_metabolomics.wdl"
+        workflow_type = self.config['workflow']['workflow_type']
+        if workflow_type not in WORKFLOW_DICT:
+            print(f"❌ Unsupported workflow type: {workflow_type}")
+            return 1
+        wdl_url = WORKFLOW_DICT[workflow_type]["wdl_download_location"]
+        wdl_file = wdl_dir / f"{WORKFLOW_DICT[workflow_type]['wdl_workflow_name']}.wdl"
         
         if not wdl_file.exists():
             print("📥 Downloading WDL file from GitHub...")
@@ -1513,6 +1518,16 @@ fi
         
         print(f"🚀 Running WDL workflows from: {working_dir}")
         print("This will take a long time for large datasets...")
+        
+        # Create symbolic link to workflow_inputs directory so relative paths work
+        workflow_inputs_source = self.base_path / "workflow_inputs"
+        workflow_inputs_link = working_dir / "workflow_inputs"
+        
+        if workflow_inputs_source.exists() and not workflow_inputs_link.exists():
+            try:
+                workflow_inputs_link.symlink_to(workflow_inputs_source)
+            except Exception as e:
+                raise Exception(f"Failed to create symbolic link for workflow inputs: {e}")
         
         # Store current directory
         original_dir = os.getcwd()
