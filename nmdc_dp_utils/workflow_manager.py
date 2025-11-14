@@ -903,7 +903,7 @@ class NMDCWorkflowManager:
         'hilic' and 'pos' in the filename).
         
         Currently supported workflow types:
-        - LCMS Metabolomics
+        - LCMS Metabolomics, LCMS Lipidomics
         
         Args:
             batch_size: Maximum number of files per batch (default: 50)
@@ -1061,7 +1061,12 @@ class NMDCWorkflowManager:
 
     def _generate_single_wdl_json(self, config: dict, batch_files: List[Path], batch_num: int):
         """
-        #TODO KRH: write docstring
+        Generate a single WDL JSON file based on workflow type.
+
+        Args:
+            config: Configuration dictionary for the workflow
+            batch_files: List of raw data file paths for this batch
+            batch_num: Batch number for naming the output file
         """
         # Make mapper from workflow type from config to 
         mapper = {
@@ -1076,6 +1081,11 @@ class NMDCWorkflowManager:
     def _generate_lcms_metab_wdl(self, config: dict, batch_files: List[Path], batch_num: int):
         """
         Generate a WDL JSON file for LCMS Metabolomics workflow.
+
+        Args:
+            config: Configuration dictionary for the workflow
+            batch_files: List of raw data file paths for this batch
+            batch_num: Batch number for naming the output file
         """
         config_dir = self.workflow_path / "wdl_jsons" / config['name']
         json_obj = {
@@ -1095,6 +1105,11 @@ class NMDCWorkflowManager:
     def _generate_lcms_lipid_wdl(self, config: dict, batch_files: List[Path], batch_num: int):
         """
         Generate a WDL JSON file for LCMS Lipidomics workflow.
+
+        Args:
+            config: Configuration dictionary for the workflow
+            batch_files: List of raw data file paths for this batch
+            batch_num: Batch number for naming the output file
         """
         config_dir = self.workflow_path / "wdl_jsons" / config['name']
         json_obj = {
@@ -1111,7 +1126,7 @@ class NMDCWorkflowManager:
         with open(output_file, 'w') as f:
             json.dump(json_obj, f, indent=4)
 
-    def generate_wdl_runner_script(self, workflow_name: str = "metaMS_lcms_metabolomics",
+    def generate_wdl_runner_script(self,
                                   script_name: Optional[str] = None) -> str:
         """
         Generate a shell script to run all WDL JSON files using miniwdl.
@@ -1122,9 +1137,9 @@ class NMDCWorkflowManager:
         
         Currently supported workflow types:
         - LCMS Metabolomics
-        
+        - LCMS Lipidomics
+
         Args:
-            workflow_name: Name of the WDL workflow file (without .wdl extension)
             script_name: Name for the generated script file. Defaults to 
                         '{study_name}_wdl_runner.sh'
         
@@ -1143,10 +1158,17 @@ class NMDCWorkflowManager:
             The generated script expects to be run from a directory containing
             a 'wdl/' subdirectory with the workflow file. Use run_wdl_script()
             to execute from the appropriate location.
-        """
-        # Check that workflow type is supported
-        self._check_workflow_type('LCMS Metabolomics', 'generate_wdl_runner_script')
-        
+        """ 
+        available_workflows = {
+            "LCMS Metabolomics": "metaMS_lcms_metabolomics",
+            "LCMS Lipidomics": "metaMS_lcms_lipidomics"
+        }
+
+        workflow_type = self.config['workflow']['workflow_type']
+        if workflow_type not in available_workflows:
+            raise NotImplementedError(f"WDL runner script generation not implemented for workflow type: {workflow_type}")
+        wdl_workflow_name = available_workflows[workflow_type]
+
         if self.should_skip('data_processed'):
             print("Skipping WDL runner script generation (data already processed)")
             script_path = self.workflow_path / "scripts" / f"{self.workflow_name}_wdl_runner.sh"
@@ -1192,26 +1214,27 @@ class NMDCWorkflowManager:
                 with open(json_file, 'r') as f:
                     json_data = json.load(f)
                 
-                # Check for file paths in the JSON
-                file_paths_key = "lcmsMetabolomics.runMetaMSLCMSMetabolomics.file_paths"
-                if file_paths_key in json_data:
+                # Find all keys that end with 'file_paths' (raw data files)
+                file_paths_keys = [key for key in json_data.keys() if key.endswith('.file_paths')]
+                for file_paths_key in file_paths_keys:
                     file_paths = json_data[file_paths_key]
-                    for file_path in file_paths:
-                        if not Path(file_path).exists():
-                            missing_files.append(file_path)
+                    if isinstance(file_paths, list):
+                        for file_path in file_paths:
+                            if not Path(file_path).exists():
+                                missing_files.append(file_path)
                 
-                # Check for other referenced files
-                config_files = [
-                    "lcmsMetabolomics.runMetaMSLCMSMetabolomics.corems_toml_path",
-                    "lcmsMetabolomics.runMetaMSLCMSMetabolomics.msp_file_path", 
-                    "lcmsMetabolomics.runMetaMSLCMSMetabolomics.scan_translator_path"
-                ]
+                # Find all keys that reference file paths (configuration files)
+                # These typically end with '_path', 'toml_path', 'msp_file_path', 'db_location'
+                config_file_patterns = ['_path', 'toml_path', 'msp_file_path', 'db_location']
+                config_keys = []
+                for key in json_data.keys():
+                    if any(key.endswith(pattern) for pattern in config_file_patterns):
+                        config_keys.append(key)
                 
-                for config_key in config_files:
-                    if config_key in json_data:
-                        config_path = json_data[config_key]
-                        if not Path(config_path).exists():
-                            missing_files.append(config_path)
+                for config_key in config_keys:
+                    config_path = json_data[config_key]
+                    if isinstance(config_path, str) and not Path(config_path).exists():
+                        missing_files.append(config_path)
                             
             except json.JSONDecodeError as e:
                 corrupted_jsons.append(f"{json_file}: {e}")
@@ -1253,7 +1276,7 @@ echo "Study ID: {self.study_id}"
 echo "========================"
 
 # Check if WDL file exists in current directory
-WDL_FILE="wdl/{workflow_name}.wdl"
+WDL_FILE="wdl/{wdl_workflow_name}.wdl"
 if [ ! -f "$WDL_FILE" ]; then
     echo "ERROR: WDL file not found: $WDL_FILE"
     echo "Please run this script from a directory containing the wdl/ subdirectory"
