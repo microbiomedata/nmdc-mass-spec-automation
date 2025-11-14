@@ -908,10 +908,6 @@ class NMDCWorkflowManager:
         Args:
             batch_size: Maximum number of files per batch (default: 50)
             
-        Returns:
-            Total number of JSON configuration files created across all
-            processing configurations
-            
         Raises:
             ValueError: If workflow_type is not set in config
             NotImplementedError: If workflow_type is not yet supported
@@ -935,19 +931,9 @@ class NMDCWorkflowManager:
         Example:
             >>> json_count = manager.generate_wdl_jsons(batch_size=25)
             >>> print(f"Created {json_count} WDL JSON files")
-        """
-        # Check that workflow type is supported
-        self._check_workflow_type('LCMS Metabolomics', 'generate_wdl_jsons')
-        
+        """        
         if self.should_skip('data_processed'):
             print("Skipping WDL JSON generation (already generated)")
-            # Count existing JSON files
-            wdl_jsons_path = self.workflow_path / "wdl_jsons"
-            if wdl_jsons_path.exists():
-                json_count = len(list(wdl_jsons_path.rglob("*.json")))
-                print(f"Found {json_count} existing WDL JSON files")
-                return json_count
-            return 0
 
         # First, move any processed data from previous WDL execution attempts
         # This ensures the processed data directory is up-to-date before we check for already-processed files
@@ -972,25 +958,8 @@ class NMDCWorkflowManager:
             raw_files = [Path(file_path) for file_path in mapped_df['raw_file_path'] 
                         if Path(file_path).exists()]
             print(f"Loaded {len(raw_files)} mapped files from {mapped_files_csv}")
-            
-            # Show mapping statistics
-            high_conf = len(mapped_df[mapped_df['match_confidence'] == 'high'])
-            med_conf = len(mapped_df[mapped_df['match_confidence'] == 'medium'])
-            print(f"  High confidence matches: {high_conf}")
-            print(f"  Medium confidence matches: {med_conf}")
         else:
-            print("⚠️  Mapped files list not found - using all raw files")
-            print("   Run biosample mapping first to filter files by biosample mapping")
-            
-            raw_data_dir = self.raw_data_directory
-            
-            # Get the configured file type extension
-            file_type = self.config['study'].get('file_type', '.raw')
-            
-            # Get list of files matching the configured file type
-            file_pattern = f"*{file_type}"
-            raw_files = list(Path(raw_data_dir).rglob(file_pattern))
-            print(f"Found {len(raw_files)} {file_type} files in {raw_data_dir}")
+            raise FileNotFoundError(f"Mapped files list not found: {mapped_files_csv}")
         
         # Remove any problem_files (from config) from list of raw_files
         problem_files = self.config.get('problem_files', [])
@@ -1033,16 +1002,13 @@ class NMDCWorkflowManager:
                     self.set_skip_trigger('data_processed', True)
                     return
                 if excluded_count > 0:
-                    print(f"📊 Excluded {excluded_count} already-processed files")
-                    print(f"   Remaining unprocessed files: {len(raw_files)}")
+                    print(f"✅ Generating wdl JSON files for {len(raw_files)} remaining unprocessed files")
                 else:
-                    print(f"✅ No processed files found - all {len(raw_files)} files will be included")
+                    print(f"✅ Generating wdl JSON files for all {len(raw_files)} files (none processed yet)")
             else:
-                print(f"⚠️  Processed data directory not found: {processed_path}")
-                print("   All files will be included for processing")
+                print(f"✅ Generating wdl JSON files for all {len(raw_files)} files (none processed yet)")
         else:
-            print("⚠️  processed_data_directory not configured in config")
-            print("   All files will be included for processing")
+            raise ValueError("Processed data directory not configured correctly, check input configuration")
         
         # Create batches for each configuration
         json_count = 0
@@ -1083,29 +1049,69 @@ class NMDCWorkflowManager:
             
             # Split files into batches
             batches = [filtered_files[i:i + batch_size] for i in range(0, len(filtered_files), batch_size)]
-            
+
+            # Get the workflow type            
             for batch_num, batch_files in enumerate(batches, 1):
-                json_obj = {
-                    "lcmsMetabolomics.runMetaMSLCMSMetabolomics.file_paths": [str(f) for f in batch_files],
-                    "lcmsMetabolomics.runMetaMSLCMSMetabolomics.output_directory": "output",
-                    "lcmsMetabolomics.runMetaMSLCMSMetabolomics.corems_toml_path": config['corems_toml'],
-                    "lcmsMetabolomics.runMetaMSLCMSMetabolomics.msp_file_path": config['msp_file'],
-                    "lcmsMetabolomics.runMetaMSLCMSMetabolomics.scan_translator_path": config['scan_translator'],
-                    "lcmsMetabolomics.runMetaMSLCMSMetabolomics.cores": config.get('cores', 1)
-                }
-                
-                output_file = config_dir / f"run_metaMS_lcms_metabolomics_{config_name}_batch{batch_num}.json"
-                
-                with open(output_file, 'w') as f:
-                    json.dump(json_obj, f, indent=4)
-                
-                json_count += 1
+                self._generate_single_wdl_json(config, batch_files, batch_num)
+
                 print(f"  ✓ Created batch {batch_num} with {len(batch_files)} files")
         
         print(f"\n📋 SUMMARY: Created {json_count} WDL JSON files total")
-        return json_count
-    
-    def generate_wdl_runner_script(self, workflow_name: str = "metaMS_lcms_metabolomics", 
+        return
+
+    def _generate_single_wdl_json(self, config: dict, batch_files: List[Path], batch_num: int):
+        """
+        #TODO KRH: write docstring
+        """
+        # Make mapper from workflow type from config to 
+        mapper = {
+            "LCMS Lipidomics":self._generate_lcms_lipid_wdl,
+            "LCMS Metabolomics":self._generate_lcms_metab_wdl
+            }
+
+        workflow_type = self.config['workflow']['workflow_type']
+
+        mapper[workflow_type](config, batch_files, batch_num)
+
+    def _generate_lcms_metab_wdl(self, config: dict, batch_files: List[Path], batch_num: int):
+        """
+        Generate a WDL JSON file for LCMS Metabolomics workflow.
+        """
+        config_dir = self.workflow_path / "wdl_jsons" / config['name']
+        json_obj = {
+            "lcmsMetabolomics.runMetaMSLCMSMetabolomics.file_paths": [str(f) for f in batch_files],
+            "lcmsMetabolomics.runMetaMSLCMSMetabolomics.output_directory": "output",
+            "lcmsMetabolomics.runMetaMSLCMSMetabolomics.corems_toml_path": config['corems_toml'],
+            "lcmsMetabolomics.runMetaMSLCMSMetabolomics.msp_file_path": config['reference_db'],
+            "lcmsMetabolomics.runMetaMSLCMSMetabolomics.scan_translator_path": config['scan_translator'],
+            "lcmsMetabolomics.runMetaMSLCMSMetabolomics.cores": config.get('cores', 1)
+        }
+        
+        output_file = config_dir / f"run_metaMS_lcms_metabolomics_{config['name']}_batch{batch_num}.json"
+        
+        with open(output_file, 'w') as f:
+            json.dump(json_obj, f, indent=4)
+
+    def _generate_lcms_lipid_wdl(self, config: dict, batch_files: List[Path], batch_num: int):
+        """
+        Generate a WDL JSON file for LCMS Lipidomics workflow.
+        """
+        config_dir = self.workflow_path / "wdl_jsons" / config['name']
+        json_obj = {
+            "lcmsLipidomics.runMetaMSLCMSLipidomics.file_paths": [str(f) for f in batch_files],
+            "lcmsLipidomics.runMetaMSLCMSLipidomics.output_directory": "output",
+            "lcmsLipidomics.runMetaMSLCMSLipidomics.corems_toml_path": config['corems_toml'],
+            "lcmsLipidomics.runMetaMSLCMSLipidomics.db_location": config['reference_db'],
+            "lcmsLipidomics.runMetaMSLCMSLipidomics.scan_translator_path": config['scan_translator'],
+            "lcmsLipidomics.runMetaMSLCMSLipidomics.cores": config.get('cores', 1)
+        }
+
+        output_file = config_dir / f"run_metaMS_lcms_lipidomics_{config['name']}_batch{batch_num}.json"
+        
+        with open(output_file, 'w') as f:
+            json.dump(json_obj, f, indent=4)
+
+    def generate_wdl_runner_script(self, workflow_name: str = "metaMS_lcms_metabolomics",
                                   script_name: Optional[str] = None) -> str:
         """
         Generate a shell script to run all WDL JSON files using miniwdl.
@@ -1305,7 +1311,7 @@ fi
         
         print(f"Generated WDL runner script: {script_path}")
         print("Made script executable (chmod +x)")
-        print(f"Script expects to find WDL file at: wdl/{workflow_name}.wdl")
+       # print(f"Script expects to find WDL file at: wdl/{workflow_name}.wdl")
         
         return str(script_path)
     
