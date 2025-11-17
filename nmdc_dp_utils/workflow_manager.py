@@ -795,23 +795,22 @@ class NMDCWorkflowManager:
         for file_path in tqdm(files_to_upload, desc="Uploading files"):
             # Create object name preserving directory structure
             relative_path = file_path.relative_to(local_path)
-            object_name = f"{folder_name}/{relative_path}".replace("\\", "/")
-
-            # Check if the object already exists in MinIO and if so, skip
+            object_name = f"{folder_name}/{relative_path}"
+            
             try:
-                self.minio_client.stat_object(bucket_name, object_name)
-                continue
-            except S3Error as e:
-                if e.code != "NoSuchKey":
-                    print(f"Error checking existence of {object_name}: {e}")
-                    continue
-
-            try:
-                print(f"Uploading {file_path}")
+                # Check if file already exists with same size
+                try:
+                    stat = self.minio_client.stat_object(bucket_name, object_name)
+                    if stat.size == file_path.stat().st_size:
+                        continue  # Skip if same size
+                except S3Error:
+                    pass  # File doesn't exist, proceed with upload
+                
                 self.minio_client.fput_object(bucket_name, object_name, str(file_path))
                 uploaded_count += 1
+                
             except S3Error as e:
-                print(f"Error uploading {file_path}: {e}")
+                print(f"Failed to upload {file_path}: {e}")
         
         print(f"Successfully uploaded {uploaded_count} files")
         return uploaded_count
@@ -2980,9 +2979,9 @@ fi
         """
         Upload processed data files to MinIO object storage.
         
-        Uploads all processed data files from the configured processed_data_directory
-        to MinIO using the study name as the folder structure. Only uploads files
-        that don't already exist in MinIO.
+        Workflow-specific wrapper around upload_to_minio() that handles processed data uploads.
+        Uses configuration to determine source directory, target bucket, and folder structure.
+        Includes skip triggers and workflow-specific validation.
         
         Returns:
             True if upload completed successfully, False otherwise
@@ -3024,23 +3023,27 @@ fi
         print(f"   Destination: {bucket_name}/{folder_name}")
         
         try:
+            # Use the core upload_to_minio method
             uploaded_count = self.upload_to_minio(
                 local_directory=str(processed_path),
                 bucket_name=bucket_name,
-                folder_name=folder_name
+                folder_name=folder_name,
+                file_pattern="*"  # Upload all files
             )
+            
+            # Set success trigger regardless of whether files were uploaded or skipped
+            # (both indicate the operation completed successfully)
+            self.set_skip_trigger('processed_data_uploaded_to_minio', True)
             
             if uploaded_count > 0:
                 print(f"✅ Successfully uploaded {uploaded_count} processed files to MinIO")
-                self.set_skip_trigger('processed_data_uploaded_to_minio', True)
-                return True
             else:
-                print("All processed files already exist in MinIO")
-                self.set_skip_trigger('processed_data_uploaded_to_minio', True)
-                return True
+                print("✅ All processed files already exist in MinIO - upload complete")
+            
+            return True
                 
         except Exception as e:
-            print(f"❌ Error uploading to MinIO: {e}")
+            print(f"❌ Error uploading processed data to MinIO: {e}")
             return False
 
     def generate_nmdc_metadata_for_workflow(self) -> bool:
