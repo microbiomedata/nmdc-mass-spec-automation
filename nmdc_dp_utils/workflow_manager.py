@@ -26,6 +26,7 @@ from typing import Dict, List, Optional
 from dotenv import load_dotenv
 
 from nmdc_ms_metadata_gen.lcms_metab_metadata_generator import LCMSMetabolomicsMetadataGenerator
+from nmdc_ms_metadata_gen.lcms_lipid_metadata_generator import LCMSLipidomicsMetadataGenerator
 
 # Load environment variables from .env file
 load_dotenv()
@@ -35,12 +36,14 @@ WORKFLOW_DICT = {
     {"wdl_workflow_name": "metaMS_lcms_metabolomics",
      "wdl_download_location": "https://raw.githubusercontent.com/microbiomedata/metaMS/master/wdl/metaMS_lcms_metabolomics.wdl",
      "generator_method": "_generate_lcms_metab_wdl",
-     "workflow_metadata_input_generator": "_generate_lcms_workflow_metadata_inputs"},
+     "workflow_metadata_input_generator": "_generate_lcms_workflow_metadata_inputs",
+     "metadata_generator_class": LCMSMetabolomicsMetadataGenerator},
     "LCMS Lipidomics":
     {"wdl_workflow_name": "metaMS_lcms_lipidomics",
      "wdl_download_location": "https://raw.githubusercontent.com/microbiomedata/metaMS/master/wdl/metaMS_lcmslipidomics.wdl",
      "generator_method": "_generate_lcms_lipid_wdl",
-     "workflow_metadata_input_generator": "_generate_lcms_workflow_metadata_inputs"}
+     "workflow_metadata_input_generator": "_generate_lcms_workflow_metadata_inputs",
+     "metadata_generator_class": LCMSLipidomicsMetadataGenerator}
 }
 
 
@@ -3055,9 +3058,6 @@ fi
         configuration, using the metadata mapping CSV files created by
         generate_metadata_mapping_files().
         
-        Currently supported workflow types:
-        - LCMS Metabolomics
-        
         Returns:
             True if metadata generation completed successfully, False otherwise
             
@@ -3077,6 +3077,12 @@ fi
         
         print("Generating NMDC metadata packages...")
         
+        # Get workflow-specific metadata generator class
+        workflow_type = self.config['workflow']['workflow_type']
+        if workflow_type not in WORKFLOW_DICT:
+            raise ValueError(f"Unsupported workflow type: {workflow_type}. Supported types: {list(WORKFLOW_DICT.keys())}")
+        
+        metadata_generator_class = WORKFLOW_DICT[workflow_type]["metadata_generator_class"]
         
         # Check for metadata mapping input files
         input_csv_dir = self.workflow_path / "metadata" / "metadata_gen_input_csvs"
@@ -3088,7 +3094,6 @@ fi
         
         # Build URL from MinIO config
         minio_config = self.config.get('minio', {})
-        endpoint = minio_config.get('endpoint', '')
         bucket = minio_config.get('bucket', '')
         
         # Construct folder path from study name and date tag
@@ -3104,6 +3109,7 @@ fi
         
         # Get existing data objects from config (if any)
         existing_data_objects = self.config.get('metadata', {}).get('existing_data_objects', [])
+        raw_data_url = self.config.get('metadata', {}).get('raw_data_url', None)
         
         # Create output directory for workflow metadata JSON files
         output_dir = self.workflow_path / "metadata" / "nmdc_submission_packages"
@@ -3131,11 +3137,12 @@ fi
             print(f"Output: {output_file.name}")
             
             try:
-                # Initialize metadata generator
-                generator = LCMSMetabolomicsMetadataGenerator(
+                # Initialize workflow-specific metadata generator
+                generator = metadata_generator_class(
                     metadata_file=str(csv_file),
                     database_dump_json_path=str(output_file),
                     process_data_url=processed_data_url,
+                    raw_data_url=raw_data_url,
                     existing_data_objects=existing_data_objects
                 )
                 
