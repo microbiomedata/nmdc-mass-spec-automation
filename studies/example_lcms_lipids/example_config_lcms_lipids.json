@@ -127,9 +127,9 @@
         "biosample_mapping_script_generated": true,
         "biosample_mapping_completed": true,
         "raw_data_inspected": true,
-        "metadata_mapping_generated": false,
-        "data_processed": false,
-        "processed_data_uploaded_to_minio": false,
+        "metadata_mapping_generated": true,
+        "data_processed": true,
+        "processed_data_uploaded_to_minio": true,
         "metadata_packages_generated": false,
         "metadata_submitted_dev": false,
         "metadata_submitted_prod": false

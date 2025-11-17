@@ -1,8 +1,6 @@
 #!/usr/bin/env python3
 """
-Kroeger study, lcms_metabolomics workflow runner.
-Study: Microbial regulation of soil water repellency to control soil degradation
-MASSIVE ID: MSV000094090
+Example Lipid study, lcms_lipidomics workflow runner.
 """
 
 import sys
@@ -14,7 +12,7 @@ sys.path.append(str(Path.cwd() / "nmdc_dp_utils"))
 from workflow_manager import NMDCWorkflowManager
 
 def main():
-    """Run the Kroeger study workflow."""
+    """Run the Example Lipid study workflow."""
     
     # Initialize study manager
     config_path = "studies/example_lcms_lipids/example_config_lcms_lipids.json"

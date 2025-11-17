@@ -34,11 +34,13 @@ WORKFLOW_DICT = {
     "LCMS Metabolomics":
     {"wdl_workflow_name": "metaMS_lcms_metabolomics",
      "wdl_download_location": "https://raw.githubusercontent.com/microbiomedata/metaMS/master/wdl/metaMS_lcms_metabolomics.wdl",
-     "generator_method": "_generate_lcms_metab_wdl"},
+     "generator_method": "_generate_lcms_metab_wdl",
+     "workflow_metadata_input_generator": "_generate_lcms_metabolomics_metadata_inputs"},
     "LCMS Lipidomics":
     {"wdl_workflow_name": "metaMS_lcms_lipidomics",
      "wdl_download_location": "https://raw.githubusercontent.com/microbiomedata/metaMS/master/wdl/metaMS_lcmslipidomics.wdl",
-     "generator_method": "_generate_lcms_lipid_wdl"}
+     "generator_method": "_generate_lcms_lipid_wdl",
+     "workflow_metadata_input_generator": "_generate_lcms_metabolomics_metadata_inputs"}
 }
 
 
@@ -141,33 +143,6 @@ class NMDCWorkflowManager:
             True if the step should be skipped, False otherwise
         """
         return self.config.get('skip_triggers', {}).get(trigger_name, False)
-    
-    def _check_workflow_type(self, required_type: str, method_name: str) -> None:
-        """
-        Validate that the configured workflow type matches the required type.
-        
-        Args:
-            required_type: The workflow type required for the calling method
-            method_name: Name of the method calling this check (for error messages)
-            
-        Raises:
-            ValueError: If workflow_type is not configured or doesn't match required_type
-        """
-        workflow_type = self.config.get('workflow', {}).get('workflow_type')
-        
-        if not workflow_type:
-            raise ValueError(
-                f"{method_name}() requires 'workflow_type' to be set in config['workflow']. "
-                f"Currently supported types: {', '.join(WORKFLOW_DICT.keys())}. "
-                f"Please add '\"workflow_type\": \"<type>\"' to your config file."
-            )
-        
-        if workflow_type != required_type:
-            raise NotImplementedError(
-                f"{method_name}() is not yet implemented for workflow type '{workflow_type}'. "
-                f"Currently only '{required_type}' is supported. "
-                f"Additional workflow types will be added in future versions."
-            )
     
     def set_skip_trigger(self, trigger_name: str, value: bool, save: bool = True):
         """
@@ -3137,8 +3112,6 @@ NO explanations, NO other text. ONLY the two function definitions with imports."
             print(f"❌ Failed to read inspection results: {e}")
             return None
     
-
-    
     def _process_inspection_results(self, result, output_dir):
         """Process the results from raw data inspection (common for both Docker and venv methods)."""
         if result.returncode == 0:
@@ -3211,17 +3184,292 @@ NO explanations, NO other text. ONLY the two function definitions with imports."
             return str(results_file)
         return None
     
+    def _generate_lcms_metabolomics_metadata_inputs(self) -> bool:
+        """Generate metadata inputs specific to LCMS Metabolomics workflow.
+        
+        This function generates metadata mapping files for NMDC submission.
+        First, it checks for prerequisites such as the biosample mapping file
+        and raw data inspection results. It then merges these datasets to create
+        a comprehensive metadata file including instrument information. Note that
+        only high-confidence biosample matches (from the mapped_raw_file_biosample_mapping file)
+        are used
+
+        Returns:
+            bool: True if metadata generation is successful, False otherwise        
+        """
+       
+        # Check prerequisites
+        biosample_mapping_file = self.workflow_path / "metadata" / "mapped_raw_file_biosample_mapping.csv"
+        if not biosample_mapping_file.exists():
+            print(f"❌ Biosample mapping file not found: {biosample_mapping_file}")
+            return False
+        
+        raw_inspection_results = self.get_raw_inspection_results_path()
+        if not raw_inspection_results:
+            print("❌ Raw data inspection results not found. Run raw_data_inspector first.")
+            return False
+        
+        # Load the mapped files
+        mapped_df = pd.read_csv(biosample_mapping_file)
+        mapped_df = mapped_df[mapped_df['match_confidence'].isin(['high'])].copy()
+
+        if len(mapped_df) == 0:
+            print("❌ No high confidence biosample matches found")
+            return False
+        
+        # Extract raw_data_file_short for merging
+        mapped_df['raw_data_file_short'] = mapped_df['raw_file_name']
+        
+        # Add raw data file paths
+        raw_data_dir = str(self.raw_data_directory)
+        if not raw_data_dir.endswith('/'):
+            raw_data_dir += '/'
+        mapped_df['raw_data_file'] = raw_data_dir + mapped_df['raw_data_file_short']
+        
+        # Add processed data directories
+        processed_data_dir = str(self.processed_data_directory)
+        if not processed_data_dir.endswith('/'):
+            processed_data_dir += '/'
+        mapped_df['processed_data_directory'] = (
+            processed_data_dir +
+            mapped_df['raw_data_file_short'].str.replace(r'(?i)\.(raw|mzml)$', '', regex=True) +
+            '.corems'
+        )
+        
+        # Add instrument times from raw inspection results
+        file_info_df = pd.read_csv(raw_inspection_results)
+        
+        # Filter out files with errors or missing critical metadata
+        initial_count = len(file_info_df)
+        
+        # Remove files with errors
+        if 'error' in file_info_df.columns:
+            error_mask = file_info_df['error'].notna()
+            if error_mask.any():
+                error_files = file_info_df[error_mask]['file_name'].tolist()
+                print(f"⚠️  Excluding {len(error_files)} files with processing errors:")
+                for f in error_files[:5]:  # Show first 5
+                    print(f"   - {f}")
+                if len(error_files) > 5:
+                    print(f"   ... and {len(error_files) - 5} more")
+                file_info_df = file_info_df[~error_mask]
+        
+        # Remove files with missing write_time (critical for metadata)
+        null_time_mask = file_info_df['write_time'].isna()
+        if null_time_mask.any():
+            null_time_files = file_info_df[null_time_mask]['file_name'].tolist()
+            print(f"⚠️  Excluding {len(null_time_files)} files with missing write_time:")
+            for f in null_time_files:
+                print(f"   - {f}")
+            file_info_df = file_info_df[~null_time_mask]
+        
+        final_count = len(file_info_df)
+        if final_count != initial_count:
+            print(f"📊 Raw inspection results: {initial_count} → {final_count} files (excluded {initial_count - final_count} with errors)")
+        
+        if final_count == 0:
+            print("❌ No valid files remaining after filtering - check raw data inspection results")
+            return {}
+        
+        # Process remaining valid files
+        file_info_df['instrument_instance_specifier'] = file_info_df['instrument_serial_number'].astype(str)
+        file_info_df['instrument_analysis_end_date'] = pd.to_datetime(file_info_df["write_time"]).dt.strftime('%Y-%m-%dT%H:%M:%SZ')
+        file_info_df['raw_data_file_short'] = file_info_df['file_name']
+        
+        # Remove unwanted serial numbers
+        serial_numbers_to_remove = self.config.get('metadata', {}).get('serial_numbers_to_remove', [])
+        if serial_numbers_to_remove:
+            file_info_df['instrument_instance_specifier'] = file_info_df['instrument_instance_specifier'].replace(serial_numbers_to_remove, pd.NA)
+        
+        print(f"Unique instrument_instance_specifier values: {file_info_df['instrument_instance_specifier'].unique()}")
+        # Only show date range for valid dates
+        valid_dates = file_info_df['instrument_analysis_end_date'].dropna()
+        if len(valid_dates) > 0:
+            print(f"Date range: {valid_dates.min()} to {valid_dates.max()}")
+        else:
+            print("No valid dates found")
+        
+        # Keep only relevant columns for merging
+        file_info_df = file_info_df[['raw_data_file_short', 'instrument_analysis_end_date', 'instrument_instance_specifier']]
+        # drop duplicates just in case
+        file_info_df = file_info_df.drop_duplicates(subset=['raw_data_file_short'])
+        
+        # Merge instrument information
+        merged_df = pd.merge(mapped_df, file_info_df, on='raw_data_file_short', how='left')
+        
+        # Validate merge didn't change row count
+        if len(merged_df) != len(mapped_df):
+            print(f"❌ Merge error: expected {len(mapped_df)} rows, got {len(merged_df)}")
+            return {}
+        
+        # Check for files that didn't get instrument metadata
+        missing_metadata = merged_df['instrument_analysis_end_date'].isna().sum()
+        if missing_metadata > 0:
+            print(f"⚠️  {missing_metadata} files missing instrument metadata (may not be in raw inspection results)")
+            missing_files = merged_df[merged_df['instrument_analysis_end_date'].isna()]['raw_data_file_short'].tolist()
+            for f in missing_files[:5]:  # Show first 5
+                print(f"   - {f}")
+            if len(missing_files) > 5:
+                print(f"   ... and {len(missing_files) - 5} more")
+            
+            # Remove files without metadata for metadata generation
+            merged_df = merged_df[merged_df['instrument_analysis_end_date'].notna()].copy()
+            print(f"📊 Proceeding with {len(merged_df)} files that have complete metadata")
+        
+        # Add common metadata from config that applies to all files
+        metadata_config = self.config.get('metadata', {})
+        merged_df['processing_institution_workflow'] = metadata_config.get('processing_institution_workflow', 'EMSL')
+        merged_df['processing_institution_generation'] = metadata_config.get('processing_institution_generation', 'EMSL')
+        
+        # Add sample_id (alias for biosample_id)
+        merged_df['sample_id'] = merged_df['biosample_id']
+        
+        # Add biosample.associated_studies (must be in brackets as a list)
+        merged_df['biosample.associated_studies'] = f"['{self.config['study']['id']}']"
+        
+        # Add raw_data_url using configurable URL construction
+        use_massive_urls = self.config.get('metadata', {}).get('use_massive_urls', True)
+        
+        if use_massive_urls:
+            # Load FTP URLs to get correct directory structure
+            ftp_file = self.workflow_path / "raw_file_info" / "massive_ftp_locs.csv"
+            if ftp_file.exists():
+                ftp_df = pd.read_csv(ftp_file)
+                # Create mapping from filename to full FTP path
+                ftp_mapping = dict(zip(ftp_df['raw_data_file_short'], ftp_df['ftp_location']))
+            else:
+                raise ValueError(f"MASSIVE FTP URLs file not found: {ftp_file}")
+            
+            # Construct MASSIVE download URLs
+            massive_id = self.config['workflow']['massive_id']
+            
+            def construct_massive_url(filename):
+                import urllib.parse
+                import re
+                
+                # Extract just the MSV part (remove version prefix like v07/)
+                if 'MSV' in massive_id:
+                    msv_part = 'MSV' + massive_id.split('MSV')[1]
+                else:
+                    msv_part = massive_id
+                
+                # Get the full directory path from FTP URL if available
+                if filename in ftp_mapping:
+                    ftp_url = ftp_mapping[filename]
+                    # Extract path after MSV number: /raw/directory/rawdata/filename.raw
+                    match = re.search(rf'{re.escape(msv_part)}(.+)/{re.escape(filename)}', ftp_url)
+                    if match:
+                        relative_path = match.group(1)  # e.g., /raw/20210819_JGI-AK_MK_506588.../rawdata
+                        # Construct the file path: MSV.../full/path/filename
+                        file_path = f"{msv_part}{relative_path}/{filename}"
+                    else:
+                        print(f"⚠️  Could not extract directory structure for {filename}")
+                        file_path = f"{msv_part}/raw/{filename}"
+                else:
+                    # Fallback to simple structure
+                    file_path = f"{msv_part}/raw/{filename}"
+                
+                encoded_path = urllib.parse.quote(file_path, safe='')
+                https_url = f"https://massive.ucsd.edu/ProteoSAFe/DownloadResultFile?file=f.{encoded_path}&forceDownload=true"
+                
+                # Validate URL format
+                if not https_url.startswith("https://massive.ucsd.edu/ProteoSAFe/DownloadResultFile?file=f.MSV"):
+                    raise ValueError(f"Invalid MASSIVE URL format generated: {https_url}")
+                
+                return https_url
+            
+            merged_df['raw_data_url'] = merged_df['raw_data_file_short'].apply(construct_massive_url)
+            
+            # Validate at least 5 URLs to ensure they're accessible
+            print("🔍 Validating MASSIVE URL accessibility...")
+            self._validate_massive_urls(merged_df['raw_data_url'].head(5).tolist())
+        else:
+            # Use placeholder URLs for future implementation
+            merged_df['raw_data_url'] = 'placeholder://raw_data/' + merged_df['raw_data_file_short']
+            print("⚠️  Using placeholder URLs - configure alternative URL construction method")
+        
+        # Remove any files marked as problematic in config from metadata generation csvs
+        problem_files = self.config.get('problem_files', [])
+        if problem_files:
+            initial_count = len(merged_df)
+            merged_df = merged_df[~merged_df['raw_data_file_short'].isin(problem_files)].copy()
+            removed_count = initial_count - len(merged_df)
+            print(f"⚠️  Removed {removed_count} problematic files from metadata generation")
+        
+        # Generate configuration-specific CSV files
+        metadata_config = self.config.get('metadata', {})
+        config_dfs = self._separate_files_by_configuration(merged_df, metadata_config)
+        
+        if not config_dfs:
+            print("❌ No files matched any configuration filters")
+            return False
+        
+        # Create output directory
+        output_dir = self.workflow_path / "metadata" / "metadata_gen_input_csvs"
+        output_dir.mkdir(parents=True, exist_ok=True)
+        
+        # Clear existing files
+        for f in output_dir.glob("*.csv"):
+            f.unlink()
+        
+        # Define final columns
+        final_columns = [
+            'sample_id', 'biosample.associated_studies', 'raw_data_file', 'processed_data_directory', 
+            'mass_spec_configuration_name', 'chromat_configuration_name', 'instrument_used', 
+            'processing_institution_workflow', 'processing_institution_generation',
+            'instrument_analysis_end_date', 'instrument_instance_specifier', 'raw_data_url'
+        ]
+        
+        # Write configuration-specific CSV files
+        files_written = 0
+        total_files = 0
+        
+        for config_name, config_df in config_dfs.items():
+            # Validate required columns exist
+            missing_cols = [col for col in final_columns if col not in config_df.columns]
+            if missing_cols:
+                print(f"❌ Skipping {config_name}: missing columns {missing_cols}")
+                continue
+            
+            # Check for empty dataframe
+            if len(config_df) == 0:
+                print(f"⚠️  Skipping {config_name}: no files after filtering")
+                continue
+            
+            # Write the CSV file
+            try:
+                output_df = config_df[final_columns].copy()
+                output_file = output_dir / f"{config_name}_metadata.csv"
+                output_df.to_csv(output_file, index=False)
+                
+                files_written += 1
+                total_files += len(output_df)
+                
+                # Show sample of metadata applied
+                sample_chromat = output_df['chromat_configuration_name'].iloc[0]
+                sample_ms = output_df['mass_spec_configuration_name'].iloc[0]
+                print(f"✅ {config_name}_metadata.csv: {len(output_df)} files ({sample_chromat}, {sample_ms})")
+                
+            except Exception as e:
+                print(f"❌ Error writing {config_name}_metadata.csv: {e}")
+                continue
+        
+        if files_written == 0:
+            print("❌ No metadata files were successfully written")
+            return False
+        
+        print(f"📋 Successfully generated {files_written} metadata files with {total_files} total entries")
+        print(f"   Output directory: {output_dir}")
+        return True
+    
     def generate_metadata_mapping_files(self) -> bool:
         """
-        Generate metadata mapping files for NMDC submission.
+        Generate metadata mapping files for generating workflow metadata.
         
         Creates workflow metadata CSV files separated by configuration that include:
         - Raw data file paths and processed data directories
         - Instrument information and analysis timestamps
         - Configuration-specific metadata for NMDC submission
-        
-        Currently supported workflow types:
-        - LCMS Metabolomics
         
         Returns:
             True if successful, False otherwise
@@ -3230,9 +3478,6 @@ NO explanations, NO other text. ONLY the two function definitions with imports."
             ValueError: If workflow_type is not set in config
             NotImplementedError: If workflow_type is not yet supported
         """
-        # Check that workflow type is supported
-        self._check_workflow_type('LCMS Metabolomics', 'generate_metadata_mapping_files')
-        
         if self.should_skip('metadata_mapping_generated'):
             print("⏭️  Skipping metadata mapping generation (skip trigger set)")
             return True
@@ -3240,272 +3485,24 @@ NO explanations, NO other text. ONLY the two function definitions with imports."
         print("📋 Generating metadata mapping files...")
         
         try:
-            # Check prerequisites
-            biosample_mapping_file = self.workflow_path / "metadata" / "mapped_raw_file_biosample_mapping.csv"
-            if not biosample_mapping_file.exists():
-                print(f"❌ Biosample mapping file not found: {biosample_mapping_file}")
-                return False
+            # Use workflow-specific generator to handle all processing
+            workflow_type = self.config['workflow']['workflow_type']
             
-            raw_inspection_results = self.get_raw_inspection_results_path()
-            if not raw_inspection_results:
-                print("❌ Raw data inspection results not found. Run raw_data_inspector first.")
-                return False
+            if workflow_type not in WORKFLOW_DICT:
+                raise NotImplementedError(f"Unsupported workflow type: {workflow_type}. Supported types: {list(WORKFLOW_DICT.keys())}")
             
-            # Load the mapped files
-            mapped_df = pd.read_csv(biosample_mapping_file)
+            # Get the generator method name from WORKFLOW_DICT and call it
+            wf_input_gen_method_name = WORKFLOW_DICT[workflow_type]["workflow_metadata_input_generator"]
+            wf_input_gen = getattr(self, wf_input_gen_method_name)
             
-            # Filter for only high and medium confidence matches
-            mapped_df = mapped_df[mapped_df['match_confidence'].isin(['high', 'medium'])].copy()
+            # Call workflow-specific processing function
+            success = wf_input_gen()
             
-            if len(mapped_df) == 0:
-                print("❌ No high or medium confidence biosample matches found")
-                return False
-            
-            # Extract raw_data_file_short for merging
-            mapped_df['raw_data_file_short'] = mapped_df['raw_file_name']
-            
-            # Add raw data file paths
-            raw_data_dir = str(self.raw_data_directory)
-            if not raw_data_dir.endswith('/'):
-                raw_data_dir += '/'
-            mapped_df['raw_data_file'] = raw_data_dir + mapped_df['raw_data_file_short']
-            
-            # Add processed data directories
-            processed_data_dir = str(self.processed_data_directory)
-            if not processed_data_dir.endswith('/'):
-                processed_data_dir += '/'
-            mapped_df['processed_data_directory'] = (
-                processed_data_dir +
-                mapped_df['raw_data_file_short'].str.replace(r'(?i)\.(raw|mzml)$', '', regex=True) +
-                '.corems'
-            )
-            
-            # Add instrument times from raw inspection results
-            file_info_df = pd.read_csv(raw_inspection_results)
-            
-            # Filter out files with errors or missing critical metadata
-            initial_count = len(file_info_df)
-            
-            # Remove files with errors
-            if 'error' in file_info_df.columns:
-                error_mask = file_info_df['error'].notna()
-                if error_mask.any():
-                    error_files = file_info_df[error_mask]['file_name'].tolist()
-                    print(f"⚠️  Excluding {len(error_files)} files with processing errors:")
-                    for f in error_files[:5]:  # Show first 5
-                        print(f"   - {f}")
-                    if len(error_files) > 5:
-                        print(f"   ... and {len(error_files) - 5} more")
-                    file_info_df = file_info_df[~error_mask]
-            
-            # Remove files with missing write_time (critical for metadata)
-            null_time_mask = file_info_df['write_time'].isna()
-            if null_time_mask.any():
-                null_time_files = file_info_df[null_time_mask]['file_name'].tolist()
-                print(f"⚠️  Excluding {len(null_time_files)} files with missing write_time:")
-                for f in null_time_files:
-                    print(f"   - {f}")
-                file_info_df = file_info_df[~null_time_mask]
-            
-            final_count = len(file_info_df)
-            if final_count != initial_count:
-                print(f"📊 Raw inspection results: {initial_count} → {final_count} files (excluded {initial_count - final_count} with errors)")
-            
-            if final_count == 0:
-                print("❌ No valid files remaining after filtering - check raw data inspection results")
-                return False
-            
-            # Process remaining valid files
-            file_info_df['instrument_instance_specifier'] = file_info_df['instrument_serial_number'].astype(str)
-            file_info_df['instrument_analysis_end_date'] = pd.to_datetime(file_info_df["write_time"]).dt.strftime('%Y-%m-%dT%H:%M:%SZ')
-            file_info_df['raw_data_file_short'] = file_info_df['file_name']
-            
-            # Remove unwanted serial numbers
-            serial_numbers_to_remove = self.config.get('metadata', {}).get('serial_numbers_to_remove', [])
-            if serial_numbers_to_remove:
-                file_info_df['instrument_instance_specifier'] = file_info_df['instrument_instance_specifier'].replace(serial_numbers_to_remove, pd.NA)
-            
-            print(f"Unique instrument_instance_specifier values: {file_info_df['instrument_instance_specifier'].unique()}")
-            # Only show date range for valid dates
-            valid_dates = file_info_df['instrument_analysis_end_date'].dropna()
-            if len(valid_dates) > 0:
-                print(f"Date range: {valid_dates.min()} to {valid_dates.max()}")
+            if success:
+                self.set_skip_trigger('metadata_mapping_generated', True)
+                return True
             else:
-                print("No valid dates found")
-            
-            # Keep only relevant columns for merging
-            file_info_df = file_info_df[['raw_data_file_short', 'instrument_analysis_end_date', 'instrument_instance_specifier']]
-            # drop duplicates just in case
-            file_info_df = file_info_df.drop_duplicates(subset=['raw_data_file_short'])
-            
-            # Merge instrument information
-            merged_df = pd.merge(mapped_df, file_info_df, on='raw_data_file_short', how='left')
-            
-            # Validate merge didn't change row count
-            if len(merged_df) != len(mapped_df):
-                print(f"❌ Merge error: expected {len(mapped_df)} rows, got {len(merged_df)}")
                 return False
-            
-            # Check for files that didn't get instrument metadata
-            missing_metadata = merged_df['instrument_analysis_end_date'].isna().sum()
-            if missing_metadata > 0:
-                print(f"⚠️  {missing_metadata} files missing instrument metadata (may not be in raw inspection results)")
-                missing_files = merged_df[merged_df['instrument_analysis_end_date'].isna()]['raw_data_file_short'].tolist()
-                for f in missing_files[:5]:  # Show first 5
-                    print(f"   - {f}")
-                if len(missing_files) > 5:
-                    print(f"   ... and {len(missing_files) - 5} more")
-                
-                # Remove files without metadata for metadata generation
-                merged_df = merged_df[merged_df['instrument_analysis_end_date'].notna()].copy()
-                print(f"📊 Proceeding with {len(merged_df)} files that have complete metadata")
-            
-            # Add common metadata from config that applies to all files
-            metadata_config = self.config.get('metadata', {})
-            merged_df['processing_institution_workflow'] = metadata_config.get('processing_institution_workflow', 'EMSL')
-            merged_df['processing_institution_generation'] = metadata_config.get('processing_institution_generation', 'EMSL')
-            
-            # Add sample_id (alias for biosample_id)
-            merged_df['sample_id'] = merged_df['biosample_id']
-            
-            # Add biosample.associated_studies (must be in brackets as a list)
-            merged_df['biosample.associated_studies'] = f"['{self.config['study']['id']}']"
-            
-            # Add raw_data_url using configurable URL construction
-            use_massive_urls = self.config.get('metadata', {}).get('use_massive_urls', True)
-            
-            if use_massive_urls:
-                # Load FTP URLs to get correct directory structure
-                ftp_file = self.workflow_path / "raw_file_info" / "massive_ftp_locs.csv"
-                if ftp_file.exists():
-                    ftp_df = pd.read_csv(ftp_file)
-                    # Create mapping from filename to full FTP path
-                    ftp_mapping = dict(zip(ftp_df['raw_data_file_short'], ftp_df['ftp_location']))
-                else:
-                    raise ValueError(f"MASSIVE FTP URLs file not found: {ftp_file}")
-                
-                # Construct MASSIVE download URLs
-                massive_id = self.config['workflow']['massive_id']
-                
-                def construct_massive_url(filename):
-                    import urllib.parse
-                    import re
-                    
-                    # Extract just the MSV part (remove version prefix like v07/)
-                    if 'MSV' in massive_id:
-                        msv_part = 'MSV' + massive_id.split('MSV')[1]
-                    else:
-                        msv_part = massive_id
-                    
-                    # Get the full directory path from FTP URL if available
-                    if filename in ftp_mapping:
-                        ftp_url = ftp_mapping[filename]
-                        # Extract path after MSV number: /raw/directory/rawdata/filename.raw
-                        match = re.search(rf'{re.escape(msv_part)}(.+)/{re.escape(filename)}', ftp_url)
-                        if match:
-                            relative_path = match.group(1)  # e.g., /raw/20210819_JGI-AK_MK_506588.../rawdata
-                            # Construct the file path: MSV.../full/path/filename
-                            file_path = f"{msv_part}{relative_path}/{filename}"
-                        else:
-                            print(f"⚠️  Could not extract directory structure for {filename}")
-                            file_path = f"{msv_part}/raw/{filename}"
-                    else:
-                        # Fallback to simple structure
-                        file_path = f"{msv_part}/raw/{filename}"
-                    
-                    encoded_path = urllib.parse.quote(file_path, safe='')
-                    https_url = f"https://massive.ucsd.edu/ProteoSAFe/DownloadResultFile?file=f.{encoded_path}&forceDownload=true"
-                    
-                    # Validate URL format
-                    if not https_url.startswith("https://massive.ucsd.edu/ProteoSAFe/DownloadResultFile?file=f.MSV"):
-                        raise ValueError(f"Invalid MASSIVE URL format generated: {https_url}")
-                    
-                    return https_url
-                
-                merged_df['raw_data_url'] = merged_df['raw_data_file_short'].apply(construct_massive_url)
-                
-                # Validate at least 5 URLs to ensure they're accessible
-                print("🔍 Validating MASSIVE URL accessibility...")
-                self._validate_massive_urls(merged_df['raw_data_url'].head(5).tolist())
-            else:
-                # Use placeholder URLs for future implementation
-                merged_df['raw_data_url'] = 'placeholder://raw_data/' + merged_df['raw_data_file_short']
-                print("⚠️  Using placeholder URLs - configure alternative URL construction method")
-            
-            # Remove any files marked as problematic in config from metadata generation csvs
-            problem_files = self.config.get('problem_files', [])
-            if problem_files:
-                initial_count = len(merged_df)
-                merged_df = merged_df[~merged_df['raw_data_file_short'].isin(problem_files)].copy()
-                removed_count = initial_count - len(merged_df)
-                print(f"⚠️  Removed {removed_count} problematic files from metadata generation")
-            
-            # Create output directory
-            output_dir = self.workflow_path / "metadata" / "metadata_gen_input_csvs"
-            output_dir.mkdir(parents=True, exist_ok=True)
-            
-            # Clear existing files
-            for f in output_dir.glob("*.csv"):
-                f.unlink()
-            
-            # Generate configuration-specific CSV files
-            config_dfs = self._separate_files_by_configuration(merged_df, metadata_config)
-            
-            if not config_dfs:
-                print("❌ No files matched any configuration filters")
-                return False
-            
-            # Define final columns
-            final_columns = [
-                'sample_id', 'biosample.associated_studies', 'raw_data_file', 'processed_data_directory', 
-                'mass_spec_configuration_name', 'chromat_configuration_name', 'instrument_used', 
-                'processing_institution_workflow', 'processing_institution_generation',
-                'instrument_analysis_end_date', 'instrument_instance_specifier', 'raw_data_url'
-            ]
-            
-            # Write configuration-specific CSV files
-            files_written = 0
-            total_files = 0
-            
-            for config_name, config_df in config_dfs.items():
-                # Validate required columns exist
-                missing_cols = [col for col in final_columns if col not in config_df.columns]
-                if missing_cols:
-                    print(f"❌ Skipping {config_name}: missing columns {missing_cols}")
-                    continue
-                
-                # Check for empty dataframe
-                if len(config_df) == 0:
-                    print(f"⚠️  Skipping {config_name}: no files after filtering")
-                    continue
-                
-                # Write the CSV file
-                try:
-                    output_df = config_df[final_columns].copy()
-                    output_file = output_dir / f"{config_name}_metadata.csv"
-                    output_df.to_csv(output_file, index=False)
-                    
-                    files_written += 1
-                    total_files += len(output_df)
-                    
-                    # Show sample of metadata applied
-                    sample_chromat = output_df['chromat_configuration_name'].iloc[0]
-                    sample_ms = output_df['mass_spec_configuration_name'].iloc[0]
-                    print(f"✅ {config_name}_metadata.csv: {len(output_df)} files ({sample_chromat}, {sample_ms})")
-                    
-                except Exception as e:
-                    print(f"❌ Error writing {config_name}_metadata.csv: {e}")
-                    continue
-            
-            if files_written == 0:
-                print("❌ No metadata files were successfully written")
-                return False
-            
-            # Mark as completed and report success
-            self.set_skip_trigger('metadata_mapping_generated', True)
-            print(f"📋 Successfully generated {files_written} metadata files with {total_files} total entries")
-            print(f"   Output directory: {output_dir}")
-            return True
             
         except Exception as e:
             print(f"❌ Error generating metadata mapping files: {e}")
@@ -3726,7 +3723,7 @@ NO explanations, NO other text. ONLY the two function definitions with imports."
         bucket_name = self.config['minio']['bucket']
         folder_name = self.config['study']['name'] + "/processed_" + self.config['workflow']['processed_data_date_tag']
         
-        print(f"📤 Uploading processed data to MinIO...")
+        print("📤 Uploading processed data to MinIO...")
         print(f"   Source: {processed_path}")
         print(f"   Destination: {bucket_name}/{folder_name}")
         
@@ -3742,7 +3739,7 @@ NO explanations, NO other text. ONLY the two function definitions with imports."
                 self.set_skip_trigger('processed_data_uploaded_to_minio', True)
                 return True
             else:
-                print("ℹ️  All processed files already exist in MinIO")
+                print("All processed files already exist in MinIO")
                 self.set_skip_trigger('processed_data_uploaded_to_minio', True)
                 return True
                 
@@ -3774,10 +3771,7 @@ NO explanations, NO other text. ONLY the two function definitions with imports."
             Uses processed_data_url from MinIO configuration or constructs from
             MinIO endpoint, bucket, and study name.
             Validates metadata against NMDC schema both locally and via API.
-        """
-        # Check that workflow type is supported
-        self._check_workflow_type('LCMS Metabolomics', 'generate_nmdc_metadata_for_workflow')
-        
+        """       
         if self.should_skip('metadata_packages_generated'):
             print("Skipping NMDC metadata generation (already generated)")
             return True
