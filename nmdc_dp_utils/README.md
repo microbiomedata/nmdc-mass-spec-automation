@@ -1,6 +1,6 @@
 # NMDC Study Management System
 
-This reusable system provides a standardized way to manage and process NMDC LCMS metabolomics studies, including:
+This reusable system provides a standardized way to manage and process NMDC mass spectrometry workflows, including:
 - Downloading files from MASSIVE datasets using dataset IDs
 - Docker-based raw data inspection for metadata extraction
 - Biosample mapping with confidence scoring
@@ -9,6 +9,14 @@ This reusable system provides a standardized way to manage and process NMDC LCMS
 - Uploading/downloading files to/from MinIO
 - Generating NMDC metadata packages
 - Validating and submitting metadata to NMDC dev and production environments
+
+## Available Workflow Types
+
+See the [Workflow Manager](workflow_manager.py)'s `show_available_workflow_types()` method for the current list of supported workflow types.
+
+As of now, the supported workflow types are:
+- LCMS Metabolomics
+- LCMS Lipidomics
 
 ## Setup
 You need Python 3.8+ and Docker installed prior to using this system.

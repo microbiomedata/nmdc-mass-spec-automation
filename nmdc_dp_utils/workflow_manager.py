@@ -102,6 +102,15 @@ class NMDCWorkflowManager:
         # Initialize MinIO client if credentials available
         self.minio_client = self._init_minio_client()
         
+    def show_available_workflow_types(self) -> List[str]:
+        """
+        Show the available workflow types supported by the NMDCWorkflowManager.
+        
+        Returns:
+            List of available workflow type names.
+        """
+        return list(WORKFLOW_DICT.keys())
+    
     def load_config(self, config_path: str) -> Dict:
         """
         Load and validate configuration from JSON file.
