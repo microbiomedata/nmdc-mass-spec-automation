@@ -35,12 +35,12 @@ WORKFLOW_DICT = {
     {"wdl_workflow_name": "metaMS_lcms_metabolomics",
      "wdl_download_location": "https://raw.githubusercontent.com/microbiomedata/metaMS/master/wdl/metaMS_lcms_metabolomics.wdl",
      "generator_method": "_generate_lcms_metab_wdl",
-     "workflow_metadata_input_generator": "_generate_lcms_metabolomics_metadata_inputs"},
+     "workflow_metadata_input_generator": "_generate_lcms_workflow_metadata_inputs"},
     "LCMS Lipidomics":
     {"wdl_workflow_name": "metaMS_lcms_lipidomics",
      "wdl_download_location": "https://raw.githubusercontent.com/microbiomedata/metaMS/master/wdl/metaMS_lcmslipidomics.wdl",
      "generator_method": "_generate_lcms_lipid_wdl",
-     "workflow_metadata_input_generator": "_generate_lcms_metabolomics_metadata_inputs"}
+     "workflow_metadata_input_generator": "_generate_lcms_workflow_metadata_inputs"}
 }
 
 
@@ -3184,8 +3184,8 @@ NO explanations, NO other text. ONLY the two function definitions with imports."
             return str(results_file)
         return None
     
-    def _generate_lcms_metabolomics_metadata_inputs(self) -> bool:
-        """Generate metadata inputs specific to LCMS Metabolomics workflow.
+    def _generate_lcms_workflow_metadata_inputs(self) -> bool:
+        """Generate metadata inputs specific to LCMS Metabolomics and Lipidomics workflows.
         
         This function generates metadata mapping files for NMDC submission.
         First, it checks for prerequisites such as the biosample mapping file
@@ -3462,7 +3462,7 @@ NO explanations, NO other text. ONLY the two function definitions with imports."
         print(f"   Output directory: {output_dir}")
         return True
     
-    def generate_metadata_mapping_files(self) -> bool:
+    def generate_workflow_metadata_generation_inputs(self) -> bool:
         """
         Generate metadata mapping files for generating workflow metadata.
         
