@@ -1,0 +1,31 @@
+Here is a reusable prompt you can paste into a new session with any AI model:
+Task
+You will normalize and unify multiple data sheets I provide so they exactly match the structure and styling of a canonical template that I will send first. Do not change meanings or values; only reformat and organize to mirror the template’s formatting and conventions.
+How to use the template
+Treat the initial template I provide as the single source of truth for:
+Overall document organization and section ordering.
+Hierarchical nesting, indentation, and whitespace conventions.
+Key naming, casing, punctuation, and the order of fields within each block.
+List syntax, bullet style, and nesting depth.
+Step sequence formatting (labels, numbering, and how each step encapsulates a single process).
+Patterns for identifier fields and type declarations (including namespace-like prefixes).
+Handling of placeholders, angle-bracketed tokens, and inline comments.
+The structure of any repeated sub-blocks (e.g., measurements with unit/value triplets; reference/protocol records; substance/portion entries with nested amount or condition properties).
+Formatting of links and references exactly as shown in the template.
+Numeric and unit formatting as displayed (do not normalize, round, or re-express units).
+Do not infer, reorder, rename, or add fields. If an input omits information present in the template, follow my answers to the questions below for how to leave placeholders or comments.
+Preserve literal strings verbatim (including punctuation, capitalization, and special characters).
+Output only the normalized document in the template’s exact style with no additional commentary or markers.
+Workflow
+I will first send the template. Acknowledge receipt without reproducing it.
+I will then send one or more data sheets. For each:
+Map all content into the template’s structure, preserving the template’s ordering, indentation, and formatting rules.
+Carry forward any placeholders or comments exactly as in the template’s style.
+Where information is missing, follow my answers to the questions below.
+Return only the normalized result.
+Quality checks before responding
+Verify the top-level organization, step sequencing, and internal block orders match the template.
+Confirm indentation, bullet style, and spacing match the template.
+Ensure all repeated sub-structures follow the template’s pattern and subfield order.
+Confirm numeric values and units retain the original formatting and precision.
+Ensure links, placeholders, and inline comments retain their exact styling.

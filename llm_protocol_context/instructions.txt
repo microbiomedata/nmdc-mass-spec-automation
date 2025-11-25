@@ -1,0 +1,114 @@
+# TASK OVERVIEW
+You are converting lab protocols from readable text into a YAML outline for metadata generation compliant with the NMDC schema.
+
+# OUTPUT FORMAT
+- Provide ONLY the YAML output - no explanatory text, code fences, or commentary
+- Your response must be valid YAML syntax using two-space indentation
+- Use human-readable names for steps and processed samples
+- Add comments with # for subject matter expert review where helpful
+
+# YAML STRUCTURE REQUIREMENTS
+Your YAML must follow this exact structure:
+
+```yaml
+protocol_name:  # Human-readable protocol identifier
+  steps:
+    - Step 1_protocol_name:
+        ProcessType:
+          id: # nmdc:subspr-{shoulder}-{blade}
+          type: nmdc:ProcessType
+          name: "Human readable step name"
+          description: "Description referencing <Biosample> or <ProcessedSampleX>"
+          has_input:
+            - Biosample  # First step only
+          has_output:
+            - ProcessedSample1_protocol_name
+          protocol_link:
+            name: "Protocol Name"
+            url: "https://doi.org/..."
+            type: nmdc:Protocol
+        # Additional fields based on process type and available information in protocol text
+  processedsamples:
+    - ProcessedSample1_protocol_name:
+        ProcessedSample:
+          id: #nmdc:
+          type: nmdc:ProcessedSample
+          name: "<Biosample>_descriptive_name"
+          description: "Description of the sample"
+          sampled_portion: portion_type  # when applicable
+```
+
+# SCHEMA COMPLIANCE REQUIREMENTS
+**Process Types:**
+- Use only process types defined in the provided NMDC schema JSON
+- Match protocol activities to the most appropriate process type from the schema
+- If uncertain about process type selection, choose the most specific applicable type from the schema
+- If an Process Types attribute's value is another class, that class must comply with the schema
+
+**Required Fields:**
+- Each step must have: `id`, `type`, `name`, `description`, `has_input`, `has_output`
+- Use only field names that are valid according to the provided NMDC schema
+- Include `protocol_link` only when explicitly provided in protocol text with a valid url
+- All enumerated fields must use values from the provided schema enumerations including substances and units
+
+# ID REFERENCE SYSTEM AND NAMING
+**Step IDs:** Use format `Step N_protocol_name` where N is sequential
+**Processed Sample IDs:** Use format `ProcessedSampleN_protocol_name` where N is sequential, also use this format on has_input and has_output
+**Biosample References:** Use `Biosample` for has_input on first step
+**Text sample references:** Use '<Biosample>' or `<ProcessedSampleN_protocol_name>` when referencing the sample anywhere else (i.e. in description)
+
+# MULTIPLE PROTOCOLS
+When the protocol text describes multiple distinct extraction or processing pathways from the same starting biosample, create separate protocol sections with descriptive names:
+
+**Identifying Multiple Protocols:**
+- Different extraction targets (e.g., water-extractable vs. organic-extractable compounds)
+- Different analytical endpoints (e.g., GCMS vs. LCMS workflows)
+- Parallel processing pathways that don't share intermediate steps
+- Distinct subsampling for different purposes
+
+**Structure for Multiple Protocols:**
+```yaml
+water_extractable_nom:  # Protocol name should be descriptive
+  steps:
+    - Step 1_water_extractable_nom:
+        SubSamplingProcess:
+          # ... steps for water extraction pathway
+  processedsamples:
+    - ProcessedSample1_water_extractable_nom:
+        # ... samples from water extraction
+
+mplex_extraction:  # Second protocol for same biosample
+  steps:
+    - Step 1_mplex_extraction:
+        SubSamplingProcess:
+          # ... steps for MPLEx pathway
+  processedsamples:
+    - ProcessedSample1_mplex_extraction:
+        # ... samples from MPLEx extraction
+```
+
+**Guidelines:**
+- Each protocol starts with its own SubSamplingProcess from `Biosample`
+- Use descriptive protocol names that reflect the extraction/analytical method
+- Maintain separate ProcessedSample numbering for each protocol (ProcessedSample1_protocol_name, ProcessedSample2_protocol_name, etc.)
+- If protocols share early steps, still separate them for clarity unless explicitly stated they use the same intermediate sample
+
+# ERROR HANDLING
+Use these exact JSON error responses:
+- `{ "error": "1 - UNREADABLE" }` - Invalid/unreadable protocol
+- `{ "error": "2 - INCOMPLETE ENUMERATION", "field": "field_name", "value": "problematic_value" }` - Missing enum value
+
+# VALIDATION CHECKLIST
+Before outputting YAML, verify:
+□ All step names follow `Step N_protocol_name` format
+□ Input/output chains form logical sequences
+□ ProcessedSample IDs match step outputs
+□ Required fields are present for each process type
+□ YAML syntax is valid with two-space indentation
+□ Your output will pass the provided validation function without errors
+
+# PROCESS FLOW
+1. **NMDC schema** with classes and enumerations (JSON)
+2. **Example protocols** with ideal YAML outlines (5 examples)
+3. **Input protocol** for conversion (your conversion task)
+4. **Validation function** that your YAML output must pass (Python function) 
