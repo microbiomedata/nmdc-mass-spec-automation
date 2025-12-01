@@ -1,8 +1,6 @@
 #!/usr/bin/env python3
 """
-Kroeger study, lcms_metabolomics workflow runner.
-Study: Microbial regulation of soil water repellency to control soil degradation
-MASSIVE ID: MSV000094090
+Example Lipid study, lcms_lipidomics workflow runner.
 """
 
 import sys
@@ -14,10 +12,10 @@ sys.path.append(str(Path.cwd() / "nmdc_dp_utils"))
 from workflow_manager import NMDCWorkflowManager
 
 def main():
-    """Run the Kroeger study workflow."""
+    """Run the Example Lipid study workflow."""
     
-    # Initialize study manager with the Kroeger config (assuming run from root directory)
-    config_path = Path.cwd() / "studies" / "kroeger_11_dwsv7q78_lcms_metab" / "kroeger_lcms_metab_config.json"
+    # Initialize study manager
+    config_path = "studies/example_lcms_lipids/example_config_lcms_lipids.json"
     manager = NMDCWorkflowManager(str(config_path))
     
     print(f"=== {manager.workflow_name.upper()} WORKFLOW ===")
@@ -51,12 +49,6 @@ def main():
     inspection_result = manager.raw_data_inspector(cores=4)
     #assert inspection_result, "Raw data inspection did not return any results."
 
-    # Step 6: Generate metadata mapping files with URL validation
-    print("\n6. Generating metadata mapping files with URL validation...")
-    metadata_success = manager.generate_workflow_metadata_generation_inputs()
-    assert manager.should_skip('metadata_mapping_generated'), "Metadata mapping generation must complete successfully to proceed"
-    assert metadata_success, "Metadata mapping generation failed."
-
     # Step 7: Generate WDL JSON files for processing, make runner script, and process them
     print("\n7. Generating WDL JSON files, runner script, and running workflow...")
     _ = manager.generate_wdl_jsons()
@@ -68,6 +60,12 @@ def main():
     print("\n8. Uploading processed data to MinIO...")
     _ = manager.upload_processed_data_to_minio()
     assert manager.should_skip('processed_data_uploaded_to_minio'), "Processed data upload to MinIO must complete successfully to proceed"
+
+    # Step 6: Generate metadata mapping files with URL validation
+    print("\n6. Generating metadata mapping files with URL validation...")
+    metadata_success = manager.generate_workflow_metadata_generation_inputs()
+    assert manager.should_skip('metadata_mapping_generated'), "Metadata mapping generation must complete successfully to proceed"
+    assert metadata_success, "Metadata mapping generation failed."
 
     # Step 9: Generate NMDC submission packages
     print("\n9. Generating NMDC submission packages for workflow metadata...")

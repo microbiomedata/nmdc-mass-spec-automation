@@ -26,9 +26,26 @@ from typing import Dict, List, Optional
 from dotenv import load_dotenv
 
 from nmdc_ms_metadata_gen.lcms_metab_metadata_generator import LCMSMetabolomicsMetadataGenerator
+from nmdc_ms_metadata_gen.lcms_lipid_metadata_generator import LCMSLipidomicsMetadataGenerator
 
 # Load environment variables from .env file
 load_dotenv()
+
+WORKFLOW_DICT = {
+    "LCMS Metabolomics":
+    {"wdl_workflow_name": "metaMS_lcms_metabolomics",
+     "wdl_download_location": "https://raw.githubusercontent.com/microbiomedata/metaMS/master/wdl/metaMS_lcms_metabolomics.wdl",
+     "generator_method": "_generate_lcms_metab_wdl",
+     "workflow_metadata_input_generator": "_generate_lcms_workflow_metadata_inputs",
+     "metadata_generator_class": LCMSMetabolomicsMetadataGenerator},
+    "LCMS Lipidomics":
+    {"wdl_workflow_name": "metaMS_lcms_lipidomics",
+     "wdl_download_location": "https://raw.githubusercontent.com/microbiomedata/metaMS/master/wdl/metaMS_lcmslipidomics.wdl",
+     "generator_method": "_generate_lcms_lipid_wdl",
+     "workflow_metadata_input_generator": "_generate_lcms_workflow_metadata_inputs",
+     "metadata_generator_class": LCMSLipidomicsMetadataGenerator}
+}
+
 
 class NMDCWorkflowManager:
     """
@@ -85,6 +102,15 @@ class NMDCWorkflowManager:
         # Initialize MinIO client if credentials available
         self.minio_client = self._init_minio_client()
         
+    def show_available_workflow_types(self) -> List[str]:
+        """
+        Show the available workflow types supported by the NMDCWorkflowManager.
+        
+        Returns:
+            List of available workflow type names.
+        """
+        return list(WORKFLOW_DICT.keys())
+    
     def load_config(self, config_path: str) -> Dict:
         """
         Load and validate configuration from JSON file.
@@ -129,33 +155,6 @@ class NMDCWorkflowManager:
             True if the step should be skipped, False otherwise
         """
         return self.config.get('skip_triggers', {}).get(trigger_name, False)
-    
-    def _check_workflow_type(self, required_type: str, method_name: str) -> None:
-        """
-        Validate that the configured workflow type matches the required type.
-        
-        Args:
-            required_type: The workflow type required for the calling method
-            method_name: Name of the method calling this check (for error messages)
-            
-        Raises:
-            ValueError: If workflow_type is not configured or doesn't match required_type
-        """
-        workflow_type = self.config.get('workflow', {}).get('workflow_type')
-        
-        if not workflow_type:
-            raise ValueError(
-                f"{method_name}() requires 'workflow_type' to be set in config['workflow']. "
-                f"Currently supported types: 'LCMS Metabolomics'. "
-                f"Please add '\"workflow_type\": \"<type>\"' to your config file."
-            )
-        
-        if workflow_type != required_type:
-            raise NotImplementedError(
-                f"{method_name}() is not yet implemented for workflow type '{workflow_type}'. "
-                f"Currently only '{required_type}' is supported. "
-                f"Additional workflow types will be added in future versions."
-            )
     
     def set_skip_trigger(self, trigger_name: str, value: bool, save: bool = True):
         """
@@ -808,23 +807,22 @@ class NMDCWorkflowManager:
         for file_path in tqdm(files_to_upload, desc="Uploading files"):
             # Create object name preserving directory structure
             relative_path = file_path.relative_to(local_path)
-            object_name = f"{folder_name}/{relative_path}".replace("\\", "/")
-
-            # Check if the object already exists in MinIO and if so, skip
+            object_name = f"{folder_name}/{relative_path}"
+            
             try:
-                self.minio_client.stat_object(bucket_name, object_name)
-                continue
-            except S3Error as e:
-                if e.code != "NoSuchKey":
-                    print(f"Error checking existence of {object_name}: {e}")
-                    continue
-
-            try:
-                print(f"Uploading {file_path}")
+                # Check if file already exists with same size
+                try:
+                    stat = self.minio_client.stat_object(bucket_name, object_name)
+                    if stat.size == file_path.stat().st_size:
+                        continue  # Skip if same size
+                except S3Error:
+                    pass  # File doesn't exist, proceed with upload
+                
                 self.minio_client.fput_object(bucket_name, object_name, str(file_path))
                 uploaded_count += 1
+                
             except S3Error as e:
-                print(f"Error uploading {file_path}: {e}")
+                print(f"Failed to upload {file_path}: {e}")
         
         print(f"Successfully uploaded {uploaded_count} files")
         return uploaded_count
@@ -901,16 +899,9 @@ class NMDCWorkflowManager:
         batches of the specified size. Files are filtered for each configuration based 
         on the configuration name (e.g., 'hilic_pos' will only include files with 
         'hilic' and 'pos' in the filename).
-        
-        Currently supported workflow types:
-        - LCMS Metabolomics
-        
+                
         Args:
             batch_size: Maximum number of files per batch (default: 50)
-            
-        Returns:
-            Total number of JSON configuration files created across all
-            processing configurations
             
         Raises:
             ValueError: If workflow_type is not set in config
@@ -935,19 +926,9 @@ class NMDCWorkflowManager:
         Example:
             >>> json_count = manager.generate_wdl_jsons(batch_size=25)
             >>> print(f"Created {json_count} WDL JSON files")
-        """
-        # Check that workflow type is supported
-        self._check_workflow_type('LCMS Metabolomics', 'generate_wdl_jsons')
-        
+        """        
         if self.should_skip('data_processed'):
             print("Skipping WDL JSON generation (already generated)")
-            # Count existing JSON files
-            wdl_jsons_path = self.workflow_path / "wdl_jsons"
-            if wdl_jsons_path.exists():
-                json_count = len(list(wdl_jsons_path.rglob("*.json")))
-                print(f"Found {json_count} existing WDL JSON files")
-                return json_count
-            return 0
 
         # First, move any processed data from previous WDL execution attempts
         # This ensures the processed data directory is up-to-date before we check for already-processed files
@@ -972,25 +953,8 @@ class NMDCWorkflowManager:
             raw_files = [Path(file_path) for file_path in mapped_df['raw_file_path'] 
                         if Path(file_path).exists()]
             print(f"Loaded {len(raw_files)} mapped files from {mapped_files_csv}")
-            
-            # Show mapping statistics
-            high_conf = len(mapped_df[mapped_df['match_confidence'] == 'high'])
-            med_conf = len(mapped_df[mapped_df['match_confidence'] == 'medium'])
-            print(f"  High confidence matches: {high_conf}")
-            print(f"  Medium confidence matches: {med_conf}")
         else:
-            print("⚠️  Mapped files list not found - using all raw files")
-            print("   Run biosample mapping first to filter files by biosample mapping")
-            
-            raw_data_dir = self.raw_data_directory
-            
-            # Get the configured file type extension
-            file_type = self.config['study'].get('file_type', '.raw')
-            
-            # Get list of files matching the configured file type
-            file_pattern = f"*{file_type}"
-            raw_files = list(Path(raw_data_dir).rglob(file_pattern))
-            print(f"Found {len(raw_files)} {file_type} files in {raw_data_dir}")
+            raise FileNotFoundError(f"Mapped files list not found: {mapped_files_csv}")
         
         # Remove any problem_files (from config) from list of raw_files
         problem_files = self.config.get('problem_files', [])
@@ -1033,16 +997,13 @@ class NMDCWorkflowManager:
                     self.set_skip_trigger('data_processed', True)
                     return
                 if excluded_count > 0:
-                    print(f"📊 Excluded {excluded_count} already-processed files")
-                    print(f"   Remaining unprocessed files: {len(raw_files)}")
+                    print(f"✅ Generating wdl JSON files for {len(raw_files)} remaining unprocessed files")
                 else:
-                    print(f"✅ No processed files found - all {len(raw_files)} files will be included")
+                    print(f"✅ Generating wdl JSON files for all {len(raw_files)} files (none processed yet)")
             else:
-                print(f"⚠️  Processed data directory not found: {processed_path}")
-                print("   All files will be included for processing")
+                print(f"✅ Generating wdl JSON files for all {len(raw_files)} files (none processed yet)")
         else:
-            print("⚠️  processed_data_directory not configured in config")
-            print("   All files will be included for processing")
+            raise ValueError("Processed data directory not configured correctly, check input configuration")
         
         # Create batches for each configuration
         json_count = 0
@@ -1083,29 +1044,84 @@ class NMDCWorkflowManager:
             
             # Split files into batches
             batches = [filtered_files[i:i + batch_size] for i in range(0, len(filtered_files), batch_size)]
-            
+
+            # Get the workflow type            
             for batch_num, batch_files in enumerate(batches, 1):
-                json_obj = {
-                    "lcmsMetabolomics.runMetaMSLCMSMetabolomics.file_paths": [str(f) for f in batch_files],
-                    "lcmsMetabolomics.runMetaMSLCMSMetabolomics.output_directory": "output",
-                    "lcmsMetabolomics.runMetaMSLCMSMetabolomics.corems_toml_path": config['corems_toml'],
-                    "lcmsMetabolomics.runMetaMSLCMSMetabolomics.msp_file_path": config['msp_file'],
-                    "lcmsMetabolomics.runMetaMSLCMSMetabolomics.scan_translator_path": config['scan_translator'],
-                    "lcmsMetabolomics.runMetaMSLCMSMetabolomics.cores": config.get('cores', 1)
-                }
-                
-                output_file = config_dir / f"run_metaMS_lcms_metabolomics_{config_name}_batch{batch_num}.json"
-                
-                with open(output_file, 'w') as f:
-                    json.dump(json_obj, f, indent=4)
-                
-                json_count += 1
+                self._generate_single_wdl_json(config, batch_files, batch_num)
+
                 print(f"  ✓ Created batch {batch_num} with {len(batch_files)} files")
         
         print(f"\n📋 SUMMARY: Created {json_count} WDL JSON files total")
-        return json_count
-    
-    def generate_wdl_runner_script(self, workflow_name: str = "metaMS_lcms_metabolomics", 
+        return
+
+    def _generate_single_wdl_json(self, config: dict, batch_files: List[Path], batch_num: int):
+        """
+        Generate a single WDL JSON file based on workflow type.
+
+        Args:
+            config: Configuration dictionary for the workflow
+            batch_files: List of raw data file paths for this batch
+            batch_num: Batch number for naming the output file
+        """
+        workflow_type = self.config['workflow']['workflow_type']
+        
+        if workflow_type not in WORKFLOW_DICT:
+            raise ValueError(f"Unsupported workflow type: {workflow_type}. Supported types: {list(WORKFLOW_DICT.keys())}")
+        
+        # Get the generator method name from WORKFLOW_DICT and call it
+        generator_method_name = WORKFLOW_DICT[workflow_type]["generator_method"]
+        generator_method = getattr(self, generator_method_name)
+        generator_method(config, batch_files, batch_num)
+
+    def _generate_lcms_metab_wdl(self, config: dict, batch_files: List[Path], batch_num: int):
+        """
+        Generate a WDL JSON file for LCMS Metabolomics workflow.
+
+        Args:
+            config: Configuration dictionary for the workflow
+            batch_files: List of raw data file paths for this batch
+            batch_num: Batch number for naming the output file
+        """
+        config_dir = self.workflow_path / "wdl_jsons" / config['name']
+        json_obj = {
+            "lcmsMetabolomics.runMetaMSLCMSMetabolomics.file_paths": [str(f) for f in batch_files],
+            "lcmsMetabolomics.runMetaMSLCMSMetabolomics.output_directory": "output",
+            "lcmsMetabolomics.runMetaMSLCMSMetabolomics.corems_toml_path": config['corems_toml'],
+            "lcmsMetabolomics.runMetaMSLCMSMetabolomics.msp_file_path": config['reference_db'],
+            "lcmsMetabolomics.runMetaMSLCMSMetabolomics.scan_translator_path": config['scan_translator'],
+            "lcmsMetabolomics.runMetaMSLCMSMetabolomics.cores": config.get('cores', 1)
+        }
+        
+        output_file = config_dir / f"run_metaMS_lcms_metabolomics_{config['name']}_batch{batch_num}.json"
+        
+        with open(output_file, 'w') as f:
+            json.dump(json_obj, f, indent=4)
+
+    def _generate_lcms_lipid_wdl(self, config: dict, batch_files: List[Path], batch_num: int):
+        """
+        Generate a WDL JSON file for LCMS Lipidomics workflow.
+
+        Args:
+            config: Configuration dictionary for the workflow
+            batch_files: List of raw data file paths for this batch
+            batch_num: Batch number for naming the output file
+        """
+        config_dir = self.workflow_path / "wdl_jsons" / config['name']
+        json_obj = {
+            "lcmsLipidomics.runMetaMSLCMSLipidomics.file_paths": [str(f) for f in batch_files],
+            "lcmsLipidomics.runMetaMSLCMSLipidomics.output_directory": "output",
+            "lcmsLipidomics.runMetaMSLCMSLipidomics.corems_toml_path": config['corems_toml'],
+            "lcmsLipidomics.runMetaMSLCMSLipidomics.db_location": config['reference_db'],
+            "lcmsLipidomics.runMetaMSLCMSLipidomics.scan_translator_path": config['scan_translator'],
+            "lcmsLipidomics.runMetaMSLCMSLipidomics.cores": config.get('cores', 1)
+        }
+
+        output_file = config_dir / f"run_metaMS_lcms_lipidomics_{config['name']}_batch{batch_num}.json"
+        
+        with open(output_file, 'w') as f:
+            json.dump(json_obj, f, indent=4)
+
+    def generate_wdl_runner_script(self,
                                   script_name: Optional[str] = None) -> str:
         """
         Generate a shell script to run all WDL JSON files using miniwdl.
@@ -1114,11 +1130,7 @@ class NMDCWorkflowManager:
         directory and runs them sequentially using miniwdl. The script includes
         progress reporting and error handling.
         
-        Currently supported workflow types:
-        - LCMS Metabolomics
-        
         Args:
-            workflow_name: Name of the WDL workflow file (without .wdl extension)
             script_name: Name for the generated script file. Defaults to 
                         '{study_name}_wdl_runner.sh'
         
@@ -1137,10 +1149,13 @@ class NMDCWorkflowManager:
             The generated script expects to be run from a directory containing
             a 'wdl/' subdirectory with the workflow file. Use run_wdl_script()
             to execute from the appropriate location.
-        """
-        # Check that workflow type is supported
-        self._check_workflow_type('LCMS Metabolomics', 'generate_wdl_runner_script')
-        
+        """ 
+
+        workflow_type = self.config['workflow']['workflow_type']
+        if workflow_type not in WORKFLOW_DICT.keys():
+            raise NotImplementedError(f"WDL runner script generation not implemented for workflow type: {workflow_type}")
+        wdl_workflow_name = WORKFLOW_DICT[workflow_type]["wdl_workflow_name"]
+
         if self.should_skip('data_processed'):
             print("Skipping WDL runner script generation (data already processed)")
             script_path = self.workflow_path / "scripts" / f"{self.workflow_name}_wdl_runner.sh"
@@ -1186,26 +1201,27 @@ class NMDCWorkflowManager:
                 with open(json_file, 'r') as f:
                     json_data = json.load(f)
                 
-                # Check for file paths in the JSON
-                file_paths_key = "lcmsMetabolomics.runMetaMSLCMSMetabolomics.file_paths"
-                if file_paths_key in json_data:
+                # Find all keys that end with 'file_paths' (raw data files)
+                file_paths_keys = [key for key in json_data.keys() if key.endswith('.file_paths')]
+                for file_paths_key in file_paths_keys:
                     file_paths = json_data[file_paths_key]
-                    for file_path in file_paths:
-                        if not Path(file_path).exists():
-                            missing_files.append(file_path)
+                    if isinstance(file_paths, list):
+                        for file_path in file_paths:
+                            if not Path(file_path).exists():
+                                missing_files.append(file_path)
                 
-                # Check for other referenced files
-                config_files = [
-                    "lcmsMetabolomics.runMetaMSLCMSMetabolomics.corems_toml_path",
-                    "lcmsMetabolomics.runMetaMSLCMSMetabolomics.msp_file_path", 
-                    "lcmsMetabolomics.runMetaMSLCMSMetabolomics.scan_translator_path"
-                ]
+                # Find all keys that reference file paths (configuration files)
+                # These typically end with '_path', 'toml_path', 'msp_file_path', 'db_location'
+                config_file_patterns = ['_path', 'toml_path', 'msp_file_path', 'db_location']
+                config_keys = []
+                for key in json_data.keys():
+                    if any(key.endswith(pattern) for pattern in config_file_patterns):
+                        config_keys.append(key)
                 
-                for config_key in config_files:
-                    if config_key in json_data:
-                        config_path = json_data[config_key]
-                        if not Path(config_path).exists():
-                            missing_files.append(config_path)
+                for config_key in config_keys:
+                    config_path = json_data[config_key]
+                    if isinstance(config_path, str) and not Path(config_path).exists():
+                        missing_files.append(config_path)
                             
             except json.JSONDecodeError as e:
                 corrupted_jsons.append(f"{json_file}: {e}")
@@ -1247,7 +1263,7 @@ echo "Study ID: {self.study_id}"
 echo "========================"
 
 # Check if WDL file exists in current directory
-WDL_FILE="wdl/{workflow_name}.wdl"
+WDL_FILE="wdl/{wdl_workflow_name}.wdl"
 if [ ! -f "$WDL_FILE" ]; then
     echo "ERROR: WDL file not found: $WDL_FILE"
     echo "Please run this script from a directory containing the wdl/ subdirectory"
@@ -1305,7 +1321,7 @@ fi
         
         print(f"Generated WDL runner script: {script_path}")
         print("Made script executable (chmod +x)")
-        print(f"Script expects to find WDL file at: wdl/{workflow_name}.wdl")
+       # print(f"Script expects to find WDL file at: wdl/{workflow_name}.wdl")
         
         return str(script_path)
     
@@ -1327,7 +1343,7 @@ fi
             Exit code from the script execution (0 for success, non-zero for failure)
             
         Note:
-            - Downloads WDL file from: https://github.com/microbiomedata/metaMS/blob/master/wdl/metaMS_lcms_metabolomics.wdl
+            - Downloads WDL file 
             - Creates study-level execution environment 
             - No file moving required - processed data goes directly to configured location
         """
@@ -1362,8 +1378,12 @@ fi
         print(f"📁 WDL execution directory: {working_dir}")
         
         # Download WDL file from GitHub
-        wdl_url = "https://raw.githubusercontent.com/microbiomedata/metaMS/master/wdl/metaMS_lcms_metabolomics.wdl"
-        wdl_file = wdl_dir / "metaMS_lcms_metabolomics.wdl"
+        workflow_type = self.config['workflow']['workflow_type']
+        if workflow_type not in WORKFLOW_DICT:
+            print(f"❌ Unsupported workflow type: {workflow_type}")
+            return 1
+        wdl_url = WORKFLOW_DICT[workflow_type]["wdl_download_location"]
+        wdl_file = wdl_dir / f"{WORKFLOW_DICT[workflow_type]['wdl_workflow_name']}.wdl"
         
         if not wdl_file.exists():
             print("📥 Downloading WDL file from GitHub...")
@@ -1484,6 +1504,16 @@ fi
         
         print(f"🚀 Running WDL workflows from: {working_dir}")
         print("This will take a long time for large datasets...")
+        
+        # Create symbolic link to workflow_inputs directory so relative paths work
+        workflow_inputs_source = self.base_path / "workflow_inputs"
+        workflow_inputs_link = working_dir / "workflow_inputs"
+        
+        if workflow_inputs_source.exists() and not workflow_inputs_link.exists():
+            try:
+                workflow_inputs_link.symlink_to(workflow_inputs_source)
+            except Exception as e:
+                raise Exception(f"Failed to create symbolic link for workflow inputs: {e}")
         
         # Store current directory
         original_dir = os.getcwd()
@@ -1946,710 +1976,6 @@ fi
         finally:
             # Always return to original directory
             os.chdir(original_dir)
-    
-    def llm_generate_and_refine_mapping_script(self, 
-                                               max_iterations: int = 3,
-                                               use_github_models: bool = True) -> bool:
-        """
-        THIS IS A WORK IN PROGRESS AND EXPERIMENTAL FEATURE.
-        Use an LLM to automatically generate and iteratively refine the biosample mapping script.
-        
-        This method:
-        1. Analyzes biosample attributes and raw file naming patterns
-        2. Generates a customized mapping script using LLM
-        3. Executes the script and analyzes results
-        4. Iteratively refines the script based on matching performance
-        
-        Stopping criteria:
-        - Always runs at least 2 iterations
-        - Stops if match rate doesn't improve from previous iteration
-        - Stops if max_iterations is reached
-        - Stops if success threshold is met
-        
-        Args:
-            max_iterations: Maximum number of refinement iterations (default: 3)
-            use_github_models: Use GitHub Models API if True, otherwise use OpenAI (default: True)
-        
-        Returns:
-            True if mapping achieves satisfactory results, False otherwise
-            
-        Note:
-            Requires either GITHUB_TOKEN_LLM (for GitHub Models) or OPENAI_API_KEY environment variable.
-            Add to .env file in project root or set as environment variable.
-            Set target success threshold in config: llm_mapping_success_threshold (default: 0.7)
-        """
-        import shutil
-        
-        # Check for API key
-        if use_github_models:
-            api_key = os.environ.get('GITHUB_TOKEN_LLM')
-            if not api_key:
-                print("❌ GITHUB_TOKEN_LLM environment variable not set")
-                print("Add it to .env file: GITHUB_TOKEN_LLM=your_token")
-                print("Or set it with: export GITHUB_TOKEN_LLM=your_token")
-                return False
-            api_base = "https://models.inference.ai.azure.com"
-            model = "gpt-4o"
-        else:
-            api_key = os.environ.get('OPENAI_API_KEY')
-            if not api_key:
-                print("❌ OPENAI_API_KEY environment variable not set")
-                print("Add it to .env file: OPENAI_API_KEY=your_key")
-                print("Or set it with: export OPENAI_API_KEY=your_key")
-                return False
-            api_base = "https://api.openai.com/v1"
-            model = "gpt-4o"
-        
-        print("\n🤖 === LLM-POWERED BIOSAMPLE MAPPING ===")
-        print(f"Model: {model}")
-        print(f"Max iterations: {max_iterations}")
-        
-        # Get success threshold from config
-        success_threshold = self.config.get('llm_mapping_success_threshold', 0.7)
-        print(f"Success threshold: {success_threshold * 100:.0f}% match rate\n")
-        
-        # Step 1: Gather context for LLM
-        print("📊 Step 1: Gathering context...")
-        context = self._gather_mapping_context()
-        if not context:
-            raise RuntimeError("Failed to gather context for LLM")
-        
-        # Track best result
-        best_match_rate = 0.0
-        best_results = None
-        best_function_code = None
-        previous_match_rate = 0.0
-        previous_results = None
-        
-        # Step 2: Iteratively generate and refine
-        for iteration in range(1, max_iterations + 1):
-            print(f"\n🔄 === ITERATION {iteration}/{max_iterations} ===")
-            
-            # Generate/refine functions using LLM
-            function_code = self._llm_generate_functions(context, iteration, api_key, api_base, model, previous_results)
-            if not function_code:
-                print(f"❌ Failed to generate functions in iteration {iteration}")
-                continue
-            
-            # Execute the functions on real data
-            execution_result = self._execute_generated_functions(function_code)
-            
-            if not execution_result:
-                print(f"⚠️  Function execution failed in iteration {iteration}")
-                continue
-            
-            # Analyze results
-            results = execution_result['stats']
-            match_rate = results['match_rate']
-            sample_match_rate = results.get('sample_match_rate', 0)
-            sample_file_pct = results.get('sample_file_pct', 0)
-            
-            print(f"\n📈 Results:")
-            print(f"   Overall match rate: {match_rate * 100:.1f}%")
-            print(f"   Matched: {results['matched_files']}/{results['total_files']} files")
-            print(f"   Sample files: {sample_file_pct:.1f}% of total")
-            print(f"   Samples mapped to biosamples: {sample_match_rate * 100:.1f}%")
-            print(f"   Biosample coverage: {results.get('biosample_coverage', 0) * 100:.1f}%")
-            
-            # Track best result
-            if match_rate > best_match_rate:
-                best_match_rate = match_rate
-                best_results = results.copy()
-                best_function_code = function_code
-                print(f"   ⭐ New best result!")
-            
-            # Check if we've met the success threshold
-            if match_rate >= success_threshold:
-                print(f"\n✅ SUCCESS! Match rate ({match_rate * 100:.1f}%) meets threshold ({success_threshold * 100:.0f}%)")
-                break
-            
-            # Stopping criteria: 
-            # - If 0% matched, always try at least 5 times
-            # - If >0% matched, try at least 2 times
-            # - Stop if no improvement from previous iteration
-            min_iterations = 5 if match_rate == 0 else 2
-            
-            if iteration >= min_iterations and match_rate <= previous_match_rate:
-                print(f"\n⏹️  No improvement from previous iteration ({previous_match_rate * 100:.1f}% → {match_rate * 100:.1f}%)")
-                print(f"   Stopping after {iteration} iterations")
-                break
-            
-            # Prepare feedback for next iteration
-            if iteration < max_iterations:
-                print(f"\n💭 Match rate below threshold. Preparing feedback for iteration {iteration + 1}...")
-                previous_results = results
-                previous_match_rate = match_rate
-        
-        # Report final results
-        print(f"\n📊 === FINAL RESULTS ===")
-        print(f"Best match rate achieved: {best_match_rate * 100:.1f}%")
-        if best_results:
-            print(f"Sample files: {best_results.get('sample_file_pct', 0):.1f}% of total")
-            print(f"Samples mapped to biosamples: {best_results.get('sample_match_rate', 0) * 100:.1f}%")
-            print(f"Biosample coverage: {best_results.get('biosample_coverage', 0):.1f}%")
-        
-        # Generate final script using best functions
-        if best_function_code:
-            print(f"\n📝 Generating final script from best functions...")
-            script_path = self._generate_final_script_from_functions(best_function_code)
-            if script_path:
-                print(f"✅ Final script saved: {script_path}")
-                self.set_skip_trigger('biosample_mapping_completed', True)
-        
-        if best_match_rate >= success_threshold:
-            return True
-        elif best_match_rate > 0:
-            print(f"\n⚠️  Best match rate ({best_match_rate * 100:.1f}%) below threshold ({success_threshold * 100:.0f}%)")
-            print("Consider:")
-            print("1. Reviewing unmapped files for patterns")
-            print("2. Checking biosample attributes for missing data")
-            print("3. Manual refinement of the generated script")
-            return False
-        else:
-            print("\n❌ Failed to generate working mapping functions")
-            return False
-    
-    def _gather_mapping_context(self) -> Optional[Dict]:
-        """Gather context about biosamples and files for LLM."""
-        import pandas as pd
-        
-        context = {}
-        
-        # Load biosample attributes
-        biosample_csv = self.workflow_path / "metadata" / "biosample_attributes.csv"
-        if not biosample_csv.exists():
-            raise FileNotFoundError(f"❌ Biosample attributes not found at {biosample_csv}. Run get_biosample_attributes() first.")
-        
-        try:
-            biosample_df = pd.read_csv(biosample_csv)
-            context['num_biosamples'] = len(biosample_df)
-            context['biosample_columns'] = list(biosample_df.columns)
-            # Get 30 random biosamples for better representation
-            sample_size = min(30, len(biosample_df))
-            sample_biosamples = biosample_df.sample(n=sample_size, random_state=42)
-            context['sample_biosample_names'] = sample_biosamples['name'].tolist() if 'name' in biosample_df.columns else []
-            context['sample_biosample_ids'] = sample_biosamples['id'].tolist() if 'id' in biosample_df.columns else []
-            
-            # Get sample of other important columns from the same random samples
-            for col in ['samp_name', 'description']:
-                if col in biosample_df.columns:
-                    context[f'sample_{col}'] = sample_biosamples[col].tolist()
-            
-            print(f"✅ Loaded {len(biosample_df)} biosamples ({sample_size} random samples for LLM)")
-        except Exception as e:
-            raise RuntimeError(f"❌ Error loading biosample attributes: {e}")
-        
-        # Load downloaded files
-        downloaded_files_csv = self.workflow_path / "metadata" / "downloaded_files.csv"
-        if not downloaded_files_csv.exists():
-            raise FileNotFoundError(f"❌ Downloaded files list not found at: {downloaded_files_csv}")
-        
-        try:
-            downloaded_df = pd.read_csv(downloaded_files_csv)
-            file_names = [Path(fp).name for fp in downloaded_df['file_path'] if Path(fp).exists()]
-            context['num_files'] = len(file_names)
-            # Get 50 random files for better representation
-            sample_size = min(50, len(file_names))
-            import random
-            random.seed(42)  # For reproducibility
-            context['sample_filenames'] = random.sample(file_names, sample_size)
-            print(f"✅ Loaded {len(file_names)} file names ({sample_size} random samples for LLM)")
-        except Exception as e:
-            raise RuntimeError(f"❌ Error loading file list: {e}")
-        
-        # Study metadata
-        context['study_name'] = self.study_name
-        context['study_description'] = self.config['study']['description']
-        
-        return context
-    
-    def _llm_generate_functions(self, context: Dict, iteration: int, 
-                               api_key: str, api_base: str, model: str,
-                               previous_results: Dict = None) -> Optional[str]:
-        """
-        Generate just the two mapping functions using LLM.
-        Returns function code as string, or None if generation failed.
-        """
-        import requests
-        
-        print(f"🤖 Generating mapping functions using {model}...")
-        
-        # Build prompt
-        prompt = self._build_llm_prompt_for_functions(context, iteration, previous_results)
-        
-        # Call LLM API
-        headers = {
-            "Content-Type": "application/json",
-            "Authorization": f"Bearer {api_key}"
-        }
-        
-        payload = {
-            "model": model,
-            "messages": [
-                {
-                    "role": "system",
-                    "content": "You are an expert Python programmer specializing in bioinformatics filename parsing. You write focused functions that extract sample identifiers from filenames and match them to biosample names. You return ONLY the requested Python functions with their imports, nothing more."
-                },
-                {
-                    "role": "user",
-                    "content": prompt
-                }
-            ],
-            "temperature": 0.3,
-            "max_tokens": 2000
-        }
-        
-        try:
-            response = requests.post(
-                f"{api_base}/chat/completions",
-                headers=headers,
-                json=payload,
-                timeout=120
-            )
-            response.raise_for_status()
-            
-            result = response.json()
-            function_code = result['choices'][0]['message']['content']
-            
-            # Debug: Show first 200 chars of what LLM returned
-            print(f"🔍 LLM returned {len(function_code)} chars. Preview: {function_code[:200]}...")
-            
-            # Extract code from markdown if present
-            if '```python' in function_code:
-                function_code = function_code.split('```python')[1].split('```')[0].strip()
-            elif '```' in function_code:
-                function_code = function_code.split('```')[1].split('```')[0].strip()
-            
-            # Validate that both functions are present
-            validation_errors = []
-            if 'def extract_sample_info_from_filename(' not in function_code:
-                validation_errors.append("❌ Missing function: extract_sample_info_from_filename")
-            if 'def match_to_biosamples(' not in function_code:
-                validation_errors.append("❌ Missing function: match_to_biosamples")
-            
-            # Check for hardcoded data arrays (should not be in functions)
-            bad_patterns = ['biosample_list = [', 'file_list = [', 'raw_files = [']
-            for pattern in bad_patterns:
-                if pattern in function_code and '"' in function_code.split(pattern, 1)[1].split(']')[0]:
-                    validation_errors.append(f"❌ Found hardcoded data: {pattern}")
-            
-            if validation_errors:
-                print("⚠️  Generated functions failed validation:")
-                for error in validation_errors:
-                    print(f"   {error}")
-                print(f"🔍 Extracted code preview: {function_code[:300]}...")
-                return None
-            
-            print(f"✅ Generated {len(function_code.splitlines())} lines of function code")
-            return function_code
-            
-        except requests.exceptions.RequestException as e:
-            print(f"❌ API request failed: {e}")
-            if hasattr(e, 'response') and e.response is not None:
-                print(f"Response: {e.response.text}")
-            return None
-        except Exception as e:
-            print(f"❌ Error generating functions: {e}")
-            return None
-    
-    def _generate_final_script_from_functions(self, function_code: str) -> Optional[Path]:
-        """
-        Generate final complete mapping script by combining generated functions with template structure.
-        
-        Args:
-            function_code: String containing the two LLM-generated functions
-            
-        Returns:
-            Path to the generated script file
-        """
-        # Read the template
-        template_path = self.base_path / "nmdc_dp_utils" / "templates" / "biosample_mapping_script_template.py"
-        if not template_path.exists():
-            print(f"❌ Template not found: {template_path}")
-            return None
-        
-        with open(template_path, 'r') as f:
-            template = f.read()
-        
-        # Replace the placeholder functions with the generated ones
-        # The template has placeholder functions that we'll replace
-        import re
-        
-        # Find where to insert the functions (after imports, before main)
-        main_match = re.search(r'(def main\(\):)', template, re.MULTILINE)
-        if not main_match:
-            print("❌ Could not find main() function in template")
-            return None
-        
-        main_start = main_match.start()
-        
-        # Split template: before main, and main onwards
-        before_main = template[:main_start]
-        main_onwards = template[main_start:]
-        
-        # Remove any existing placeholder functions from before_main
-        # (they're between the imports and main())
-        import_match = re.search(r'(from study_manager import NMDCWorkflowManager.*?\n)', before_main, re.DOTALL)
-        if import_match:
-            imports_section = before_main[:import_match.end()]
-            # Insert our generated functions after imports
-            final_script = imports_section + "\n\n" + function_code + "\n\n" + main_onwards
-        else:
-            # Fallback: just insert before main
-            final_script = before_main + "\n\n" + function_code + "\n\n" + main_onwards
-        
-        # Format with study-specific values
-        final_script = final_script.format(
-            study_name=self.study_name,
-            study_description=self.config['study']['description'],
-            script_name="map_raw_files_to_biosamples.py",
-            config_path=self.config_path
-        )
-        
-        # Save the script
-        script_path = self.workflow_path / "scripts" / "map_raw_files_to_biosamples.py"
-        with open(script_path, 'w') as f:
-            f.write(final_script)
-        
-        os.chmod(script_path, 0o755)
-        
-        return script_path
-    
-    def _execute_generated_functions(self, function_code: str) -> Optional[Dict]:
-        """
-        Execute generated functions on real data and return mapping results.
-        
-        Args:
-            function_code: String containing the two function definitions
-            
-        Returns:
-            Dict with mapping results and statistics, or None if execution failed
-        """
-        import pandas as pd
-        import traceback
-        
-        print("🔧 Executing generated functions on real data...")
-        
-        # Load real data from CSV files
-        downloaded_files_path = self.workflow_path / "metadata" / "downloaded_files.csv"
-        biosample_path = self.workflow_path / "metadata" / "biosample_attributes.csv"
-        
-        if not downloaded_files_path.exists():
-            print(f"❌ Missing file: {downloaded_files_path}")
-            return None
-        if not biosample_path.exists():
-            print(f"❌ Missing file: {biosample_path}")
-            return None
-        
-        try:
-            # Load the data
-            files_df = pd.read_csv(downloaded_files_path)
-            biosamples_df = pd.read_csv(biosample_path)
-            
-            # Get biosample names
-            if 'biosample_name' in biosamples_df.columns:
-                biosample_list = biosamples_df['biosample_name'].tolist()
-            elif 'name' in biosamples_df.columns:
-                biosample_list = biosamples_df['name'].tolist()
-            else:
-                print(f"❌ No biosample name column found in {biosample_path}")
-                return None
-            
-            # Get filenames
-            if 'filename' in files_df.columns:
-                raw_files = files_df['filename'].tolist()
-            elif 'file_name' in files_df.columns:
-                raw_files = files_df['file_name'].tolist()
-            elif 'name' in files_df.columns:
-                raw_files = files_df['name'].tolist()
-            else:
-                print(f"❌ No filename column found in {downloaded_files_path}")
-                print(f"   Available columns: {list(files_df.columns)}")
-                return None
-            
-            # Create a namespace and execute the function code
-            namespace = {}
-            exec(function_code, namespace)
-            
-            # Get the functions from namespace
-            extract_func = namespace.get('extract_sample_info_from_filename')
-            match_func = namespace.get('match_to_biosamples')
-            
-            if not extract_func or not match_func:
-                print("❌ Failed to load functions from generated code")
-                return None
-            
-            # Process all files
-            results = []
-            for filename in raw_files:
-                try:
-                    extracted_sample = extract_func(filename)
-                    matched_biosample = match_func(extracted_sample, biosample_list)
-                    
-                    results.append({
-                        'filename': filename,
-                        'extracted_sample': extracted_sample,
-                        'matched_biosample': matched_biosample
-                    })
-                except Exception as e:
-                    # If individual file processing fails, record it
-                    results.append({
-                        'filename': filename,
-                        'extracted_sample': None,
-                        'matched_biosample': None
-                    })
-            
-            # Convert to DataFrame
-            results_df = pd.DataFrame(results)
-            
-            # Calculate statistics
-            total_files = len(results_df)
-            matched_files = results_df['matched_biosample'].notna().sum()
-            match_rate = matched_files / total_files if total_files > 0 else 0
-            
-            # Calculate sample-type statistics
-            sample_files = results_df[results_df['extracted_sample'].notna()]
-            sample_file_count = len(sample_files)
-            sample_file_pct = sample_file_count / total_files if total_files > 0 else 0
-            
-            sample_matched = sample_files['matched_biosample'].notna().sum()
-            sample_match_rate = sample_matched / sample_file_count if sample_file_count > 0 else 0
-            
-            # Calculate biosample coverage
-            unique_biosamples_matched = results_df['matched_biosample'].dropna().nunique()
-            total_biosamples = len(biosample_list)
-            biosample_coverage = unique_biosamples_matched / total_biosamples if total_biosamples > 0 else 0
-            
-            stats = {
-                'total_files': total_files,
-                'matched_files': matched_files,
-                'match_rate': match_rate,
-                'sample_files': sample_file_count,
-                'sample_file_pct': sample_file_pct,
-                'sample_matched': sample_matched,
-                'sample_match_rate': sample_match_rate,
-                'unique_biosamples_matched': unique_biosamples_matched,
-                'total_biosamples': total_biosamples,
-                'biosample_coverage': biosample_coverage
-            }
-            
-            print(f"✅ Execution complete: {matched_files}/{total_files} files matched ({match_rate:.1%})")
-            print(f"   Sample files: {sample_file_count} ({sample_file_pct:.1%}), {sample_matched} matched ({sample_match_rate:.1%})")
-            
-            return {
-                'results_df': results_df,
-                'stats': stats
-            }
-            
-        except Exception as e:
-            print(f"❌ Function execution failed: {e}")
-            traceback.print_exc()
-            return None
-    
-    def _build_llm_prompt_for_functions(self, context: Dict, iteration: int, 
-                                        previous_results: Dict = None) -> str:
-        """Build the prompt for LLM function generation using few-shot learning."""
-        
-        # Read the Kroeger example functions (working reference implementation)
-        kroeger_example_path = self.base_path / "studies" / "kroeger_11_dwsv7q78" / "scripts" / "map_raw_files_to_biosamples.py"
-        kroeger_functions = ""
-        if kroeger_example_path.exists():
-            with open(kroeger_example_path, 'r') as f:
-                content = f.read()
-                # Extract just the two functions
-                import_match = re.search(r'(import re.*?)def extract_sample_info_from_filename', content, re.DOTALL)
-                func_match = re.search(r'(def extract_sample_info_from_filename.*?def match_to_biosamples.*?)(?=\n\ndef main|\nif __name__)', content, re.DOTALL)
-                if import_match and func_match:
-                    kroeger_functions = import_match.group(1).strip() + "\n\n" + func_match.group(1).strip()
-        
-        if iteration == 1:
-            prompt = f"""You are writing Python functions to map raw data filenames to biosample names.
-
-STUDY: {context['study_name']}
-Description: {context['study_description']}
-
-BIOSAMPLE NAMES ({context['num_biosamples']} total):
-{chr(10).join(f"  {name}" for name in context['sample_biosample_names'][:30])}
-
-RAW FILENAMES ({context['num_files']} total):
-{chr(10).join(f"  {name}" for name in context['sample_filenames'][:40])}
-
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-WORKING EXAMPLE FROM SIMILAR STUDY (Kroeger)
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-
-Kroeger study had files like:
-- "20210915_JGI-AK_MK_506588_SoilWaterRep_final_QE-HF_C18_USDAY63680_NEG_MSMS_49_S40-D89_A_Rg80to1200-CE102040-soil-S1_Run33.raw"
-
-And biosample names like:
-- "S40_A_D89 hydrophobic"
-
-Here are the working functions from that study:
-
-```python
-{kroeger_functions}
-```
-
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-YOUR TASK
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-
-Write TWO functions for {context['study_name']} using the Kroeger example as a guide:
-
-1. extract_sample_info_from_filename(filename)
-   - Extract sample identifier from filename using regex
-   - Return a dict with sample information (adapt Kroeger's structure to your needs)
-   - Try multiple regex patterns in order (like Kroeger does)
-   - Handle control/QC samples specially
-
-2. match_to_biosamples(raw_files_info, biosample_df)
-   - Match extracted info to biosample names
-   - Return list of dicts with keys: raw_file_name, biosample_id, biosample_name, match_confidence
-   - Try multiple strategies: exact match, contains, regex patterns
-   - Use match_confidence values: 'high', 'medium', 'no_match', 'control_sample'
-
-REQUIREMENTS:
-✓ Include necessary imports (re, pandas, etc.)
-✓ Study the patterns in YOUR filenames and biosample names above
-✓ Adapt Kroeger's regex approach to YOUR patterns
-✓ Use similar multi-strategy matching logic
-
-❌ DO NOT:
-- Include hardcoded example data
-- Include main() function or script execution code
-- Make up test data
-
-Return ONLY the two function definitions with their imports."""
-
-        else:
-            # Refinement iteration
-            if previous_results is None:
-                previous_results = {}
-            prev_stats = previous_results.get('stats', {}) if previous_results else {}
-            
-            prompt = f"""You are refining Python functions to improve biosample matching.
-
-PREVIOUS ITERATION RESULTS:
-- Match rate: {prev_stats.get('match_rate', 0):.1%}
-- Files matched: {prev_stats.get('matched_files', 0)}/{prev_stats.get('total_files', 0)}
-- Sample files: {prev_stats.get('sample_files', 0)} ({prev_stats.get('sample_file_pct', 0):.1%})
-- Samples matched: {prev_stats.get('sample_matched', 0)} ({prev_stats.get('sample_match_rate', 0):.1%})
-
-STUDY: {context['study_name']}
-
-BIOSAMPLE NAMES ({context['num_biosamples']} total):
-{chr(10).join(f"  {name}" for name in context['sample_biosample_names'][:30])}
-
-RAW FILENAMES ({context['num_files']} total):
-{chr(10).join(f"  {name}" for name in context['sample_filenames'][:40])}
-
-TASK: Write improved versions of these TWO functions:
-1. extract_sample_info_from_filename(filename) - extract sample ID from filename
-2. match_to_biosamples(raw_files_info, biosample_df) - match extracted info to biosamples
-
-IMPROVEMENTS NEEDED:
-- {prev_stats.get('total_files', 0) - prev_stats.get('matched_files', 0)} files didn't match - add more regex patterns
-- Try different matching strategies (exact, contains, fuzzy)
-- Handle edge cases and control samples
-
-FORMAT: Return ONLY Python code with:
-```python
-import re
-import pandas as pd
-from pathlib import Path
-
-def extract_sample_info_from_filename(filename):
-    # Your improved implementation
-    ...
-
-def match_to_biosamples(raw_files_info, biosample_df):
-    # Your improved implementation
-    ...
-```
-
-NO explanations, NO other text. ONLY the two function definitions with imports."""
-
-        return prompt
-    
-    def _execute_and_analyze_mapping(self, script_path: Path) -> tuple[bool, Dict]:
-        """Execute mapping script and analyze results."""
-        import subprocess
-        import pandas as pd
-        
-        results = {}
-        
-        try:
-            # Execute script
-            result = subprocess.run(
-                [sys.executable, str(script_path)],
-                capture_output=True,
-                text=True,
-                cwd=self.base_path,
-                timeout=300
-            )
-            
-            if result.returncode != 0:
-                error_msg = result.stderr or result.stdout
-                results['error'] = error_msg
-                print(f"❌ Script execution error:")
-                print(f"STDOUT: {result.stdout[:500]}")
-                print(f"STDERR: {result.stderr[:500]}")
-                return False, results
-            
-            # Load and analyze mapping results
-            mapping_file = self.workflow_path / f"{self.study_name}_raw_file_biosample_mapping.csv"
-            if not mapping_file.exists():
-                results['error'] = "Mapping file not created"
-                return False, results
-            
-            mapping_df = pd.read_csv(mapping_file)
-            
-            # Calculate statistics
-            total_files = len(mapping_df)
-            matched = mapping_df['match_confidence'].isin(['high', 'medium', 'low']).sum()
-            
-            # Calculate sample-specific statistics
-            sample_files = mapping_df[mapping_df['raw_file_type'] == 'sample']
-            total_sample_files = len(sample_files)
-            sample_file_pct = (total_sample_files / total_files * 100) if total_files > 0 else 0
-            
-            # Of the sample files, how many mapped to biosamples?
-            sample_matched = len(sample_files[sample_files['match_confidence'].isin(['high', 'medium', 'low'])]) if total_sample_files > 0 else 0
-            sample_match_rate = (sample_matched / total_sample_files) if total_sample_files > 0 else 0
-            
-            results['total_files'] = total_files
-            results['matched_files'] = matched
-            results['match_rate'] = matched / total_files if total_files > 0 else 0
-            results['sample_files'] = total_sample_files
-            results['sample_file_pct'] = sample_file_pct
-            results['sample_matched'] = sample_matched
-            results['sample_match_rate'] = sample_match_rate
-            
-            # Biosample coverage
-            if 'biosample_id' in mapping_df.columns:
-                mapped_biosamples = mapping_df[mapping_df['biosample_id'].notna()]['biosample_id'].nunique()
-                biosample_csv = self.workflow_path / "metadata" / "biosample_attributes.csv"
-                total_biosamples = len(pd.read_csv(biosample_csv))
-                results['biosample_coverage'] = (mapped_biosamples / total_biosamples * 100) if total_biosamples > 0 else 0
-            
-            # Get examples for feedback
-            unmatched = mapping_df[mapping_df['match_confidence'] == 'no_match']
-            results['unmatched_examples'] = unmatched['raw_file_name'].head(15).tolist() if len(unmatched) > 0 else []
-            
-            matched_rows = mapping_df[mapping_df['match_confidence'].isin(['high', 'medium'])]
-            results['matched_examples'] = [
-                (row['raw_file_name'], row.get('biosample_name', row.get('biosample_id', 'unknown')))
-                for _, row in matched_rows.head(10).iterrows()
-            ] if len(matched_rows) > 0 else []
-            
-            return True, results
-            
-        except subprocess.TimeoutExpired:
-            results['error'] = "Script execution timeout (>5 minutes)"
-            return False, results
-        except Exception as e:
-            results['error'] = str(e)
-            return False, results
             
     def _generate_mapped_files_list(self) -> None:
         """
@@ -3093,8 +2419,6 @@ NO explanations, NO other text. ONLY the two function definitions with imports."
             print(f"❌ Failed to read inspection results: {e}")
             return None
     
-
-    
     def _process_inspection_results(self, result, output_dir):
         """Process the results from raw data inspection (common for both Docker and venv methods)."""
         if result.returncode == 0:
@@ -3167,17 +2491,292 @@ NO explanations, NO other text. ONLY the two function definitions with imports."
             return str(results_file)
         return None
     
-    def generate_metadata_mapping_files(self) -> bool:
+    def _generate_lcms_workflow_metadata_inputs(self) -> bool:
+        """Generate metadata inputs specific to LCMS Metabolomics and Lipidomics workflows.
+        
+        This function generates metadata mapping files for NMDC submission.
+        First, it checks for prerequisites such as the biosample mapping file
+        and raw data inspection results. It then merges these datasets to create
+        a comprehensive metadata file including instrument information. Note that
+        only high-confidence biosample matches (from the mapped_raw_file_biosample_mapping file)
+        are used
+
+        Returns:
+            bool: True if metadata generation is successful, False otherwise        
         """
-        Generate metadata mapping files for NMDC submission.
+       
+        # Check prerequisites
+        biosample_mapping_file = self.workflow_path / "metadata" / "mapped_raw_file_biosample_mapping.csv"
+        if not biosample_mapping_file.exists():
+            print(f"❌ Biosample mapping file not found: {biosample_mapping_file}")
+            return False
+        
+        raw_inspection_results = self.get_raw_inspection_results_path()
+        if not raw_inspection_results:
+            print("❌ Raw data inspection results not found. Run raw_data_inspector first.")
+            return False
+        
+        # Load the mapped files
+        mapped_df = pd.read_csv(biosample_mapping_file)
+        mapped_df = mapped_df[mapped_df['match_confidence'].isin(['high'])].copy()
+
+        if len(mapped_df) == 0:
+            print("❌ No high confidence biosample matches found")
+            return False
+        
+        # Extract raw_data_file_short for merging
+        mapped_df['raw_data_file_short'] = mapped_df['raw_file_name']
+        
+        # Add raw data file paths
+        raw_data_dir = str(self.raw_data_directory)
+        if not raw_data_dir.endswith('/'):
+            raw_data_dir += '/'
+        mapped_df['raw_data_file'] = raw_data_dir + mapped_df['raw_data_file_short']
+        
+        # Add processed data directories
+        processed_data_dir = str(self.processed_data_directory)
+        if not processed_data_dir.endswith('/'):
+            processed_data_dir += '/'
+        mapped_df['processed_data_directory'] = (
+            processed_data_dir +
+            mapped_df['raw_data_file_short'].str.replace(r'(?i)\.(raw|mzml)$', '', regex=True) +
+            '.corems'
+        )
+        
+        # Add instrument times from raw inspection results
+        file_info_df = pd.read_csv(raw_inspection_results)
+        
+        # Filter out files with errors or missing critical metadata
+        initial_count = len(file_info_df)
+        
+        # Remove files with errors
+        if 'error' in file_info_df.columns:
+            error_mask = file_info_df['error'].notna()
+            if error_mask.any():
+                error_files = file_info_df[error_mask]['file_name'].tolist()
+                print(f"⚠️  Excluding {len(error_files)} files with processing errors:")
+                for f in error_files[:5]:  # Show first 5
+                    print(f"   - {f}")
+                if len(error_files) > 5:
+                    print(f"   ... and {len(error_files) - 5} more")
+                file_info_df = file_info_df[~error_mask]
+        
+        # Remove files with missing write_time (critical for metadata)
+        null_time_mask = file_info_df['write_time'].isna()
+        if null_time_mask.any():
+            null_time_files = file_info_df[null_time_mask]['file_name'].tolist()
+            print(f"⚠️  Excluding {len(null_time_files)} files with missing write_time:")
+            for f in null_time_files:
+                print(f"   - {f}")
+            file_info_df = file_info_df[~null_time_mask]
+        
+        final_count = len(file_info_df)
+        if final_count != initial_count:
+            print(f"📊 Raw inspection results: {initial_count} → {final_count} files (excluded {initial_count - final_count} with errors)")
+        
+        if final_count == 0:
+            print("❌ No valid files remaining after filtering - check raw data inspection results")
+            return {}
+        
+        # Process remaining valid files
+        file_info_df['instrument_instance_specifier'] = file_info_df['instrument_serial_number'].astype(str)
+        file_info_df['instrument_analysis_end_date'] = pd.to_datetime(file_info_df["write_time"]).dt.strftime('%Y-%m-%dT%H:%M:%SZ')
+        file_info_df['raw_data_file_short'] = file_info_df['file_name']
+        
+        # Remove unwanted serial numbers
+        serial_numbers_to_remove = self.config.get('metadata', {}).get('serial_numbers_to_remove', [])
+        if serial_numbers_to_remove:
+            file_info_df['instrument_instance_specifier'] = file_info_df['instrument_instance_specifier'].replace(serial_numbers_to_remove, pd.NA)
+        
+        print(f"Unique instrument_instance_specifier values: {file_info_df['instrument_instance_specifier'].unique()}")
+        # Only show date range for valid dates
+        valid_dates = file_info_df['instrument_analysis_end_date'].dropna()
+        if len(valid_dates) > 0:
+            print(f"Date range: {valid_dates.min()} to {valid_dates.max()}")
+        else:
+            print("No valid dates found")
+        
+        # Keep only relevant columns for merging
+        file_info_df = file_info_df[['raw_data_file_short', 'instrument_analysis_end_date', 'instrument_instance_specifier']]
+        # drop duplicates just in case
+        file_info_df = file_info_df.drop_duplicates(subset=['raw_data_file_short'])
+        
+        # Merge instrument information
+        merged_df = pd.merge(mapped_df, file_info_df, on='raw_data_file_short', how='left')
+        
+        # Validate merge didn't change row count
+        if len(merged_df) != len(mapped_df):
+            print(f"❌ Merge error: expected {len(mapped_df)} rows, got {len(merged_df)}")
+            return {}
+        
+        # Check for files that didn't get instrument metadata
+        missing_metadata = merged_df['instrument_analysis_end_date'].isna().sum()
+        if missing_metadata > 0:
+            print(f"⚠️  {missing_metadata} files missing instrument metadata (may not be in raw inspection results)")
+            missing_files = merged_df[merged_df['instrument_analysis_end_date'].isna()]['raw_data_file_short'].tolist()
+            for f in missing_files[:5]:  # Show first 5
+                print(f"   - {f}")
+            if len(missing_files) > 5:
+                print(f"   ... and {len(missing_files) - 5} more")
+            
+            # Remove files without metadata for metadata generation
+            merged_df = merged_df[merged_df['instrument_analysis_end_date'].notna()].copy()
+            print(f"📊 Proceeding with {len(merged_df)} files that have complete metadata")
+        
+        # Add common metadata from config that applies to all files
+        metadata_config = self.config.get('metadata', {})
+        merged_df['processing_institution_workflow'] = metadata_config.get('processing_institution_workflow', 'EMSL')
+        merged_df['processing_institution_generation'] = metadata_config.get('processing_institution_generation', 'EMSL')
+        
+        # Add sample_id (alias for biosample_id)
+        merged_df['sample_id'] = merged_df['biosample_id']
+        
+        # Add biosample.associated_studies (must be in brackets as a list)
+        merged_df['biosample.associated_studies'] = f"['{self.config['study']['id']}']"
+        
+        # Add raw_data_url using configurable URL construction
+        use_massive_urls = self.config.get('metadata', {}).get('use_massive_urls', True)
+        
+        if use_massive_urls:
+            # Load FTP URLs to get correct directory structure
+            ftp_file = self.workflow_path / "raw_file_info" / "massive_ftp_locs.csv"
+            if ftp_file.exists():
+                ftp_df = pd.read_csv(ftp_file)
+                # Create mapping from filename to full FTP path
+                ftp_mapping = dict(zip(ftp_df['raw_data_file_short'], ftp_df['ftp_location']))
+            else:
+                raise ValueError(f"MASSIVE FTP URLs file not found: {ftp_file}")
+            
+            # Construct MASSIVE download URLs
+            massive_id = self.config['workflow']['massive_id']
+            
+            def construct_massive_url(filename):
+                import urllib.parse
+                import re
+                
+                # Extract just the MSV part (remove version prefix like v07/)
+                if 'MSV' in massive_id:
+                    msv_part = 'MSV' + massive_id.split('MSV')[1]
+                else:
+                    msv_part = massive_id
+                
+                # Get the full directory path from FTP URL if available
+                if filename in ftp_mapping:
+                    ftp_url = ftp_mapping[filename]
+                    # Extract path after MSV number: /raw/directory/rawdata/filename.raw
+                    match = re.search(rf'{re.escape(msv_part)}(.+)/{re.escape(filename)}', ftp_url)
+                    if match:
+                        relative_path = match.group(1)  # e.g., /raw/20210819_JGI-AK_MK_506588.../rawdata
+                        # Construct the file path: MSV.../full/path/filename
+                        file_path = f"{msv_part}{relative_path}/{filename}"
+                    else:
+                        print(f"⚠️  Could not extract directory structure for {filename}")
+                        file_path = f"{msv_part}/raw/{filename}"
+                else:
+                    # Fallback to simple structure
+                    file_path = f"{msv_part}/raw/{filename}"
+                
+                encoded_path = urllib.parse.quote(file_path, safe='')
+                https_url = f"https://massive.ucsd.edu/ProteoSAFe/DownloadResultFile?file=f.{encoded_path}&forceDownload=true"
+                
+                # Validate URL format
+                if not https_url.startswith("https://massive.ucsd.edu/ProteoSAFe/DownloadResultFile?file=f.MSV"):
+                    raise ValueError(f"Invalid MASSIVE URL format generated: {https_url}")
+                
+                return https_url
+            
+            merged_df['raw_data_url'] = merged_df['raw_data_file_short'].apply(construct_massive_url)
+            
+            # Validate at least 5 URLs to ensure they're accessible
+            print("🔍 Validating MASSIVE URL accessibility...")
+            self._validate_massive_urls(merged_df['raw_data_url'].head(5).tolist())
+        else:
+            # Use placeholder URLs for future implementation
+            merged_df['raw_data_url'] = 'placeholder://raw_data/' + merged_df['raw_data_file_short']
+            print("⚠️  Using placeholder URLs - configure alternative URL construction method")
+        
+        # Remove any files marked as problematic in config from metadata generation csvs
+        problem_files = self.config.get('problem_files', [])
+        if problem_files:
+            initial_count = len(merged_df)
+            merged_df = merged_df[~merged_df['raw_data_file_short'].isin(problem_files)].copy()
+            removed_count = initial_count - len(merged_df)
+            print(f"⚠️  Removed {removed_count} problematic files from metadata generation")
+        
+        # Generate configuration-specific CSV files
+        metadata_config = self.config.get('metadata', {})
+        config_dfs = self._separate_files_by_configuration(merged_df, metadata_config)
+        
+        if not config_dfs:
+            print("❌ No files matched any configuration filters")
+            return False
+        
+        # Create output directory
+        output_dir = self.workflow_path / "metadata" / "metadata_gen_input_csvs"
+        output_dir.mkdir(parents=True, exist_ok=True)
+        
+        # Clear existing files
+        for f in output_dir.glob("*.csv"):
+            f.unlink()
+        
+        # Define final columns
+        final_columns = [
+            'sample_id', 'biosample.associated_studies', 'raw_data_file', 'processed_data_directory', 
+            'mass_spec_configuration_name', 'chromat_configuration_name', 'instrument_used', 
+            'processing_institution_workflow', 'processing_institution_generation',
+            'instrument_analysis_end_date', 'instrument_instance_specifier', 'raw_data_url'
+        ]
+        
+        # Write configuration-specific CSV files
+        files_written = 0
+        total_files = 0
+        
+        for config_name, config_df in config_dfs.items():
+            # Validate required columns exist
+            missing_cols = [col for col in final_columns if col not in config_df.columns]
+            if missing_cols:
+                print(f"❌ Skipping {config_name}: missing columns {missing_cols}")
+                continue
+            
+            # Check for empty dataframe
+            if len(config_df) == 0:
+                print(f"⚠️  Skipping {config_name}: no files after filtering")
+                continue
+            
+            # Write the CSV file
+            try:
+                output_df = config_df[final_columns].copy()
+                output_file = output_dir / f"{config_name}_metadata.csv"
+                output_df.to_csv(output_file, index=False)
+                
+                files_written += 1
+                total_files += len(output_df)
+                
+                # Show sample of metadata applied
+                sample_chromat = output_df['chromat_configuration_name'].iloc[0]
+                sample_ms = output_df['mass_spec_configuration_name'].iloc[0]
+                print(f"✅ {config_name}_metadata.csv: {len(output_df)} files ({sample_chromat}, {sample_ms})")
+                
+            except Exception as e:
+                print(f"❌ Error writing {config_name}_metadata.csv: {e}")
+                continue
+        
+        if files_written == 0:
+            print("❌ No metadata files were successfully written")
+            return False
+        
+        print(f"📋 Successfully generated {files_written} metadata files with {total_files} total entries")
+        print(f"   Output directory: {output_dir}")
+        return True
+    
+    def generate_workflow_metadata_generation_inputs(self) -> bool:
+        """
+        Generate metadata mapping files for generating workflow metadata.
         
         Creates workflow metadata CSV files separated by configuration that include:
         - Raw data file paths and processed data directories
         - Instrument information and analysis timestamps
         - Configuration-specific metadata for NMDC submission
-        
-        Currently supported workflow types:
-        - LCMS Metabolomics
         
         Returns:
             True if successful, False otherwise
@@ -3186,9 +2785,6 @@ NO explanations, NO other text. ONLY the two function definitions with imports."
             ValueError: If workflow_type is not set in config
             NotImplementedError: If workflow_type is not yet supported
         """
-        # Check that workflow type is supported
-        self._check_workflow_type('LCMS Metabolomics', 'generate_metadata_mapping_files')
-        
         if self.should_skip('metadata_mapping_generated'):
             print("⏭️  Skipping metadata mapping generation (skip trigger set)")
             return True
@@ -3196,272 +2792,24 @@ NO explanations, NO other text. ONLY the two function definitions with imports."
         print("📋 Generating metadata mapping files...")
         
         try:
-            # Check prerequisites
-            biosample_mapping_file = self.workflow_path / "metadata" / "mapped_raw_file_biosample_mapping.csv"
-            if not biosample_mapping_file.exists():
-                print(f"❌ Biosample mapping file not found: {biosample_mapping_file}")
-                return False
+            # Use workflow-specific generator to handle all processing
+            workflow_type = self.config['workflow']['workflow_type']
             
-            raw_inspection_results = self.get_raw_inspection_results_path()
-            if not raw_inspection_results:
-                print("❌ Raw data inspection results not found. Run raw_data_inspector first.")
-                return False
+            if workflow_type not in WORKFLOW_DICT:
+                raise NotImplementedError(f"Unsupported workflow type: {workflow_type}. Supported types: {list(WORKFLOW_DICT.keys())}")
             
-            # Load the mapped files
-            mapped_df = pd.read_csv(biosample_mapping_file)
+            # Get the generator method name from WORKFLOW_DICT and call it
+            wf_input_gen_method_name = WORKFLOW_DICT[workflow_type]["workflow_metadata_input_generator"]
+            wf_input_gen = getattr(self, wf_input_gen_method_name)
             
-            # Filter for only high and medium confidence matches
-            mapped_df = mapped_df[mapped_df['match_confidence'].isin(['high', 'medium'])].copy()
+            # Call workflow-specific processing function
+            success = wf_input_gen()
             
-            if len(mapped_df) == 0:
-                print("❌ No high or medium confidence biosample matches found")
-                return False
-            
-            # Extract raw_data_file_short for merging
-            mapped_df['raw_data_file_short'] = mapped_df['raw_file_name']
-            
-            # Add raw data file paths
-            raw_data_dir = str(self.raw_data_directory)
-            if not raw_data_dir.endswith('/'):
-                raw_data_dir += '/'
-            mapped_df['raw_data_file'] = raw_data_dir + mapped_df['raw_data_file_short']
-            
-            # Add processed data directories
-            processed_data_dir = str(self.processed_data_directory)
-            if not processed_data_dir.endswith('/'):
-                processed_data_dir += '/'
-            mapped_df['processed_data_directory'] = (
-                processed_data_dir +
-                mapped_df['raw_data_file_short'].str.replace(r'(?i)\.(raw|mzml)$', '', regex=True) +
-                '.corems'
-            )
-            
-            # Add instrument times from raw inspection results
-            file_info_df = pd.read_csv(raw_inspection_results)
-            
-            # Filter out files with errors or missing critical metadata
-            initial_count = len(file_info_df)
-            
-            # Remove files with errors
-            if 'error' in file_info_df.columns:
-                error_mask = file_info_df['error'].notna()
-                if error_mask.any():
-                    error_files = file_info_df[error_mask]['file_name'].tolist()
-                    print(f"⚠️  Excluding {len(error_files)} files with processing errors:")
-                    for f in error_files[:5]:  # Show first 5
-                        print(f"   - {f}")
-                    if len(error_files) > 5:
-                        print(f"   ... and {len(error_files) - 5} more")
-                    file_info_df = file_info_df[~error_mask]
-            
-            # Remove files with missing write_time (critical for metadata)
-            null_time_mask = file_info_df['write_time'].isna()
-            if null_time_mask.any():
-                null_time_files = file_info_df[null_time_mask]['file_name'].tolist()
-                print(f"⚠️  Excluding {len(null_time_files)} files with missing write_time:")
-                for f in null_time_files:
-                    print(f"   - {f}")
-                file_info_df = file_info_df[~null_time_mask]
-            
-            final_count = len(file_info_df)
-            if final_count != initial_count:
-                print(f"📊 Raw inspection results: {initial_count} → {final_count} files (excluded {initial_count - final_count} with errors)")
-            
-            if final_count == 0:
-                print("❌ No valid files remaining after filtering - check raw data inspection results")
-                return False
-            
-            # Process remaining valid files
-            file_info_df['instrument_instance_specifier'] = file_info_df['instrument_serial_number'].astype(str)
-            file_info_df['instrument_analysis_end_date'] = pd.to_datetime(file_info_df["write_time"]).dt.strftime('%Y-%m-%dT%H:%M:%SZ')
-            file_info_df['raw_data_file_short'] = file_info_df['file_name']
-            
-            # Remove unwanted serial numbers
-            serial_numbers_to_remove = self.config.get('metadata', {}).get('serial_numbers_to_remove', [])
-            if serial_numbers_to_remove:
-                file_info_df['instrument_instance_specifier'] = file_info_df['instrument_instance_specifier'].replace(serial_numbers_to_remove, pd.NA)
-            
-            print(f"Unique instrument_instance_specifier values: {file_info_df['instrument_instance_specifier'].unique()}")
-            # Only show date range for valid dates
-            valid_dates = file_info_df['instrument_analysis_end_date'].dropna()
-            if len(valid_dates) > 0:
-                print(f"Date range: {valid_dates.min()} to {valid_dates.max()}")
+            if success:
+                self.set_skip_trigger('metadata_mapping_generated', True)
+                return True
             else:
-                print("No valid dates found")
-            
-            # Keep only relevant columns for merging
-            file_info_df = file_info_df[['raw_data_file_short', 'instrument_analysis_end_date', 'instrument_instance_specifier']]
-            # drop duplicates just in case
-            file_info_df = file_info_df.drop_duplicates(subset=['raw_data_file_short'])
-            
-            # Merge instrument information
-            merged_df = pd.merge(mapped_df, file_info_df, on='raw_data_file_short', how='left')
-            
-            # Validate merge didn't change row count
-            if len(merged_df) != len(mapped_df):
-                print(f"❌ Merge error: expected {len(mapped_df)} rows, got {len(merged_df)}")
                 return False
-            
-            # Check for files that didn't get instrument metadata
-            missing_metadata = merged_df['instrument_analysis_end_date'].isna().sum()
-            if missing_metadata > 0:
-                print(f"⚠️  {missing_metadata} files missing instrument metadata (may not be in raw inspection results)")
-                missing_files = merged_df[merged_df['instrument_analysis_end_date'].isna()]['raw_data_file_short'].tolist()
-                for f in missing_files[:5]:  # Show first 5
-                    print(f"   - {f}")
-                if len(missing_files) > 5:
-                    print(f"   ... and {len(missing_files) - 5} more")
-                
-                # Remove files without metadata for metadata generation
-                merged_df = merged_df[merged_df['instrument_analysis_end_date'].notna()].copy()
-                print(f"📊 Proceeding with {len(merged_df)} files that have complete metadata")
-            
-            # Add common metadata from config that applies to all files
-            metadata_config = self.config.get('metadata', {})
-            merged_df['processing_institution_workflow'] = metadata_config.get('processing_institution_workflow', 'EMSL')
-            merged_df['processing_institution_generation'] = metadata_config.get('processing_institution_generation', 'EMSL')
-            
-            # Add sample_id (alias for biosample_id)
-            merged_df['sample_id'] = merged_df['biosample_id']
-            
-            # Add biosample.associated_studies (must be in brackets as a list)
-            merged_df['biosample.associated_studies'] = f"['{self.config['study']['id']}']"
-            
-            # Add raw_data_url using configurable URL construction
-            use_massive_urls = self.config.get('metadata', {}).get('use_massive_urls', True)
-            
-            if use_massive_urls:
-                # Load FTP URLs to get correct directory structure
-                ftp_file = self.workflow_path / "raw_file_info" / "massive_ftp_locs.csv"
-                if ftp_file.exists():
-                    ftp_df = pd.read_csv(ftp_file)
-                    # Create mapping from filename to full FTP path
-                    ftp_mapping = dict(zip(ftp_df['raw_data_file_short'], ftp_df['ftp_location']))
-                else:
-                    raise ValueError(f"MASSIVE FTP URLs file not found: {ftp_file}")
-                
-                # Construct MASSIVE download URLs
-                massive_id = self.config['workflow']['massive_id']
-                
-                def construct_massive_url(filename):
-                    import urllib.parse
-                    import re
-                    
-                    # Extract just the MSV part (remove version prefix like v07/)
-                    if 'MSV' in massive_id:
-                        msv_part = 'MSV' + massive_id.split('MSV')[1]
-                    else:
-                        msv_part = massive_id
-                    
-                    # Get the full directory path from FTP URL if available
-                    if filename in ftp_mapping:
-                        ftp_url = ftp_mapping[filename]
-                        # Extract path after MSV number: /raw/directory/rawdata/filename.raw
-                        match = re.search(rf'{re.escape(msv_part)}(.+)/{re.escape(filename)}', ftp_url)
-                        if match:
-                            relative_path = match.group(1)  # e.g., /raw/20210819_JGI-AK_MK_506588.../rawdata
-                            # Construct the file path: MSV.../full/path/filename
-                            file_path = f"{msv_part}{relative_path}/{filename}"
-                        else:
-                            print(f"⚠️  Could not extract directory structure for {filename}")
-                            file_path = f"{msv_part}/raw/{filename}"
-                    else:
-                        # Fallback to simple structure
-                        file_path = f"{msv_part}/raw/{filename}"
-                    
-                    encoded_path = urllib.parse.quote(file_path, safe='')
-                    https_url = f"https://massive.ucsd.edu/ProteoSAFe/DownloadResultFile?file=f.{encoded_path}&forceDownload=true"
-                    
-                    # Validate URL format
-                    if not https_url.startswith("https://massive.ucsd.edu/ProteoSAFe/DownloadResultFile?file=f.MSV"):
-                        raise ValueError(f"Invalid MASSIVE URL format generated: {https_url}")
-                    
-                    return https_url
-                
-                merged_df['raw_data_url'] = merged_df['raw_data_file_short'].apply(construct_massive_url)
-                
-                # Validate at least 5 URLs to ensure they're accessible
-                print("🔍 Validating MASSIVE URL accessibility...")
-                self._validate_massive_urls(merged_df['raw_data_url'].head(5).tolist())
-            else:
-                # Use placeholder URLs for future implementation
-                merged_df['raw_data_url'] = 'placeholder://raw_data/' + merged_df['raw_data_file_short']
-                print("⚠️  Using placeholder URLs - configure alternative URL construction method")
-            
-            # Remove any files marked as problematic in config from metadata generation csvs
-            problem_files = self.config.get('problem_files', [])
-            if problem_files:
-                initial_count = len(merged_df)
-                merged_df = merged_df[~merged_df['raw_data_file_short'].isin(problem_files)].copy()
-                removed_count = initial_count - len(merged_df)
-                print(f"⚠️  Removed {removed_count} problematic files from metadata generation")
-            
-            # Create output directory
-            output_dir = self.workflow_path / "metadata" / "metadata_gen_input_csvs"
-            output_dir.mkdir(parents=True, exist_ok=True)
-            
-            # Clear existing files
-            for f in output_dir.glob("*.csv"):
-                f.unlink()
-            
-            # Generate configuration-specific CSV files
-            config_dfs = self._separate_files_by_configuration(merged_df, metadata_config)
-            
-            if not config_dfs:
-                print("❌ No files matched any configuration filters")
-                return False
-            
-            # Define final columns
-            final_columns = [
-                'sample_id', 'biosample.associated_studies', 'raw_data_file', 'processed_data_directory', 
-                'mass_spec_configuration_name', 'chromat_configuration_name', 'instrument_used', 
-                'processing_institution_workflow', 'processing_institution_generation',
-                'instrument_analysis_end_date', 'instrument_instance_specifier', 'raw_data_url'
-            ]
-            
-            # Write configuration-specific CSV files
-            files_written = 0
-            total_files = 0
-            
-            for config_name, config_df in config_dfs.items():
-                # Validate required columns exist
-                missing_cols = [col for col in final_columns if col not in config_df.columns]
-                if missing_cols:
-                    print(f"❌ Skipping {config_name}: missing columns {missing_cols}")
-                    continue
-                
-                # Check for empty dataframe
-                if len(config_df) == 0:
-                    print(f"⚠️  Skipping {config_name}: no files after filtering")
-                    continue
-                
-                # Write the CSV file
-                try:
-                    output_df = config_df[final_columns].copy()
-                    output_file = output_dir / f"{config_name}_metadata.csv"
-                    output_df.to_csv(output_file, index=False)
-                    
-                    files_written += 1
-                    total_files += len(output_df)
-                    
-                    # Show sample of metadata applied
-                    sample_chromat = output_df['chromat_configuration_name'].iloc[0]
-                    sample_ms = output_df['mass_spec_configuration_name'].iloc[0]
-                    print(f"✅ {config_name}_metadata.csv: {len(output_df)} files ({sample_chromat}, {sample_ms})")
-                    
-                except Exception as e:
-                    print(f"❌ Error writing {config_name}_metadata.csv: {e}")
-                    continue
-            
-            if files_written == 0:
-                print("❌ No metadata files were successfully written")
-                return False
-            
-            # Mark as completed and report success
-            self.set_skip_trigger('metadata_mapping_generated', True)
-            print(f"📋 Successfully generated {files_written} metadata files with {total_files} total entries")
-            print(f"   Output directory: {output_dir}")
-            return True
             
         except Exception as e:
             print(f"❌ Error generating metadata mapping files: {e}")
@@ -3643,9 +2991,9 @@ NO explanations, NO other text. ONLY the two function definitions with imports."
         """
         Upload processed data files to MinIO object storage.
         
-        Uploads all processed data files from the configured processed_data_directory
-        to MinIO using the study name as the folder structure. Only uploads files
-        that don't already exist in MinIO.
+        Workflow-specific wrapper around upload_to_minio() that handles processed data uploads.
+        Uses configuration to determine source directory, target bucket, and folder structure.
+        Includes skip triggers and workflow-specific validation.
         
         Returns:
             True if upload completed successfully, False otherwise
@@ -3682,28 +3030,32 @@ NO explanations, NO other text. ONLY the two function definitions with imports."
         bucket_name = self.config['minio']['bucket']
         folder_name = self.config['study']['name'] + "/processed_" + self.config['workflow']['processed_data_date_tag']
         
-        print(f"📤 Uploading processed data to MinIO...")
+        print("📤 Uploading processed data to MinIO...")
         print(f"   Source: {processed_path}")
         print(f"   Destination: {bucket_name}/{folder_name}")
         
         try:
+            # Use the core upload_to_minio method
             uploaded_count = self.upload_to_minio(
                 local_directory=str(processed_path),
                 bucket_name=bucket_name,
-                folder_name=folder_name
+                folder_name=folder_name,
+                file_pattern="*"  # Upload all files
             )
+            
+            # Set success trigger regardless of whether files were uploaded or skipped
+            # (both indicate the operation completed successfully)
+            self.set_skip_trigger('processed_data_uploaded_to_minio', True)
             
             if uploaded_count > 0:
                 print(f"✅ Successfully uploaded {uploaded_count} processed files to MinIO")
-                self.set_skip_trigger('processed_data_uploaded_to_minio', True)
-                return True
             else:
-                print("ℹ️  All processed files already exist in MinIO")
-                self.set_skip_trigger('processed_data_uploaded_to_minio', True)
-                return True
+                print("✅ All processed files already exist in MinIO - upload complete")
+            
+            return True
                 
         except Exception as e:
-            print(f"❌ Error uploading to MinIO: {e}")
+            print(f"❌ Error uploading processed data to MinIO: {e}")
             return False
 
     def generate_nmdc_metadata_for_workflow(self) -> bool:
@@ -3714,9 +3066,6 @@ NO explanations, NO other text. ONLY the two function definitions with imports."
         nmdc-ms-metadata-gen package. Generates one metadata package per
         configuration, using the metadata mapping CSV files created by
         generate_metadata_mapping_files().
-        
-        Currently supported workflow types:
-        - LCMS Metabolomics
         
         Returns:
             True if metadata generation completed successfully, False otherwise
@@ -3730,16 +3079,19 @@ NO explanations, NO other text. ONLY the two function definitions with imports."
             Uses processed_data_url from MinIO configuration or constructs from
             MinIO endpoint, bucket, and study name.
             Validates metadata against NMDC schema both locally and via API.
-        """
-        # Check that workflow type is supported
-        self._check_workflow_type('LCMS Metabolomics', 'generate_nmdc_metadata_for_workflow')
-        
+        """       
         if self.should_skip('metadata_packages_generated'):
             print("Skipping NMDC metadata generation (already generated)")
             return True
         
         print("Generating NMDC metadata packages...")
         
+        # Get workflow-specific metadata generator class
+        workflow_type = self.config['workflow']['workflow_type']
+        if workflow_type not in WORKFLOW_DICT:
+            raise ValueError(f"Unsupported workflow type: {workflow_type}. Supported types: {list(WORKFLOW_DICT.keys())}")
+        
+        metadata_generator_class = WORKFLOW_DICT[workflow_type]["metadata_generator_class"]
         
         # Check for metadata mapping input files
         input_csv_dir = self.workflow_path / "metadata" / "metadata_gen_input_csvs"
@@ -3751,7 +3103,6 @@ NO explanations, NO other text. ONLY the two function definitions with imports."
         
         # Build URL from MinIO config
         minio_config = self.config.get('minio', {})
-        endpoint = minio_config.get('endpoint', '')
         bucket = minio_config.get('bucket', '')
         
         # Construct folder path from study name and date tag
@@ -3767,6 +3118,7 @@ NO explanations, NO other text. ONLY the two function definitions with imports."
         
         # Get existing data objects from config (if any)
         existing_data_objects = self.config.get('metadata', {}).get('existing_data_objects', [])
+        raw_data_url = self.config.get('metadata', {}).get('raw_data_url', None)
         
         # Create output directory for workflow metadata JSON files
         output_dir = self.workflow_path / "metadata" / "nmdc_submission_packages"
@@ -3794,11 +3146,12 @@ NO explanations, NO other text. ONLY the two function definitions with imports."
             print(f"Output: {output_file.name}")
             
             try:
-                # Initialize metadata generator
-                generator = LCMSMetabolomicsMetadataGenerator(
+                # Initialize workflow-specific metadata generator
+                generator = metadata_generator_class(
                     metadata_file=str(csv_file),
                     database_dump_json_path=str(output_file),
                     process_data_url=processed_data_url,
+                    raw_data_url=raw_data_url,
                     existing_data_objects=existing_data_objects
                 )
                 

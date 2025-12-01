@@ -1,6 +1,6 @@
 # NMDC Study Management System
 
-This reusable system provides a standardized way to manage and process NMDC LCMS metabolomics studies, including:
+This reusable system provides a standardized way to manage and process NMDC mass spectrometry workflows, including:
 - Downloading files from MASSIVE datasets using dataset IDs
 - Docker-based raw data inspection for metadata extraction
 - Biosample mapping with confidence scoring
@@ -9,6 +9,14 @@ This reusable system provides a standardized way to manage and process NMDC LCMS
 - Uploading/downloading files to/from MinIO
 - Generating NMDC metadata packages
 - Validating and submitting metadata to NMDC dev and production environments
+
+## Available Workflow Types
+
+See the [Workflow Manager](workflow_manager.py)'s `show_available_workflow_types()` method for the current list of supported workflow types.
+
+As of now, the supported workflow types are:
+- LCMS Metabolomics
+- LCMS Lipidomics
 
 ## Setup
 You need Python 3.8+ and Docker installed prior to using this system.
@@ -60,7 +68,7 @@ Each study needs a configuration json. Use `nmdc_dp_utils/example_config.json` a
   - **`file_filter`**: List of keywords to filter files for this configuration (e.g., ["HILIC", "_POS_"])
   - **`cores`**: Number of CPU cores to allocate per WDL job
   - **`corems_toml`**: Path to CoreMS parameter TOML file
-  - **`msp_file`**: Path to MS/MS database MSP file
+  - **`reference_db`**: Path to reference MS/MS database MSP file or SQLIte database for annotation
   - **`scan_translator`**: Path to scan translator TOML file
   - **`chromat_configuration_name`**: Name of the chromatographic configuration (e.g., "JGI/LBNL Metabolomics Standard LC Method - Polar HILIC-Z"). See Metadata Overrides Examples ([metadata_overrides_examples.md](./metadata_overrides_examples.md)) for more details.
   - **`mass_spec_configuration_name`**: Name of the mass spectrometry configuration (e.g., "JGI/LBNL Standard Metabolomics Method, positive @10,20,40CE"). See Metadata Overrides Examples ([metadata_overrides_examples.md](./metadata_overrides_examples.md)) for more details.

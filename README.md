@@ -78,7 +78,7 @@ json_count = manager.generate_wdl_jsons()
 script_path = manager.generate_wdl_runner_script()
 manager.run_wdl_script(script_path)
 
-# Step 6: Upload to MinIO (if configured)
+# Step 6: Upload to MinIO
 manager.upload_processed_data_to_minio()
 
 # Step 7: Generate metadata mapping files with URL validation
@@ -103,7 +103,7 @@ nmdc_mass_spec_automation/
 │       ├── biosample_mapping_script_template.py
 │       └── README.md
 ├── studies/                        # Individual study/workflow directories
-│   └── kroeger_11_dwsv7q78_lcms_metab/  # Example: complete LC-MS workflow
+│   └── kroeger_11_dwsv7q78_lcms_metab/  # Example: complete LC-MS Metabolomics workflow
 ├── requirements.txt                # Python dependencies
 └── README.md                       # This file
 ```
