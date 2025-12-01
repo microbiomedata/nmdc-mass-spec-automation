@@ -1,0 +1,13 @@
+{
+    "lcmsLipidomics.runMetaMSLCMSLipidomics.file_paths": [
+        "/Volumes/LaCie/nmdc_data/kroeger_11_dwsv7q78/raw/20210915_JGI-AK_MK_506588_SoilWaterRep_final_QE-HF_C18_USDAY63680_POS_MSMS_34_S53-D30_A_Rg80to1200-CE102040-soil-S1_Run70.raw",
+        "/Volumes/LaCie/nmdc_data/kroeger_11_dwsv7q78/raw/20210915_JGI-AK_MK_506588_SoilWaterRep_final_QE-HF_C18_USDAY63680_POS_MSMS_1_S16-D30_A_Rg80to1200-CE102040-soil-S1_Run79.raw",
+        "/Volumes/LaCie/nmdc_data/kroeger_11_dwsv7q78/raw/20210915_JGI-AK_MK_506588_SoilWaterRep_final_QE-HF_C18_USDAY63680_POS_MSMS_36_S53-D30_C_Rg80to1200-CE102040-soil-S1_Run217.raw",
+        "/Volumes/LaCie/nmdc_data/kroeger_11_dwsv7q78/raw/20210915_JGI-AK_MK_506588_SoilWaterRep_final_QE-HF_C18_USDAY63680_POS_MSMS_29_S29-D30_B_Rg80to1200-CE205060-soil-S1_Run108.raw"
+    ],
+    "lcmsLipidomics.runMetaMSLCMSLipidomics.output_directory": "output",
+    "lcmsLipidomics.runMetaMSLCMSLipidomics.corems_toml_path": "workflow_inputs/metams_rp_corems.toml",
+    "lcmsLipidomics.runMetaMSLCMSLipidomics.db_location": "workflow_inputs/20250407_database.msp",
+    "lcmsLipidomics.runMetaMSLCMSLipidomics.scan_translator_path": "workflow_inputs/metams_jgi_scan_translator.toml",
+    "lcmsLipidomics.runMetaMSLCMSLipidomics.cores": 5
+}

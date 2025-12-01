@@ -5,14 +5,14 @@
         "description": "Microbial regulation of soil water repellency to control soil degradation"
     },
     "workflow": {
-        "name": "kroeger_11_dwsv7q78_lcms_metab",
+        "name": "example_lcms_lipids",
         "massive_id": "v07/MSV000094090",
         "file_type": ".raw",
         "file_filters": [
             "msms"
         ],
-        "processed_data_date_tag": "20251027",
-        "workflow_type": "LCMS Metabolomics",
+        "processed_data_date_tag": "20251114",
+        "workflow_type": "LCMS Lipidomics",
         "batch_size": 25
     },
     "paths": {
