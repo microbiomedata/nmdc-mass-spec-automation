@@ -27,7 +27,7 @@ protocol_name:  # Human-readable protocol identifier
             name: "Protocol Name"
             url: "https://doi.org/..."
             type: nmdc:Protocol
-        # Additional fields based on process type and available information in protocol text
+        # Additional fields as defined in the schema for this process type if there is relevant information in the protocol text
   processedsamples:
     - ProcessedSample1_protocol_name:
         ProcessedSample:
@@ -43,7 +43,7 @@ protocol_name:  # Human-readable protocol identifier
 - Use only process types defined in the provided NMDC schema JSON
 - Match protocol activities to the most appropriate process type from the schema
 - If uncertain about process type selection, choose the most specific applicable type from the schema
-- If an Process Types attribute's value is another class, that class must comply with the schema
+- If an Process Type's attribute's value is another class, that class must comply with the schema
 
 **Required Fields:**
 - Each step must have: `id`, `type`, `name`, `description`, `has_input`, `has_output`
@@ -94,6 +94,8 @@ mplex_extraction:  # Second protocol for same biosample
 - If protocols share early steps, still separate them for clarity unless explicitly stated they use the same intermediate sample
 
 # ERROR HANDLING
+It is not unprecedcented that the provide protocol text is not able to be modeled by the current schema, example an enumerated field is missing a permissible value.
+If this is the case, return this function with the following possible errors.
 Use these exact JSON error responses:
 - `{ "error": "1 - UNREADABLE" }` - Invalid/unreadable protocol
 - `{ "error": "2 - INCOMPLETE ENUMERATION", "field": "field_name", "value": "problematic_value" }` - Missing enum value
@@ -105,10 +107,4 @@ Before outputting YAML, verify:
 □ ProcessedSample IDs match step outputs
 □ Required fields are present for each process type
 □ YAML syntax is valid with two-space indentation
-□ Your output will pass the provided validation function without errors
-
-# PROCESS FLOW
-1. **NMDC schema** with classes and enumerations (JSON)
-2. **Example protocols** with ideal YAML outlines (5 examples)
-3. **Input protocol** for conversion (your conversion task)
-4. **Validation function** that your YAML output must pass (Python function) 
+□ Your output will pass the provided validation function without errors OR return an error as described above
