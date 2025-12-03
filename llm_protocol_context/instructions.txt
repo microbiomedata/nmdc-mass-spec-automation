@@ -43,7 +43,7 @@ protocol_name:  # Human-readable protocol identifier
 - Use only process types defined in the provided NMDC schema JSON
 - Match protocol activities to the most appropriate process type from the schema
 - If uncertain about process type selection, choose the most specific applicable type from the schema
-- If an Process Type's attribute's value is another class, that class must comply with the schema
+- If a Process Type's attribute's value is another class, that class must comply with the schema
 
 **Required Fields:**
 - Each step must have: `id`, `type`, `name`, `description`, `has_input`, `has_output`
