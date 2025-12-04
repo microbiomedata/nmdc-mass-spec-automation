@@ -36,7 +36,8 @@ def get_protocol_schema_context(output_path: str = None):
         new_found = False
         for class_name, class_def in list(relevant_classes.items()):
             for slot_name in class_def.slots:
-                slot_def = schema_view.get_slot(slot_name)
+                # Get the induced slot (which includes slot_usage overrides)
+                slot_def = schema_view.induced_slot(slot_name, class_name)
                 slot_range = slot_def.range
                 
                 # Check if range is an enum
