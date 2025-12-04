@@ -8,7 +8,7 @@ from openai import OpenAI
 # Standard library imports
 import os
 
-class NMDCLLMClient():
+class LLMClient():
     """
     Client for interacting with the LLM API.
     Attributes:

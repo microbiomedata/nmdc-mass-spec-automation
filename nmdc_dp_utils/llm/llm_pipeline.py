@@ -1,14 +1,14 @@
-from llm.llm_client import NMDCLLMClient
+from llm.llm_client import LLMClient
 from llm.llm_conversation_manager import ConversationManager
 
 
-def get_llm_yaml_outline(llm_client:NMDCLLMClient, conversation_obj:ConversationManager):
+def get_llm_yaml_outline(llm_client:LLMClient, conversation_obj:ConversationManager):
     """
     Get the LLM generated YAML outline.
     
     Parameters
     ----------
-    llm_client (NMDCLLMClient) : object that hold LLM configuration information.
+    llm_client (LLMClient) : object that hold LLM configuration information.
     conversation_obj (ConversationManager) : object that contains currrent session conversation information.
     """
     conversation_obj.add_message(role="user", content="Generate the YAML outline for the provided protocol description.")
@@ -28,7 +28,7 @@ if __name__ == "__main__":
         protocol_description = f.read()
 
     # create the client that contains configuration information
-    llm_client = NMDCLLMClient()
+    llm_client = LLMClient()
     # create the conversation manager object that will handle adding the system prompt and examples
     conversation_obj = ConversationManager(interaction_type="protocol_conversion")
     # use the converation obj to add the protocol decsription

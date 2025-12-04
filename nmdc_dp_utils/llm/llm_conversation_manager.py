@@ -10,7 +10,7 @@ class ConversationManager:
     Manages conversation messages for LLM interactions.
     Parameters
     ----------
-    type (str): The type of conversation must be one of ('protocol_conversion', 'biosample_mapping').
+    interaction_type (str): The type of conversation must be one of ('protocol_conversion', 'biosample_mapping').
     Attributes:
         messages (list): List of message dictionaries in the conversation.
     """
