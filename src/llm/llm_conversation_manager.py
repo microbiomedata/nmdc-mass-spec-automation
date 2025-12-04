@@ -15,6 +15,8 @@ class ConversationManager:
         messages (list): List of message dictionaries in the conversation.
     """
     def __init__(self, interaction_type: str):
+        if interaction_type not in ['protocol_conversion', 'biosample_mapping']:
+            raise ValueError("`interaction_type` not one of ('protocol_conversion', 'biosample_mapping')")
         self.messages = [{}]  # List to store the conversation messages
         # add the system prompt as the first message
         if interaction_type == "protocol_conversion":
@@ -34,6 +36,9 @@ class ConversationManager:
     def add_protocol_description(self, description: str):
         """
         Adds a protocol description message to the conversation.
+        Parameters
+        ----------
+        description (str) : The protocol description gathered from user input data.
         """
         self.add_message(role="system", content="Utilize this lab protocol provided by the user and convert it to a YAML outline:\n" + description)
 
