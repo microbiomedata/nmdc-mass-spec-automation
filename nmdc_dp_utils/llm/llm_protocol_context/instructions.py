@@ -1,3 +1,4 @@
+system_prompt = '''
 # TASK OVERVIEW
 You are converting lab protocols from readable text into a YAML outline for metadata generation compliant with the NMDC schema.
 
@@ -108,3 +109,4 @@ Before outputting YAML, verify:
 □ Required fields are present for each process type
 □ YAML syntax is valid with two-space indentation
 □ Your output will pass the provided validation function without errors OR return an error as described above
+'''
