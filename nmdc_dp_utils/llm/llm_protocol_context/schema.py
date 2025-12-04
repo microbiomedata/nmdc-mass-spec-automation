@@ -59,37 +59,49 @@ def get_protocol_schema_context(output_path: str = None):
     # Convert classes and enums to LLM-friendly format
     schema_output = {
         "classes": {},
+        "slots": {},
         "enums": {name: enum_def._as_json_obj() for name, enum_def in enums.items()}
     }
     
-    # For each class, include all slots with their ranges
+    # Collect all unique slot definitions across all classes
+    all_slot_definitions = {}
+    
+    # For each class, include slot names and collect slot definitions
     for class_name, class_def in relevant_classes.items():
         class_data = class_def._as_json_obj()
         
         # Get all induced slots for this class (includes inherited slots)
-        all_slots = {}
+        class_slot_names = []
         for slot_name in schema_view.class_slots(class_name):
-            induced_slot = schema_view.induced_slot(slot_name, class_name)
-            slot_info = {
-                "range": induced_slot.range,
-            }
-            # Only add non-null values for these fields
-            for attr in ["description", "required", "multivalued"]:
-                value = getattr(induced_slot, attr, None)
-                if value is not None:
-                    slot_info[attr] = value
+            class_slot_names.append(slot_name)
             
-            all_slots[slot_name] = slot_info
+            # Collect slot definition if not already captured
+            if slot_name not in all_slot_definitions:
+                induced_slot = schema_view.induced_slot(slot_name, class_name)
+                slot_info = {
+                    "range": induced_slot.range,
+                }
+                # Only add non-null values for these fields
+                for attr in ["description", "required", "multivalued"]:
+                    value = getattr(induced_slot, attr, None)
+                    if value is not None:
+                        slot_info[attr] = value
+                
+                all_slot_definitions[slot_name] = slot_info
         
-        class_data["all_slots"] = all_slots
+        # Store just the slot names in the class
+        class_data["class_slots"] = class_slot_names
         schema_output["classes"][class_name] = class_data
+    
+    # Add all collected slot definitions
+    schema_output["slots"] = all_slot_definitions
     
     return schema_output
 
 if __name__ == "__main__":
     schema_output = get_protocol_schema_context()
     if schema_output:
-        output_file = "nmdc_material_processing_llm_context.json"
+        output_file = "nmdc_material_processing_llm_context_sloted.json"
         with open(output_file, "w") as f:
             json.dump(schema_output, f, indent=2)
         print(f"LLM protocol schema context saved to {output_file}")
