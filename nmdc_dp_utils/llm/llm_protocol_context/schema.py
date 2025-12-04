@@ -28,13 +28,15 @@ def get_protocol_schema_context(output_path: str = None):
     }
 
     # Recursively find all related classes and enums
-    # For each slot in each relevant class, if the range is an enum or class, add it
+    # For each slot in each relevant class, if the range is an enum or inline class, add it
+    # Only include classes that are used inline (not just referenced by ID)
     # Continue until no new classes or enums are found
     enums = {}
     new_found = True
     while new_found:
         new_found = False
         for class_name, class_def in list(relevant_classes.items()):
+            # Check only slots defined in this class (not inherited) for inline usage
             for slot_name in class_def.slots:
                 # Get the induced slot (which includes slot_usage overrides)
                 slot_def = schema_view.induced_slot(slot_name, class_name)
@@ -46,17 +48,42 @@ def get_protocol_schema_context(output_path: str = None):
                     enums[slot_range] = enum_def
                     new_found = True
                 
-                # Check if range is a class
+                # Check if range is a class that's used inline, if so, add it to relevant_classes
                 class_range_def = schema_view.get_class(slot_range)
                 if class_range_def and slot_range not in relevant_classes:
-                    relevant_classes[slot_range] = class_range_def
-                    new_found = True
+                    # Only include if the slot is inlined or inlined_as_list
+                    if slot_def.inlined or slot_def.inlined_as_list:
+                        relevant_classes[slot_range] = class_range_def
+                        new_found = True
 
     # Convert classes and enums to LLM-friendly format
     schema_output = {
-        "classes": {name: class_def._as_json_obj() for name, class_def in relevant_classes.items()},
+        "classes": {},
         "enums": {name: enum_def._as_json_obj() for name, enum_def in enums.items()}
     }
+    
+    # For each class, include all slots with their ranges
+    for class_name, class_def in relevant_classes.items():
+        class_data = class_def._as_json_obj()
+        
+        # Get all induced slots for this class (includes inherited slots)
+        all_slots = {}
+        for slot_name in schema_view.class_slots(class_name):
+            induced_slot = schema_view.induced_slot(slot_name, class_name)
+            slot_info = {
+                "range": induced_slot.range,
+            }
+            # Only add non-null values for these fields
+            for attr in ["description", "required", "multivalued"]:
+                value = getattr(induced_slot, attr, None)
+                if value is not None:
+                    slot_info[attr] = value
+            
+            all_slots[slot_name] = slot_info
+        
+        class_data["all_slots"] = all_slots
+        schema_output["classes"][class_name] = class_data
+    
     return schema_output
 
 if __name__ == "__main__":
