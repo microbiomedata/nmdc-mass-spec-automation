@@ -24,7 +24,8 @@ def get_protocol_schema_context(output_path: str = None):
     relevant_classes = {
         class_name: class_def
         for class_name, class_def in all_classes.items()
-        if class_def.is_a and "MaterialProcessing" in schema_view.get_class(class_def.is_a).name
+        if class_def.is_a and "MaterialProcessing" in schema_view.get_class(class_def.is_a).name or
+              class_name == "ProcessedSample"
     }
 
     # Recursively find all related classes and enums
@@ -91,20 +92,14 @@ def get_protocol_schema_context(output_path: str = None):
         
         # Store just the slot names in the class
         class_data["class_slots"] = class_slot_names
+        # Remove the class_data["slots"] since we are replacing it with class_slots
+        if "slots" in class_data:
+            del class_data["slots"]
         schema_output["classes"][class_name] = class_data
     
     # Add all collected slot definitions
     schema_output["slots"] = all_slot_definitions
     
     return schema_output
-
-if __name__ == "__main__":
-    schema_output = get_protocol_schema_context()
-    if schema_output:
-        output_file = "nmdc_material_processing_llm_context_sloted.json"
-        with open(output_file, "w") as f:
-            json.dump(schema_output, f, indent=2)
-        print(f"LLM protocol schema context saved to {output_file}")
-
 
 
