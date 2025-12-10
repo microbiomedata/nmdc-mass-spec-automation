@@ -889,6 +889,89 @@ class NMDCWorkflowManager:
         print(f"Downloaded {downloaded_count} new files")
         return downloaded_count
     
+    def download_raw_data_from_minio(self, bucket_name: Optional[str] = None, 
+                                     folder_name: Optional[str] = None) -> List[str]:
+        """
+        Download raw data files from MinIO object storage.
+        
+        Downloads files from MinIO bucket/folder using configuration settings,
+        similar to download_from_massive() for consistency. Provides progress tracking
+        and skips files that already exist locally.
+        
+        Args:
+            bucket_name: MinIO bucket name. Uses config['minio']['bucket'] if not provided.
+            folder_name: Folder path within bucket. Uses config['study']['name'] + '/raw' 
+                        if not provided.
+            
+        Returns:
+            List of local file paths for successfully downloaded files
+            
+        Raises:
+            ValueError: If MinIO client is not initialized or bucket_name cannot be determined
+                       
+        Note:
+            Files are downloaded to self.raw_data_directory. Existing files with 
+            matching sizes are skipped to avoid re-downloading.
+            
+        Example:
+            >>> manager = NMDCWorkflowManager('config.json')
+            >>> files = manager.download_raw_data_from_minio()
+            >>> print(f"Downloaded {len(files)} raw data files")
+        """
+        if self.should_skip('raw_data_downloaded'):
+            print("Skipping raw data download from MinIO (already downloaded)")
+            # Return list of existing files if directory exists
+            if os.path.exists(self.raw_data_directory):
+                file_type = self.config['workflow'].get('file_type')
+                existing_files = [os.path.join(self.raw_data_directory, f) 
+                                for f in os.listdir(self.raw_data_directory) 
+                                if f.endswith(file_type)]
+                print(f"Found {len(existing_files)} existing {file_type} files")
+                return existing_files
+            return []
+        
+        if not self.minio_client:
+            raise ValueError("MinIO client not initialized")
+        
+        # Use config values if not provided
+        if bucket_name is None:
+            bucket_name = self.config.get('minio', {}).get('bucket')
+            if not bucket_name:
+                raise ValueError("bucket_name not provided and not found in config['minio']['bucket']")
+        
+        if folder_name is None:
+            folder_name = f"{self.config['study']['name']}/raw"
+        
+        # Download files using the core download_from_minio method
+        _ = self.download_from_minio(
+            bucket_name=bucket_name,
+            folder_name=folder_name,
+            local_directory=str(self.raw_data_directory)
+        )
+        
+        # Get list of downloaded files
+        file_type = self.config['workflow'].get('file_type')
+        downloaded_files = [os.path.join(self.raw_data_directory, f) 
+                          for f in os.listdir(self.raw_data_directory) 
+                          if f.endswith(file_type)]
+        
+        # Write CSV of downloaded file names for biosample mapping
+        if len(downloaded_files) > 0:
+            downloaded_files_csv = self.workflow_path / "metadata" / "downloaded_files.csv"
+            downloaded_files_csv.parent.mkdir(parents=True, exist_ok=True)
+            
+            # Create DataFrame with just filenames
+            df = pd.DataFrame({
+                'raw_data_file_short': [os.path.basename(f) for f in downloaded_files]
+            })
+            df.to_csv(downloaded_files_csv, index=False)
+            print(f"Saved list of downloaded files to {downloaded_files_csv}")
+        
+            # Set skip trigger for raw_data_downloaded
+            self.set_skip_trigger('raw_data_downloaded', True)
+        
+        return downloaded_files
+    
     def generate_wdl_jsons(self, batch_size: int = 50) -> int:
         """
         Generate WDL workflow JSON configuration files for batch processing.
