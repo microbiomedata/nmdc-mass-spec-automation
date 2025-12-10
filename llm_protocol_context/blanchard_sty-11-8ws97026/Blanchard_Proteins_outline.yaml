@@ -1,0 +1,42 @@
+Study: nmdc:sty-11-8ws97026
+steps: # no alklyation for this study, checked on DMS
+  - Step 3:
+      ChemicalConversionProcess:
+        id: # nmdc:chcpr-{shoulder}-{blade}
+        type: nmdc:ChemicalConversionProcess
+        name: Protein_digestion_trypsin
+        description: Trypsin digestion of proteins from <ProcessedSample3> for analysis
+        has_input:
+          - ProcessedSample3 # from mplex
+        has_output:
+          - ProcessedSample6 # DataGeneration.has_input
+        processing_institution: EMSL
+        chemical_conversion_category: protease_cleavage
+        substances_used:
+          - type: nmdc:PortionOfSubstance
+            known_as: trypsin
+            substance_role: ms_proteolytic_enzyme
+            volume: 
+              type: nmdc:QuantityValue
+              has_raw_value: 0.004 mL
+              has_unit: mL
+              has_numeric_value: 0.004
+        temperature:
+          type: nmdc:QuantityValue
+          has_raw_value: 37 C
+          has_unit: C
+          has_numeric_value: 37
+        duration:
+          type: nmdc:QuantityValue
+          has_raw_value: 3 h
+          has_unit: h
+          has_numeric_value: 3
+
+processedsamples:
+
+  - ProcessedSample6:
+      ProcessedSample:
+        id: #nmdc:
+        type: nmdc:ProcessedSample
+        name: <Biosample>_proteins
+        description: Extracted and digested proteins from <Biosample>

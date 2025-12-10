@@ -1,0 +1,29 @@
+Email communication with lab staff
+
+Hi Montana,
+ 
+For these samples, 500mg of sample were weighed out and I did a H2O extraction (2mL water) followed by a Folch. 
+ 
+Jason
+ 
+From: Chu, Rosey <Rosalie.Chu@pnnl.gov> 
+Sent: Wednesday, January 22, 2025 9:48 AM
+To: Toyoda, Jason G <Jason.Toyoda@pnnl.gov>
+Subject: FW: 49483-Blanchard
+ 
+These samples were ran in Feb of 2018.  I just need to know if you followed a seq ext protocol or shake extracted each sample separately.  I will just send her the paper for reference or you can forward her the protocol you used.  
+ 
+Rosey
+ 
+From: Smith, Montana L <montana.smith@pnnl.gov> 
+Sent: Monday, January 20, 2025 6:17 PM
+To: Chu, Rosey <Rosalie.Chu@pnnl.gov>
+Cc: Meluch, Beata J <beata.meluch@pnnl.gov>
+Subject: 49483-Blanchard
+ 
+Hello Rosey!
+ 
+We’re working on metadata for the user project 49483- Jeff Blanchard. We have a lot of metadata for the samples from protoapps. It looks like Erika did the metabolomics, lipidomics, and proteomics via MPLEx. I noticed the FTICR extracts say Methanol, Water, Chloroform. I suspect that means that a subsample of MPLEx isn’t what was used for FTICR, but rather you did a separate extraction. Could you confirm that? And possible share a protocol that would’ve been followed for these?
+ 
+Thanks!
+Montana Smith

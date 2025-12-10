@@ -1,0 +1,92 @@
+Study: # nmdc:sty
+steps:
+  - Step 1:
+      SubSamplingProcess:
+        id: # nmdc:subspr-{shoulder}-{blade}
+        type: nmdc:SubSamplingProcess
+        name: Subsampling1
+        description: A portion of soil taken from <Biosample> soil sample for extraction
+        has_input:
+          - Biosample
+        has_output:
+          - ProcessedSample1
+        processing_institution: EMSL
+        mass:
+          type: nmdc:QuantityValue
+          has_raw_value: # See mass spreadsheet, or skip as the sheet has only the value
+          has_unit: g
+          has_numeric_value: # See mass spreadsheet
+
+  - Step 2:
+      Extraction:
+        id: # nmdc:extrp-{shoulder}-{blade}
+        type: nmdc:Extraction
+        name: MPLEx
+        description: MPLEx extraction of <ProcessedSample1> to obtain metabolites, proteins, and lipids
+        has_input:
+          - ProcessedSample1
+        has_output:
+          - ProcessedSample2 # metabolites
+          - ProcessedSample3 # proteins
+          - ProcessedSample4 # lipids
+        processing_institution: EMSL
+        extraction_targets:
+          - metabolite
+          - protein
+          - lipid
+        input_mass:
+          type: nmdc:QuantityValue
+          has_raw_value: # mass from subsampling process
+          has_unit: g
+          has_numeric_value: # mass from subsampling process
+        substances_used:
+          - type: nmdc:PortionOfSubstance
+            known_as: chloroform
+            substance_role: solvent
+            volume:
+              type: nmdc:QuantityValue
+              has_raw_value: 13.33 mL
+              has_numeric_value: 13.33
+              has_unit: mL
+          - type: nmdc:PortionOfSubstance
+            known_as: methanol
+            substance_role: solvent
+            volume:
+              type: nmdc:QuantityValue
+              has_raw_value: 6.67 mL
+              has_numeric_value: 6.67
+              has_unit: mL
+          - type: nmdc:PortionOfSubstance
+            known_as: water
+            substance_role: solvent
+            volume:
+              type: nmdc:QuantityValue
+              has_raw_value: 4 mL
+              has_numeric_value: 4
+              has_unit: mL
+
+processedsamples:
+
+  - ProcessedSample1:
+      ProcessedSample:
+        id: #nmdc:
+        name: <Biosample>_MPLEx-subsample
+        description: The output from subsampling <Biosample> for extraction
+
+  - ProcessedSample2:
+      ProcessedSample:
+        id: #nmdc:
+        name: <Biosample>_metabolites
+        description: The metabolites from extracting <Biosample> via MPLEx
+
+  - ProcessedSample3:
+      ProcessedSample:
+        id: #nmdc:
+        name: <Biosample>_proteins
+        description: The proteins from extracting <Biosample> via MPLEx
+
+  - ProcessedSample4:
+      ProcessedSample:
+        id: #nmdc:
+        name: <Biosample>_lipids
+        description: The lipids from extracting <Biosample> via MPLEx

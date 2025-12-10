@@ -1,0 +1,50 @@
+Leaf, root, and rhizosphere soil samples for metabolomic and transcriptomic analyses were collected as
+separate samples in the field and processed as follows. Roots from each sample were placed in a ceramic or
+stainless-steel mortar, bathed in liquid nitrogen. Rhizosphere soil samples (consisting of soil originally adhering
+to the root samples collected from the same sample bag) was immediately subsampled and refrozen. To focus
+on the most biologically active portion of the root sample, roots <2 mm in diameter were quickly separated
+using tweezers from overall samples in the mortar, placed into a new tube on dry ice while processing, and then
+refrozen. Subsamples from all three metabolomic sample types (leaf, root, and rhizosphere) were then frozen
+in liquid nitrogen and ground using a SPEX Geno/Grinder system. The remainder of the root sample available
+after the metabolomics preps was then used for plant transcriptomic analyses. However, because the amount of
+material remaining in some cases was not enough for RNA extraction 18 (of 109) samples were omitted. Root
+transcriptomics samples were prepared for extraction by freezing fine roots in liquid nitrogen within a 50 mL
+grinding jar and grinding for 30 s with a steel ball at 30 Hz on a Retch MM400 Mixer Mill. Total RNA was then
+extracted 100 mg of ground material from each sample using a combined method that included CTAB lysis
+buffer and a Spectrum Total Plant RNA extraction kit (Sigma) as described previously25. RNA was then shipped
+to JGI on dry ice for cDNA preparation and sequencing.
+
+Extractions for metabolomic analyses were then further prepared by JGI. For general non-targeted metabolomic
+analysis by liquid chromatography - mass spectrometry (LC-MS), polar and non-polar metabolites
+were extracted from rhizosphere soil, leaf, and ground root tissue using a methanol-based extraction. Here,
+leaf and root samples were first frozen and lyophilized dry (FreeZone 2.5 Plus, Labconco), then powderized by
+bead-beating using a FastPrep-24 5 G (MP Biomedicals) for 5 seconds (2x) using a 2 mm stainless steel bead.
+To extract leaf and root metabolites, 1 mL of 100% methanol was added to 300–400 mg powderized root tissue
+or 500–600 mg powderized leaf tissue in 2 mL Eppendorf tubes, briefly vortexed, sonicated 10 minutes in an
+iced water bath, centrifuged 5 minutes at 4000 rpm, then supernatant containing extracted metabolites were
+transferred to new 2 mL Eppendorf tubes and dried in a SpeedVac (SPD111V, Thermo Scientific). To extract
+soil metabolites, 4 mL of 100% methanol was added to ~500 mg soil samples in a 15 mL Falcon tube, briefly
+vortexed, sonicated 10 minutes in an ice water bath, then centrifuged 5 minutes at 4000 rpm. Supernatants were
+then syringe-filtered using 0.45 μm hydrophilic PVDF membranes (Pall), transferred to 5 mL Eppendorf tubes
+and dried in a SpeedVac. Dried metabolite extracts were stored at −80 °C until ready for LC-MS.
+For quantitative LC-MS, dried sample extracts were resuspended in 100% methanol containing isotopically
+labeled internal standards (5–50 μM of 13C, 15N Cell Free Amino Acid Mixture, #767964, Sigma; 1 μg/
+mL 2-amino-3-bromo-5-methylbenzoic acid, ABMBA, #R435902, Sigma; 10 μg/mL 13C-trehalose, #TRE-002,
+Omicron; 10 μg/mL 13C-mannitol, ALD-030, Omicron; 2 μg/mL 13C-15N-uracil, CNLM-3917, CIL; 5.5 μg/mL
+15N-inosine, NLM-4264, CIL; 4 μg/mL 15N-adenine, NLM-6924, CIL; 3 μg/mL 15N-hypoxanthine, NLM-8500,
+CIL; 5 μg/mL 13C-15N-cytosine, #294108, Sigma; 2.5 μg/mL 13C-15N-thymine, CNLM-6945, CIL; 1 μg/mL 13C
+linolenic acid, #CLM-8386, CIL; 1 μg/mL 13C-ferulic acid, #CLM-9260, CIL; 1 μg/mL 13C-p-coumaric acid,
+#CLM-10642, CIL; 1 μg/mL 13C-L-malic acid, #CLM-8065, CIL; 1 μg/mL 13C-citric acid, #CLM-9876, CIL;
+1 μg/mL 13C-D-sucrose, #CLM-8091, CIL). Resuspension volumes were varied for each sample to normalize
+by initial biomass (200 μL per 150 mg for leaf and root, 200 μL per 500 mg for rhizosphere soil). Either 150 or
+200 μL of resuspended sample volume were then centrifuge-filtered (0.22 μM hydrophilic PVDF membrane,
+#UFC30GV00, Millipore) and transferred to glass LC-MS vials.
+Within the targeted identifications files, observations that exceed level 1 represent our highest level of confidence
+in that they match the fragmentation data, expected retention time, and have no confounding signals
+within our mass tolerance for the precursor m/z. Towards a larger scope of potential compound identifications,
+several observations within the targeted analysis match only the expected retention time and precursor m/z;
+while these are considered Level 1 identifications, they are far lower confidence than the aforementioned observations.
+The largest possible scope of potential compound identifications can be seen in the untargeted data.
+These matches are only when fragmentation data from our experiment agrees with fragmentation data from
+authentic standards. These identifications should be considered as putative identifications but nevertheless can
+be extremely useful to advance discovery due to their broad coverage of the metabolome.

@@ -1,0 +1,50 @@
+Soil metabolite and lipid extraction protocol:
+
+1.	The 2 lyophilized sets are all about 15g each.
+2.	Place soil into yellow 50mL BB tubes 
+3.	Add a scoop of each SS, garnet and glass beads
+4.	Add 24mL of 60% MeOH to each and bead beat at speed 8 for 10 minutes at 4C (for the unprocessed sample, the water was measured and calculated into the 60%MeOH solution). 
+5.	Pour samples into 3 separate 50mL M/C compatible tubes, use 6mL of 60% MeoH to the yellow capped tube to rinse and pour 2mL into each white capped tube.
+6.	Add 12mL of ice cold chloroform to each tube and probe sonicate at 60% amp for 30 seconds on ice. 
+7.	Place in the -80C for ~5minutes and sonicate again as before.
+8.	Spin the tubes at 3,500g for 10 minutes
+9.	Collect the upper metabolite layers from the 3 tubes into 1 large glass vial and completely dry in the speed vac
+10.	Using a large, flat spatula pull the protein interlayer from the 3 tubes into one new labeled 50mL tube
+11.	Collect the
+12.	 lipid layers into one white capped tube and store at -80C. 
+13.	Add 20mL of ice cold MeOH to the protein sample, vortex, spin and discard the supernatant and lightly dry the protein pellet under N2. 
+
+Protein digestion of pellet
+
+14.	Add 20mL of 4% SDS, 20mM DTT in 100mM Tris-HCL, pH 5
+15.	Sonicate sample into solution at 20% amp for 30 seconds each
+16.	Shake at 40C for 30 minutes upright in mini shaker, 300rpm
+17.	Spin at 4,500g for 15 minutes at room temp and collect supernatant into a 50mL MC compatible tube.
+18.	Adjust the buffer pH to 8 using 50% NaOH and add 5mL to each pellet and sonicate back into solution and vortex.
+19.	Spin at 4,500g for 10 minutes at room temp and collect supernatant into the 50mL MC compatible tube.
+20.	Add 20% TCA to the supernatant and incubate at -20C for ~1-2 hours
+21.	Thaw and spin out protein at 4,500g 15mins 4C. 
+22.	Add 1mL of 100% ice cold acetone to TCA pellet and lightly water-bath sonicate into solution and transfer to a 1.5mL tube, use 400ul to rinse and add. 
+23.	Centrifuge at 12,000g for 5 minutes at 4C. 
+24.	Pour off the supernatant
+25.	Dry inverted on Kim wipe
+26.	Add 50ul of the extraction buffer (4% SDS, 40mM DTT in 100mM Tris-HCL, pH8) to the protein pellets and sonicate into solution.  
+27.	Incubate at 95C for 5 minutes with the lids open under the thermos top with shaking at 700rpm, cool and spin out the debris at 15,000g for 5 minutes. 
+28.	Remove the supernatant into a 1.5mL tube and snap freeze. 
+29.	Store at -80C overnight.
+30.	One spin column each, Add 400ul of 8M urea to each FASP column and add 50ul of the sample
+31.	Spin at 14,000g for 30 minutes to bring the sample all the way to the dead volume.
+32.	Remove the waste from the bottom of the tube (tap off the excess urea onto a Kim wipe). Add 400ul of 8M urea to the column and spin again at 14,000g for 30 minutes.
+33.	Remove the waste and add 400ul of 8M urea to the column and spin as before.
+34.	Add 400ul of ABC to each column and spin for 30 minutes, remove waste
+35.	Add 400ul of ABC to each column and spin for 30 minutes, make sure sample is all the way to dead volume. 
+36.	Remove the spin column from the collection tube and lightly clean the bottom with an alcohol wipe, to remove any excess urea from the side or underneath the column. 
+37.	Place the column into a new fresh, clean and labeled collection tube.
+38.	Make 75 μL Digestion Solution by dissolving 4μg trypsin in 75 μL 50mM Ammonium Bicarbonate Solution provided with the FASP Kit to a final concentration of 0.05μg/μL.
+39.	Place each column in a thermomixer with a thermotop for 3hrs at 37C with shaking at 600rpm.
+40.	After 3 hours add 30ul of ABC and spin out the peptides into the collection tube.
+41.	Add 30ul and spin again.
+42.	Remove the spin columns into waste and place a membrane on top of the collection tubes and dry down all the way and add 20ul of H2O. 
+43.	No SPE
+44.	BCA
+45.	Vialed for Orbi

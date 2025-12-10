@@ -1,0 +1,21 @@
+For San Clements: received hot and cold water extractions and all samples were SPE’d following same protocol as stated above. Most of the work was done be Maggie Bowman when she was visiting so she would be the best person to reach out to for the rest of the details.
+
+Solid Phase Extraction (SPE) of DOM SOP
+
+Bond Elut PPL SPE:
+1.	Place labeled SPE cartridge (Agilent, Cat# 12105004) onto SPE vacuum manifold (Sigma-Aldrich (Supelco), Cat# 57250-U) with 15mL falcon tube underneath to collect waste.
+2.	Prepare 5mL* of H2O sample in a 15mL Olympus tube (Genesee Sci., Cat# 28-103) by acidifying the sample to at least pH2 with 2µL of 37% HCl.
+a.	Depending on sample volume, sample may need to be diluted to 5mL with MilliQ H2O.
+b.	Depending on sample alkalinity and natural buffers within the sample, more 37% HCl may be needed to acidify the sample to pH2. 
+c.	Test acidity with 0-6pH strip by pipetting 20µL of the sample on the pH strip.
+3.	Activate each SPE cartridge with 3mL of Optima LC/MS-grade methanol and let excess drain off into waste.
+4.	Equilibrate cartridge with 5mL 10mM HCl.
+5.	Load the acidified sample onto the cartridge and allow the sample to flow through the column#.
+6.	Wash the cartridge 17X+, # with 3mL of 10mM HCl, emptying waste tubes into a larger waste container once they are 80% full.
+7.	Dry each cartridge with N2(g) until packing material returns to original color (about 5 minutes)
+a.	If top filter has moved during drying, tamp down gently with pipette tip.
+8.	After cartridge is dry, expel any remaining HCl rinse in cartridge port and solvent guide needle by gently pushing N2(g) through the port.
+9.	Replace cartridge onto original port and elute with 1.5mL of Optima LC/MS-grade MeOH into a 2mL Microsolv vial (Microsolv, Cat# 9502S-WCV) and cap with a non-slit cap (Microsolv, Cat# 9502S-10C-B-M) until ready to run. Sample is then placed in a sample box and stored at -80oC
+*More than 5mL of sample can be used, especially if total volume of sample received is greater than 5mL and/or is of low concentration
+#If samples are having a hard time flowing through with gravity and capillary action, gently pull vacuum to pull the sample or solvent through the column
++ Samples can be rinsed more than 17X depending on salt concentration

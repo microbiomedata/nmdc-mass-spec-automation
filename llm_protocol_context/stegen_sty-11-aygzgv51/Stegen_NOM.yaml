@@ -1,0 +1,174 @@
+Study: nmdc:sty-11-aygzgv51
+steps:
+  - Step 1:
+      SubSamplingProcess:
+        id: # nmdc:subspr-{shoulder}-{blade}
+        type: nmdc:SubSamplingProcess
+        name: Subsample_sediment
+        description: A portion of sediment being taken from <Biosample> sediment sample for extraction
+        has_input:
+          - Biosample
+        has_output:
+          - ProcessedSample1
+        processing_institution: EMSL
+        mass:
+          type: nmdc:QuantityValue
+          has_raw_value: 0.1 g
+          has_unit: g
+          has_numeric_value: 0.1
+        protocol_link:
+          name: Graham et al 2018. Multi 'omics comparison reveals metabolome biochemistry, not microbiome composition or gene expression, corresponds to elevated biogeochemical function in the hyporheic zone
+          url: https://doi.org/10.1016/j.scitotenv.2018.05.256
+          type: nmdc:Protocol
+
+  - Step 2:
+      Extraction:
+        id: # nmdc:extrp-{shoulder}-{blade}
+        type: nmdc:Extraction
+        name: Water extraction for NOM
+        description: Water extraction of <ProcessedSample1>
+        has_input:
+          - ProcessedSample1
+        has_output:
+          - ProcessedSample2 # this is input to the water extraction DataGen records
+          - ProcessedSample3 # soil that has already been extracted a bit
+        processing_institution: EMSL
+        extraction_targets:
+          - natural organic matter
+        input_mass:
+          type: nmdc:QuantityValue
+          has_raw_value: 0.1 g # from subsampling process
+          has_unit: g
+          has_numeric_value: 0.1 # from subsampling process
+        substances_used:
+          - type: nmdc:PortionOfSubstance
+            known_as: water
+            substance_role: solvent
+            volume:
+              type: nmdc:QuantityValue
+              has_raw_value: 1 mL
+              has_unit: mL
+              has_numeric_value: 1
+        protocol_link:
+          name: Graham et al 2018. Multi 'omics comparison reveals metabolome biochemistry, not microbiome composition or gene expression, corresponds to elevated biogeochemical function in the hyporheic zone
+          url: https://doi.org/10.1016/j.scitotenv.2018.05.256
+          type: nmdc:Protocol
+
+  - Step 3:
+      Extraction:
+        id: # nmdc:extrp-{shoulder}-{blade}
+        type: nmdc:Extraction
+        name: Methanol extraction for NOM
+        description: Methanol extraction of <ProcessedSample1>
+        has_input:
+          - ProcessedSample3
+        has_output:
+          - ProcessedSample4 # this is input to the methanol extraction DataGen records
+          - ProcessedSample5 # soil that has already been extracted a bit
+        processing_institution: EMSL
+        extraction_targets:
+          - natural organic matter
+        input_mass:
+          type: nmdc:QuantityValue
+          has_raw_value: 0.1 g # from subsampling process
+          has_unit: g
+          has_numeric_value: 0.1 # from subsampling process
+        substances_used:
+          - type: nmdc:PortionOfSubstance
+            known_as: methanol
+            substance_role: solvent
+            volume:
+              type: nmdc:QuantityValue
+              has_raw_value: 1 mL
+              has_unit: mL
+              has_numeric_value: 1
+        protocol_link:
+          name: Graham et al 2018. Multi 'omics comparison reveals metabolome biochemistry, not microbiome composition or gene expression, corresponds to elevated biogeochemical function in the hyporheic zone
+          url: https://doi.org/10.1016/j.scitotenv.2018.05.256
+          type: nmdc:Protocol
+
+  - Step 4:
+      Extraction:
+        id: # nmdc:extrp-{shoulder}-{blade}
+        type: nmdc:Extraction
+        name: Chloroform extraction for NOM
+        description: Chloroform extraction of <ProcessedSample1>
+        has_input:
+          - ProcessedSample5
+        has_output:
+          - ProcessedSample6 # this is input to the chloroform DataGen records
+        processing_institution: EMSL
+        extraction_targets:
+          - natural organic matter
+        input_mass:
+          type: nmdc:QuantityValue
+          has_raw_value: 0.1 g # from subsampling process
+          has_unit: g
+          has_numeric_value: 0.1 # from subsampling process
+        substances_used:
+          - type: nmdc:PortionOfSubstance
+            known_as: chloroform
+            substance_role: solvent
+            volume:
+              type: nmdc:QuantityValue
+              has_raw_value: 1 mL
+              has_unit: mL
+              has_numeric_value: 1
+        protocol_link:
+          name: Graham et al 2018. Multi 'omics comparison reveals metabolome biochemistry, not microbiome composition or gene expression, corresponds to elevated biogeochemical function in the hyporheic zone
+          url: https://doi.org/10.1016/j.scitotenv.2018.05.256
+          type: nmdc:Protocol
+
+processedsamples:
+
+  - ProcessedSample1:
+      ProcessedSample:
+        id: #nmdc:
+        type: nmdc:ProcessedSample
+        name: <Biosample>_subsample
+        description: The output from subsampling <Biosample> for extraction
+
+  - ProcessedSample2:
+      ProcessedSample:
+        id: #nmdc:
+        type: nmdc:ProcessedSample
+        name: <Biosample>_NOM_water
+        description: NOM from water extraction of <Biosample>
+        sampled_portion:
+        - aqueous_layer
+
+  - ProcessedSample3:
+      ProcessedSample:
+        id: #nmdc:
+        type: nmdc:ProcessedSample
+        name: <Biosample>_water_extracted_soil
+        description: Water-extracted soil for further extraction of <Biosample>
+        sampled_portion:
+        - pellet
+
+  - ProcessedSample4:
+      ProcessedSample:
+        id: #nmdc:
+        type: nmdc:ProcessedSample
+        name: <Biosample>_NOM_methanol
+        description: NOM from methanol extraction of <Biosample>
+        sampled_portion: 
+        - methanol_layer
+
+  - ProcessedSample5:
+      ProcessedSample:
+        id: #nmdc:
+        type: nmdc:ProcessedSample
+        name: <Biosample>_methanol_extracted_soil
+        description: Methanol-extracted soil for further extraction of <Biosample>
+        sampled_portion:
+        - pellet
+  
+  - ProcessedSample6:
+      ProcessedSample:
+        id: #nmdc:
+        type: nmdc:ProcessedSample
+        name: <Biosample>_NOM_chloroform
+        description: NOM from chloroform extraction of <Biosample>
+        sampled_portion:
+        - chloroform_layer

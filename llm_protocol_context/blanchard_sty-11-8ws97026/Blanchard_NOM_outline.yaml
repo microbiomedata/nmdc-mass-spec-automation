@@ -1,0 +1,124 @@
+Study: nmdc:sty-11-8ws97026
+steps:
+  - Step 1:
+      SubSamplingProcess:
+        id: # nmdc:subspr-{shoulder}-{blade}
+        type: nmdc:SubSamplingProcess
+        name: Subsample_soil
+        description: A portion of soil being taken from <Biosample> soil sample for extraction
+        has_input:
+          - Biosample
+        has_output:
+          - ProcessedSample1
+        processing_institution: EMSL
+        mass:
+          type: nmdc:QuantityValue
+          has_raw_value: 0.5 g
+          has_unit: g
+          has_numeric_value: 0.5
+
+  - Step 2:
+      Extraction:
+        id: # nmdc:extrp-{shoulder}-{blade}
+        type: nmdc:Extraction
+        name: Water extraction for NOM
+        description: Water extraction of <ProcessedSample1> preceding Folch extraction
+        has_input:
+          - ProcessedSample1
+        has_output:
+          - ProcessedSample2 # this is input to the water extraction DataGen records
+          - ProcessedSample3 # soil that has already been extracted a bit for Folch
+        processing_institution: EMSL
+        extraction_targets:
+          - natural organic matter
+        input_mass:
+          type: nmdc:QuantityValue
+          has_raw_value: 0.5 g # from subsampling process
+          has_unit: g
+          has_numeric_value: 0.5 # from subsampling process
+        substances_used:
+          - type: nmdc:PortionOfSubstance
+            known_as: water
+            substance_role: solvent
+            volume:
+              type: nmdc:QuantityValue
+              has_raw_value: 2 mL
+              has_unit: mL
+              has_numeric_value: 2
+
+  - Step 3:
+      Extraction:
+        id: # nmdc:extrp-{shoulder}-{blade}
+        type: nmdc:Extraction
+        name: Folch extraction for NOM
+        description: Folch extraction of <ProcessedSample3> to separate NOM by methanol-chloroform layer
+        has_input:
+          - ProcessedSample3
+        has_output:
+          - ProcessedSample4 # input to methanol DataGeneration record
+          - ProcessedSample5 # input to chloroform DataGeneration record
+        processing_institution: EMSL
+        extraction_targets:
+          - natural organic matter
+        substances_used:
+          - type: nmdc:PortionOfSubstance
+            known_as: methanol
+            substance_role: solvent
+            volume:
+              type: nmdc:QuantityValue
+              has_raw_value: 2 mL
+              has_unit: mL
+              has_numeric_value: 2
+          - type: nmdc:PortionOfSubstance
+            known_as: chloroform
+            substance_role: solvent
+            volume:
+              type: nmdc:QuantityValue
+              has_raw_value: 4 mL
+              has_unit: mL
+              has_numeric_value: 4
+          - type: nmdc:PortionOfSubstance
+            known_as: water
+            substance_role: solvent
+            volume:
+              type: nmdc:QuantityValue
+              has_raw_value: 1.5 mL
+              has_unit: mL
+              has_numeric_value: 1.5
+
+processedsamples:
+
+  - ProcessedSample1:
+      ProcessedSample:
+        id: #nmdc:
+        type: nmdc:ProcessedSample
+        name: <Biosample>_Folch-subsample
+        description: The output from subsampling <Biosample> for extraction
+
+  - ProcessedSample2:
+      ProcessedSample:
+        id: #nmdc:
+        type: nmdc:ProcessedSample
+        name: <Biosample>_NOM_water
+        description: NOM from water extraction of <Biosample>
+
+  - ProcessedSample3:
+      ProcessedSample:
+        id: #nmdc:
+        type: nmdc:ProcessedSample
+        name: <Biosample>_water_extracted_soil
+        description: Water-extracted soil for Folch extraction of <Biosample>
+
+  - ProcessedSample4:
+      ProcessedSample:
+        id: #nmdc:
+        type: nmdc:ProcessedSample
+        name: <Biosample>_NOM_methanol
+        description: NOM from methanol layer of the Folch extract of <Biosample>
+
+  - ProcessedSample5:
+      ProcessedSample:
+        id: #nmdc:
+        type: nmdc:ProcessedSample
+        name: <Biosample>_NOM_chloroform
+        description: NOM from chloroform layer of the Folch extract of <Biosample>
