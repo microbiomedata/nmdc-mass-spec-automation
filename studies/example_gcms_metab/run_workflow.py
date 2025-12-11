@@ -25,7 +25,7 @@ def main():
     manager.create_workflow_structure()
     
     # Step 2: Get Raw Data
-    #Download raw data files from MinIO, we assume they are already there for this example,
+    # Download raw data files from MinIO, we assume they are already there for this example,
     # but we can build in a way to get them from EMSL later maybe?
     manager.download_raw_data_from_minio()
 
