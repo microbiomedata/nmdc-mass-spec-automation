@@ -1054,8 +1054,10 @@ class NMDCWorkflowManager:
             initial_count = len(raw_files)
             raw_files = [f for f in raw_files if f.name not in problem_files]
 
-        # Filter out already-processed files by checking for corresponding .corems directories
+        # Filter out already-processed files by checking for processed outputs
         processed_data_dir = self.processed_data_directory
+        workflow_type = self.config['workflow']['workflow_type']
+        
         if processed_data_dir:
             processed_path = Path(processed_data_dir)
             if processed_path.exists():
@@ -1068,13 +1070,22 @@ class NMDCWorkflowManager:
                     # Get the base name without extension (e.g., sample1.raw -> sample1)
                     base_name = raw_file.stem
                     
-                    # Check if corresponding .corems directory exists
-                    corems_dir = processed_path / f"{base_name}.corems"
+                    # Check for processed output based on workflow type
+                    if workflow_type in ["LCMS Metabolomics", "LCMS Lipidomics"]:
+                        # LCMS: Check if corresponding .corems directory exists
+                        corems_dir = processed_path / f"{base_name}.corems"
+                        
+                        if corems_dir.exists() and corems_dir.is_dir():
+                            # Check if the .corems directory contains CSV files (indicates successful processing)
+                            csv_files = list(corems_dir.glob('*.csv'))
+                            if csv_files:
+                                continue  # Skip this file - already processed
                     
-                    if corems_dir.exists() and corems_dir.is_dir():
-                        # Check if the .corems directory contains CSV files (indicates successful processing)
-                        csv_files = list(corems_dir.glob('*.csv'))
-                        if csv_files:
+                    elif workflow_type == "GCMS Metabolomics":
+                        # GCMS: Check if corresponding CSV file exists directly in processed directory
+                        csv_file = processed_path / f"{base_name}.csv"
+                        
+                        if csv_file.exists() and csv_file.is_file():
                             continue  # Skip this file - already processed
                     
                     # File is not processed or processing incomplete
@@ -1929,10 +1940,9 @@ fi
         """
         Move processed output files from working directory to designated processed data location.
         
-        Searches for directories ending with .corems in the working directory and moves them
-        to the processed data directory specified in the configuration. Only moves directories
-        that contain CSV files (indicating successful processing) and validates that the 
-        .corems directories belong to this study by matching filenames with raw data files.
+        Handles both LCMS and GCMS workflow outputs:
+        - LCMS: Searches for .corems directories and moves them to processed directory
+        - GCMS: Searches for CSV files in out/output_files/ structure and copies them directly to processed directory
         
         After attempting to move files, optionally cleans up the WDL execution directory
         to keep the study directory clean and prevent accumulation of large temporary files.
@@ -1945,8 +1955,7 @@ fi
         Note:
             Uses self.processed_data_directory as the destination.
             Creates the destination directory if it doesn't exist.
-            Validates .corems directory names match raw files from this study to prevent
-            moving files from other studies that might be in the working directory.
+            Validates output files belong to this study by matching filenames with raw data files.
         """
         import shutil
         
@@ -1967,7 +1976,7 @@ fi
         print(f"🔍 Searching for processed files in: {working_path}")
         print(f"📁 Moving processed files to: {processed_path}")
         
-        # Get list of raw files for this study to validate .corems directories belong to this study
+        # Get list of raw files for this study to validate outputs belong to this study
         raw_data_dir = self.raw_data_directory
         study_raw_files = set()
         if raw_data_dir and Path(raw_data_dir).exists():
@@ -1977,35 +1986,66 @@ fi
         
         moved_count = 0
         
-        # Search for .corems directories recursively within the working directory only
-        for dirpath in working_path.rglob('*'):
-            if dirpath.is_dir() and dirpath.name.endswith('.corems'):
-                # Check that there is a .csv within the directory (indicates successful processing)
-                csv_files = list(dirpath.glob('*.csv'))
-                if not csv_files:
-                    print(f"  ⚠️  No .csv files found in {dirpath.name}, skipping.")
+        # Determine workflow type to use appropriate file moving strategy
+        workflow_type = self.config['workflow']['workflow_type']
+        
+        if workflow_type in ["LCMS Metabolomics", "LCMS Lipidomics"]:
+            # LCMS: Search for .corems directories
+            for dirpath in working_path.rglob('*'):
+                if dirpath.is_dir() and dirpath.name.endswith('.corems'):
+                    # Check that there is a .csv within the directory (indicates successful processing)
+                    csv_files = list(dirpath.glob('*.csv'))
+                    if not csv_files:
+                        print(f"  ⚠️  No .csv files found in {dirpath.name}, skipping.")
+                        continue
+                    
+                    # Validate this .corems directory belongs to our study by checking the filename
+                    corems_filename = dirpath.name.replace('.corems', '')
+                    if study_raw_files and corems_filename not in study_raw_files:
+                        print(f"  ⚠️  {dirpath.name} does not match any raw files for study {self.study_name}, skipping.")
+                        continue
+                    
+                    # Move the entire .corems directory to processed location
+                    destination = processed_path / dirpath.name
+                    
+                    # Handle case where destination already exists
+                    if destination.exists():
+                        print(f"  ⚠️  Destination already exists: {destination.name}, skipping.")
+                        continue
+                    
+                    try:
+                        shutil.move(str(dirpath), str(destination))
+                        moved_count += 1
+                        print(f"  ✅ Moved {dirpath.name} -> {destination}")
+                    except Exception as e:
+                        print(f"  ❌ Failed to move {dirpath.name}: {e}")
+                        
+        elif workflow_type == "GCMS Metabolomics":
+            # GCMS: Search for CSV files in out/output_files/ structure
+            # Pattern: <timestamp>_gcmsMetabolomics/out/output_files/<number>/<filename>.csv
+            for csv_file in working_path.rglob('out/output_files/*/*.csv'):
+                # Get the base filename (without extension)
+                base_filename = csv_file.stem
+                
+                # Validate this file belongs to our study
+                if study_raw_files and base_filename not in study_raw_files:
+                    print(f"  ⚠️  {csv_file.name} does not match any raw files for study {self.study_name}, skipping.")
                     continue
                 
-                # Validate this .corems directory belongs to our study by checking the filename
-                corems_filename = dirpath.name.replace('.corems', '')
-                if study_raw_files and corems_filename not in study_raw_files:
-                    print(f"  ⚠️  {dirpath.name} does not match any raw files for study {self.study_name}, skipping.")
-                    continue
+                # Move CSV file directly to processed data directory
+                destination_file = processed_path / csv_file.name
                 
-                # Move the entire .corems directory to processed location
-                destination = processed_path / dirpath.name
-                
-                # Handle case where destination already exists
-                if destination.exists():
-                    print(f"  ⚠️  Destination already exists: {destination.name}, skipping.")
+                # Handle case where destination file already exists
+                if destination_file.exists():
+                    print(f"  ⚠️  Destination already exists: {csv_file.name}, skipping.")
                     continue
                 
                 try:
-                    shutil.move(str(dirpath), str(destination))
+                    shutil.copy2(str(csv_file), str(destination_file))
                     moved_count += 1
-                    print(f"  ✅ Moved {dirpath.name} -> {destination}")
+                    print(f"  ✅ Copied {csv_file.name} -> {processed_path.name}/")
                 except Exception as e:
-                    print(f"  ❌ Failed to move {dirpath.name}: {e}")
+                    print(f"  ❌ Failed to copy {csv_file.name}: {e}")
         
         print(f"📋 Processed file move summary:")
         print(f"   Files moved: {moved_count}")
