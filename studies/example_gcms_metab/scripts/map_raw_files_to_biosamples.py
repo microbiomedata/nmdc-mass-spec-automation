@@ -115,9 +115,9 @@ def match_to_biosamples(raw_files_info, biosample_df):
     for raw_info in raw_files_info:
         filename = Path(raw_info['raw_filename']).name
         
-        # Determine file type - check if it's a QC/standard file
+        # Determine file type - check if it's a calibration/standard file
         if 'FAMEs' in filename or 'GCMS01' in filename:
-            raw_file_type = 'qc'
+            raw_file_type = 'calibration'
         else:
             raw_file_type = 'sample'
         
@@ -129,7 +129,7 @@ def match_to_biosamples(raw_files_info, biosample_df):
             'match_confidence': 'no_match'
         }
         
-        # Only try to match sample files (not QC files)
+        # Only try to match sample files (not calibration files)
         if raw_file_type == 'sample' and 'biosample_pattern' in raw_info and raw_info['biosample_pattern']:
             pattern = raw_info['biosample_pattern']
             
@@ -157,9 +157,9 @@ def match_to_biosamples(raw_files_info, biosample_df):
                         mapping['match_confidence'] = 'medium'
                     elif len(matches) > 1:
                         mapping['match_confidence'] = 'multiple_matches'
-        elif raw_file_type == 'qc':
-            # QC files don't need biosample mapping
-            mapping['match_confidence'] = 'high'  # QC files are always valid
+        elif raw_file_type == 'calibration':
+            # Calibration files don't need biosample mapping but should be included
+            mapping['match_confidence'] = 'high'  # Calibration files are always valid
         
         mappings.append(mapping)
     
@@ -323,4 +323,4 @@ def main():
 
 
 if __name__ == "__main__":
-    sys.exit(main())
+    main()

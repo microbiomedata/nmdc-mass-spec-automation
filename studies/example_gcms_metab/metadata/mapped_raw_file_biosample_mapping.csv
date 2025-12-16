@@ -22,7 +22,7 @@ Blanch_Nat_Met_C_14_AB_O_09.cdf,sample,nmdc:bsm-11-4rx1wt74,BW-C-14-O,high
 Blanch_Nat_Met_C_14_AB_M_27.cdf,sample,nmdc:bsm-11-frgt4x11,BW-C-14-M,high
 Blanch_Nat_Met_C_12_AB_O_25.cdf,sample,nmdc:bsm-11-pwa2h444,BW-C-12-O,high
 Blanch_Nat_Met_C_7_AB_M_07.cdf,sample,nmdc:bsm-11-042nd237,BW-C-7-M,high
-GCMS_FAMEs_01_GCMS01_20180115.cdf,qc,,,high
+GCMS_FAMEs_01_GCMS01_20180115.cdf,calibration,,,high
 Blanch_Nat_Met_C_34_AB_O_10.cdf,sample,,,no_match
 Blanch_Nat_Met_H_2B_M_02.cdf,sample,,,no_match
 Blanch_Nat_Met_H_30_AB_M_11.cdf,sample,,,no_match

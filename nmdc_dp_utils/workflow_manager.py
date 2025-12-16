@@ -37,13 +37,22 @@ WORKFLOW_DICT = {
      "wdl_download_location": "https://raw.githubusercontent.com/microbiomedata/metaMS/master/wdl/metaMS_lcms_metabolomics.wdl",
      "generator_method": "_generate_lcms_metab_wdl",
      "workflow_metadata_input_generator": "_generate_lcms_workflow_metadata_inputs",
-     "metadata_generator_class": LCMSMetabolomicsMetadataGenerator},
+     "metadata_generator_class": LCMSMetabolomicsMetadataGenerator,
+     "raw_data_inspector": "raw_data_inspector"},
     "LCMS Lipidomics":
     {"wdl_workflow_name": "metaMS_lcms_lipidomics",
      "wdl_download_location": "https://raw.githubusercontent.com/microbiomedata/metaMS/master/wdl/metaMS_lcmslipidomics.wdl",
      "generator_method": "_generate_lcms_lipid_wdl",
      "workflow_metadata_input_generator": "_generate_lcms_workflow_metadata_inputs",
-     "metadata_generator_class": LCMSLipidomicsMetadataGenerator}
+     "metadata_generator_class": LCMSLipidomicsMetadataGenerator,
+     "raw_data_inspector": "raw_data_inspector"},
+    "GCMS Metabolomics":
+    {"wdl_workflow_name": "metaMS_gcms_metabolomics",
+     "wdl_download_location": "TBD",
+     "generator_method": "TBD",
+     "workflow_metadata_input_generator": "TBD",
+     "metadata_generator_class": None,
+     "raw_data_inspector": "gcms_data_inspector"}
 }
 
 
@@ -2082,37 +2091,60 @@ fi
         try:
             mapping_df = pd.read_csv(mapping_file)
             
-            # Filter for only high and medium confidence matches
-            mapped_df = mapping_df[mapping_df['match_confidence'].isin(['high', 'medium'])].copy()
+            # Check if raw_file_type column exists (new format) or not (old format for backwards compatibility)
+            has_file_type = 'raw_file_type' in mapping_df.columns
+            
+            if has_file_type:
+                # New format: Filter for high/medium confidence matches AND include calibration/qc files
+                # Calibration files are needed for raw_data_inspector even though they don't map to biosamples
+                mapped_df = mapping_df[
+                    (mapping_df['match_confidence'].isin(['high', 'medium'])) |
+                    (mapping_df['raw_file_type'].isin(['qc', 'calibration']))
+                ].copy()
+            else:
+                # Old format (backwards compatible): Filter for only high and medium confidence matches
+                mapped_df = mapping_df[mapping_df['match_confidence'].isin(['high', 'medium'])].copy()
             
             if len(mapped_df) == 0:
                 print("⚠️  No high or medium confidence matches found - no files will be processed")
                 return
             
-            # Get the full file paths from the downloaded files list
+            # Get the full file paths - try to use downloaded_files.csv if available (old format)
+            # Otherwise construct paths from raw_data_directory (new format)
             downloaded_files_csv = self.workflow_path / "metadata" / "downloaded_files.csv"
             if downloaded_files_csv.exists():
                 downloaded_df = pd.read_csv(downloaded_files_csv)
                 
-                # Match by filename to get full paths
-                mapped_df = mapped_df.merge(
-                    downloaded_df[['file_name', 'file_path']], 
-                    left_on='raw_file_name', 
-                    right_on='file_name', 
-                    how='left'
-                )
-                
-                # Select and rename columns for output
-                output_df = mapped_df[['file_path', 'biosample_id', 'biosample_name', 'match_confidence']].copy()
-                output_df = output_df.rename(columns={'file_path': 'raw_file_path'})
+                # Check if old format (has file_path column) or new format (only has raw_data_file_short)
+                if 'file_path' in downloaded_df.columns and 'file_name' in downloaded_df.columns:
+                    # Old format with full paths
+                    mapped_df = mapped_df.merge(
+                        downloaded_df[['file_name', 'file_path']], 
+                        left_on='raw_file_name', 
+                        right_on='file_name', 
+                        how='left'
+                    )
+                    mapped_df['raw_file_path'] = mapped_df['file_path']
+                else:
+                    # New format - construct paths
+                    raw_data_dir = Path(self.raw_data_directory)
+                    mapped_df['raw_file_path'] = mapped_df['raw_file_name'].apply(
+                        lambda x: str(raw_data_dir / x)
+                    )
             else:
-                # Fallback if downloaded_files.csv doesn't exist
-                print("⚠️  downloaded_files.csv not found - using relative paths")
-                raw_data_dir = self.raw_data_directory
+                # No downloaded_files.csv - construct paths from raw_data_directory
+                raw_data_dir = Path(self.raw_data_directory)
                 mapped_df['raw_file_path'] = mapped_df['raw_file_name'].apply(
-                    lambda x: str(Path(raw_data_dir) / x)
+                    lambda x: str(raw_data_dir / x)
                 )
-                output_df = mapped_df[['raw_file_path', 'biosample_id', 'biosample_name', 'match_confidence']].copy()
+            
+            # Select columns for output - include raw_file_type if it exists
+            if has_file_type:
+                output_df = mapped_df[['raw_file_path', 'biosample_id', 
+                                       'biosample_name', 'match_confidence']].copy()
+            else:
+                output_df = mapped_df[['raw_file_path', 'biosample_id', 
+                                       'biosample_name', 'match_confidence']].copy()
             
             # Save the filtered file list
             output_file = self.workflow_path / "metadata" / "mapped_raw_files.csv"
@@ -2127,7 +2159,14 @@ fi
             print(f"   Total mapped files: {len(output_df)} of {total_files} ({len(output_df)/total_files*100:.1f}%)")
             print(f"   High confidence: {high_conf}")
             print(f"   Medium confidence: {med_conf}")
-            print(f"   Files excluded: {total_files - len(output_df)} (control samples + unmapped)")
+            
+            if has_file_type:
+                calibration_files = len(mapped_df[mapped_df['raw_file_type'].isin(['qc', 'calibration'])])
+                sample_files = len(mapped_df[mapped_df['raw_file_type'] == 'sample'])
+                print(f"   Sample files: {sample_files}")
+                print(f"   Calibration/QC files: {calibration_files}")
+            
+            print(f"   Files excluded: {total_files - len(output_df)} (no_match + low confidence)")
             
         except Exception as e:
             print(f"❌ Error generating mapped files list: {e}")
@@ -2136,13 +2175,16 @@ fi
 
     def raw_data_inspector(self, file_paths=None, cores=1, limit=None, max_retries=10, retry_delay=10.0):
         """
-        Run raw data inspection on raw files to extract metadata using CoreMS in Docker.
+        Run raw data inspection on raw files to extract metadata using Docker.
         
-        This method runs a specialized script to extract instrument metadata, scan parameters, 
-        and data range information from raw MS files using a Docker container.
+        Uses workflow-specific inspector based on WORKFLOW_DICT configuration:
+        - LCMS workflows: Docker-based raw_data_inspector.py (for .mzML/.raw files)
+        - GCMS workflows: Docker-based gcms_data_inspector.py (for .cdf files)
         
-        IMPORTANT: .raw files require single-core processing to prevent crashes due to file
-        locking issues with the Thermo RawFileReader in Docker containers. This method 
+        Both workflows require the same Docker image specified in configuration.
+        
+        IMPORTANT: .raw files (LCMS) require single-core processing to prevent crashes due to 
+        file locking issues with the Thermo RawFileReader in Docker containers. This method 
         automatically forces cores=1 when .raw files are detected.
         
         Args:
@@ -2173,7 +2215,28 @@ fi
                 return str(existing_file)
             return None
         
-        print("🔍 Starting raw data inspection...")
+        # Determine which inspector to use based on workflow type
+        workflow_type = self.config['workflow']['workflow_type']
+        workflow_config = WORKFLOW_DICT.get(workflow_type)
+        if not workflow_config:
+            raise ValueError(f"Unknown workflow type: {workflow_type}")
+        
+        inspector_name = workflow_config.get('raw_data_inspector', 'raw_data_inspector')
+        print(f"🔍 Starting raw data inspection...")
+        print(f"📋 Workflow type: {workflow_type}")
+        print(f"🔧 Using inspector: {inspector_name}")
+        
+        # Branch to appropriate inspector method
+        if inspector_name == 'gcms_data_inspector':
+            return self._run_gcms_data_inspector(file_paths, cores, limit, max_retries, retry_delay)
+        else:
+            return self._run_lcms_data_inspector(file_paths, cores, limit, max_retries, retry_delay)
+    
+    def _run_lcms_data_inspector(self, file_paths, cores, limit, max_retries, retry_delay):
+        """Run LCMS raw data inspector using Docker container."""
+        print("=" * 70)
+        print("🐳 LCMS RAW DATA INSPECTION (Docker)")
+        print("=" * 70)
         
         try:
             # Get file paths to inspect
@@ -2468,6 +2531,210 @@ fi
         # Since we used capture_output=False, we need to check the output file directly
         if result.returncode == 0:
             # Look for the output file
+            default_output = output_dir / "raw_file_inspection_results.csv"
+            if default_output.exists():
+                return self._process_inspection_results_from_file(default_output)
+            else:
+                print(f"⚠️  Expected output file not found: {default_output}")
+                return None
+        else:
+            print(f"❌ Docker execution failed with exit code: {result.returncode}")
+            return None
+    
+    def _run_gcms_data_inspector(self, file_paths, cores, limit, max_retries, retry_delay):
+        """Run GCMS raw data inspector using gcms_data_inspector.py script."""
+        print("=" * 70)
+        print("🧪 GCMS RAW DATA INSPECTION")
+        print("=" * 70)
+        
+        try:
+            # Get file paths to inspect
+            if file_paths is None:
+                # Use mapped raw files if available
+                mapped_files_path = self.workflow_path / "metadata" / "mapped_raw_files.csv"
+                if mapped_files_path.exists():
+                    mapped_df = pd.read_csv(mapped_files_path)
+                    file_paths = mapped_df['raw_file_path'].tolist()
+                    print(f"📋 Using {len(file_paths)} mapped raw files for inspection")
+                else:
+                    # Fallback to all .cdf files in raw_data_directory
+                    raw_data_dir = Path(self.raw_data_directory)
+                    file_paths = []
+                    for ext in ['*.cdf', '*.CDF']:
+                        file_paths.extend([str(f) for f in raw_data_dir.rglob(ext)])
+                    print(f"📋 Using {len(file_paths)} CDF files from data directory")
+            
+            if not file_paths:
+                print("⚠️  No CDF files found to inspect")
+                return None
+            
+            # Setup output directory
+            output_dir = self.workflow_path / "raw_file_info"
+            output_dir.mkdir(parents=True, exist_ok=True)
+            existing_results_file = output_dir / "raw_file_inspection_results.csv"
+            
+            # Check for previous results and filter out successfully inspected files
+            previous_results_df = None
+            if existing_results_file.exists():
+                print(f"📊 Found existing inspection results: {existing_results_file}")
+                try:
+                    previous_results_df = pd.read_csv(existing_results_file)
+                    previous_file_paths = set(previous_results_df['file_path'].tolist())
+                    
+                    # Filter out already-inspected files
+                    files_to_inspect = [f for f in file_paths if f not in previous_file_paths]
+                    
+                    if len(files_to_inspect) < len(file_paths):
+                        print(f"   ✓ {len(previous_results_df)} files already inspected")
+                        print(f"   → {len(files_to_inspect)} new files to inspect")
+                        file_paths = files_to_inspect
+                    
+                    if not files_to_inspect:
+                        print("✅ All files already inspected!")
+                        return str(existing_results_file)
+                except Exception as e:
+                    print(f"⚠️  Could not read previous results: {e}")
+                    previous_results_df = None
+            
+            # Apply limit if specified
+            if limit and len(file_paths) > limit:
+                print(f"⚠️  Limiting inspection to {limit} files (total available: {len(file_paths)})")
+                file_paths = file_paths[:limit]
+            
+            # Get the gcms_data_inspector.py script path
+            script_path = Path(__file__).parent / "gcms_data_inspector.py"
+            if not script_path.exists():
+                raise ValueError(f"GCMS data inspector script not found at: {script_path}")
+            
+            # Get Docker image from config (required)
+            docker_image = self.config.get('docker', {}).get('raw_data_inspector_image')
+            if not docker_image:
+                raise ValueError("Docker configuration required: config['docker']['raw_data_inspector_image'] not found")
+            
+            print(f"🐳 Using Docker image: {docker_image}")
+            result = self._run_gcms_inspector_docker(file_paths, output_dir, cores, 
+                                                    max_retries, retry_delay, docker_image, script_path)
+            
+            # Merge with previous results if they exist
+            if result is not None and previous_results_df is not None:
+                print("🔗 Merging previous and new inspection results...")
+                try:
+                    if isinstance(result, pd.DataFrame):
+                        new_results_df = result
+                    else:
+                        new_results_df = pd.read_csv(result)
+                    
+                    # Combine dataframes
+                    new_file_paths = set(new_results_df['file_path'].tolist())
+                    previous_to_keep = previous_results_df[
+                        ~previous_results_df['file_path'].isin(new_file_paths)
+                    ]
+                    
+                    combined_df = pd.concat([previous_to_keep, new_results_df], ignore_index=True)
+                    combined_df = combined_df.drop_duplicates(subset=['file_path'], keep='last')
+                    combined_df = combined_df.sort_values('file_path').reset_index(drop=True)
+                    
+                    # Write combined results
+                    combined_df.to_csv(existing_results_file, index=False)
+                    
+                    print(f"✅ Combined results saved: {existing_results_file}")
+                    print(f"   Previous results retained: {len(previous_to_keep)}")
+                    print(f"   New/updated results: {len(new_results_df)}")
+                    print(f"   Total files in results: {len(combined_df)}")
+                    
+                    result = str(existing_results_file)
+                except Exception as e:
+                    print(f"⚠️  Error merging results: {e}")
+            
+            # Set skip trigger on success
+            if result is not None:
+                print("✅ GCMS raw data inspection completed successfully!")
+                self.set_skip_trigger('raw_data_inspected', True)
+                return result
+            else:
+                print("❌ GCMS raw data inspection failed")
+                return None
+                
+        except Exception as e:
+            print(f"❌ Error during GCMS inspection: {e}")
+            import traceback
+            traceback.print_exc()
+            return None
+    
+    def _run_gcms_inspector_docker(self, file_paths, output_dir, cores, max_retries, 
+                                   retry_delay, docker_image, script_path):
+        """Run GCMS inspector in Docker container."""
+        print("🐳 Running GCMS inspector in Docker...")
+        
+        # Check if Docker is available
+        try:
+            docker_check = subprocess.run(['docker', '--version'], 
+                                        capture_output=True, text=True, timeout=10)
+            if docker_check.returncode != 0:
+                raise RuntimeError("Docker is not available")
+            print(f"✅ Docker available: {docker_check.stdout.strip()}")
+        except (subprocess.TimeoutExpired, FileNotFoundError):
+            raise RuntimeError("Docker is not installed or not available")
+        
+        # Prepare volume mounts
+        mount_points = set()
+        raw_data_dir = Path(self.raw_data_directory).resolve()
+        mount_points.add(str(raw_data_dir))
+        mount_points.add(str(output_dir.resolve()))
+        mount_points.add(str(script_path.parent.resolve()))
+        
+        # Build volume arguments
+        volume_args = []
+        for mount_point in mount_points:
+            container_path = f"/mnt{mount_point}"
+            volume_args.extend(["-v", f"{mount_point}:{container_path}"])
+        
+        # Convert file paths to container paths
+        container_file_paths = []
+        for file_path in file_paths:
+            file_path_obj = Path(file_path).resolve()
+            container_file_path = str(file_path_obj).replace(str(raw_data_dir), f"/mnt{raw_data_dir}")
+            container_file_paths.append(container_file_path)
+        
+        # Convert paths to container paths
+        container_output_dir = f"/mnt{output_dir.resolve()}"
+        container_script_path = f"/mnt{script_path.resolve()}"
+        
+        # Build command arguments (files are positional, not --files)
+        cmd_args = container_file_paths + [
+            "--output-dir", container_output_dir,
+            "--cores", str(cores),
+            "--max-retries", str(max_retries),
+            "--retry-delay", str(retry_delay)
+        ]
+        
+        # Build Docker command
+        docker_cmd = [
+            "docker", "run", "--rm",
+            "--user", f"{os.getuid()}:{os.getgid()}",
+        ] + volume_args + [
+            docker_image,
+            "python", container_script_path
+        ] + cmd_args
+        
+        print(f"📁 Output directory: {output_dir}")
+        print(f"🔧 Processing {len(file_paths)} files with {cores} cores")
+        print("🔄 Starting GCMS inspection...")
+        print("=" * 70)
+        
+        # Run Docker command
+        result = subprocess.run(
+            docker_cmd,
+            cwd=str(self.workflow_path),
+            capture_output=False,
+            text=True,
+            timeout=3600
+        )
+        
+        print("=" * 70)
+        print(f"📊 Docker execution completed with exit code: {result.returncode}")
+        
+        if result.returncode == 0:
             default_output = output_dir / "raw_file_inspection_results.csv"
             if default_output.exists():
                 return self._process_inspection_results_from_file(default_output)
