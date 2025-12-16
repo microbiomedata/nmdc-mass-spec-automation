@@ -54,7 +54,7 @@ def main():
 
     # Step 8: Upload processed data to MinIO
     print("\n8. Uploading processed data to MinIO...")
-    _ = manager.upload_processed_data_to_minio()
+    manager.upload_processed_data_to_minio()
     assert manager.should_skip('processed_data_uploaded_to_minio'), "Processed data upload to MinIO must complete successfully to proceed"
 
     # Step 6: Generate metadata mapping files with URL validation
