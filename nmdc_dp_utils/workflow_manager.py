@@ -524,7 +524,8 @@ class NMDCWorkflowManager:
             print(f"✗ Error parsing log file: {e}")
             return pd.DataFrame(columns=['ftp_location', 'raw_data_file_short'])
     
-    def get_massive_ftp_urls(self, massive_id: Optional[str] = None) -> pd.DataFrame:
+    @skip_if_complete('raw_data_downloaded')
+    def get_massive_ftp_urls(self, massive_id: Optional[str] = None):
         """
         Complete workflow to discover and catalog MASSIVE dataset files with filtering.
         
@@ -555,31 +556,21 @@ class NMDCWorkflowManager:
             massive_id: MASSIVE dataset ID with version path (e.g., 'v07/MSV000094090').
                        Uses config['workflow']['massive_id'] if not provided.
             
-        Returns:
-            DataFrame containing FTP locations and file information ONLY for files
-            matching the filter criteria. Original dataset may contain thousands of
-            files, but only filtered subset is returned.
+        Note:
+            Results are saved to CSV file at workflow_path/raw_file_info/massive_ftp_locs.csv.
+            This method is automatically skipped if raw_data_downloaded trigger is set.
             
         Warning:
-            Without proper file_filters configuration, this method could return
-            thousands of files for download. Always verify your file_filters are
-            configured correctly for your specific study needs.
+            Without proper file_filters configuration, this method could discover
+            thousands of files. Always verify your file_filters are configured
+            correctly for your specific study needs.
             
         Example:
             >>> manager = NMDCWorkflowManager('config.json')
             >>> # Ensure config has: "file_filters": ["pos", "neg", "hilic"]
-            >>> ftp_df = manager.get_massive_ftp_urls()
-            >>> print(f"Found {len(ftp_df)} filtered files (original dataset may have had many more)")
+            >>> manager.get_massive_ftp_urls()
+            >>> # Results saved to: workflow_path/raw_file_info/massive_ftp_locs.csv
         """
-        if self.should_skip('raw_data_downloaded'):
-            print("Skipping MASSIVE FTP URL discovery (raw data already downloaded)")
-            # Return existing FTP data if available
-            ftp_csv = self.workflow_path / "raw_file_info" / "massive_ftp_locs.csv"
-            if ftp_csv.exists():
-                return pd.read_csv(ftp_csv)
-            else:
-                return pd.DataFrame(columns=['ftp_location', 'raw_data_file_short'])
-                
         if massive_id is None:
             massive_id = self.config['workflow']['massive_id']
             
@@ -616,14 +607,13 @@ class NMDCWorkflowManager:
                 print("   Check your file_type and file_filters configuration")
                 print()
             
-            return filtered_df
         except Exception as e:
             print(f"Error in MASSIVE FTP process: {e}")
-            return pd.DataFrame(columns=['ftp_location', 'raw_data_file_short'])
     
+    @skip_if_complete('raw_data_downloaded')
     def download_from_massive(self, ftp_file: Optional[str] = None, 
                             download_dir: Optional[str] = None,
-                            massive_id: Optional[str] = None) -> List[str]:
+                            massive_id: Optional[str] = None):
         """
         Download raw data files from MASSIVE dataset via FTP.
         
@@ -640,9 +630,6 @@ class NMDCWorkflowManager:
             massive_id: MASSIVE dataset ID to query directly. Uses
                        config['study']['massive_id'] if not provided.
             
-        Returns:
-            List of local file paths for successfully downloaded files
-            
         Raises:
             ValueError: If neither ftp_file nor massive_id is provided and
                        no massive_id exists in config
@@ -650,26 +637,19 @@ class NMDCWorkflowManager:
         Note:
             Files are downloaded using urllib.request.urlretrieve for reliability.
             Existing files with matching names are skipped to avoid re-downloading.
+            Downloaded file list is saved to metadata/downloaded_files.csv.
+            This method is automatically skipped if raw_data_downloaded trigger is set.
         """
-        if self.should_skip('raw_data_downloaded'):
-            print("Skipping raw data download (already downloaded)")
-            # Return list of existing files if directory exists
-            if download_dir is None:
-                download_dir = self.raw_data_directory
-            if os.path.exists(download_dir):
-                file_type = self.config['study'].get('file_type', '.raw')
-                existing_files = [os.path.join(download_dir, f) for f in os.listdir(download_dir) 
-                                if f.endswith(file_type)]
-                print(f"Found {len(existing_files)} existing {file_type} files")
-                return existing_files
-            return []
-            
         if download_dir is None:
             download_dir = self.raw_data_directory
         
         # Get FTP URLs either from file or by querying MASSIVE
         if massive_id:
-            ftp_df = self.get_massive_ftp_urls(massive_id)
+            # Call to discover and save URLs to CSV
+            self.get_massive_ftp_urls(massive_id)
+            # Read the saved CSV
+            ftp_csv = self.workflow_path / "raw_file_info" / "massive_ftp_locs.csv"
+            ftp_df = pd.read_csv(ftp_csv) if ftp_csv.exists() else pd.DataFrame(columns=['ftp_location', 'raw_data_file_short'])
         elif ftp_file:
             ftp_path = self.workflow_path / ftp_file
             if ftp_path.suffix == '.csv':
@@ -682,18 +662,22 @@ class NMDCWorkflowManager:
         else:
             # Try to use MASSIVE ID from config
             if 'massive_id' in self.config['workflow']:
-                ftp_df = self.get_massive_ftp_urls()
+                # Call to discover and save URLs to CSV
+                self.get_massive_ftp_urls()
+                # Read the saved CSV
+                ftp_csv = self.workflow_path / "raw_file_info" / "massive_ftp_locs.csv"
+                ftp_df = pd.read_csv(ftp_csv) if ftp_csv.exists() else pd.DataFrame(columns=['ftp_location', 'raw_data_file_short'])
             else:
                 raise ValueError("Either ftp_file or massive_id must be provided")
         
         if len(ftp_df) == 0:
             print("No files to download")
-            return []
+            return
         
         # Skip if this looks like a template file
         if 'example_file.raw' in str(ftp_df.iloc[0].get('raw_data_file_short', '')):
             print("FTP file appears to be a template. Please edit with real FTP URLs first.")
-            return []
+            return
         
         os.makedirs(download_dir, exist_ok=True)
         downloaded_files = []
@@ -740,7 +724,6 @@ class NMDCWorkflowManager:
                 print(f"📄 Downloaded files list saved to: {downloaded_files_csv}")
             
             self.set_skip_trigger('raw_data_downloaded', True)
-        return downloaded_files
     
     def _download_file_wget(self, ftp_location: str, download_path: str):
         """
@@ -913,8 +896,9 @@ class NMDCWorkflowManager:
         print(f"Downloaded {downloaded_count} new files")
         return downloaded_count
     
+    @skip_if_complete('raw_data_downloaded')
     def download_raw_data_from_minio(self, bucket_name: Optional[str] = None, 
-                                     folder_name: Optional[str] = None) -> List[str]:
+                                     folder_name: Optional[str] = None):
         """
         Download raw data files from MinIO object storage.
         
@@ -927,33 +911,19 @@ class NMDCWorkflowManager:
             folder_name: Folder path within bucket. Uses config['study']['name'] + '/raw' 
                         if not provided.
             
-        Returns:
-            List of local file paths for successfully downloaded files
-            
         Raises:
             ValueError: If MinIO client is not initialized or bucket_name cannot be determined
                        
         Note:
             Files are downloaded to self.raw_data_directory. Existing files with 
             matching sizes are skipped to avoid re-downloading.
+            Downloaded file list is saved to metadata/downloaded_files.csv.
+            This method is automatically skipped if raw_data_downloaded trigger is set.
             
         Example:
             >>> manager = NMDCWorkflowManager('config.json')
-            >>> files = manager.download_raw_data_from_minio()
-            >>> print(f"Downloaded {len(files)} raw data files")
+            >>> manager.download_raw_data_from_minio()
         """
-        if self.should_skip('raw_data_downloaded'):
-            print("Skipping raw data download from MinIO (already downloaded)")
-            # Return list of existing files if directory exists
-            if os.path.exists(self.raw_data_directory):
-                file_type = self.config['workflow'].get('file_type')
-                existing_files = [os.path.join(self.raw_data_directory, f) 
-                                for f in os.listdir(self.raw_data_directory) 
-                                if f.endswith(file_type)]
-                print(f"Found {len(existing_files)} existing {file_type} files")
-                return existing_files
-            return []
-        
         if not self.minio_client:
             raise ValueError("MinIO client not initialized")
         
@@ -993,11 +963,9 @@ class NMDCWorkflowManager:
         
             # Set skip trigger for raw_data_downloaded
             self.set_skip_trigger('raw_data_downloaded', True)
-        
-        return downloaded_files
     
     @skip_if_complete('data_processed')
-    def generate_wdl_jsons(self, batch_size: int = 50) -> int:
+    def generate_wdl_jsons(self, batch_size: int = 50):
         """
         Generate WDL workflow JSON configuration files for batch processing.
         
@@ -1032,8 +1000,7 @@ class NMDCWorkflowManager:
             WDL execution directories before generating new configurations.
             
         Example:
-            >>> json_count = manager.generate_wdl_jsons(batch_size=25)
-            >>> print(f"Created {json_count} WDL JSON files")
+            >>> manager.generate_wdl_jsons(batch_size=25)
         """
 
         # First, move any processed data from previous WDL execution attempts
@@ -1191,8 +1158,6 @@ class NMDCWorkflowManager:
         if json_count == 0:
             print("⚠️  No WDL JSON files created - all files already processed")
             self.set_skip_trigger('data_processed', True)
-        
-        return json_count
 
     def _generate_single_wdl_json(self, config: dict, batch_files: List[Path], batch_num: int) -> int:
         """
@@ -1484,7 +1449,7 @@ class NMDCWorkflowManager:
 
     @skip_if_complete('data_processed', return_value="")
     def generate_wdl_runner_script(self,
-                                  script_name: Optional[str] = None) -> str:
+                                  script_name: Optional[str] = None):
         """
         Generate a shell script to run all WDL JSON files using miniwdl.
         
@@ -1495,17 +1460,13 @@ class NMDCWorkflowManager:
         Args:
             script_name: Name for the generated script file. Defaults to 
                         '{study_name}_wdl_runner.sh'
-        
-        Returns:
-            Path to the generated shell script file
             
         Raises:
             ValueError: If workflow_type is not set in config
             NotImplementedError: If workflow_type is not yet supported
             
         Example:
-            >>> script_path = manager.generate_wdl_runner_script()
-            >>> print(f"Generated script: {script_path}")
+            >>> manager.generate_wdl_runner_script()
             
         Note:
             The generated script expects to be run from a directory containing
@@ -1673,11 +1634,9 @@ fi
         print(f"Generated WDL runner script: {script_path}")
         print("Made script executable (chmod +x)")
        # print(f"Script expects to find WDL file at: wdl/{workflow_name}.wdl")
-        
-        return str(script_path)
     
-    @skip_if_complete('data_processed', return_value=0)
-    def run_wdl_script(self, script_path: str, working_directory: Optional[str] = None) -> int:
+    @skip_if_complete('data_processed')
+    def run_wdl_script(self, script_path: Optional[str] = None, working_directory: Optional[str] = None) -> int:
         """
         Execute WDL workflows by downloading the workflow file from GitHub and running 
         it from a study-level workflow directory.
@@ -1687,7 +1646,8 @@ fi
         the workflows directly without needing an external workspace.
         
         Args:
-            script_path: Path to the shell script to execute
+            script_path: Path to the shell script to execute. If not provided,
+                        looks for '{workflow_name}_wdl_runner.sh' in scripts directory.
             working_directory: Optional override for execution directory. If not provided,
                              creates 'wdl_execution' directory within the study.
         
@@ -1703,13 +1663,19 @@ fi
         import urllib.request
         import ssl
         
+        # Find script if not provided
+        if script_path is None:
+            script_path = self.workflow_path / "scripts" / f"{self.workflow_name}_wdl_runner.sh"
+            if not script_path.exists():
+                raise FileNotFoundError(f"WDL runner script not found: {script_path}. Run generate_wdl_runner_script() first.")
+        else:
+            script_path = Path(script_path)
+        
         # Set up working directory within study
         if working_directory is None:
             working_directory = self.workflow_path / "wdl_execution"
         else:
             working_directory = Path(working_directory)
-        
-        script_path = Path(script_path)
         working_dir = Path(working_directory)
         
         # Validate script exists
@@ -2109,7 +2075,8 @@ fi
         else:
             print("🧹 Skipping cleanup of WDL execution directory (clean_up=False)")
     
-    def get_biosample_attributes(self, study_id: Optional[str] = None) -> str:
+    @skip_if_complete('biosample_attributes_fetched')
+    def get_biosample_attributes(self, study_id: Optional[str] = None):
         """
         Fetch biosample attributes from NMDC API and save to CSV file.
         
@@ -2120,23 +2087,12 @@ fi
         Args:
             study_id: NMDC study ID (e.g., 'nmdc:sty-11-dwsv7q78'). 
                      Uses config['study']['id'] if not provided.
-        
-        Returns:
-            Path to the generated biosample attributes CSV file
             
         Note:
-            This method sets a skip trigger 'biosample_attributes_fetched' to
-            avoid re-downloading on subsequent runs. The CSV file is saved as
-            'biosample_attributes.csv' in the study's metadata directory.
+            The CSV file is saved as 'biosample_attributes.csv' in the study's metadata directory.
+            This method is automatically skipped if biosample_attributes_fetched trigger is set.
         """
         from nmdc_api_utilities.biosample_search import BiosampleSearch
-        
-        # Check skip trigger
-        if self.should_skip('biosample_attributes_fetched'):
-            print("Skipping biosample attributes fetch (already downloaded)")
-            biosample_csv = self.workflow_path / "metadata" / "biosample_attributes.csv"
-            if biosample_csv.exists():
-                return str(biosample_csv)
         
         if study_id is None:
             study_id = self.config['study']['id']
@@ -2177,16 +2133,15 @@ fi
             # Set skip trigger
             self.set_skip_trigger('biosample_attributes_fetched', True)
             
-            return str(biosample_csv)
-            
         except Exception as e:
             print(f"❌ Error fetching biosample data: {e}")
             print("Please check your internet connection and verify the study ID")
             print("Make sure nmdc_api_utilities package is installed: pip install nmdc-api-utilities")
             raise
     
+    @skip_if_complete('biosample_mapping_script_generated')
     def generate_biosample_mapping_script(self, script_name: Optional[str] = None, 
-                                         template_path: Optional[str] = None) -> str:
+                                         template_path: Optional[str] = None):
         """
         Generate a study-specific TEMPLATE script for mapping raw files to biosamples.
         
@@ -2200,21 +2155,13 @@ fi
                         'map_raw_files_to_biosamples_TEMPLATE.py'
             template_path: Path to template file. Defaults to 
                           'nmdc_dp_utils/templates/biosample_mapping_script_template.py'
-        
-        Returns:
-            Path to the generated TEMPLATE script
             
         Note:
             The generated script is labeled as _TEMPLATE to prevent accidental use
             without customization. Users should copy to a new filename and modify
             the parsing logic for their study's specific file naming patterns.
+            This method is automatically skipped if biosample_mapping_script_generated trigger is set.
         """
-        if self.should_skip('biosample_mapping_script_generated'):
-            print("Skipping biosample mapping script generation (already generated)")
-            script_path = self.workflow_path / "scripts" / (script_name or "map_raw_files_to_biosamples_TEMPLATE.py")
-            if script_path.exists():
-                return str(script_path)
-        
         if script_name is None:
             script_name = "map_raw_files_to_biosamples_TEMPLATE.py"
             
@@ -2260,7 +2207,6 @@ fi
         print("   3. Test with a small subset of files before running on the full dataset")
         
         self.set_skip_trigger('biosample_mapping_script_generated', True)
-        return str(script_path)
     
     @skip_if_complete('biosample_mapping_completed', return_value=True)
     def run_biosample_mapping_script(self, script_path: Optional[str] = None) -> bool:
@@ -2458,6 +2404,7 @@ fi
             import traceback
             traceback.print_exc()
 
+    @skip_if_complete('raw_data_inspected')
     def raw_data_inspector(self, file_paths=None, cores=1, limit=None, max_retries=10, retry_delay=10.0):
         """
         Run raw data inspection on raw files to extract metadata using Docker.
@@ -2480,26 +2427,16 @@ fi
             limit (int, optional): Limit number of files to process (for testing)
             max_retries (int): Maximum number of retry attempts for transient errors (default: 10)
             retry_delay (float): Delay in seconds between retry attempts (default: 10.0)
-        
-        Returns:
-            str: Path to the output CSV file with inspection results
+            
+        Note:
+            Results are saved to raw_file_info/raw_file_inspection_results.csv.
+            This method is automatically skipped if raw_data_inspected trigger is set.
             
         Configuration Required:
             "docker": {
                 "raw_data_inspector_image": "microbiomedata/metams:3.3.3"
             }
         """
-        # Check skip trigger first
-        if self.should_skip('raw_data_inspected'):
-            print("⏭️  Skipping raw data inspection (skip trigger set)")
-            # Try to return existing inspection results
-            output_dir = self.workflow_path / "raw_file_info"
-            existing_file = output_dir / "raw_file_inspection_results.csv"
-            if existing_file.exists():
-                print(f"📊 Found existing inspection results: {existing_file}")
-                return str(existing_file)
-            return None
-        
         # Determine which inspector to use based on workflow type
         workflow_type = self.config['workflow']['workflow_type']
         workflow_config = WORKFLOW_DICT.get(workflow_type)
