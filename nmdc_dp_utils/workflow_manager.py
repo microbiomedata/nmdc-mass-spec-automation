@@ -47,8 +47,8 @@ WORKFLOW_DICT = {
      "metadata_generator_class": LCMSLipidomicsMetadataGenerator,
      "raw_data_inspector": "raw_data_inspector"},
     "GCMS Metabolomics":
-    {"wdl_workflow_name": "metaMS_gcms_metabolomics",
-     "wdl_download_location": "https://raw.githubusercontent.com/microbiomedata/metaMS/master/wdl/metaMS_gcms_metabolomics.wdl",
+    {"wdl_workflow_name": "metaMS_gcms",
+     "wdl_download_location": "https://raw.githubusercontent.com/microbiomedata/metaMS/master/wdl/metaMS_gcms.wdl",
      "generator_method": "_generate_gcms_metab_wdl",
      "workflow_metadata_input_generator": "TBD",
      "metadata_generator_class": None,
@@ -1264,6 +1264,9 @@ class NMDCWorkflowManager:
         
         mapping_df = pd.read_csv(mapping_file)
         
+        # Create a mapping from filename to actual file path (from batch_files)
+        batch_file_map = {f.name: str(f) for f in batch_files}
+        
         # Filter inspection results by filename (not full path) since batch_files come from
         # mapped_raw_files.csv which may have different path prefixes than inspection results
         batch_file_names = [f.name for f in batch_files]
@@ -1278,6 +1281,9 @@ class NMDCWorkflowManager:
             how='left'
         )
         
+        # Replace file_path with the actual path from batch_files (correct path prefix)
+        batch_df['actual_file_path'] = batch_df['file_name'].map(batch_file_map)
+        
         # Convert write_time to datetime for sorting
         batch_df['write_time_dt'] = pd.to_datetime(batch_df['write_time'])
         batch_df = batch_df.sort_values('write_time_dt')
@@ -1289,9 +1295,9 @@ class NMDCWorkflowManager:
             print(f"  Available filenames in mapping: {mapping_df['raw_file_name'].tolist()[:5]}")
             raise ValueError(f"Failed to match batch files with biosample mapping. Check that file names match between inspection results and biosample mapping.")
         
-        # Separate calibration and sample files
-        calibration_files = batch_df[batch_df['raw_file_type'] == 'calibration']['file_path'].tolist()
-        sample_files = batch_df[batch_df['raw_file_type'] != 'calibration']['file_path'].tolist()
+        # Separate calibration and sample files using the actual file paths
+        calibration_files = batch_df[batch_df['raw_file_type'] == 'calibration']['actual_file_path'].tolist()
+        sample_files = batch_df[batch_df['raw_file_type'] != 'calibration']['actual_file_path'].tolist()
         
         # Debug output
         print(f"  📊 Batch {batch_num} composition:")
@@ -1381,9 +1387,9 @@ class NMDCWorkflowManager:
         Returns:
             Path to the calibration file to use for this batch
         """
-        # Get calibration write times
-        cal_df = batch_df[batch_df['file_path'].isin(calibration_files)].copy()
-        sample_df = batch_df[batch_df['file_path'].isin(sample_files)].copy()
+        # Get calibration write times (using actual_file_path which has correct paths)
+        cal_df = batch_df[batch_df['actual_file_path'].isin(calibration_files)].copy()
+        sample_df = batch_df[batch_df['actual_file_path'].isin(sample_files)].copy()
         
         if len(cal_df) == 0:
             raise ValueError("No calibration files found")
@@ -1394,7 +1400,7 @@ class NMDCWorkflowManager:
         
         # Get the first calibration
         first_cal_time = cal_df.iloc[0]['write_time_dt']
-        first_cal_file = cal_df.iloc[0]['file_path']
+        first_cal_file = cal_df.iloc[0]['actual_file_path']
         
         # Check if any samples come before the first calibration
         early_samples = sample_df[sample_df['write_time_dt'] < first_cal_time]
@@ -1402,7 +1408,7 @@ class NMDCWorkflowManager:
         if len(early_samples) > 0:
             print(f"  ⚠️  WARNING: {len(early_samples)} sample(s) were run before any calibration:")
             for _, row in early_samples.iterrows():
-                sample_name = Path(row['file_path']).name
+                sample_name = Path(row['actual_file_path']).name
                 print(f"      - {sample_name} ({row['write_time']})")
             print(f"      These will use the first calibration: {Path(first_cal_file).name}")
         

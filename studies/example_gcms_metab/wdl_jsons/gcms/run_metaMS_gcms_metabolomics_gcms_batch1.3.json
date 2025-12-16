@@ -1,12 +1,12 @@
 {
     "gcmsMetabolomics.runMetaMSGCMS.file_paths": [
-        "/mnt/Volumes/LaCie/nmdc_data/blanchard_11_8ws97026/raw/Blanch_Nat_Met_H_2_AB_O_15.cdf",
-        "/mnt/Volumes/LaCie/nmdc_data/blanchard_11_8ws97026/raw/Blanch_Nat_Met_C_4_AB_O_04.cdf",
-        "/mnt/Volumes/LaCie/nmdc_data/blanchard_11_8ws97026/raw/Blanch_Nat_Met_H_32_AB_O_19.cdf",
-        "/mnt/Volumes/LaCie/nmdc_data/blanchard_11_8ws97026/raw/Blanch_Nat_Met_C_14_AB_O_09.cdf",
-        "/mnt/Volumes/LaCie/nmdc_data/blanchard_11_8ws97026/raw/Blanch_Nat_Met_H_4_AB_M_05.cdf"
+        "/Volumes/LaCie/nmdc_data/blanchard_11_8ws97026/raw/Blanch_Nat_Met_H_2_AB_O_15.cdf",
+        "/Volumes/LaCie/nmdc_data/blanchard_11_8ws97026/raw/Blanch_Nat_Met_C_4_AB_O_04.cdf",
+        "/Volumes/LaCie/nmdc_data/blanchard_11_8ws97026/raw/Blanch_Nat_Met_H_32_AB_O_19.cdf",
+        "/Volumes/LaCie/nmdc_data/blanchard_11_8ws97026/raw/Blanch_Nat_Met_C_14_AB_O_09.cdf",
+        "/Volumes/LaCie/nmdc_data/blanchard_11_8ws97026/raw/Blanch_Nat_Met_H_4_AB_M_05.cdf"
     ],
-    "gcmsMetabolomics.runMetaMSGCMS.calibration_file_path": "/mnt/Volumes/LaCie/nmdc_data/blanchard_11_8ws97026/raw/GCMS_FAMEs_01_GCMS01_20180115.cdf",
+    "gcmsMetabolomics.runMetaMSGCMS.calibration_file_path": "/Volumes/LaCie/nmdc_data/blanchard_11_8ws97026/raw/GCMS_FAMEs_01_GCMS01_20180115.cdf",
     "gcmsMetabolomics.runMetaMSGCMS.output_directory": "output_batch_1.3",
     "gcmsMetabolomics.runMetaMSGCMS.output_type": "csv",
     "gcmsMetabolomics.runMetaMSGCMS.corems_toml_path": "workflow_inputs/metams_gcms_corems.toml",
