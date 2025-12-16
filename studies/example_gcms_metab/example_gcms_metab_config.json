@@ -9,7 +9,7 @@
         "file_type": ".cdf",
         "processed_data_date_tag": "20251210",
         "workflow_type": "GCMS Metabolomics",
-        "batch_size": 25
+        "batch_size": 5
     },
     "paths": {
         "base_directory": "/Users/heal742/LOCAL/05_NMDC/07_automation/nmdc_mass_spec_automation",

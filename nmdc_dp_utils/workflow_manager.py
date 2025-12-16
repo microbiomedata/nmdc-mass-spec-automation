@@ -48,8 +48,8 @@ WORKFLOW_DICT = {
      "raw_data_inspector": "raw_data_inspector"},
     "GCMS Metabolomics":
     {"wdl_workflow_name": "metaMS_gcms_metabolomics",
-     "wdl_download_location": "TBD",
-     "generator_method": "TBD",
+     "wdl_download_location": "https://raw.githubusercontent.com/microbiomedata/metaMS/master/wdl/metaMS_gcms_metabolomics.wdl",
+     "generator_method": "_generate_gcms_metab_wdl",
      "workflow_metadata_input_generator": "TBD",
      "metadata_generator_class": None,
      "raw_data_inspector": "gcms_data_inspector"}
@@ -1139,21 +1139,23 @@ class NMDCWorkflowManager:
 
             # Get the workflow type            
             for batch_num, batch_files in enumerate(batches, 1):
-                self._generate_single_wdl_json(config, batch_files, batch_num)
-
-                print(f"  ✓ Created batch {batch_num} with {len(batch_files)} files")
+                num_jsons = self._generate_single_wdl_json(config, batch_files, batch_num)
+                json_count += num_jsons
         
         print(f"\n📋 SUMMARY: Created {json_count} WDL JSON files total")
-        return
+        return json_count
 
-    def _generate_single_wdl_json(self, config: dict, batch_files: List[Path], batch_num: int):
+    def _generate_single_wdl_json(self, config: dict, batch_files: List[Path], batch_num: int) -> int:
         """
-        Generate a single WDL JSON file based on workflow type.
+        Generate WDL JSON file(s) based on workflow type.
 
         Args:
             config: Configuration dictionary for the workflow
             batch_files: List of raw data file paths for this batch
             batch_num: Batch number for naming the output file
+            
+        Returns:
+            Number of JSON files created (may be >1 if batch is split into sub-batches)
         """
         workflow_type = self.config['workflow']['workflow_type']
         
@@ -1163,9 +1165,9 @@ class NMDCWorkflowManager:
         # Get the generator method name from WORKFLOW_DICT and call it
         generator_method_name = WORKFLOW_DICT[workflow_type]["generator_method"]
         generator_method = getattr(self, generator_method_name)
-        generator_method(config, batch_files, batch_num)
+        return generator_method(config, batch_files, batch_num)
 
-    def _generate_lcms_metab_wdl(self, config: dict, batch_files: List[Path], batch_num: int):
+    def _generate_lcms_metab_wdl(self, config: dict, batch_files: List[Path], batch_num: int) -> int:
         """
         Generate a WDL JSON file for LCMS Metabolomics workflow.
 
@@ -1173,6 +1175,9 @@ class NMDCWorkflowManager:
             config: Configuration dictionary for the workflow
             batch_files: List of raw data file paths for this batch
             batch_num: Batch number for naming the output file
+            
+        Returns:
+            Number of JSON files created (always 1 for LCMS)
         """
         config_dir = self.workflow_path / "wdl_jsons" / config['name']
         json_obj = {
@@ -1188,8 +1193,11 @@ class NMDCWorkflowManager:
         
         with open(output_file, 'w') as f:
             json.dump(json_obj, f, indent=4)
+        
+        print(f"  ✓ Created batch {batch_num} with {len(batch_files)} files")
+        return 1
 
-    def _generate_lcms_lipid_wdl(self, config: dict, batch_files: List[Path], batch_num: int):
+    def _generate_lcms_lipid_wdl(self, config: dict, batch_files: List[Path], batch_num: int) -> int:
         """
         Generate a WDL JSON file for LCMS Lipidomics workflow.
 
@@ -1197,6 +1205,9 @@ class NMDCWorkflowManager:
             config: Configuration dictionary for the workflow
             batch_files: List of raw data file paths for this batch
             batch_num: Batch number for naming the output file
+            
+        Returns:
+            Number of JSON files created (always 1 for LCMS)
         """
         config_dir = self.workflow_path / "wdl_jsons" / config['name']
         json_obj = {
@@ -1212,6 +1223,192 @@ class NMDCWorkflowManager:
         
         with open(output_file, 'w') as f:
             json.dump(json_obj, f, indent=4)
+        
+        print(f"  ✓ Created batch {batch_num} with {len(batch_files)} files")
+        return 1
+    
+    def _generate_gcms_metab_wdl(self, config: dict, batch_files: List[Path], batch_num: int) -> int:
+        """
+        Generate WDL JSON file(s) for GCMS Metabolomics workflow.
+        
+        Matches sample files to calibration files based on chronological order (write_time).
+        For each batch, finds the appropriate calibration file based on when files were run.
+        May create multiple JSON files if samples exceed configured batch_size.
+        
+        Calibration Matching Logic:
+        - Samples are matched to the most recent calibration file before them
+        - If a sample was run before any calibration, it uses the first available calibration (with warning)
+        - Example: [Cal1, S1, S2, Cal2, S3] -> S1,S2 use Cal1; S3 uses Cal2
+        
+        Args:
+            config: Configuration dictionary for the workflow
+            batch_files: List of raw data file paths for this batch (includes both samples and calibrations)
+            batch_num: Batch number for naming the output file
+            
+        Returns:
+            Number of JSON files created (may be >1 if batch is split into sub-batches)
+        """
+        config_dir = self.workflow_path / "wdl_jsons" / config['name']
+        
+        # Load inspection results to get write_time and file types
+        inspection_results_file = self.workflow_path / "raw_file_info" / "raw_file_inspection_results.csv"
+        if not inspection_results_file.exists():
+            raise FileNotFoundError(f"Raw file inspection results not found: {inspection_results_file}. Run raw_data_inspector() first.")
+        
+        inspection_df = pd.read_csv(inspection_results_file)
+        
+        # Load biosample mapping to identify calibration files
+        mapping_file = self.workflow_path / "metadata" / "mapped_raw_file_biosample_mapping.csv"
+        if not mapping_file.exists():
+            raise FileNotFoundError(f"Biosample mapping not found: {mapping_file}. Run biosample mapping first.")
+        
+        mapping_df = pd.read_csv(mapping_file)
+        
+        # Filter inspection results by filename (not full path) since batch_files come from
+        # mapped_raw_files.csv which may have different path prefixes than inspection results
+        batch_file_names = [f.name for f in batch_files]
+        batch_df = inspection_df[inspection_df['file_name'].isin(batch_file_names)].copy()
+        
+        # Merge on file_name (not file_path) since inspection results already has the filename column
+        # and it matches the raw_file_name column in the mapping file
+        batch_df = batch_df.merge(
+            mapping_df[['raw_file_name', 'raw_file_type']],
+            left_on='file_name',
+            right_on='raw_file_name',
+            how='left'
+        )
+        
+        # Convert write_time to datetime for sorting
+        batch_df['write_time_dt'] = pd.to_datetime(batch_df['write_time'])
+        batch_df = batch_df.sort_values('write_time_dt')
+        
+        # Debug: Check if merge was successful
+        if batch_df['raw_file_type'].isna().all():
+            print(f"  ⚠️  WARNING: No file type matches found after merge")
+            print(f"  Available filenames in batch: {batch_df['file_name'].tolist()[:5]}")
+            print(f"  Available filenames in mapping: {mapping_df['raw_file_name'].tolist()[:5]}")
+            raise ValueError(f"Failed to match batch files with biosample mapping. Check that file names match between inspection results and biosample mapping.")
+        
+        # Separate calibration and sample files
+        calibration_files = batch_df[batch_df['raw_file_type'] == 'calibration']['file_path'].tolist()
+        sample_files = batch_df[batch_df['raw_file_type'] != 'calibration']['file_path'].tolist()
+        
+        # Debug output
+        print(f"  📊 Batch {batch_num} composition:")
+        print(f"     Total files: {len(batch_df)}")
+        print(f"     Calibration files: {len(calibration_files)}")
+        print(f"     Sample files: {len(sample_files)}")
+        if len(calibration_files) > 0:
+            print(f"     Calibration: {[Path(f).name for f in calibration_files]}")
+        
+        if not calibration_files:
+            raise ValueError(f"No calibration files found in batch {batch_num}. At least one calibration file is required.")
+        
+        # Match samples to calibration files based on chronological order
+        calibration_file = self._match_calibration_to_samples(batch_df, calibration_files, sample_files)
+        
+        # Get batch size from workflow config (default to no limit if not specified)
+        max_batch_size = self.config['workflow'].get('batch_size', len(sample_files))
+        
+        # If sample files exceed batch size, split into sub-batches
+        if len(sample_files) > max_batch_size:
+            print(f"  ⚠️  {len(sample_files)} samples exceed batch size of {max_batch_size}")
+            print(f"     Splitting into sub-batches...")
+            
+            # Split samples into sub-batches
+            num_sub_batches = (len(sample_files) + max_batch_size - 1) // max_batch_size
+            for sub_batch_idx in range(num_sub_batches):
+                start_idx = sub_batch_idx * max_batch_size
+                end_idx = min(start_idx + max_batch_size, len(sample_files))
+                sub_batch_samples = sample_files[start_idx:end_idx]
+                
+                # Create unique batch number: original_batch.sub_batch (e.g., 1.1, 1.2)
+                sub_batch_num = f"{batch_num}.{sub_batch_idx + 1}"
+                
+                # Generate WDL JSON for this sub-batch
+                json_obj = {
+                    "gcmsMetabolomics.runMetaMSGCMS.file_paths": sub_batch_samples,
+                    "gcmsMetabolomics.runMetaMSGCMS.calibration_file_path": calibration_file,
+                    "gcmsMetabolomics.runMetaMSGCMS.output_directory": f"output_batch_{sub_batch_num}",
+                    "gcmsMetabolomics.runMetaMSGCMS.output_type": config.get('output_type', 'csv'),
+                    "gcmsMetabolomics.runMetaMSGCMS.corems_toml_path": config['corems_toml'],
+                    "gcmsMetabolomics.runMetaMSGCMS.jobs_count": config.get('cores', 5),
+                    "gcmsMetabolomics.runMetaMSGCMS.output_filename": f"{config['name']}_batch{sub_batch_num}"
+                }
+                
+                output_file = config_dir / f"run_metaMS_gcms_metabolomics_{config['name']}_batch{sub_batch_num}.json"
+                
+                with open(output_file, 'w') as f:
+                    json.dump(json_obj, f, indent=4)
+                
+                print(f"     ✓ Created sub-batch {sub_batch_num}: {len(sub_batch_samples)} samples with calibration {Path(calibration_file).name}")
+            
+            return num_sub_batches
+        else:
+            # Generate single WDL JSON (batch size not exceeded)
+            json_obj = {
+                "gcmsMetabolomics.runMetaMSGCMS.file_paths": sample_files,
+                "gcmsMetabolomics.runMetaMSGCMS.calibration_file_path": calibration_file,
+                "gcmsMetabolomics.runMetaMSGCMS.output_directory": f"output_batch_{batch_num}",
+                "gcmsMetabolomics.runMetaMSGCMS.output_type": config.get('output_type', 'csv'),
+                "gcmsMetabolomics.runMetaMSGCMS.corems_toml_path": config['corems_toml'],
+                "gcmsMetabolomics.runMetaMSGCMS.jobs_count": config.get('cores', 5),
+                "gcmsMetabolomics.runMetaMSGCMS.output_filename": f"{config['name']}_batch{batch_num}"
+            }
+            
+            output_file = config_dir / f"run_metaMS_gcms_metabolomics_{config['name']}_batch{batch_num}.json"
+            
+            with open(output_file, 'w') as f:
+                json.dump(json_obj, f, indent=4)
+            
+            print(f"  ✓ Created batch {batch_num}: {len(sample_files)} samples with calibration {Path(calibration_file).name}")
+            return 1
+    
+    def _match_calibration_to_samples(self, batch_df: pd.DataFrame, 
+                                      calibration_files: List[str], 
+                                      sample_files: List[str]) -> str:
+        """
+        Match samples to the most appropriate calibration file based on write_time.
+        
+        Uses chronological order to assign the most recent calibration before each sample.
+        If all samples come before the first calibration, warns and uses first calibration.
+        
+        Args:
+            batch_df: DataFrame with file_path, write_time_dt, and raw_file_type columns
+            calibration_files: List of calibration file paths
+            sample_files: List of sample file paths
+            
+        Returns:
+            Path to the calibration file to use for this batch
+        """
+        # Get calibration write times
+        cal_df = batch_df[batch_df['file_path'].isin(calibration_files)].copy()
+        sample_df = batch_df[batch_df['file_path'].isin(sample_files)].copy()
+        
+        if len(cal_df) == 0:
+            raise ValueError("No calibration files found")
+        
+        # Sort by time
+        cal_df = cal_df.sort_values('write_time_dt')
+        sample_df = sample_df.sort_values('write_time_dt')
+        
+        # Get the first calibration
+        first_cal_time = cal_df.iloc[0]['write_time_dt']
+        first_cal_file = cal_df.iloc[0]['file_path']
+        
+        # Check if any samples come before the first calibration
+        early_samples = sample_df[sample_df['write_time_dt'] < first_cal_time]
+        
+        if len(early_samples) > 0:
+            print(f"  ⚠️  WARNING: {len(early_samples)} sample(s) were run before any calibration:")
+            for _, row in early_samples.iterrows():
+                sample_name = Path(row['file_path']).name
+                print(f"      - {sample_name} ({row['write_time']})")
+            print(f"      These will use the first calibration: {Path(first_cal_file).name}")
+        
+        # For simplicity in batch processing, use the first calibration in the batch
+        # (More complex logic could assign different calibrations to different samples)
+        return first_cal_file
 
     def generate_wdl_runner_script(self,
                                   script_name: Optional[str] = None) -> str:

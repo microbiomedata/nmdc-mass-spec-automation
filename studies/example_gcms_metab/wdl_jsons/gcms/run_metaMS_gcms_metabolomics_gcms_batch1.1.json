@@ -1,0 +1,15 @@
+{
+    "gcmsMetabolomics.runMetaMSGCMS.file_paths": [
+        "/mnt/Volumes/LaCie/nmdc_data/blanchard_11_8ws97026/raw/Blanch_Nat_Met_H_17_AB_O_22.cdf",
+        "/mnt/Volumes/LaCie/nmdc_data/blanchard_11_8ws97026/raw/Blanch_Nat_Met_H_11_AB_O_24.cdf",
+        "/mnt/Volumes/LaCie/nmdc_data/blanchard_11_8ws97026/raw/Blanch_Nat_Met_C_19_AB_O_26.cdf",
+        "/mnt/Volumes/LaCie/nmdc_data/blanchard_11_8ws97026/raw/Blanch_Nat_Met_C_7_AB_M_07.cdf",
+        "/mnt/Volumes/LaCie/nmdc_data/blanchard_11_8ws97026/raw/Blanch_Nat_Met_H_4_AB_O_06.cdf"
+    ],
+    "gcmsMetabolomics.runMetaMSGCMS.calibration_file_path": "/mnt/Volumes/LaCie/nmdc_data/blanchard_11_8ws97026/raw/GCMS_FAMEs_01_GCMS01_20180115.cdf",
+    "gcmsMetabolomics.runMetaMSGCMS.output_directory": "output_batch_1.1",
+    "gcmsMetabolomics.runMetaMSGCMS.output_type": "csv",
+    "gcmsMetabolomics.runMetaMSGCMS.corems_toml_path": "workflow_inputs/metams_gcms_corems.toml",
+    "gcmsMetabolomics.runMetaMSGCMS.jobs_count": 5,
+    "gcmsMetabolomics.runMetaMSGCMS.output_filename": "gcms_batch1.1"
+}
