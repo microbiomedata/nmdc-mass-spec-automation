@@ -74,7 +74,7 @@ WORKFLOW_DICT = {
     {"wdl_workflow_name": "metaMS_gcms",
      "wdl_download_location": "https://raw.githubusercontent.com/microbiomedata/metaMS/master/wdl/metaMS_gcms.wdl",
      "generator_method": "_generate_gcms_metab_wdl",
-     "workflow_metadata_input_generator": "TBD",
+     "workflow_metadata_input_generator": "_generate_gcms_workflow_metadata_inputs",
      "metadata_generator_class": None,
      "raw_data_inspector": "gcms_data_inspector"}
 }
@@ -1262,190 +1262,91 @@ class NMDCWorkflowManager:
         Returns:
             Number of JSON files created (may be >1 if batch is split into sub-batches)
         """
-        # Debug: Check what files we received
-        print(f"  🔍 DEBUG: _generate_gcms_metab_wdl called with {len(batch_files)} files")
-        if len(batch_files) > 0:
-            print(f"     Sample batch_files: {[f.name for f in batch_files[:3]]}")
-        
         config_dir = self.workflow_path / "wdl_jsons" / config['name']
         
-        # Load inspection results to get write_time and file types
-        inspection_results_file = self.workflow_path / "raw_file_info" / "raw_file_inspection_results.csv"
-        if not inspection_results_file.exists():
-            raise FileNotFoundError(f"Raw file inspection results not found: {inspection_results_file}. Run raw_data_inspector() first.")
+        # Get inspection results path
+        inspection_results_path = self.get_raw_inspection_results_path()
+        if not inspection_results_path:
+            raise FileNotFoundError("Raw file inspection results not found. Run raw_data_inspector() first.")
         
-        inspection_df = pd.read_csv(inspection_results_file)
-        
-        # Load biosample mapping to identify calibration files
+        # Load biosample mapping to identify file types
         mapping_file = self.workflow_path / "metadata" / "mapped_raw_file_biosample_mapping.csv"
         if not mapping_file.exists():
             raise FileNotFoundError(f"Biosample mapping not found: {mapping_file}. Run biosample mapping first.")
         
         mapping_df = pd.read_csv(mapping_file)
+        inspection_df = pd.read_csv(inspection_results_path)
         
-        # Build DataFrame directly from batch_files (source of truth for paths)
-        # and look up metadata by filename
-        batch_data = []
-        for file_path in batch_files:
-            filename = file_path.name
-            
-            # Look up write_time from inspection results
-            inspection_row = inspection_df[inspection_df['file_name'] == filename]
-            if inspection_row.empty:
-                raise ValueError(f"File {filename} not found in inspection results")
-            write_time = inspection_row.iloc[0]['write_time']
-            
-            # Look up raw_file_type from mapping
-            mapping_row = mapping_df[mapping_df['raw_file_name'] == filename]
-            if mapping_row.empty:
-                raise ValueError(f"File {filename} not found in biosample mapping")
-            raw_file_type = mapping_row.iloc[0]['raw_file_type']
-            
-            batch_data.append({
-                'file_path': str(file_path),
-                'file_name': filename,
-                'write_time': write_time,
-                'raw_file_type': raw_file_type
-            })
-        
-        batch_df = pd.DataFrame(batch_data)
-        
-        # Debug: Check batch_data content
-        print(f"  🔍 DEBUG: Built batch_data with {len(batch_data)} entries")
-        if len(batch_data) > 0:
-            print(f"     First entry: {batch_data[0]}")
-            print(f"     raw_file_types in batch: {[d['raw_file_type'] for d in batch_data]}")
-        
-        # Convert write_time to datetime for sorting
-        batch_df['write_time_dt'] = pd.to_datetime(batch_df['write_time'])
-        batch_df = batch_df.sort_values('write_time_dt')
+        # Build DataFrame for batch files with their metadata
+        batch_df = pd.DataFrame([
+            {
+                'raw_data_file_short': f.name,
+                'file_path': str(f),
+                'raw_file_type': mapping_df[mapping_df['raw_file_name'] == f.name].iloc[0]['raw_file_type'],
+                'write_time': inspection_df[inspection_df['file_name'] == f.name].iloc[0]['write_time']
+            }
+            for f in batch_files
+        ])
         
         # Separate calibration and sample files
-        calibration_files = batch_df[batch_df['raw_file_type'] == 'calibration']['file_path'].tolist()
-        sample_files = batch_df[batch_df['raw_file_type'] != 'calibration']['file_path'].tolist()
+        sample_files_df = batch_df[batch_df['raw_file_type'] != 'calibration'].copy()
+        calibration_count = len(batch_df[batch_df['raw_file_type'] == 'calibration'])
         
-        # Debug output
-        print(f"  📊 Batch {batch_num} composition:")
-        print(f"     Total files in batch_df: {len(batch_df)}")
-        print(f"     Calibration files: {len(calibration_files)}")
-        print(f"     Sample files: {len(sample_files)}")
-        if len(calibration_files) > 0:
-            print(f"     Calibration: {[Path(f).name for f in calibration_files]}")
+        print(f"  📊 Batch {batch_num} composition: {len(sample_files_df)} samples, {calibration_count} calibrations")
         
-        if not calibration_files:
+        if calibration_count == 0:
             raise ValueError(f"No calibration files found in batch {batch_num}. At least one calibration file is required.")
         
-        if not sample_files:
-            print(f"  ⚠️  WARNING: No sample files in batch {batch_num} - only calibration file(s) present")
-            print(f"     This likely means all samples have already been processed")
-            print(f"     Skipping JSON generation for this batch")
-            return 0  # Don't create a JSON with no samples
+        if len(sample_files_df) == 0:
+            print(f"  ⚠️  WARNING: No sample files in batch {batch_num} - skipping")
+            return 0
         
-        # Match samples to calibration files based on chronological order
-        calibration_file = self._match_calibration_to_samples(batch_df, calibration_files, sample_files)
+        # Use helper function to assign calibration files to samples
+        sample_files_df = self._assign_calibration_files_to_samples(sample_files_df, inspection_results_path)
+        
+        # Get unique calibration file (for this batch, all samples should use same calibration)
+        calibration_file = sample_files_df['calibration_file'].iloc[0]
+        sample_file_paths = sample_files_df['file_path'].tolist()
         
         # Get batch size from workflow config (default to no limit if not specified)
-        max_batch_size = self.config['workflow'].get('batch_size', len(sample_files))
+        max_batch_size = self.config['workflow'].get('batch_size', len(sample_file_paths))
+        
+        # Helper function to create WDL JSON
+        def create_wdl_json(samples, batch_id):
+            json_obj = {
+                "gcmsMetabolomics.runMetaMSGCMS.file_paths": samples,
+                "gcmsMetabolomics.runMetaMSGCMS.calibration_file_path": calibration_file,
+                "gcmsMetabolomics.runMetaMSGCMS.output_directory": f"output_batch_{batch_id}",
+                "gcmsMetabolomics.runMetaMSGCMS.output_type": config.get('output_type', 'csv'),
+                "gcmsMetabolomics.runMetaMSGCMS.corems_toml_path": config['corems_toml'],
+                "gcmsMetabolomics.runMetaMSGCMS.jobs_count": config.get('cores', 5),
+                "gcmsMetabolomics.runMetaMSGCMS.output_filename": f"{config['name']}_batch{batch_id}"
+            }
+            output_file = config_dir / f"run_metaMS_gcms_metabolomics_{config['name']}_batch{batch_id}.json"
+            with open(output_file, 'w') as f:
+                json.dump(json_obj, f, indent=4)
+            return output_file
         
         # If sample files exceed batch size, split into sub-batches
-        if len(sample_files) > max_batch_size:
-            print(f"  ⚠️  {len(sample_files)} samples exceed batch size of {max_batch_size}")
-            print(f"     Splitting into sub-batches...")
+        if len(sample_file_paths) > max_batch_size:
+            print(f"  ⚠️  {len(sample_file_paths)} samples exceed batch size of {max_batch_size} - splitting into sub-batches")
+            num_sub_batches = (len(sample_file_paths) + max_batch_size - 1) // max_batch_size
             
-            # Split samples into sub-batches
-            num_sub_batches = (len(sample_files) + max_batch_size - 1) // max_batch_size
             for sub_batch_idx in range(num_sub_batches):
                 start_idx = sub_batch_idx * max_batch_size
-                end_idx = min(start_idx + max_batch_size, len(sample_files))
-                sub_batch_samples = sample_files[start_idx:end_idx]
-                
-                # Create unique batch number: original_batch.sub_batch (e.g., 1.1, 1.2)
+                end_idx = min(start_idx + max_batch_size, len(sample_file_paths))
+                sub_batch_samples = sample_file_paths[start_idx:end_idx]
                 sub_batch_num = f"{batch_num}.{sub_batch_idx + 1}"
                 
-                # Generate WDL JSON for this sub-batch
-                json_obj = {
-                    "gcmsMetabolomics.runMetaMSGCMS.file_paths": sub_batch_samples,
-                    "gcmsMetabolomics.runMetaMSGCMS.calibration_file_path": calibration_file,
-                    "gcmsMetabolomics.runMetaMSGCMS.output_directory": f"output_batch_{sub_batch_num}",
-                    "gcmsMetabolomics.runMetaMSGCMS.output_type": config.get('output_type', 'csv'),
-                    "gcmsMetabolomics.runMetaMSGCMS.corems_toml_path": config['corems_toml'],
-                    "gcmsMetabolomics.runMetaMSGCMS.jobs_count": config.get('cores', 5),
-                    "gcmsMetabolomics.runMetaMSGCMS.output_filename": f"{config['name']}_batch{sub_batch_num}"
-                }
-                
-                output_file = config_dir / f"run_metaMS_gcms_metabolomics_{config['name']}_batch{sub_batch_num}.json"
-                
-                with open(output_file, 'w') as f:
-                    json.dump(json_obj, f, indent=4)
-                
-                print(f"     ✓ Created sub-batch {sub_batch_num}: {len(sub_batch_samples)} samples with calibration {Path(calibration_file).name}")
+                create_wdl_json(sub_batch_samples, sub_batch_num)
+                print(f"     ✓ Created sub-batch {sub_batch_num}: {len(sub_batch_samples)} samples")
             
             return num_sub_batches
         else:
             # Generate single WDL JSON (batch size not exceeded)
-            json_obj = {
-                "gcmsMetabolomics.runMetaMSGCMS.file_paths": sample_files,
-                "gcmsMetabolomics.runMetaMSGCMS.calibration_file_path": calibration_file,
-                "gcmsMetabolomics.runMetaMSGCMS.output_directory": f"output_batch_{batch_num}",
-                "gcmsMetabolomics.runMetaMSGCMS.output_type": config.get('output_type', 'csv'),
-                "gcmsMetabolomics.runMetaMSGCMS.corems_toml_path": config['corems_toml'],
-                "gcmsMetabolomics.runMetaMSGCMS.jobs_count": config.get('cores', 5),
-                "gcmsMetabolomics.runMetaMSGCMS.output_filename": f"{config['name']}_batch{batch_num}"
-            }
-            
-            output_file = config_dir / f"run_metaMS_gcms_metabolomics_{config['name']}_batch{batch_num}.json"
-            
-            with open(output_file, 'w') as f:
-                json.dump(json_obj, f, indent=4)
-            
-            print(f"  ✓ Created batch {batch_num}: {len(sample_files)} samples with calibration {Path(calibration_file).name}")
+            create_wdl_json(sample_file_paths, batch_num)
+            print(f"  ✓ Created batch {batch_num}: {len(sample_file_paths)} samples with calibration {Path(calibration_file).name}")
             return 1
-    
-    def _match_calibration_to_samples(self, batch_df: pd.DataFrame, 
-                                      calibration_files: List[str], 
-                                      sample_files: List[str]) -> str:
-        """
-        Match samples to the most appropriate calibration file based on write_time.
-        
-        Uses chronological order to assign the most recent calibration before each sample.
-        If all samples come before the first calibration, warns and uses first calibration.
-        
-        Args:
-            batch_df: DataFrame with file_path, write_time_dt, and raw_file_type columns
-            calibration_files: List of calibration file paths
-            sample_files: List of sample file paths
-            
-        Returns:
-            Path to the calibration file to use for this batch
-        """
-        # Get calibration and sample DataFrames
-        cal_df = batch_df[batch_df['file_path'].isin(calibration_files)].copy()
-        sample_df = batch_df[batch_df['file_path'].isin(sample_files)].copy()
-        
-        if len(cal_df) == 0:
-            raise ValueError("No calibration files found")
-        
-        # Sort by time
-        cal_df = cal_df.sort_values('write_time_dt')
-        sample_df = sample_df.sort_values('write_time_dt')
-        
-        # Get the first calibration
-        first_cal_time = cal_df.iloc[0]['write_time_dt']
-        first_cal_file = cal_df.iloc[0]['file_path']
-        
-        # Check if any samples come before the first calibration
-        early_samples = sample_df[sample_df['write_time_dt'] < first_cal_time]
-        
-        if len(early_samples) > 0:
-            print(f"  ⚠️  WARNING: {len(early_samples)} sample(s) were run before any calibration:")
-            for _, row in early_samples.iterrows():
-                sample_name = Path(row['file_path']).name
-                print(f"      - {sample_name} ({row['write_time']})")
-            print(f"      These will use the first calibration: {Path(first_cal_file).name}")
-        
-        # For simplicity in batch processing, use the first calibration in the batch
-        # (More complex logic could assign different calibrations to different samples)
-        return first_cal_file
 
     @skip_if_complete('data_processed', return_value="")
     def generate_wdl_runner_script(self,
@@ -3063,19 +2964,286 @@ fi
             return str(results_file)
         return None
     
+    def _generate_workflow_metadata_inputs_common(self, workflow_specific_processor) -> bool:
+        """
+        Common metadata generation logic shared by all workflow types.
+        
+        Args:
+            workflow_specific_processor: Function that takes merged_df and returns (merged_df, final_columns)
+                                        to add workflow-specific columns and define final column list
+        
+        Returns:
+            bool: True if metadata generation is successful, False otherwise
+        """
+        # Check prerequisites
+        biosample_mapping_file = self.workflow_path / "metadata" / "mapped_raw_file_biosample_mapping.csv"
+        if not biosample_mapping_file.exists():
+            print(f"❌ Biosample mapping file not found: {biosample_mapping_file}")
+            return False
+        
+        raw_inspection_results = self.get_raw_inspection_results_path()
+        if not raw_inspection_results:
+            print("❌ Raw data inspection results not found. Run raw_data_inspector first.")
+            return False
+        
+        # Load the mapped files (high confidence only)
+        mapped_df = pd.read_csv(biosample_mapping_file)
+        mapped_df = mapped_df[mapped_df['match_confidence'].isin(['high'])].copy()
+        if len(mapped_df) == 0:
+            print("❌ No high confidence biosample matches found")
+            return False
+        
+        mapped_df['raw_data_file_short'] = mapped_df['raw_file_name']
+        
+        # Add raw data file paths
+        raw_data_dir = str(self.raw_data_directory)
+        if not raw_data_dir.endswith('/'):
+            raw_data_dir += '/'
+        mapped_df['raw_data_file'] = raw_data_dir + mapped_df['raw_data_file_short']
+        
+        # Load and filter inspection results
+        file_info_df = pd.read_csv(raw_inspection_results)
+        initial_count = len(file_info_df)
+        
+        # Remove files with errors
+        if 'error' in file_info_df.columns:
+            error_mask = file_info_df['error'].notna()
+            if error_mask.any():
+                error_files = file_info_df[error_mask]['file_name'].tolist()
+                print(f"⚠️  Excluding {len(error_files)} files with processing errors:")
+                for f in error_files[:5]:
+                    print(f"   - {f}")
+                if len(error_files) > 5:
+                    print(f"   ... and {len(error_files) - 5} more")
+                file_info_df = file_info_df[~error_mask]
+        
+        # Remove files with missing write_time
+        null_time_mask = file_info_df['write_time'].isna()
+        if null_time_mask.any():
+            null_time_files = file_info_df[null_time_mask]['file_name'].tolist()
+            print(f"⚠️  Excluding {len(null_time_files)} files with missing write_time:")
+            for f in null_time_files:
+                print(f"   - {f}")
+            file_info_df = file_info_df[~null_time_mask]
+        
+        final_count = len(file_info_df)
+        if final_count != initial_count:
+            print(f"📊 Raw inspection results: {initial_count} → {final_count} files (excluded {initial_count - final_count} with errors)")
+        if final_count == 0:
+            print("❌ No valid files remaining after filtering - check raw data inspection results")
+            return False
+        
+        # Process instrument metadata
+        file_info_df['instrument_instance_specifier'] = file_info_df['instrument_serial_number'].astype(str)
+        file_info_df['instrument_analysis_end_date'] = pd.to_datetime(file_info_df["write_time"]).dt.strftime('%Y-%m-%dT%H:%M:%SZ')
+        file_info_df['raw_data_file_short'] = file_info_df['file_name']
+        
+        serial_numbers_to_remove = self.config.get('metadata', {}).get('serial_numbers_to_remove', [])
+        if serial_numbers_to_remove:
+            file_info_df['instrument_instance_specifier'] = file_info_df['instrument_instance_specifier'].replace(serial_numbers_to_remove, pd.NA)
+        
+        print(f"Unique instrument_instance_specifier values: {file_info_df['instrument_instance_specifier'].unique()}")
+        valid_dates = file_info_df['instrument_analysis_end_date'].dropna()
+        if len(valid_dates) > 0:
+            print(f"Date range: {valid_dates.min()} to {valid_dates.max()}")
+        else:
+            print("No valid dates found")
+        
+        # Merge with mapped files
+        file_info_columns = ['raw_data_file_short', 'instrument_analysis_end_date', 'instrument_instance_specifier', 'write_time']
+        file_info_merge = file_info_df[file_info_columns].drop_duplicates(subset=['raw_data_file_short'])
+        merged_df = pd.merge(mapped_df, file_info_merge, on='raw_data_file_short', how='left')
+        
+        if len(merged_df) != len(mapped_df):
+            print(f"❌ Merge error: expected {len(mapped_df)} rows, got {len(merged_df)}")
+            return False
+        
+        # Check for missing metadata
+        missing_metadata = merged_df['instrument_analysis_end_date'].isna().sum()
+        if missing_metadata > 0:
+            print(f"⚠️  {missing_metadata} files missing instrument metadata (may not be in raw inspection results)")
+            missing_files = merged_df[merged_df['instrument_analysis_end_date'].isna()]['raw_data_file_short'].tolist()
+            for f in missing_files[:5]:
+                print(f"   - {f}")
+            if len(missing_files) > 5:
+                print(f"   ... and {len(missing_files) - 5} more")
+            merged_df = merged_df[merged_df['instrument_analysis_end_date'].notna()].copy()
+            print(f"📊 Proceeding with {len(merged_df)} files that have complete metadata")
+        
+        # Add common metadata
+        metadata_config = self.config.get('metadata', {})
+        merged_df['processing_institution_workflow'] = metadata_config.get('processing_institution_workflow', 'EMSL')
+        merged_df['processing_institution_generation'] = metadata_config.get('processing_institution_generation', 'EMSL')
+        merged_df['sample_id'] = merged_df['biosample_id']
+        merged_df['biosample.associated_studies'] = f"['{self.config['study']['id']}']"        
+        
+        # Handle raw_data_url (MASSIVE vs MinIO)
+        raw_data_location = self.config.get('metadata', {}).get('raw_data_location', 'massive')
+        include_raw_data_url = False
+        
+        if raw_data_location.lower() == 'massive':
+            include_raw_data_url = True
+            ftp_file = self.workflow_path / "raw_file_info" / "massive_ftp_locs.csv"
+            if ftp_file.exists():
+                ftp_df = pd.read_csv(ftp_file)
+                ftp_mapping = dict(zip(ftp_df['raw_data_file_short'], ftp_df['ftp_location']))
+            else:
+                raise ValueError(f"MASSIVE FTP URLs file not found: {ftp_file}")
+            
+            massive_id = self.config['workflow']['massive_id']
+            
+            def construct_massive_url(filename):
+                import urllib.parse
+                import re
+                if 'MSV' in massive_id:
+                    msv_part = 'MSV' + massive_id.split('MSV')[1]
+                else:
+                    msv_part = massive_id
+                
+                if filename in ftp_mapping:
+                    ftp_url = ftp_mapping[filename]
+                    match = re.search(rf'{re.escape(msv_part)}(.+)/{re.escape(filename)}', ftp_url)
+                    if match:
+                        file_path = f"{msv_part}{match.group(1)}/{filename}"
+                    else:
+                        file_path = f"{msv_part}/raw/{filename}"
+                else:
+                    file_path = f"{msv_part}/raw/{filename}"
+                
+                encoded_path = urllib.parse.quote(file_path, safe='')
+                https_url = f"https://massive.ucsd.edu/ProteoSAFe/DownloadResultFile?file=f.{encoded_path}&forceDownload=true"
+                if not https_url.startswith("https://massive.ucsd.edu/ProteoSAFe/DownloadResultFile?file=f.MSV"):
+                    raise ValueError(f"Invalid MASSIVE URL format generated: {https_url}")
+                return https_url
+            
+            merged_df['raw_data_url'] = merged_df['raw_data_file_short'].apply(construct_massive_url)
+            print("🔍 Validating MASSIVE URL accessibility...")
+            self._validate_massive_urls(merged_df['raw_data_url'].head(5).tolist())
+        elif raw_data_location.lower() == 'minio':
+            print("ℹ️  Using MinIO - raw_data_url will not be included in metadata CSV")
+        else:
+            raise ValueError(f"Unsupported raw_data_location: {raw_data_location}, must be 'massive' or 'minio'")
+        
+        # Remove problem files
+        problem_files = self.config.get('problem_files', [])
+        if problem_files:
+            initial_count = len(merged_df)
+            merged_df = merged_df[~merged_df['raw_data_file_short'].isin(problem_files)].copy()
+            print(f"⚠️  Removed {initial_count - len(merged_df)} problematic files from metadata generation")
+        
+        # Call workflow-specific processor to add workflow-specific columns and get final column list
+        merged_df, final_columns = workflow_specific_processor(merged_df, raw_inspection_results, include_raw_data_url)
+        
+        # Generate configuration-specific CSV files
+        config_dfs = self._separate_files_by_configuration(merged_df, metadata_config)
+        if not config_dfs:
+            print("❌ No files matched any configuration filters")
+            return False
+        
+        # Create output directory and clear existing files
+        output_dir = self.workflow_path / "metadata" / "metadata_gen_input_csvs"
+        output_dir.mkdir(parents=True, exist_ok=True)
+        for f in output_dir.glob("*.csv"):
+            f.unlink()
+        
+        # Write configuration-specific CSV files
+        files_written = 0
+        total_files = 0
+        
+        for config_name, config_df in config_dfs.items():
+            missing_cols = [col for col in final_columns if col not in config_df.columns]
+            if missing_cols:
+                print(f"❌ Skipping {config_name}: missing columns {missing_cols}")
+                continue
+            if len(config_df) == 0:
+                print(f"⚠️  Skipping {config_name}: no files after filtering")
+                continue
+            
+            try:
+                output_df = config_df[final_columns].copy()
+                output_file = output_dir / f"{config_name}_metadata.csv"
+                output_df.to_csv(output_file, index=False)
+                files_written += 1
+                total_files += len(output_df)
+                sample_chromat = output_df['chromat_configuration_name'].iloc[0]
+                sample_ms = output_df['mass_spec_configuration_name'].iloc[0]
+                print(f"✅ {config_name}_metadata.csv: {len(output_df)} files ({sample_chromat}, {sample_ms})")
+            except Exception as e:
+                print(f"❌ Error writing {config_name}_metadata.csv: {e}")
+                continue
+        
+        if files_written == 0:
+            print("❌ No metadata files were successfully written")
+            return False
+        
+        print(f"📋 Successfully generated {files_written} metadata files with {total_files} total entries")
+        print(f"   Output directory: {output_dir}")
+        return True
+    
     def _generate_lcms_workflow_metadata_inputs(self) -> bool:
         """Generate metadata inputs specific to LCMS Metabolomics and Lipidomics workflows.
         
-        This function generates metadata mapping files for NMDC submission.
-        First, it checks for prerequisites such as the biosample mapping file
-        and raw data inspection results. It then merges these datasets to create
-        a comprehensive metadata file including instrument information. Note that
-        only high-confidence biosample matches (from the mapped_raw_file_biosample_mapping file)
-        are used
-
         Returns:
             bool: True if metadata generation is successful, False otherwise        
         """
+        def lcms_processor(merged_df, raw_inspection_results, include_raw_data_url):
+            # Add processed_data_directory for LCMS
+            processed_data_dir = str(self.processed_data_directory)
+            if not processed_data_dir.endswith('/'):
+                processed_data_dir += '/'
+            merged_df['processed_data_directory'] = (
+                processed_data_dir +
+                merged_df['raw_data_file_short'].str.replace(r'(?i)\.(raw|mzml)$', '', regex=True) +
+                '.corems'
+            )
+            
+            # Define final columns for LCMS
+            final_columns = [
+                'sample_id', 'biosample.associated_studies', 'raw_data_file', 'processed_data_directory', 
+                'mass_spec_configuration_name', 'chromat_configuration_name', 'instrument_used', 
+                'processing_institution_workflow', 'processing_institution_generation',
+                'instrument_analysis_end_date', 'instrument_instance_specifier'
+            ]
+            if include_raw_data_url:
+                final_columns.append('raw_data_url')
+            
+            return merged_df, final_columns
+        
+        return self._generate_workflow_metadata_inputs_common(lcms_processor)
+    
+    def _generate_gcms_workflow_metadata_inputs(self) -> bool:
+        """Generate metadata inputs specific to GCMS Metabolomics workflows.
+        
+        Returns:
+            bool: True if metadata generation is successful, False otherwise        
+        """
+        def gcms_processor(merged_df, raw_inspection_results, include_raw_data_url):
+            # Add processed_data_file for GCMS (CSV files)
+            processed_data_dir = str(self.processed_data_directory)
+            if not processed_data_dir.endswith('/'):
+                processed_data_dir += '/'
+            merged_df['processed_data_file'] = (
+                processed_data_dir +
+                merged_df['raw_data_file_short'].str.replace(r'(?i)\.(cdf|mzml)$', '.csv', regex=True)
+            )
+            
+            # Match samples to calibration files
+            print("🔬 Matching samples to calibration files based on chronological order...")
+            merged_df = self._assign_calibration_files_to_samples(merged_df, raw_inspection_results)
+            
+            # Define final columns for GCMS
+            final_columns = [
+                'sample_id', 'biosample.associated_studies', 'raw_data_file', 'processed_data_file',
+                'calibration_file', 'mass_spec_configuration_name', 'chromat_configuration_name',
+                'instrument_used', 'processing_institution_workflow', 'processing_institution_generation',
+                'instrument_analysis_end_date', 'instrument_instance_specifier'
+            ]
+            if include_raw_data_url:
+                final_columns.append('raw_data_url')
+            
+            return merged_df, final_columns
+        
+        return self._generate_workflow_metadata_inputs_common(gcms_processor)
        
         # Check prerequisites
         biosample_mapping_file = self.workflow_path / "metadata" / "mapped_raw_file_biosample_mapping.csv"
@@ -3105,17 +3273,16 @@ fi
             raw_data_dir += '/'
         mapped_df['raw_data_file'] = raw_data_dir + mapped_df['raw_data_file_short']
         
-        # Add processed data directories
+        # Add processed data file paths (CSV files for GCMS)
         processed_data_dir = str(self.processed_data_directory)
         if not processed_data_dir.endswith('/'):
             processed_data_dir += '/'
-        mapped_df['processed_data_directory'] = (
+        mapped_df['processed_data_file'] = (
             processed_data_dir +
-            mapped_df['raw_data_file_short'].str.replace(r'(?i)\.(raw|mzml)$', '', regex=True) +
-            '.corems'
+            mapped_df['raw_data_file_short'].str.replace(r'(?i)\.(cdf|mzml)$', '.csv', regex=True)
         )
         
-        # Add instrument times from raw inspection results
+        # Load inspection results to get write_time for calibration matching
         file_info_df = pd.read_csv(raw_inspection_results)
         
         # Filter out files with errors or missing critical metadata
@@ -3148,9 +3315,9 @@ fi
         
         if final_count == 0:
             print("❌ No valid files remaining after filtering - check raw data inspection results")
-            return {}
+            return False
         
-        # Process remaining valid files
+        # Process remaining valid files (same as LCMS)
         file_info_df['instrument_instance_specifier'] = file_info_df['instrument_serial_number'].astype(str)
         file_info_df['instrument_analysis_end_date'] = pd.to_datetime(file_info_df["write_time"]).dt.strftime('%Y-%m-%dT%H:%M:%SZ')
         file_info_df['raw_data_file_short'] = file_info_df['file_name']
@@ -3168,18 +3335,18 @@ fi
         else:
             print("No valid dates found")
         
-        # Keep only relevant columns for merging
-        file_info_df = file_info_df[['raw_data_file_short', 'instrument_analysis_end_date', 'instrument_instance_specifier']]
+        # Keep columns for merging (including write_time for calibration matching)
+        file_info_df_merge = file_info_df[['raw_data_file_short', 'instrument_analysis_end_date', 'instrument_instance_specifier', 'write_time']].copy()
         # drop duplicates just in case
-        file_info_df = file_info_df.drop_duplicates(subset=['raw_data_file_short'])
+        file_info_df_merge = file_info_df_merge.drop_duplicates(subset=['raw_data_file_short'])
         
-        # Merge instrument information
-        merged_df = pd.merge(mapped_df, file_info_df, on='raw_data_file_short', how='left')
+        # Merge instrument information (includes write_time for calibration matching)
+        merged_df = pd.merge(mapped_df, file_info_df_merge, on='raw_data_file_short', how='left')
         
         # Validate merge didn't change row count
         if len(merged_df) != len(mapped_df):
             print(f"❌ Merge error: expected {len(mapped_df)} rows, got {len(merged_df)}")
-            return {}
+            return False
         
         # Check for files that didn't get instrument metadata
         missing_metadata = merged_df['instrument_analysis_end_date'].isna().sum()
@@ -3195,7 +3362,12 @@ fi
             merged_df = merged_df[merged_df['instrument_analysis_end_date'].notna()].copy()
             print(f"📊 Proceeding with {len(merged_df)} files that have complete metadata")
         
-        # Add common metadata from config that applies to all files
+        # Match each sample to its appropriate calibration file based on chronological order
+        # This uses the same logic as _generate_gcms_metab_wdl
+        print("🔬 Matching samples to calibration files based on chronological order...")
+        merged_df = self._assign_calibration_files_to_samples(merged_df, raw_inspection_results)
+        
+        # Add common metadata from config (same as LCMS)
         metadata_config = self.config.get('metadata', {})
         merged_df['processing_institution_workflow'] = metadata_config.get('processing_institution_workflow', 'EMSL')
         merged_df['processing_institution_generation'] = metadata_config.get('processing_institution_generation', 'EMSL')
@@ -3204,12 +3376,14 @@ fi
         merged_df['sample_id'] = merged_df['biosample_id']
         
         # Add biosample.associated_studies (must be in brackets as a list)
-        merged_df['biosample.associated_studies'] = f"['{self.config['study']['id']}']"
+        merged_df['biosample.associated_studies'] = f"['{self.config['study']['id']}']"        
         
-        # Add raw_data_url using configurable URL construction
-        use_massive_urls = self.config.get('metadata', {}).get('use_massive_urls', True)
+        # Add raw_data_url only for MASSIVE (not needed for MinIO)
+        raw_data_location = self.config.get('metadata', {}).get('raw_data_location', False)
+        include_raw_data_url = False
         
-        if use_massive_urls:
+        if raw_data_location.lower() == 'massive':
+            include_raw_data_url = True
             # Load FTP URLs to get correct directory structure
             ftp_file = self.workflow_path / "raw_file_info" / "massive_ftp_locs.csv"
             if ftp_file.exists():
@@ -3262,10 +3436,11 @@ fi
             # Validate at least 5 URLs to ensure they're accessible
             print("🔍 Validating MASSIVE URL accessibility...")
             self._validate_massive_urls(merged_df['raw_data_url'].head(5).tolist())
+        elif raw_data_location.lower() == 'minio':
+            # MinIO: raw_data_url not needed in metadata CSV
+            print("ℹ️  Using MinIO - raw_data_url will not be included in metadata CSV")
         else:
-            # Use placeholder URLs for future implementation
-            merged_df['raw_data_url'] = 'placeholder://raw_data/' + merged_df['raw_data_file_short']
-            print("⚠️  Using placeholder URLs - configure alternative URL construction method")
+            raise ValueError(f"Unsupported raw_data_location for GCMS: {raw_data_location}, must be 'massive' or 'minio'")
         
         # Remove any files marked as problematic in config from metadata generation csvs
         problem_files = self.config.get('problem_files', [])
@@ -3276,7 +3451,6 @@ fi
             print(f"⚠️  Removed {removed_count} problematic files from metadata generation")
         
         # Generate configuration-specific CSV files
-        metadata_config = self.config.get('metadata', {})
         config_dfs = self._separate_files_by_configuration(merged_df, metadata_config)
         
         if not config_dfs:
@@ -3291,13 +3465,16 @@ fi
         for f in output_dir.glob("*.csv"):
             f.unlink()
         
-        # Define final columns
+        # Define final columns for GCMS (includes calibration_file, uses processed_data_file)
+        # raw_data_url is optional - only included when using MASSIVE
         final_columns = [
-            'sample_id', 'biosample.associated_studies', 'raw_data_file', 'processed_data_directory', 
-            'mass_spec_configuration_name', 'chromat_configuration_name', 'instrument_used', 
-            'processing_institution_workflow', 'processing_institution_generation',
-            'instrument_analysis_end_date', 'instrument_instance_specifier', 'raw_data_url'
+            'sample_id', 'biosample.associated_studies', 'raw_data_file', 'processed_data_file',
+            'calibration_file', 'mass_spec_configuration_name', 'chromat_configuration_name',
+            'instrument_used', 'processing_institution_workflow', 'processing_institution_generation',
+            'instrument_analysis_end_date', 'instrument_instance_specifier'
         ]
+        if include_raw_data_url:
+            final_columns.append('raw_data_url')
         
         # Write configuration-specific CSV files
         files_written = 0
@@ -3340,6 +3517,100 @@ fi
         print(f"📋 Successfully generated {files_written} metadata files with {total_files} total entries")
         print(f"   Output directory: {output_dir}")
         return True
+    
+    def _assign_calibration_files_to_samples(self, merged_df: pd.DataFrame, raw_inspection_results: str) -> pd.DataFrame:
+        """
+        Assign calibration files to samples based on chronological order.
+        
+        Matches each sample file to the most recent calibration file that was run before it.
+        Uses the same logic as _generate_gcms_metab_wdl to ensure consistency between
+        WDL execution and metadata generation.
+        
+        Args:
+            merged_df: DataFrame with sample files (must have 'raw_data_file_short' and 'write_time' columns)
+            raw_inspection_results: Path to raw inspection results CSV
+            
+        Returns:
+            DataFrame with added 'calibration_file' column containing full paths to calibration files
+        """
+        # Load full biosample mapping to identify calibration files
+        mapping_file = self.workflow_path / "metadata" / "mapped_raw_file_biosample_mapping.csv"
+        if not mapping_file.exists():
+            raise FileNotFoundError(f"Biosample mapping not found: {mapping_file}. Run biosample mapping first.")
+        
+        mapping_df = pd.read_csv(mapping_file)
+        
+        # Load inspection results for all files (samples + calibrations)
+        inspection_df = pd.read_csv(raw_inspection_results)
+        
+        # Get calibration files from mapping
+        calibration_files_df = mapping_df[mapping_df['raw_file_type'] == 'calibration'].copy()
+        
+        if len(calibration_files_df) == 0:
+            raise ValueError("No calibration files found in biosample mapping. At least one calibration file is required for GCMS.")
+        
+        # Merge calibration files with their write_time from inspection results
+        calibration_files_df = calibration_files_df.merge(
+            inspection_df[['file_name', 'write_time']],
+            left_on='raw_file_name',
+            right_on='file_name',
+            how='left'
+        )
+        
+        # Convert write_time to datetime for both samples and calibrations
+        merged_df['write_time_dt'] = pd.to_datetime(merged_df['write_time'])
+        calibration_files_df['write_time_dt'] = pd.to_datetime(calibration_files_df['write_time'])
+        
+        # Sort calibrations by time
+        calibration_files_df = calibration_files_df.sort_values('write_time_dt')
+        
+        # Build raw data directory path
+        raw_data_dir = str(self.raw_data_directory)
+        if not raw_data_dir.endswith('/'):
+            raw_data_dir += '/'
+        
+        # Function to find the appropriate calibration file for each sample
+        def find_calibration_for_sample(sample_time):
+            """Find the most recent calibration before this sample time."""
+            # Find calibrations that were run before or at the same time as this sample
+            valid_calibrations = calibration_files_df[calibration_files_df['write_time_dt'] <= sample_time]
+            
+            if len(valid_calibrations) == 0:
+                # No calibration before this sample - use the first calibration (with warning logged once)
+                return calibration_files_df.iloc[0]['raw_file_name']
+            else:
+                # Use the most recent calibration before this sample
+                return valid_calibrations.iloc[-1]['raw_file_name']
+        
+        # Assign calibration file to each sample
+        merged_df['calibration_file_short'] = merged_df['write_time_dt'].apply(find_calibration_for_sample)
+        merged_df['calibration_file'] = raw_data_dir + merged_df['calibration_file_short']
+        
+        # Check for samples that use calibration from after their run time (shouldn't happen, but check)
+        early_samples = []
+        first_cal_time = calibration_files_df.iloc[0]['write_time_dt']
+        for idx, row in merged_df.iterrows():
+            if row['write_time_dt'] < first_cal_time:
+                early_samples.append(row['raw_data_file_short'])
+        
+        if early_samples:
+            print(f"  ⚠️  WARNING: {len(early_samples)} sample(s) were run before any calibration:")
+            for sample in early_samples[:5]:
+                print(f"      - {sample}")
+            if len(early_samples) > 5:
+                print(f"      ... and {len(early_samples) - 5} more")
+            print(f"      These will use the first calibration: {calibration_files_df.iloc[0]['raw_file_name']}")
+        
+        # Report calibration file assignment summary
+        calibration_counts = merged_df['calibration_file_short'].value_counts()
+        print(f"  📊 Calibration file assignments:")
+        for cal_file, count in calibration_counts.items():
+            print(f"      {cal_file}: {count} samples")
+        
+        # Drop temporary columns
+        merged_df = merged_df.drop(columns=['write_time_dt', 'calibration_file_short', 'write_time'])
+        
+        return merged_df
     
     @skip_if_complete('metadata_mapping_generated', return_value=True)
     def generate_workflow_metadata_generation_inputs(self) -> bool:

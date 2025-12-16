@@ -59,9 +59,8 @@ def main():
 
     # Step 6: Generate metadata mapping files with URL validation
     print("\n6. Generating metadata mapping files with URL validation...")
-    metadata_success = manager.generate_workflow_metadata_generation_inputs()
+    manager.generate_workflow_metadata_generation_inputs()
     assert manager.should_skip('metadata_mapping_generated'), "Metadata mapping generation must complete successfully to proceed"
-    assert metadata_success, "Metadata mapping generation failed."
 
     # Step 9: Generate NMDC submission packages
     print("\n9. Generating NMDC submission packages for workflow metadata...")

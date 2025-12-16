@@ -39,7 +39,8 @@
         "serial_numbers_to_remove": [
             "Unknown",
             "Exactive Series slot #1"
-        ]
+        ],
+        "raw_data_location": "MinIO"
     },
     "skip_triggers": {
         "study_structure_created": true,
@@ -48,7 +49,7 @@
         "biosample_mapping_script_generated": true,
         "biosample_mapping_completed": true,
         "raw_data_inspected": true,
-        "metadata_mapping_generated": false,
+        "metadata_mapping_generated": true,
         "data_processed": true,
         "processed_data_uploaded_to_minio": true,
         "metadata_packages_generated": false,
