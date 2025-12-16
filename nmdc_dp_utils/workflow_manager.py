@@ -23,6 +23,7 @@ from minio import Minio
 from minio.error import S3Error
 from tqdm import tqdm
 from typing import Dict, List, Optional
+from functools import wraps
 from dotenv import load_dotenv
 
 from nmdc_ms_metadata_gen.lcms_metab_metadata_generator import LCMSMetabolomicsMetadataGenerator
@@ -30,6 +31,29 @@ from nmdc_ms_metadata_gen.lcms_lipid_metadata_generator import LCMSLipidomicsMet
 
 # Load environment variables from .env file
 load_dotenv()
+
+def skip_if_complete(trigger_name: str, return_value=None):
+    """
+    Decorator to skip a method if the specified trigger is set to True.
+    
+    Args:
+        trigger_name: Name of the skip trigger to check
+        return_value: Value to return if skipping (default: None)
+    
+    Usage:
+        @skip_if_complete('data_processed', return_value=0)
+        def some_method(self):
+            # method implementation
+    """
+    def decorator(func):
+        @wraps(func)
+        def wrapper(self, *args, **kwargs):
+            if self.should_skip(trigger_name):
+                print(f"Skipping {func.__name__} ({trigger_name} already complete)")
+                return return_value
+            return func(self, *args, **kwargs)
+        return wrapper
+    return decorator
 
 WORKFLOW_DICT = {
     "LCMS Metabolomics":
@@ -90,6 +114,8 @@ class NMDCWorkflowManager:
             json.JSONDecodeError: If the configuration file is invalid JSON
             KeyError: If required configuration fields are missing
         """
+        # Convert to absolute path so it works regardless of current working directory
+        self.config_path = str(Path(config_path).resolve())
         self.config = self.load_config(config_path)
         self.workflow_name = self.config['workflow']['name']
         self.study_name = self.config['study']['name']
@@ -149,8 +175,6 @@ class NMDCWorkflowManager:
                 'data_processed': False
             }
         
-        # Store config path for later updates
-        self.config_path = config_path
         return config
     
     def should_skip(self, trigger_name: str) -> bool:
@@ -179,7 +203,7 @@ class NMDCWorkflowManager:
         
         self.config['skip_triggers'][trigger_name] = value
         
-        if save and hasattr(self, 'config_path'):
+        if save:
             with open(self.config_path, 'w') as f:
                 json.dump(self.config, f, indent=4)
             print(f"Updated skip trigger '{trigger_name}' to {value}")
@@ -201,12 +225,6 @@ class NMDCWorkflowManager:
         Example:
             >>> manager = NMDCWorkflowManager('config.json')
             >>> manager.reset_all_triggers()
-            🔄 Reset 5 skip triggers to False:
-               • raw_data_downloaded: False
-               • biosample_mapping_completed: False
-               • data_processed: False
-               • biosample_attributes_fetched: False
-               • raw_data_inspected: False
             All workflow steps will now run when executed
         """
         if 'skip_triggers' not in self.config:
@@ -255,6 +273,7 @@ class NMDCWorkflowManager:
             print("MinIO credentials not found in environment variables")
             return None
     
+    @skip_if_complete('study_structure_created')
     def create_workflow_structure(self):
         """
         Create the standard directory structure for a workflow for a study.
@@ -268,10 +287,6 @@ class NMDCWorkflowManager:
         Additional subdirectories are created for each processing configuration
         specified in the config file.
         """
-        if self.should_skip('study_structure_created'):
-            print("Skipping study structure creation (already created)")
-            return
-            
         directories = [
             self.workflow_path,
             self.workflow_path / "scripts",
@@ -981,6 +996,7 @@ class NMDCWorkflowManager:
         
         return downloaded_files
     
+    @skip_if_complete('data_processed')
     def generate_wdl_jsons(self, batch_size: int = 50) -> int:
         """
         Generate WDL workflow JSON configuration files for batch processing.
@@ -1018,9 +1034,7 @@ class NMDCWorkflowManager:
         Example:
             >>> json_count = manager.generate_wdl_jsons(batch_size=25)
             >>> print(f"Created {json_count} WDL JSON files")
-        """        
-        if self.should_skip('data_processed'):
-            print("Skipping WDL JSON generation (already generated)")
+        """
 
         # First, move any processed data from previous WDL execution attempts
         # This ensures the processed data directory is up-to-date before we check for already-processed files
@@ -1055,8 +1069,21 @@ class NMDCWorkflowManager:
             raw_files = [f for f in raw_files if f.name not in problem_files]
 
         # Filter out already-processed files by checking for processed outputs
+        # IMPORTANT: Calibration files should never be filtered out as they are reference files, not samples
         processed_data_dir = self.processed_data_directory
         workflow_type = self.config['workflow']['workflow_type']
+        
+        # Load biosample mapping to identify calibration files (for GCMS workflow)
+        calibration_files_set = set()
+        if workflow_type == "GCMS Metabolomics":
+            mapping_file = self.workflow_path / "metadata" / "mapped_raw_file_biosample_mapping.csv"
+            if mapping_file.exists():
+                mapping_df = pd.read_csv(mapping_file)
+                calibration_files_set = set(
+                    mapping_df[mapping_df['raw_file_type'] == 'calibration']['raw_file_name'].tolist()
+                )
+                if calibration_files_set:
+                    print(f"🔧 Found {len(calibration_files_set)} calibration file(s) - these will always be included")
         
         if processed_data_dir:
             processed_path = Path(processed_data_dir)
@@ -1069,6 +1096,11 @@ class NMDCWorkflowManager:
                 for raw_file in raw_files:
                     # Get the base name without extension (e.g., sample1.raw -> sample1)
                     base_name = raw_file.stem
+                    
+                    # ALWAYS include calibration files (they are reference files, not samples to be processed)
+                    if raw_file.name in calibration_files_set:
+                        unprocessed_files.append(raw_file)
+                        continue
                     
                     # Check for processed output based on workflow type
                     if workflow_type in ["LCMS Metabolomics", "LCMS Lipidomics"]:
@@ -1154,6 +1186,12 @@ class NMDCWorkflowManager:
                 json_count += num_jsons
         
         print(f"\n📋 SUMMARY: Created {json_count} WDL JSON files total")
+        
+        # If no JSONs were created, all files are already processed
+        if json_count == 0:
+            print("⚠️  No WDL JSON files created - all files already processed")
+            self.set_skip_trigger('data_processed', True)
+        
         return json_count
 
     def _generate_single_wdl_json(self, config: dict, batch_files: List[Path], batch_num: int) -> int:
@@ -1259,6 +1297,11 @@ class NMDCWorkflowManager:
         Returns:
             Number of JSON files created (may be >1 if batch is split into sub-batches)
         """
+        # Debug: Check what files we received
+        print(f"  🔍 DEBUG: _generate_gcms_metab_wdl called with {len(batch_files)} files")
+        if len(batch_files) > 0:
+            print(f"     Sample batch_files: {[f.name for f in batch_files[:3]]}")
+        
         config_dir = self.workflow_path / "wdl_jsons" / config['name']
         
         # Load inspection results to get write_time and file types
@@ -1275,44 +1318,50 @@ class NMDCWorkflowManager:
         
         mapping_df = pd.read_csv(mapping_file)
         
-        # Create a mapping from filename to actual file path (from batch_files)
-        batch_file_map = {f.name: str(f) for f in batch_files}
+        # Build DataFrame directly from batch_files (source of truth for paths)
+        # and look up metadata by filename
+        batch_data = []
+        for file_path in batch_files:
+            filename = file_path.name
+            
+            # Look up write_time from inspection results
+            inspection_row = inspection_df[inspection_df['file_name'] == filename]
+            if inspection_row.empty:
+                raise ValueError(f"File {filename} not found in inspection results")
+            write_time = inspection_row.iloc[0]['write_time']
+            
+            # Look up raw_file_type from mapping
+            mapping_row = mapping_df[mapping_df['raw_file_name'] == filename]
+            if mapping_row.empty:
+                raise ValueError(f"File {filename} not found in biosample mapping")
+            raw_file_type = mapping_row.iloc[0]['raw_file_type']
+            
+            batch_data.append({
+                'file_path': str(file_path),
+                'file_name': filename,
+                'write_time': write_time,
+                'raw_file_type': raw_file_type
+            })
         
-        # Filter inspection results by filename (not full path) since batch_files come from
-        # mapped_raw_files.csv which may have different path prefixes than inspection results
-        batch_file_names = [f.name for f in batch_files]
-        batch_df = inspection_df[inspection_df['file_name'].isin(batch_file_names)].copy()
+        batch_df = pd.DataFrame(batch_data)
         
-        # Merge on file_name (not file_path) since inspection results already has the filename column
-        # and it matches the raw_file_name column in the mapping file
-        batch_df = batch_df.merge(
-            mapping_df[['raw_file_name', 'raw_file_type']],
-            left_on='file_name',
-            right_on='raw_file_name',
-            how='left'
-        )
-        
-        # Replace file_path with the actual path from batch_files (correct path prefix)
-        batch_df['actual_file_path'] = batch_df['file_name'].map(batch_file_map)
+        # Debug: Check batch_data content
+        print(f"  🔍 DEBUG: Built batch_data with {len(batch_data)} entries")
+        if len(batch_data) > 0:
+            print(f"     First entry: {batch_data[0]}")
+            print(f"     raw_file_types in batch: {[d['raw_file_type'] for d in batch_data]}")
         
         # Convert write_time to datetime for sorting
         batch_df['write_time_dt'] = pd.to_datetime(batch_df['write_time'])
         batch_df = batch_df.sort_values('write_time_dt')
         
-        # Debug: Check if merge was successful
-        if batch_df['raw_file_type'].isna().all():
-            print(f"  ⚠️  WARNING: No file type matches found after merge")
-            print(f"  Available filenames in batch: {batch_df['file_name'].tolist()[:5]}")
-            print(f"  Available filenames in mapping: {mapping_df['raw_file_name'].tolist()[:5]}")
-            raise ValueError(f"Failed to match batch files with biosample mapping. Check that file names match between inspection results and biosample mapping.")
-        
-        # Separate calibration and sample files using the actual file paths
-        calibration_files = batch_df[batch_df['raw_file_type'] == 'calibration']['actual_file_path'].tolist()
-        sample_files = batch_df[batch_df['raw_file_type'] != 'calibration']['actual_file_path'].tolist()
+        # Separate calibration and sample files
+        calibration_files = batch_df[batch_df['raw_file_type'] == 'calibration']['file_path'].tolist()
+        sample_files = batch_df[batch_df['raw_file_type'] != 'calibration']['file_path'].tolist()
         
         # Debug output
         print(f"  📊 Batch {batch_num} composition:")
-        print(f"     Total files: {len(batch_df)}")
+        print(f"     Total files in batch_df: {len(batch_df)}")
         print(f"     Calibration files: {len(calibration_files)}")
         print(f"     Sample files: {len(sample_files)}")
         if len(calibration_files) > 0:
@@ -1320,6 +1369,12 @@ class NMDCWorkflowManager:
         
         if not calibration_files:
             raise ValueError(f"No calibration files found in batch {batch_num}. At least one calibration file is required.")
+        
+        if not sample_files:
+            print(f"  ⚠️  WARNING: No sample files in batch {batch_num} - only calibration file(s) present")
+            print(f"     This likely means all samples have already been processed")
+            print(f"     Skipping JSON generation for this batch")
+            return 0  # Don't create a JSON with no samples
         
         # Match samples to calibration files based on chronological order
         calibration_file = self._match_calibration_to_samples(batch_df, calibration_files, sample_files)
@@ -1398,9 +1453,9 @@ class NMDCWorkflowManager:
         Returns:
             Path to the calibration file to use for this batch
         """
-        # Get calibration write times (using actual_file_path which has correct paths)
-        cal_df = batch_df[batch_df['actual_file_path'].isin(calibration_files)].copy()
-        sample_df = batch_df[batch_df['actual_file_path'].isin(sample_files)].copy()
+        # Get calibration and sample DataFrames
+        cal_df = batch_df[batch_df['file_path'].isin(calibration_files)].copy()
+        sample_df = batch_df[batch_df['file_path'].isin(sample_files)].copy()
         
         if len(cal_df) == 0:
             raise ValueError("No calibration files found")
@@ -1411,7 +1466,7 @@ class NMDCWorkflowManager:
         
         # Get the first calibration
         first_cal_time = cal_df.iloc[0]['write_time_dt']
-        first_cal_file = cal_df.iloc[0]['actual_file_path']
+        first_cal_file = cal_df.iloc[0]['file_path']
         
         # Check if any samples come before the first calibration
         early_samples = sample_df[sample_df['write_time_dt'] < first_cal_time]
@@ -1419,7 +1474,7 @@ class NMDCWorkflowManager:
         if len(early_samples) > 0:
             print(f"  ⚠️  WARNING: {len(early_samples)} sample(s) were run before any calibration:")
             for _, row in early_samples.iterrows():
-                sample_name = Path(row['actual_file_path']).name
+                sample_name = Path(row['file_path']).name
                 print(f"      - {sample_name} ({row['write_time']})")
             print(f"      These will use the first calibration: {Path(first_cal_file).name}")
         
@@ -1427,6 +1482,7 @@ class NMDCWorkflowManager:
         # (More complex logic could assign different calibrations to different samples)
         return first_cal_file
 
+    @skip_if_complete('data_processed', return_value="")
     def generate_wdl_runner_script(self,
                                   script_name: Optional[str] = None) -> str:
         """
@@ -1461,17 +1517,6 @@ class NMDCWorkflowManager:
         if workflow_type not in WORKFLOW_DICT.keys():
             raise NotImplementedError(f"WDL runner script generation not implemented for workflow type: {workflow_type}")
         wdl_workflow_name = WORKFLOW_DICT[workflow_type]["wdl_workflow_name"]
-
-        if self.should_skip('data_processed'):
-            print("Skipping WDL runner script generation (data already processed)")
-            script_path = self.workflow_path / "scripts" / f"{self.workflow_name}_wdl_runner.sh"
-            if script_path.exists():
-                print(f"Found existing script: {script_path}")
-                return str(script_path)
-            else:
-                print("No existing script found.")
-                return ""
-
 
         if script_name is None:
             script_name = f"{self.workflow_name}_wdl_runner.sh"
@@ -1631,6 +1676,7 @@ fi
         
         return str(script_path)
     
+    @skip_if_complete('data_processed', return_value=0)
     def run_wdl_script(self, script_path: str, working_directory: Optional[str] = None) -> int:
         """
         Execute WDL workflows by downloading the workflow file from GitHub and running 
@@ -1656,11 +1702,6 @@ fi
         import subprocess
         import urllib.request
         import ssl
-        
-        # Check if already processed
-        if self.should_skip('data_processed'):
-            print("Skipping WDL workflow execution (data already processed)")
-            return 0
         
         # Set up working directory within study
         if working_directory is None:
@@ -1849,7 +1890,11 @@ fi
                 print("📁 Moving processed files to configured location...")
                 self._move_processed_files(str(working_dir))
                 
-                self.set_skip_trigger('data_processed', True)
+                self.set_skip_trigger(
+                    trigger_name='data_processed',
+                    value=True,
+                    save=True
+                )
             else:
                 print(f"⚠️  Some workflows failed (exit code: {result.returncode})")
                 print("Check the logs above for details.")
@@ -2217,6 +2262,7 @@ fi
         self.set_skip_trigger('biosample_mapping_script_generated', True)
         return str(script_path)
     
+    @skip_if_complete('biosample_mapping_completed', return_value=True)
     def run_biosample_mapping_script(self, script_path: Optional[str] = None) -> bool:
         """
         Execute the biosample mapping script.
@@ -2237,10 +2283,6 @@ fi
             trigger on successful completion.
         """
         import subprocess
-        
-        if self.should_skip('biosample_mapping_completed'):
-            print("Skipping biosample mapping (already completed)")
-            return True
         
         if script_path is None:
             # Check for both template and non-template versions
@@ -3362,6 +3404,7 @@ fi
         print(f"   Output directory: {output_dir}")
         return True
     
+    @skip_if_complete('metadata_mapping_generated', return_value=True)
     def generate_workflow_metadata_generation_inputs(self) -> bool:
         """
         Generate metadata mapping files for generating workflow metadata.
@@ -3378,10 +3421,6 @@ fi
             ValueError: If workflow_type is not set in config
             NotImplementedError: If workflow_type is not yet supported
         """
-        if self.should_skip('metadata_mapping_generated'):
-            print("⏭️  Skipping metadata mapping generation (skip trigger set)")
-            return True
-        
         print("📋 Generating metadata mapping files...")
         
         try:
@@ -3580,6 +3619,7 @@ fi
             
         return True
     
+    @skip_if_complete('processed_data_uploaded_to_minio', return_value=True)
     def upload_processed_data_to_minio(self) -> bool:
         """
         Upload processed data files to MinIO object storage.
@@ -3595,10 +3635,6 @@ fi
             Uses config paths for source directory and MinIO settings.
             Creates folder structure: bucket/study_name/processed_data/
         """
-        if self.should_skip('processed_data_uploaded_to_minio'):
-            print("⏭️  Skipping processed data upload to MinIO (skip trigger set)")
-            return True
-
         if not self.minio_client:
             print("❌ MinIO client not initialized")
             print("Set MINIO_ACCESS_KEY and MINIO_SECRET_KEY environment variables")
@@ -3651,6 +3687,7 @@ fi
             print(f"❌ Error uploading processed data to MinIO: {e}")
             return False
 
+    @skip_if_complete('metadata_packages_generated', return_value=True)
     def generate_nmdc_metadata_for_workflow(self) -> bool:
         """
         Generate NMDC metadata packages for workflow submission.
@@ -3673,10 +3710,6 @@ fi
             MinIO endpoint, bucket, and study name.
             Validates metadata against NMDC schema both locally and via API.
         """       
-        if self.should_skip('metadata_packages_generated'):
-            print("Skipping NMDC metadata generation (already generated)")
-            return True
-        
         print("Generating NMDC metadata packages...")
         
         # Get workflow-specific metadata generator class
