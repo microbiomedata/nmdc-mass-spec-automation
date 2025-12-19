@@ -1,14 +1,20 @@
-#!/usr/bin/env python3
 """
 Extract specific classes from NMDC LinkML schema and convert to LLM-friendly format
 """
 
-import json
 import os
 from linkml_runtime.utils.schemaview import SchemaView
 import nmdc_schema
 
-def get_protocol_schema_context(output_path: str = None):
+from mcp.server.fastmcp import FastMCP
+mcp = FastMCP(
+    "NMDC Schema Context Server",
+    instructions=(
+        "You are an MCP server that provides the NMDC protocol schema context."
+    ),
+)
+@mcp.tool()
+def get_protocol_schema_context() -> dict:
     """
     Extract classes related to 'MaterialProcessing' from NMDC schema
     and convert them to a JSON format suitable for LLM context.
@@ -101,5 +107,13 @@ def get_protocol_schema_context(output_path: str = None):
     schema_output["slots"] = all_slot_definitions
     
     return schema_output
+
+def main() -> None:
+    mcp.run()
+
+
+if __name__ == "__main__":
+    main()
+
 
 

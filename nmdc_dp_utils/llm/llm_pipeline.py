@@ -1,8 +1,8 @@
-from llm.llm_client import LLMClient
-from llm.llm_conversation_manager import ConversationManager
+from llm_client import LLMClient
+from llm_conversation_manager import ConversationManager
+import asyncio
 
-
-def get_llm_yaml_outline(llm_client:LLMClient, conversation_obj:ConversationManager):
+async def get_llm_yaml_outline(llm_client:LLMClient, conversation_obj:ConversationManager):
     """
     Get the LLM generated YAML outline.
     
@@ -13,11 +13,9 @@ def get_llm_yaml_outline(llm_client:LLMClient, conversation_obj:ConversationMana
     """
     conversation_obj.add_message(role="user", content="Generate the YAML outline for the provided protocol description.")
 
-    response = llm_client.client.chat.completions.create(
-        model=llm_client.model,
-        messages=conversation_obj.messages
-    )
-    conversation_obj.add_message(role="assistant", content=response.choices[0])
+    response = await llm_client.get_response(conversation_obj.messages)
+
+    conversation_obj.add_message(role="assistant", content=response)
     return response
 
 
@@ -33,6 +31,6 @@ if __name__ == "__main__":
     conversation_obj = ConversationManager(interaction_type="protocol_conversion")
     # use the converation obj to add the protocol decsription
     conversation_obj.add_protocol_description(description=protocol_description)
-    response = get_llm_yaml_outline(llm_client=llm_client, conversation_obj=conversation_obj)
+    response = asyncio.run(get_llm_yaml_outline(llm_client=llm_client, conversation_obj=conversation_obj))
 
 
