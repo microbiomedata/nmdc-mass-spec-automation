@@ -2,3 +2,4 @@ nmdc-mass-spectrometry-metadata-generation @ git+https://github.com/microbiomeda
 minio==7.2.18
 miniwdl
 openai
+openai-agents
