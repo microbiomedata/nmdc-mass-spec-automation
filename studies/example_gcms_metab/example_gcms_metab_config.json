@@ -40,7 +40,8 @@
             "Unknown",
             "Exactive Series slot #1"
         ],
-        "raw_data_location": "MinIO"
+        "raw_data_location": "MinIO",
+        "configuration_file_name": "emsl_gcms_corems_params.toml"
     },
     "skip_triggers": {
         "study_structure_created": true,

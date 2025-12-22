@@ -28,6 +28,7 @@ from dotenv import load_dotenv
 
 from nmdc_ms_metadata_gen.lcms_metab_metadata_generator import LCMSMetabolomicsMetadataGenerator
 from nmdc_ms_metadata_gen.lcms_lipid_metadata_generator import LCMSLipidomicsMetadataGenerator
+from nmdc_ms_metadata_gen.gcms_metab_metadata_generator import GCMSMetabolomicsMetadataGenerator
 
 # Load environment variables from .env file
 load_dotenv()
@@ -75,7 +76,7 @@ WORKFLOW_DICT = {
      "wdl_download_location": "https://raw.githubusercontent.com/microbiomedata/metaMS/master/wdl/metaMS_gcms.wdl",
      "generator_method": "_generate_gcms_metab_wdl",
      "workflow_metadata_input_generator": "_generate_gcms_workflow_metadata_inputs",
-     "metadata_generator_class": None,
+     "metadata_generator_class": GCMSMetabolomicsMetadataGenerator,
      "raw_data_inspector": "gcms_data_inspector"}
 }
 
@@ -3075,7 +3076,6 @@ fi
         merged_df['processing_institution_workflow'] = metadata_config.get('processing_institution_workflow', 'EMSL')
         merged_df['processing_institution_generation'] = metadata_config.get('processing_institution_generation', 'EMSL')
         merged_df['sample_id'] = merged_df['biosample_id']
-        merged_df['biosample.associated_studies'] = f"['{self.config['study']['id']}']"        
         
         # Handle raw_data_url (MASSIVE vs MinIO)
         raw_data_location = self.config.get('metadata', {}).get('raw_data_location', 'massive')
@@ -3130,6 +3130,13 @@ fi
             initial_count = len(merged_df)
             merged_df = merged_df[~merged_df['raw_data_file_short'].isin(problem_files)].copy()
             print(f"⚠️  Removed {initial_count - len(merged_df)} problematic files from metadata generation")
+        
+        # Remove rows without sample_id (e.g., calibration-only files)
+        initial_count = len(merged_df)
+        merged_df = merged_df[merged_df['sample_id'].notna() & (merged_df['sample_id'] != '')].copy()
+        removed_count = initial_count - len(merged_df)
+        if removed_count > 0:
+            print(f"ℹ️  Removed {removed_count} rows without sample_id (calibration files)")
         
         # Call workflow-specific processor to add workflow-specific columns and get final column list
         merged_df, final_columns = workflow_specific_processor(merged_df, raw_inspection_results, include_raw_data_url)
@@ -3199,7 +3206,7 @@ fi
             
             # Define final columns for LCMS
             final_columns = [
-                'sample_id', 'biosample.associated_studies', 'raw_data_file', 'processed_data_directory', 
+                'sample_id', 'raw_data_file', 'processed_data_directory', 
                 'mass_spec_configuration_name', 'chromat_configuration_name', 'instrument_used', 
                 'processing_institution_workflow', 'processing_institution_generation',
                 'instrument_analysis_end_date', 'instrument_instance_specifier'
@@ -3233,7 +3240,7 @@ fi
             
             # Define final columns for GCMS
             final_columns = [
-                'sample_id', 'biosample.associated_studies', 'raw_data_file', 'processed_data_file',
+                'sample_id', 'raw_data_file', 'processed_data_file',
                 'calibration_file', 'mass_spec_configuration_name', 'chromat_configuration_name',
                 'instrument_used', 'processing_institution_workflow', 'processing_institution_generation',
                 'instrument_analysis_end_date', 'instrument_instance_specifier'
@@ -3375,9 +3382,6 @@ fi
         # Add sample_id (alias for biosample_id)
         merged_df['sample_id'] = merged_df['biosample_id']
         
-        # Add biosample.associated_studies (must be in brackets as a list)
-        merged_df['biosample.associated_studies'] = f"['{self.config['study']['id']}']"        
-        
         # Add raw_data_url only for MASSIVE (not needed for MinIO)
         raw_data_location = self.config.get('metadata', {}).get('raw_data_location', False)
         include_raw_data_url = False
@@ -3468,7 +3472,7 @@ fi
         # Define final columns for GCMS (includes calibration_file, uses processed_data_file)
         # raw_data_url is optional - only included when using MASSIVE
         final_columns = [
-            'sample_id', 'biosample.associated_studies', 'raw_data_file', 'processed_data_file',
+            'sample_id', 'raw_data_file', 'processed_data_file',
             'calibration_file', 'mass_spec_configuration_name', 'chromat_configuration_name',
             'instrument_used', 'processing_institution_workflow', 'processing_institution_generation',
             'instrument_analysis_end_date', 'instrument_instance_specifier'
@@ -3939,12 +3943,16 @@ fi
         minio_config = self.config.get('minio', {})
         bucket = minio_config.get('bucket', '')
         
-        # Construct folder path from study name and date tag
-        processed_date_tag = self.config['study'].get('processed_data_date_tag', '')
-        if processed_date_tag:
-            folder_path = f"{self.study_name}/processed_{processed_date_tag}"
-        else:
-            folder_path = f"{self.study_name}/processed"
+        # Get date tag from workflow config (required)
+        processed_date_tag = self.config['workflow'].get('processed_data_date_tag', '')
+        if not processed_date_tag:
+            raise ValueError(
+                "processed_data_date_tag is required in config['workflow']['processed_data_date_tag']. "
+                "Example: '20251210'"
+            )
+        
+        # Construct folder path with date tag
+        folder_path = f"{self.study_name}/processed_{processed_date_tag}"
         
         # Build URL
         processed_data_url = f"https://nmdcdemo.emsl.pnnl.gov/{bucket}/{folder_path}/"
@@ -3952,7 +3960,24 @@ fi
         
         # Get existing data objects from config (if any)
         existing_data_objects = self.config.get('metadata', {}).get('existing_data_objects', [])
-        raw_data_url = self.config.get('metadata', {}).get('raw_data_url', None)
+        
+        # Construct raw_data_url based on data location
+        raw_data_location = self.config.get('metadata', {}).get('raw_data_location', 'massive')
+        if raw_data_location.lower() == 'minio':
+            # Construct MinIO raw data URL: https://nmdcdemo.emsl.pnnl.gov/bucket/study_name/raw/
+            minio_endpoint = self.config.get('minio', {}).get('public_url_base', 'https://nmdcdemo.emsl.pnnl.gov')
+            # Remove any trailing slashes from endpoint
+            minio_endpoint = minio_endpoint.rstrip('/')
+            raw_data_url = f"{minio_endpoint}/{bucket}/{self.study_name}/raw/"
+            print(f"Constructed MinIO raw data URL: {raw_data_url}")
+        else:
+            # Use configured raw_data_url or None for MASSIVE
+            raw_data_url = self.config.get('metadata', {}).get('raw_data_url', None)
+            if raw_data_url:
+                print(f"Using configured raw data URL: {raw_data_url}")
+        
+        # Get GCMS-specific configuration file name if needed
+        configuration_file_name = self.config.get('metadata', {}).get('configuration_file_name', None)
         
         # Create output directory for workflow metadata JSON files
         output_dir = self.workflow_path / "metadata" / "nmdc_submission_packages"
@@ -3981,13 +4006,31 @@ fi
             
             try:
                 # Initialize workflow-specific metadata generator
-                generator = metadata_generator_class(
-                    metadata_file=str(csv_file),
-                    database_dump_json_path=str(output_file),
-                    process_data_url=processed_data_url,
-                    raw_data_url=raw_data_url,
-                    existing_data_objects=existing_data_objects
-                )
+                # Build kwargs based on workflow type
+                generator_kwargs = {
+                    'metadata_file': str(csv_file),
+                    'database_dump_json_path': str(output_file),
+                    'process_data_url': processed_data_url
+                }
+                
+                # Add raw_data_url if available (required for MinIO, optional for MASSIVE)
+                if raw_data_url:
+                    generator_kwargs['raw_data_url'] = raw_data_url
+                
+                # Add workflow-specific parameters
+                if workflow_type == 'GCMS Metabolomics':
+                    # GCMS requires configuration_file_name but not existing_data_objects
+                    if not configuration_file_name:
+                        raise ValueError(
+                            "GCMS Metabolomics workflow requires 'configuration_file_name' to be set in "
+                            "config['metadata']['configuration_file_name']. Example: 'emsl_gcms_corems_params.toml'"
+                        )
+                    generator_kwargs['configuration_file_name'] = configuration_file_name
+                else:
+                    # LCMS generators accept existing_data_objects
+                    generator_kwargs['existing_data_objects'] = existing_data_objects
+                
+                generator = metadata_generator_class(**generator_kwargs)
                 
                 # Run metadata generation
                 metadata = generator.run()

@@ -61,22 +61,22 @@ manager = NMDCWorkflowManager("studies/your_study/config.json")
 manager.create_workflow_structure()
 
 # Step 2: Discover and download raw data
-ftp_df = manager.get_massive_ftp_urls()
-downloaded_files = manager.download_from_massive()
+manager.get_massive_ftp_urls()
+manager.download_from_massive()
 
 # Step 3: Map files to biosamples
-biosample_csv = manager.get_biosample_attributes()
-mapping_script = manager.generate_biosample_mapping_script()
+manager.get_biosample_attributes()
+manager.generate_biosample_mapping_script()
 ## Manually edit and run the mapping script as instructed in the generated script
 manager.run_biosample_mapping_script()
 
 # Step 4: Inspect raw data
-inspection_results = manager.raw_data_inspector(cores=4)
+manager.raw_data_inspector(cores=4)
 
 # Step 5: Generate WDL configurations, make runner script and run workflows
-json_count = manager.generate_wdl_jsons()
-script_path = manager.generate_wdl_runner_script()
-manager.run_wdl_script(script_path)
+manager.generate_wdl_jsons()
+manager.generate_wdl_runner_script()
+manager.run_wdl_script()
 
 # Step 6: Upload to MinIO
 manager.upload_processed_data_to_minio()

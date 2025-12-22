@@ -33,11 +33,8 @@ def main():
 
     # Step 3: Map raw data files to biosamples by generating mapping script and running it
     print("\n3. Mapping raw data files to biosamples...")
-    biosample_csv = manager.get_biosample_attributes()
-    print(f"Biosample attributes saved to: {biosample_csv}")
-    
-    mapping_script = manager.generate_biosample_mapping_script()
-    print(f"Mapping script generated: {mapping_script}")
+    manager.get_biosample_attributes()
+    manager.generate_biosample_mapping_script()
     
     mapping_success = manager.run_biosample_mapping_script()
     if not mapping_success:
@@ -48,8 +45,7 @@ def main():
     
     # Step 5: Inspect raw data files for metadata and QC
     print("\n5. Inspecting raw data files...")
-    inspection_result = manager.raw_data_inspector(cores=4)
-    #assert inspection_result, "Raw data inspection did not return any results."
+    manager.raw_data_inspector(cores=4)
 
     # Step 6: Generate metadata mapping files with URL validation
     print("\n6. Generating metadata mapping files with URL validation...")
@@ -57,11 +53,10 @@ def main():
     assert manager.should_skip('metadata_mapping_generated'), "Metadata mapping generation must complete successfully to proceed"
     assert metadata_success, "Metadata mapping generation failed."
 
-    # Step 7: Generate WDL JSON files for processing, make runner script, and process them
-    print("\n7. Generating WDL JSON files, runner script, and running workflow...")
-    _ = manager.generate_wdl_jsons()
-    script_path = manager.generate_wdl_runner_script()
-    manager.run_wdl_script(script_path)
+    # Step 7: Generate WDL JSON files for processing, make runner script, and running workflow...")
+    manager.generate_wdl_jsons()
+    manager.generate_wdl_runner_script()
+    manager.run_wdl_script()
     assert manager.should_skip('data_processed'), "WDL workflows must complete successfully to proceed"
 
     # Step 8: Upload processed data to MinIO
