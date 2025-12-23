@@ -1744,7 +1744,6 @@ fi
             self.logger.error(f"Error checking Docker: {e}")
             return 1
         
-        #TODO KRH: Remove this option!
         # Use the base directory virtual environment
         base_venv_dir = self.base_path / "venv"
         venv_python = base_venv_dir / "bin" / "python"
@@ -1983,9 +1982,8 @@ fi
                     # Move the entire .corems directory to processed location
                     destination = processed_path / dirpath.name
                     
-                    # Handle case where destination already exists
+                    # Handle case where destination already exists (silent skip)
                     if destination.exists():
-                        self.logger.warning(f"Destination already exists: {destination.name}, skipping.")
                         continue
                     
                     try:
@@ -2009,9 +2007,8 @@ fi
                 # Move CSV file directly to processed data directory
                 destination_file = processed_path / csv_file.name
                 
-                # Handle case where destination file already exists
+                # Handle case where destination file already exists (silent skip)
                 if destination_file.exists():
-                    self.logger.warning(f"Destination already exists: {csv_file.name}, skipping.")
                     continue
                 
                 try:
@@ -3218,276 +3215,6 @@ fi
         
         return self._generate_workflow_metadata_inputs_common(gcms_processor)
        
-        #TODO KRH: CHeck this - is it ever run?
-        # Check prerequisites
-        biosample_mapping_file = self.workflow_path / "metadata" / "mapped_raw_file_biosample_mapping.csv"
-        if not biosample_mapping_file.exists():
-            self.logger.error(f"Biosample mapping file not found: {biosample_mapping_file}")
-            return False
-        
-        raw_inspection_results = self.get_raw_inspection_results_path()
-        if not raw_inspection_results:
-            self.logger.error("Raw data inspection results not found. Run raw_data_inspector first.")
-            return False
-        
-        # Load the mapped files
-        mapped_df = pd.read_csv(biosample_mapping_file)
-        mapped_df = mapped_df[mapped_df['match_confidence'].isin(['high'])].copy()
-
-        if len(mapped_df) == 0:
-            self.logger.error("No high confidence biosample matches found")
-            return False
-        
-        # Extract raw_data_file_short for merging
-        mapped_df['raw_data_file_short'] = mapped_df['raw_file_name']
-        
-        # Add raw data file paths
-        raw_data_dir = str(self.raw_data_directory)
-        if not raw_data_dir.endswith('/'):
-            raw_data_dir += '/'
-        mapped_df['raw_data_file'] = raw_data_dir + mapped_df['raw_data_file_short']
-        
-        # Add processed data file paths (CSV files for GCMS)
-        processed_data_dir = str(self.processed_data_directory)
-        if not processed_data_dir.endswith('/'):
-            processed_data_dir += '/'
-        mapped_df['processed_data_file'] = (
-            processed_data_dir +
-            mapped_df['raw_data_file_short'].str.replace(r'(?i)\.(cdf|mzml)$', '.csv', regex=True)
-        )
-        
-        # Load inspection results to get write_time for calibration matching
-        file_info_df = pd.read_csv(raw_inspection_results)
-        
-        # Filter out files with errors or missing critical metadata
-        initial_count = len(file_info_df)
-        
-        # Remove files with errors
-        if 'error' in file_info_df.columns:
-            error_mask = file_info_df['error'].notna()
-            if error_mask.any():
-                error_files = file_info_df[error_mask]['file_name'].tolist()
-                self.logger.warning(f"Excluding {len(error_files)} files with processing errors:")
-                for f in error_files[:5]:  # Show first 5
-                    self.logger.warning(f"- {f}")
-                if len(error_files) > 5:
-                    self.logger.warning(f"... and {len(error_files) - 5} more")
-                file_info_df = file_info_df[~error_mask]
-        
-        # Remove files with missing write_time (critical for metadata)
-        null_time_mask = file_info_df['write_time'].isna()
-        if null_time_mask.any():
-            null_time_files = file_info_df[null_time_mask]['file_name'].tolist()
-            self.logger.warning(f"Excluding {len(null_time_files)} files with missing write_time:")
-            for f in null_time_files:
-                self.logger.warning(f"- {f}")
-            file_info_df = file_info_df[~null_time_mask]
-        
-        final_count = len(file_info_df)
-        if final_count != initial_count:
-            self.logger.info(f"Raw inspection results: {initial_count} → {final_count} files (excluded {initial_count - final_count} with errors)")
-        
-        if final_count == 0:
-            self.logger.error("No valid files remaining after filtering - check raw data inspection results")
-            return False
-        
-        # Process remaining valid files (same as LCMS)
-        file_info_df['instrument_instance_specifier'] = file_info_df['instrument_serial_number'].astype(str)
-        file_info_df['instrument_analysis_end_date'] = pd.to_datetime(file_info_df["write_time"]).dt.strftime('%Y-%m-%dT%H:%M:%SZ')
-        file_info_df['raw_data_file_short'] = file_info_df['file_name']
-        
-        # Remove unwanted serial numbers
-        serial_numbers_to_remove = self.config.get('metadata', {}).get('serial_numbers_to_remove', [])
-        if serial_numbers_to_remove:
-            file_info_df['instrument_instance_specifier'] = file_info_df['instrument_instance_specifier'].replace(serial_numbers_to_remove, pd.NA)
-        
-        self.logger.debug(f"Unique instrument_instance_specifier values: {file_info_df['instrument_instance_specifier'].unique()}")
-        # Only show date range for valid dates
-        valid_dates = file_info_df['instrument_analysis_end_date'].dropna()
-        if len(valid_dates) > 0:
-            self.logger.debug(f"Date range: {valid_dates.min()} to {valid_dates.max()}")
-        else:
-            self.logger.debug("No valid dates found")
-        
-        # Keep columns for merging (including write_time for calibration matching)
-        file_info_df_merge = file_info_df[['raw_data_file_short', 'instrument_analysis_end_date', 'instrument_instance_specifier', 'write_time']].copy()
-        # drop duplicates just in case
-        file_info_df_merge = file_info_df_merge.drop_duplicates(subset=['raw_data_file_short'])
-        
-        # Merge instrument information (includes write_time for calibration matching)
-        merged_df = pd.merge(mapped_df, file_info_df_merge, on='raw_data_file_short', how='left')
-        
-        # Validate merge didn't change row count
-        if len(merged_df) != len(mapped_df):
-            self.logger.error(f"Merge error: expected {len(mapped_df)} rows, got {len(merged_df)}")
-            return False
-        
-        # Check for files that didn't get instrument metadata
-        missing_metadata = merged_df['instrument_analysis_end_date'].isna().sum()
-        if missing_metadata > 0:
-            self.logger.warning(f"{missing_metadata} files missing instrument metadata (may not be in raw inspection results)")
-            missing_files = merged_df[merged_df['instrument_analysis_end_date'].isna()]['raw_data_file_short'].tolist()
-            for f in missing_files[:5]:  # Show first 5
-                self.logger.warning(f"- {f}")
-            if len(missing_files) > 5:
-                self.logger.warning(f"... and {len(missing_files) - 5} more")
-            
-            # Remove files without metadata for metadata generation
-            merged_df = merged_df[merged_df['instrument_analysis_end_date'].notna()].copy()
-            self.logger.info(f"Proceeding with {len(merged_df)} files that have complete metadata")
-        
-        # Match each sample to its appropriate calibration file based on chronological order
-        # This uses the same logic as _generate_gcms_metab_wdl
-        self.logger.info("Matching samples to calibration files based on chronological order...")
-        merged_df = self._assign_calibration_files_to_samples(merged_df, raw_inspection_results)
-        
-        # Add common metadata from config (same as LCMS)
-        metadata_config = self.config.get('metadata', {})
-        merged_df['processing_institution_workflow'] = metadata_config.get('processing_institution_workflow', 'EMSL')
-        merged_df['processing_institution_generation'] = metadata_config.get('processing_institution_generation', 'EMSL')
-        
-        # Add sample_id (alias for biosample_id)
-        merged_df['sample_id'] = merged_df['biosample_id']
-        
-        # Add raw_data_url only for MASSIVE (not needed for MinIO)
-        raw_data_location = self.config.get('metadata', {}).get('raw_data_location', False)
-        include_raw_data_url = False
-        
-        if raw_data_location.lower() == 'massive':
-            include_raw_data_url = True
-            # Load FTP URLs to get correct directory structure
-            ftp_file = self.workflow_path / "raw_file_info" / "massive_ftp_locs.csv"
-            if ftp_file.exists():
-                ftp_df = pd.read_csv(ftp_file)
-                # Create mapping from filename to full FTP path
-                ftp_mapping = dict(zip(ftp_df['raw_data_file_short'], ftp_df['ftp_location']))
-            else:
-                raise ValueError(f"MASSIVE FTP URLs file not found: {ftp_file}")
-            
-            # Construct MASSIVE download URLs
-            massive_id = self.config['workflow']['massive_id']
-            
-            def construct_massive_url(filename):
-                import urllib.parse
-                import re
-                
-                # Extract just the MSV part (remove version prefix like v07/)
-                if 'MSV' in massive_id:
-                    msv_part = 'MSV' + massive_id.split('MSV')[1]
-                else:
-                    msv_part = massive_id
-                
-                # Get the full directory path from FTP URL if available
-                if filename in ftp_mapping:
-                    ftp_url = ftp_mapping[filename]
-                    # Extract path after MSV number: /raw/directory/rawdata/filename.raw
-                    match = re.search(rf'{re.escape(msv_part)}(.+)/{re.escape(filename)}', ftp_url)
-                    if match:
-                        relative_path = match.group(1)  # e.g., /raw/20210819_JGI-AK_MK_506588.../rawdata
-                        # Construct the file path: MSV.../full/path/filename
-                        file_path = f"{msv_part}{relative_path}/{filename}"
-                    else:
-                        self.logger.warning(f"Could not extract directory structure for {filename}")
-                        file_path = f"{msv_part}/raw/{filename}"
-                else:
-                    # Fallback to simple structure
-                    file_path = f"{msv_part}/raw/{filename}"
-                
-                encoded_path = urllib.parse.quote(file_path, safe='')
-                https_url = f"https://massive.ucsd.edu/ProteoSAFe/DownloadResultFile?file=f.{encoded_path}&forceDownload=true"
-                
-                # Validate URL format
-                if not https_url.startswith("https://massive.ucsd.edu/ProteoSAFe/DownloadResultFile?file=f.MSV"):
-                    raise ValueError(f"Invalid MASSIVE URL format generated: {https_url}")
-                
-                return https_url
-            
-            merged_df['raw_data_url'] = merged_df['raw_data_file_short'].apply(construct_massive_url)
-            
-            # Validate at least 5 URLs to ensure they're accessible
-            self.logger.info("Validating MASSIVE URL accessibility...")
-            self._validate_massive_urls(merged_df['raw_data_url'].head(5).tolist())
-        elif raw_data_location.lower() == 'minio':
-            # MinIO: raw_data_url not needed in metadata CSV
-            self.logger.info("Using MinIO - raw_data_url will not be included in metadata CSV")
-        else:
-            raise ValueError(f"Unsupported raw_data_location for GCMS: {raw_data_location}, must be 'massive' or 'minio'")
-        
-        # Remove any files marked as problematic in config from metadata generation csvs
-        problem_files = self.config.get('problem_files', [])
-        if problem_files:
-            initial_count = len(merged_df)
-            merged_df = merged_df[~merged_df['raw_data_file_short'].isin(problem_files)].copy()
-            removed_count = initial_count - len(merged_df)
-            self.logger.warning(f"Removed {removed_count} problematic files from metadata generation")
-        
-        # Generate configuration-specific CSV files
-        config_dfs = self._separate_files_by_configuration(merged_df, metadata_config)
-        
-        if not config_dfs:
-            self.logger.error("No files matched any configuration filters")
-            return False
-        
-        # Create output directory
-        output_dir = self.workflow_path / "metadata" / "metadata_gen_input_csvs"
-        output_dir.mkdir(parents=True, exist_ok=True)
-        
-        # Clear existing files
-        for f in output_dir.glob("*.csv"):
-            f.unlink()
-        
-        # Define final columns for GCMS (includes calibration_file, uses processed_data_file)
-        # raw_data_url is optional - only included when using MASSIVE
-        final_columns = [
-            'sample_id', 'raw_data_file', 'processed_data_file',
-            'calibration_file', 'mass_spec_configuration_name', 'chromat_configuration_name',
-            'instrument_used', 'processing_institution_workflow', 'processing_institution_generation',
-            'instrument_analysis_end_date', 'instrument_instance_specifier'
-        ]
-        if include_raw_data_url:
-            final_columns.append('raw_data_url')
-        
-        # Write configuration-specific CSV files
-        files_written = 0
-        total_files = 0
-        
-        for config_name, config_df in config_dfs.items():
-            # Validate required columns exist
-            missing_cols = [col for col in final_columns if col not in config_df.columns]
-            if missing_cols:
-                self.logger.error(f"Skipping {config_name}: missing columns {missing_cols}")
-                continue
-            
-            # Check for empty dataframe
-            if len(config_df) == 0:
-                self.logger.warning(f"Skipping {config_name}: no files after filtering")
-                continue
-            
-            # Write the CSV file
-            try:
-                output_df = config_df[final_columns].copy()
-                output_file = output_dir / f"{config_name}_metadata.csv"
-                output_df.to_csv(output_file, index=False)
-                
-                files_written += 1
-                total_files += len(output_df)
-                
-                # Show sample of metadata applied
-                sample_chromat = output_df['chromat_configuration_name'].iloc[0]
-                sample_ms = output_df['mass_spec_configuration_name'].iloc[0]
-                self.logger.info(f"{config_name}_metadata.csv: {len(output_df)} files ({sample_chromat}, {sample_ms})")
-                
-            except Exception as e:
-                self.logger.error(f"Error writing {config_name}_metadata.csv: {e}")
-                continue
-        
-        if files_written == 0:
-            self.logger.error("No metadata files were successfully written")
-            return False
-        
-        self.logger.info(f"Successfully generated {files_written} metadata files with {total_files} total entries")
-        self.logger.info(f"Output directory: {output_dir}")
-        return True
     
     def _assign_calibration_files_to_samples(self, merged_df: pd.DataFrame, raw_inspection_results: str) -> pd.DataFrame:
         """

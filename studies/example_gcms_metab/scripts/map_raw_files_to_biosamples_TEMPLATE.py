@@ -189,7 +189,7 @@ def main():
     print("=== {study_name.upper()} - RAW FILE TO BIOSAMPLE MAPPING ===")
     
     # Initialize study manager
-    config_path = Path("studies/example_gcms_metab/example_gcms_metab_config.json")
+    config_path = Path("/Users/heal742/LOCAL/05_NMDC/07_automation/nmdc_mass_spec_automation/studies/example_gcms_metab/example_gcms_metab_config.json")
     if not config_path.exists():
         print(f"❌ Config file not found: {config_path}")
         print("Please run this script from the data_processing root directory")
