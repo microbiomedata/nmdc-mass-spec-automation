@@ -4020,9 +4020,9 @@ fi
             return False
 
     @skip_if_complete('metadata_packages_generated', return_value=True)
-    def generate_nmdc_metadata_for_workflow(self) -> bool:
+    def _generate_nmdc_metadata_packages(self) -> bool:
         """
-        Generate NMDC metadata packages for workflow submission.
+        Generate NMDC metadata packages for workflow submission (internal method).
         
         Creates workflow metadata JSON files for NMDC submission using the
         nmdc-ms-metadata-gen package. Generates one metadata package per
@@ -4201,3 +4201,35 @@ fi
         Needs to be implemented.
         """
         raise NotImplementedError("submit_metadata_packages() is not yet implemented.")
+    
+    def generate_nmdc_metadata_for_workflow(self) -> bool:
+        """
+        Generate NMDC metadata for workflow submission.
+        
+        This consolidated method handles the complete metadata generation workflow:
+        1. Generates metadata mapping CSV files with URL validation
+        2. Generates NMDC submission packages from the mapping files
+        
+        Returns:
+            True if all steps completed successfully, False otherwise
+            
+        Note:
+            This method combines generate_workflow_metadata_generation_inputs() and
+            _generate_nmdc_metadata_packages() into a single workflow step.
+            
+        Example:
+            >>> manager = NMDCWorkflowManager('config.json')
+            >>> success = manager.generate_nmdc_metadata_for_workflow()
+        """
+        
+        # Step 1: Generate metadata mapping CSV files
+        if not self.generate_workflow_metadata_generation_inputs():
+            print("❌ Failed to generate metadata mapping files")
+            return False
+        
+        # Step 2: Generate NMDC submission packages
+        if not self._generate_nmdc_metadata_packages():
+            print("❌ Failed to generate NMDC metadata packages")
+            return False
+        
+        return True

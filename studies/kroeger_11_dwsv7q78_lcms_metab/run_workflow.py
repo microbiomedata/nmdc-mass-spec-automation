@@ -46,26 +46,20 @@ def main():
     print("\n4. Inspecting raw data files...")
     manager.raw_data_inspector(cores=4)
 
-    # Step 5: Generate metadata mapping files with URL validation
-    print("\n5. Generating metadata mapping files with URL validation...")
-    metadata_success = manager.generate_workflow_metadata_generation_inputs()
-    assert manager.should_skip('metadata_mapping_generated'), "Metadata mapping generation must complete successfully to proceed"
-    assert metadata_success, "Metadata mapping generation failed."
-
-    # Step 6: Process data (generate WDL configs and execute workflows)
-    print("\n6. Processing data with WDL workflows...")
+    # Step 5: Process data (generate WDL configs and execute workflows)
+    print("\n5. Processing data with WDL workflows...")
     manager.process_data(execute=True)
     assert manager.should_skip('data_processed'), "WDL workflows must complete successfully to proceed"
 
-    # Step 7: Upload processed data to MinIO
-    print("\n7. Uploading processed data to MinIO...")
-    _ = manager.upload_processed_data_to_minio()
+    # Step 6: Upload processed data to MinIO
+    print("\n6. Uploading processed data to MinIO...")
+    manager.upload_processed_data_to_minio()
     assert manager.should_skip('processed_data_uploaded_to_minio'), "Processed data upload to MinIO must complete successfully to proceed"
 
-    # Step 8: Generate NMDC submission packages
-    print("\n8. Generating NMDC submission packages for workflow metadata...")
-    _ = manager.generate_nmdc_metadata_for_workflow()
-    assert manager.should_skip('nmdc_metadata_generated'), "NMDC metadata package generation must complete successfully to proceed"
+    # Step 7: Generate and submit NMDC metadata packages
+    print("\n7. Generating NMDC metadata packages...")
+    manager.generate_nmdc_metadata_for_workflow()
+    assert manager.should_skip('metadata_packages_generated'), "NMDC metadata package generation must complete successfully to proceed"
 
 if __name__ == "__main__":
     main()

@@ -72,18 +72,14 @@ manager.run_biosample_mapping_script()
 # Step 4: Inspect raw data
 manager.raw_data_inspector(cores=4)
 
-# Step 5: Generate metadata inputs
-manager.generate_workflow_metadata_generation_inputs()
-
-# Step 6: Process data (generate WDL configs and execute workflows)
+# Step 5: Process data (generate WDL configs and execute workflows)
 manager.process_data(execute=True)
 
-# Step 7: Upload to MinIO
+# Step 6: Upload to MinIO
 manager.upload_processed_data_to_minio()
 
-# Step 8: Generate and submit NMDC metadata packages
+# Step 7: Generate NMDC metadata packages
 manager.generate_nmdc_metadata_for_workflow()
-manager.submit_metadata_packages(environment='dev')
 ```
 
 ### Configuration-Based Operation
