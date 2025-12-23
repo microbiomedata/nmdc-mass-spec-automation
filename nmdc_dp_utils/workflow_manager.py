@@ -129,10 +129,27 @@ class NMDCWorkflowManager:
         self.logger = logging.getLogger(f"nmdc.{self.workflow_name}")
         if not self.logger.handlers:
             handler = logging.StreamHandler()
-            formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
-            handler.setFormatter(formatter)
+            handler.setFormatter(logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s'))
             self.logger.addHandler(handler)
-            self.logger.setLevel(logging.INFO)
+
+        # Configure level from environment (default INFO)
+        level_name = os.getenv("NMDC_LOG_LEVEL", "INFO").upper()
+        level = getattr(logging, level_name, logging.INFO)
+        self.logger.setLevel(level)
+
+        # Optional file logging via environment variable
+        log_file = os.getenv("NMDC_LOG_FILE")
+        if log_file:
+            abs_log_file = os.path.abspath(log_file)
+            has_same_file_handler = any(
+                isinstance(h, logging.FileHandler) and getattr(h, 'baseFilename', None) == abs_log_file
+                for h in self.logger.handlers
+            )
+            if not has_same_file_handler:
+                file_handler = logging.FileHandler(abs_log_file)
+                file_handler.setFormatter(logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s'))
+                self.logger.addHandler(file_handler)
+                self.logger.info(f"File logging enabled: {abs_log_file}")
         
         # Construct dynamic paths from data_directory
         self.data_directory = Path(self.config['paths']['data_directory'])
@@ -217,7 +234,6 @@ class NMDCWorkflowManager:
         if save:
             with open(self.config_path, 'w') as f:
                 json.dump(self.config, f, indent=4)
-            self.logger.debug(f"Updated skip trigger '{trigger_name}' to {value}")
     
     def reset_all_triggers(self, save: bool = True):
         """
@@ -368,7 +384,6 @@ class NMDCWorkflowManager:
         log_file = self.workflow_path / "raw_file_info" / "massive_ftp_locs.txt"
         
         self.logger.info(f"Crawling MASSIVE FTP directory for dataset: {massive_id}")
-        self.logger.info("This may take several minutes...")
         
         ftp_urls = []
         
@@ -380,7 +395,6 @@ class NMDCWorkflowManager:
             # Navigate to the study directory (massive_id should include version path)
             try:
                 ftp.cwd(massive_id)
-                self.logger.info(f"Successfully accessed {massive_id}")
             except ftplib.error_perm:
                 self.logger.error(f"Could not access {massive_id} - check that the path includes version (e.g., 'v07/MSV000094090')")
                 return []
@@ -417,11 +431,11 @@ class NMDCWorkflowManager:
                                     full_url = f"ftp://massive-ftp.ucsd.edu/{current_path}/{filename}"
                                     ftp_urls.append(full_url)
                                     if len(ftp_urls) % 100 == 0:
-                                        self.logger.debug(f"Found {len(ftp_urls)} {file_type} files...")
+                                        self.logger.info(f"Found {len(ftp_urls)} {file_type} files...")
                         
                 except ftplib.error_perm as e:
                     # Permission denied or directory doesn't exist
-                    self.logger.warning(f"Cannot access current directory: {e}")
+                    self.logger.error(f"Cannot access current directory: {e}")
                 except Exception as e:
                     self.logger.error(f"Error processing current directory: {e}")
             
@@ -436,7 +450,6 @@ class NMDCWorkflowManager:
             
             file_type = self.config['study'].get('file_type', '.raw').lower()
             self.logger.info(f"Found {len(ftp_urls)} {file_type} files")
-            self.logger.info(f"URLs saved to: {log_file}")
             
             return str(log_file)
             
@@ -518,21 +531,17 @@ class NMDCWorkflowManager:
                 original_count = len(ftp_df)
                 filter_pattern = '|'.join(self.config['workflow']['file_filters'])
                 ftp_df = ftp_df[ftp_df['raw_data_file_short'].str.contains(filter_pattern, na=False, case=False)]
-                self.logger.info(f"Applied filters ({filter_pattern}), reduced from {original_count} to {len(ftp_df)} files")
-                self.logger.debug(f"Filter criteria: filename must contain ANY of: {self.config['workflow']['file_filters']}")
             elif len(ftp_df) > 0:
                 self.logger.warning(f"No file_filters configured - returning ALL {len(ftp_df)} files")
                 self.logger.warning("Consider adding 'file_filters' to config to avoid downloading unnecessary files")
             
             # Save to CSV
             ftp_df.to_csv(output_path, index=False)
-            self.logger.info(f"Found {len(ftp_df)} files, saved to {output_path}")
             
             return ftp_df
             
         except FileNotFoundError:
-            self.logger.error(f"Log file not found: {log_file}")
-            self.logger.error("Run crawl_massive_ftp() first to generate the log file")
+            self.logger.error(f"Log file not found: {log_file}, run crawl_massive_ftp() first")
             return pd.DataFrame(columns=['ftp_location', 'raw_data_file_short'])
         except Exception as e:
             self.logger.error(f"Error parsing log file: {e}")
@@ -602,11 +611,7 @@ class NMDCWorkflowManager:
             file_filters = self.config['study'].get('file_filters', [])
             
             if len(filtered_df) > 0:
-                self.logger.info("")
-                self.logger.info("FILTERING RESULTS:")
-                self.logger.info(f"  File type: {file_type}")
-                self.logger.info(f"  Filters applied: {file_filters}")
-                self.logger.info(f"  Kept {len(filtered_df)} files after applying both file type and filter criteria")
+                self.logger.info(f"Kept {len(filtered_df)} files for downloading after applying both file type and filter criteria")
                 
                 # Show 4 random sample files
                 sample_size = min(4, len(filtered_df))
@@ -618,11 +623,10 @@ class NMDCWorkflowManager:
                 if len(filtered_df) > 4:
                     self.logger.info(f"    ... and {len(filtered_df) - 4} more files")
             else:
-                self.logger.warning("")
-                self.logger.warning("No files matched the criteria!")
-                self.logger.warning(f"  File type: {file_type}")
-                self.logger.warning(f"  File filters: {file_filters}")
-                self.logger.warning("  Check your file_type and file_filters configuration")
+                self.logger.error("No files matched the criteria!")
+                self.logger.error(f"  File type: {file_type}")
+                self.logger.error(f"  File filters: {file_filters}")
+                self.logger.error("  Check your file_type and file_filters configuration")
             
             return True
             
@@ -693,7 +697,7 @@ class NMDCWorkflowManager:
                 return False
         
         if len(ftp_df) == 0:
-            self.logger.warning("No files to download")
+            self.logger.error("No files to download")
             return True  # Not an error, just nothing to do
         
 
@@ -740,7 +744,6 @@ class NMDCWorkflowManager:
             if file_data:
                 download_df = pd.DataFrame(file_data)
                 download_df.to_csv(downloaded_files_csv, index=False)
-                self.logger.info(f"Downloaded files list saved to: {downloaded_files_csv}")
             
             self.set_skip_trigger('raw_data_downloaded', True)
         
@@ -892,7 +895,6 @@ class NMDCWorkflowManager:
         all_objects = [obj for obj in objects if not obj.object_name.endswith('/')]
         downloaded_count = 0
         
-        self.logger.info(f"Found {len(all_objects)} files to download from {bucket_name}/{folder_name}")
         
         for obj in tqdm(all_objects, desc="Downloading files"):
             # Create local file path
@@ -1114,7 +1116,6 @@ class NMDCWorkflowManager:
         # This ensures the processed data directory is up-to-date before we check for already-processed files
         wdl_execution_dir = self.workflow_path / "wdl_execution"
         if wdl_execution_dir.exists():
-            self.logger.info("Moving any processed data from previous WDL execution...")
             self._move_processed_files(str(wdl_execution_dir))
 
         # Always empty the wdl_jsons directory first
@@ -1127,12 +1128,10 @@ class NMDCWorkflowManager:
         mapped_files_csv = self.workflow_path / "metadata" / "mapped_raw_files.csv"
         
         if mapped_files_csv.exists():
-            self.logger.info("Using mapped raw files list (only biosample-mapped files will be processed)")
             import pandas as pd
             mapped_df = pd.read_csv(mapped_files_csv)
             raw_files = [Path(file_path) for file_path in mapped_df['raw_file_path'] 
                         if Path(file_path).exists()]
-            self.logger.info(f"Loaded {len(raw_files)} mapped files from {mapped_files_csv}")
         else:
             raise FileNotFoundError(f"Mapped files list not found: {mapped_files_csv}")
         
@@ -1156,8 +1155,6 @@ class NMDCWorkflowManager:
                 calibration_files_set = set(
                     mapping_df[mapping_df['raw_file_type'] == 'calibration']['raw_file_name'].tolist()
                 )
-                if calibration_files_set:
-                    self.logger.info(f"Found {len(calibration_files_set)} calibration file(s) - these will always be included")
         
         if processed_data_dir:
             processed_path = Path(processed_data_dir)
@@ -1165,8 +1162,7 @@ class NMDCWorkflowManager:
                 initial_count = len(raw_files)
                 unprocessed_files = []
                 
-                self.logger.info(f"Checking for already-processed files in: {processed_path}")
-                
+               
                 for raw_file in raw_files:
                     # Get the base name without extension (e.g., sample1.raw -> sample1)
                     base_name = raw_file.stem
@@ -1201,7 +1197,6 @@ class NMDCWorkflowManager:
                 raw_files = unprocessed_files
 
                 if not raw_files:
-                    self.logger.warning("All files have been processed already - no files left to process")
                     # set skip trigger for data_processed
                     self.set_skip_trigger('data_processed', True)
                     return
@@ -1259,11 +1254,9 @@ class NMDCWorkflowManager:
                 num_jsons = self._generate_single_wdl_json(config, batch_files, batch_num)
                 json_count += num_jsons
         
-        self.logger.info(f"SUMMARY: Created {json_count} WDL JSON files total")
         
         # If no JSONs were created, all files are already processed
         if json_count == 0:
-            self.logger.warning("No WDL JSON files created - all files already processed")
             self.set_skip_trigger('data_processed', True)
             return True
         
@@ -1318,7 +1311,6 @@ class NMDCWorkflowManager:
         with open(output_file, 'w') as f:
             json.dump(json_obj, f, indent=4)
         
-        self.logger.debug(f"Created batch {batch_num} with {len(batch_files)} files")
         return 1
 
     def _generate_lcms_lipid_wdl(self, config: dict, batch_files: List[Path], batch_num: int) -> int:
@@ -1348,7 +1340,6 @@ class NMDCWorkflowManager:
         with open(output_file, 'w') as f:
             json.dump(json_obj, f, indent=4)
         
-        self.logger.debug(f"Created batch {batch_num} with {len(batch_files)} files")
         return 1
     
     def _generate_gcms_metab_wdl(self, config: dict, batch_files: List[Path], batch_num: int) -> int:
@@ -1401,9 +1392,7 @@ class NMDCWorkflowManager:
         # Separate calibration and sample files
         sample_files_df = batch_df[batch_df['raw_file_type'] != 'calibration'].copy()
         calibration_count = len(batch_df[batch_df['raw_file_type'] == 'calibration'])
-        
-        self.logger.debug(f"Batch {batch_num} composition: {len(sample_files_df)} samples, {calibration_count} calibrations")
-        
+                
         if calibration_count == 0:
             raise ValueError(f"No calibration files found in batch {batch_num}. At least one calibration file is required.")
         
@@ -1439,7 +1428,6 @@ class NMDCWorkflowManager:
         
         # If sample files exceed batch size, split into sub-batches
         if len(sample_file_paths) > max_batch_size:
-            self.logger.warning(f"{len(sample_file_paths)} samples exceed batch size of {max_batch_size} - splitting into sub-batches")
             num_sub_batches = (len(sample_file_paths) + max_batch_size - 1) // max_batch_size
             
             for sub_batch_idx in range(num_sub_batches):
@@ -1449,13 +1437,11 @@ class NMDCWorkflowManager:
                 sub_batch_num = f"{batch_num}.{sub_batch_idx + 1}"
                 
                 create_wdl_json(sub_batch_samples, sub_batch_num)
-                self.logger.debug(f"Created sub-batch {sub_batch_num}: {len(sub_batch_samples)} samples")
             
             return num_sub_batches
         else:
             # Generate single WDL JSON (batch size not exceeded)
             create_wdl_json(sample_file_paths, batch_num)
-            self.logger.debug(f"Created batch {batch_num}: {len(sample_file_paths)} samples with calibration {Path(calibration_file).name}")
             return 1
 
     @skip_if_complete('data_processed', return_value=True)
@@ -1497,19 +1483,16 @@ class NMDCWorkflowManager:
         # Get absolute path to the wdl_jsons directory
         wdl_jsons_dir = self.workflow_path / "wdl_jsons"
         
-        self.logger.info("Validating WDL JSON files...")
         
         # Check if wdl_jsons directory exists
         if not wdl_jsons_dir.exists():
-            self.logger.error(f"WDL JSON directory not found: {wdl_jsons_dir}")
-            self.logger.error("Run generate_wdl_jsons() first to create JSON files")
+            self.logger.error(f"WDL JSON directory not found: {wdl_jsons_dir}, run generate_wdl_jsons() first")
             raise FileNotFoundError(f"WDL JSON directory not found: {wdl_jsons_dir}")
         
         # Find all JSON files
         json_files = list(wdl_jsons_dir.rglob("*.json"))
         if not json_files:
-            self.logger.error(f"No JSON files found in: {wdl_jsons_dir}")
-            self.logger.error("Run generate_wdl_jsons() first to create JSON files")
+            self.logger.error(f"No JSON files found in: {wdl_jsons_dir}, run generate_wdl_jsons() first")
             raise FileNotFoundError(f"No JSON files found in: {wdl_jsons_dir}")
         
         self.logger.info(f"Found {len(json_files)} JSON files")
@@ -1642,7 +1625,6 @@ fi
         os.chmod(script_path, 0o755)
         
         self.logger.info(f"Generated WDL runner script: {script_path}")
-        self.logger.debug("Made script executable (chmod +x)")
         return True
        # print(f"Script expects to find WDL file at: wdl/{workflow_name}.wdl")
     
@@ -1698,10 +1680,7 @@ fi
         # Create working directory structure
         working_dir.mkdir(parents=True, exist_ok=True)
         wdl_dir = working_dir / "wdl"
-        wdl_dir.mkdir(parents=True, exist_ok=True)
-        
-        self.logger.info(f"WDL execution directory: {working_dir}")
-        
+        wdl_dir.mkdir(parents=True, exist_ok=True)        
         # Download WDL file from GitHub
         workflow_type = self.config['workflow']['workflow_type']
         if workflow_type not in WORKFLOW_DICT:
@@ -1711,9 +1690,6 @@ fi
         wdl_file = wdl_dir / f"{WORKFLOW_DICT[workflow_type]['wdl_workflow_name']}.wdl"
         
         if not wdl_file.exists():
-            self.logger.info("Downloading WDL file from GitHub...")
-            self.logger.debug(f"URL: {wdl_url}")
-            self.logger.debug(f"Destination: {wdl_file}")
             
             try:
                 # Create SSL context that handles certificate issues on macOS
@@ -1727,7 +1703,6 @@ fi
                         wdl_content = response.read().decode('utf-8')
                 except Exception:
                     # Fallback: try using subprocess with curl (often works better on macOS)
-                    self.logger.debug("Retrying with curl...")
                     result = subprocess.run([
                         'curl', '-L', '-k', '--silent', '--show-error', wdl_url
                     ], capture_output=True, text=True, timeout=30)
@@ -1750,8 +1725,6 @@ fi
                 self.logger.error("You can manually download the file with:")
                 self.logger.error(f"  curl -L -k '{wdl_url}' > '{wdl_file}'")
                 return 1
-        else:
-            self.logger.info(f"WDL file already exists: {wdl_file}")
         
         # Check if Docker is running
         self.logger.info("Checking Docker availability...")
@@ -1760,9 +1733,7 @@ fi
                                         capture_output=True, text=True, timeout=10)
             if docker_check.returncode != 0:
                 self.logger.error("Docker is not running or not available")
-                self.logger.error("Please start Docker Desktop and try again")
                 return 1
-            self.logger.info("Docker is running")
         except subprocess.TimeoutExpired:
             self.logger.error("Docker check timed out - Docker may not be running")
             return 1
@@ -1773,6 +1744,7 @@ fi
             self.logger.error(f"Error checking Docker: {e}")
             return 1
         
+        #TODO KRH: Remove this option!
         # Use the base directory virtual environment
         base_venv_dir = self.base_path / "venv"
         venv_python = base_venv_dir / "bin" / "python"
@@ -1797,7 +1769,7 @@ fi
             ], capture_output=True, text=True, timeout=10)
             
             if result.returncode == 0:
-                self.logger.info("WDL dependencies available")
+                pass
             else:
                 raise subprocess.CalledProcessError(result.returncode, "import check")
                 
@@ -1816,7 +1788,7 @@ fi
                 ], capture_output=True, text=True, timeout=10)
                 
                 if verify_result.returncode == 0:
-                    self.logger.info("WDL dependencies installed and verified")
+                    pass
                 else:
                     self.logger.error(f"Installation verification failed: {verify_result.stderr}")
                     return False
@@ -1828,7 +1800,6 @@ fi
                 return False
         
         self.logger.info(f"Running WDL workflows from: {working_dir}")
-        self.logger.info("This will take a long time for large datasets...")
         
         # Create symbolic link to workflow_inputs directory so relative paths work
         workflow_inputs_source = self.base_path / "workflow_inputs"
@@ -1844,11 +1815,7 @@ fi
         original_dir = os.getcwd()
         
         try:
-            self.logger.info(f"Changing to working directory: {working_dir}")
             os.chdir(working_dir)
-            
-            self.logger.info(f"Executing script with base venv: {script_path}")
-            self.logger.info("=" * 50)
             
             # Create a command that activates the base venv and runs the script
             activate_and_run = f"source {base_venv_dir}/bin/activate && {script_path}"
@@ -1865,7 +1832,6 @@ fi
                 self.logger.info("All WDL workflows completed successfully!")
                 
                 # Move processed output files from working directory to designated processed data location
-                self.logger.info("Moving processed files to configured location...")
                 self._move_processed_files(str(working_dir))
                 
                 self.set_skip_trigger(
@@ -1876,29 +1842,23 @@ fi
                 return True
             else:
                 self.logger.warning(f"Some workflows failed (exit code: {result.returncode})")
-                self.logger.warning("Check the logs above for details.")
                 
                 # Still move any processed files that were completed successfully
-                self.logger.info("Moving any completed processed files...")
                 self._move_processed_files(str(working_dir), clean_up=False)
                 
-                self.logger.info("To re-run failed workflows, use run_wdl_script() again - it will recreate the execution environment.")
                 return False
             
         except Exception as e:
             self.logger.error(f"Error executing script: {e}")
             
             # Still try to move any completed processed files
-            self.logger.info("Attempting to move any completed processed files...")
             self._move_processed_files(str(working_dir))
             
-            self.logger.info("To retry, use run_wdl_script() again - it will recreate the execution environment.")
             return False
             
         finally:
             # Always return to original directory
             os.chdir(original_dir)
-            self.logger.debug(f"Returned to original directory: {original_dir}")
     
     def _cleanup_wdl_execution_dir(self, working_dir: str) -> bool:
         """
@@ -1927,19 +1887,15 @@ fi
         
         # Safety check 1: only clean up directories that are clearly WDL execution directories
         if 'wdl_execution' not in str(working_path):
-            self.logger.warning(f"Skipping cleanup - directory doesn't appear to be a WDL execution directory: {working_path}")
             return False
         
         # Safety check 2: ensure this is within the current study's directory structure
         try:
             working_path.relative_to(self.workflow_path)
         except ValueError:
-            self.logger.warning(f"Skipping cleanup - directory is not within current study path: {working_path}")
-            self.logger.warning(f"Current study path: {self.workflow_path}")
             return False
         
         if not working_path.exists():
-            self.logger.info(f"WDL execution directory already cleaned up: {working_path}")
             return True
         
         try:
@@ -1951,12 +1907,10 @@ fi
             # Remove the entire directory tree
             shutil.rmtree(working_path)
             
-            self.logger.info(f"Successfully removed WDL execution directory ({total_items} items cleaned up)")
             return True
             
         except Exception as e:
             self.logger.error(f"Failed to clean up WDL execution directory: {e}")
-            self.logger.error(f"You may want to manually remove: {working_path}")
             return False
 
     def _move_processed_files(self, working_dir: str, clean_up: bool = True) -> None:
@@ -1994,10 +1948,8 @@ fi
         # Create processed data directory if it doesn't exist
         if not processed_path.exists():
             processed_path.mkdir(parents=True, exist_ok=True)
-            self.logger.info(f"Created processed data directory: {processed_path}")
         
-        self.logger.info(f"Searching for processed files in: {working_path}")
-        self.logger.info(f"Moving processed files to: {processed_path}")
+
         
         # Get list of raw files for this study to validate outputs belong to this study
         raw_data_dir = self.raw_data_directory
@@ -2039,7 +1991,6 @@ fi
                     try:
                         shutil.move(str(dirpath), str(destination))
                         moved_count += 1
-                        self.logger.info(f"Moved {dirpath.name} -> {destination}")
                     except Exception as e:
                         self.logger.error(f"Failed to move {dirpath.name}: {e}")
                         
@@ -2066,13 +2017,9 @@ fi
                 try:
                     shutil.copy2(str(csv_file), str(destination_file))
                     moved_count += 1
-                    self.logger.info(f"Copied {csv_file.name} -> {processed_path.name}/")
                 except Exception as e:
                     self.logger.error(f"Failed to copy {csv_file.name}: {e}")
         
-        self.logger.info("Processed file move summary:")
-        self.logger.info(f"Files moved: {moved_count}")
-        self.logger.info(f"Destination: {processed_path}")
         
         if moved_count > 0:
             # Report total processed files in destination
@@ -2126,10 +2073,8 @@ fi
             
             if not biosamples:
                 self.logger.error(f"No biosamples found for study {study_id}")
-                self.logger.error("Please verify the study ID and check if biosamples are available in NMDC")
                 return False
             
-            self.logger.info(f"Found {len(biosamples)} biosamples")
             
             # Convert to DataFrame
             biosample_df = pd.DataFrame(biosamples)
@@ -2142,17 +2087,13 @@ fi
             biosample_csv = metadata_dir / "biosample_attributes.csv"
             biosample_df.to_csv(biosample_csv, index=False)
             
-            self.logger.info(f"Saved biosample attributes to: {biosample_csv}")
-            self.logger.debug(f"Columns available: {list(biosample_df.columns)}")
-            
             # Set skip trigger
             self.set_skip_trigger('biosample_attributes_fetched', True)
             return True
             
         except Exception as e:
             self.logger.error(f"Error fetching biosample data: {e}")
-            self.logger.error("Please check your internet connection and verify the study ID")
-            self.logger.error("Make sure nmdc_api_utilities package is installed: pip install nmdc-api-utilities")
+
             return False
     
     @skip_if_complete('biosample_mapping_script_generated', return_value=True)
@@ -2192,8 +2133,6 @@ fi
             
         script_path = self.workflow_path / "scripts" / script_name
         
-        self.logger.info(f"Generating biosample mapping TEMPLATE script: {script_path}")
-        self.logger.debug(f"Using template: {template_path}")
         
         # Check if template exists
         if not template_path.exists():
@@ -2221,11 +2160,7 @@ fi
             os.chmod(script_path, 0o755)
             
             self.logger.info(f"Generated biosample mapping TEMPLATE script: {script_path}")
-            self.logger.debug("Made script executable (chmod +x)")
-            self.logger.warning("IMPORTANT: This is a TEMPLATE file - customize it for your study!")
-            self.logger.warning("1. Copy to a new filename (remove _TEMPLATE)")
-            self.logger.warning("2. Modify the parsing and matching logic for your specific file naming patterns")
-            self.logger.warning("3. Test with a small subset of files before running on the full dataset")
+
             
             self.set_skip_trigger('biosample_mapping_script_generated', True)
             return True
@@ -2266,10 +2201,6 @@ fi
             elif template_script.exists():
                 self.logger.error("Found only TEMPLATE script - you must customize it first!")
                 self.logger.error(f"Template script: {template_script}")
-                self.logger.error("To use it:")
-                self.logger.error("1. Copy the template to a new filename (remove _TEMPLATE)")
-                self.logger.error("2. Customize the parsing logic for your study")
-                self.logger.error("3. Run this function again with the customized script path")
                 return False
             else:
                 self.logger.error("No mapping script found. Run generate_biosample_mapping_script() first")
@@ -2281,15 +2212,10 @@ fi
         if '_TEMPLATE' in script_path.name:
             self.logger.error("Cannot run TEMPLATE script directly!")
             self.logger.error(f"Template script: {script_path}")
-            self.logger.error("You must customize the template first:")
-            self.logger.error("1. Copy the template to a new filename (remove _TEMPLATE)")
-            self.logger.error("2. Customize the parsing logic for your study")
-            self.logger.error("3. Run this function again with the customized script path")
             return False
         
         if not script_path.exists():
             self.logger.error(f"Mapping script not found: {script_path}")
-            self.logger.error("Make sure you've customized and saved the script from the template")
             return False
         
         self.logger.info(f"Running biosample mapping script: {script_path}")
@@ -2305,7 +2231,6 @@ fi
                                   cwd=self.base_path)  # Run from base directory
             
             if result.returncode == 0:
-                self.logger.info("Biosample mapping completed successfully!")
                 
                 # Generate filtered file list for WDL processing
                 self._generate_mapped_files_list()
@@ -2314,8 +2239,7 @@ fi
                 return True
             else:
                 self.logger.warning(f"Biosample mapping script exited with code: {result.returncode}")
-                self.logger.warning("This may indicate unmatched files or multiple matches that need review")
-                self.logger.warning("Check the mapping file and customize the script as needed")
+
                 return False
                 
         except Exception as e:
@@ -2473,9 +2397,7 @@ fi
             raise ValueError(f"Unknown workflow type: {workflow_type}")
         
         inspector_name = workflow_config.get('raw_data_inspector', 'raw_data_inspector')
-        self.logger.info("Starting raw data inspection...")
-        self.logger.info(f"Workflow type: {workflow_type}")
-        self.logger.info(f"Using inspector: {inspector_name}")
+
         
         # Branch to appropriate inspector method
         if inspector_name == 'gcms_data_inspector':
@@ -2485,10 +2407,8 @@ fi
     
     def _run_lcms_data_inspector(self, file_paths, cores, limit, max_retries, retry_delay):
         """Run LCMS raw data inspector using Docker container."""
-        self.logger.info("=" * 70)
-        self.logger.info("LCMS RAW DATA INSPECTION (Docker)")
-        self.logger.info("=" * 70)
-        
+        self.logger.info("Starting LCMS RAW DATA INSPECTION (Docker)")
+
         try:
             # Get file paths to inspect
             if file_paths is None:
@@ -2497,14 +2417,12 @@ fi
                 if mapped_files_path.exists():
                     mapped_df = pd.read_csv(mapped_files_path)
                     file_paths = mapped_df['raw_file_path'].tolist()
-                    self.logger.info(f"Using {len(file_paths)} mapped raw files for inspection")
                 else:
                     # Fallback to all files in raw_data_directory
                     raw_data_dir = Path(self.raw_data_directory)
                     file_paths = []
                     for ext in ['*.mzML', '*.raw', '*.mzml']:  # Include lowercase variants
                         file_paths.extend([str(f) for f in raw_data_dir.rglob(ext)])
-                    self.logger.info(f"Using {len(file_paths)} raw files from data directory for inspection")
             
             if not file_paths:
                 self.logger.warning("No raw files found to inspect")
@@ -2519,7 +2437,6 @@ fi
             files_to_inspect = file_paths
             
             if existing_results_file.exists():
-                self.logger.info(f"Found previous inspection results: {existing_results_file}")
                 try:
                     previous_results_df = pd.read_csv(existing_results_file)
                     
@@ -2541,31 +2458,22 @@ fi
                     # Filter out successfully inspected files by comparing filenames
                     files_to_inspect = [fp for fp in file_paths if Path(fp).name not in successful_filenames]
                     
-                    self.logger.info(f"Previously inspected: {len(successful_filenames)} files")
-                    self.logger.info(f"Need to inspect: {len(files_to_inspect)} files (new or previously failed)")
                     
                     if len(files_to_inspect) == 0:
-                        self.logger.info("All files have been successfully inspected!")
                         # Set skip trigger
                         self.set_skip_trigger('raw_data_inspected', True)
                         return str(existing_results_file)
                         
                 except Exception as e:
                     self.logger.warning(f"Error reading previous results: {e}")
-                    self.logger.warning("Will inspect all files")
                     files_to_inspect = file_paths
                     previous_results_df = None
-            else:
-                self.logger.info("No previous inspection results found - inspecting all files")
             
             # Now check Docker configuration since we have files to inspect
             docker_image = self.config.get('docker', {}).get('raw_data_inspector_image')
             if not docker_image:
                 self.logger.error("Docker image not configured.")
-                self.logger.error("Please add 'docker.raw_data_inspector_image' to your config:")
-                self.logger.error('  "docker": {')
-                self.logger.error('    "raw_data_inspector_image": "microbiomedata/metams:3.3.3"')
-                self.logger.error('  }')
+
                 return None
             
             # Check for .raw files and force single core processing to prevent crashes
@@ -2574,10 +2482,8 @@ fi
             if has_raw_files and cores > 1:
                 cores = 1
                 self.logger.warning(f"Detected .raw files - forcing single core processing (requested: {original_cores} → using: 1)")
-                self.logger.warning("Reason: Multi-core processing of .raw files in Docker causes crashes")
-                self.logger.warning("due to file locking issues with Thermo RawFileReader library")
-            elif has_raw_files:
-                self.logger.info(".raw files detected - single core processing already configured")
+
+
             
             # Use a temporary output file to avoid overwriting existing results
             if previous_results_df is not None:
@@ -2594,7 +2500,6 @@ fi
             
             # Merge previous and new results if we had previous results
             if result is not None and previous_results_df is not None:
-                self.logger.info("Merging previous and new inspection results...")
                 try:
                     # result is already a DataFrame from _process_inspection_results_from_file
                     if isinstance(result, pd.DataFrame):
@@ -2628,28 +2533,23 @@ fi
                     # Write combined results back to the main results file
                     combined_df.to_csv(existing_results_file, index=False)
                     
-                    self.logger.info(f"Combined results saved: {existing_results_file}")
-                    self.logger.info(f"Previous results retained: {len(previous_to_keep)}")
-                    self.logger.info(f"New/updated results: {len(new_results_df)}")
-                    self.logger.info(f"Total files in results: {len(combined_df)}")
+
                     
                     # Clean up temporary directory
                     if temp_output_dir.exists():
                         import shutil
                         shutil.rmtree(temp_output_dir)
-                        self.logger.debug("Cleaned up temporary inspection directory")
                     
                     result = str(existing_results_file)
                     
                 except Exception as e:
-                    self.logger.warning(f"Error merging results: {e}")
-                    self.logger.warning("Using new results only")
+                    self.logger.warning(f"Error merging results during raw data inspection: {e}")
                     import traceback
                     traceback.print_exc()
             
             # Set the skip trigger on successful completion
             if result is not None:
-                self.logger.info("Raw data inspection completed successfully!")
+                self.logger.info("Raw data inspection completed successfully")
                 return True
             else:
                 self.logger.error("Raw data inspection failed")
@@ -2663,7 +2563,6 @@ fi
     
     def _run_raw_data_inspector_docker(self, file_paths, output_dir, cores, limit, max_retries, retry_delay, docker_image):
         """Run raw data inspector using Docker container."""
-        self.logger.info(f"Using Docker image: {docker_image}")
         
         # Check if Docker is available
         try:
@@ -2671,7 +2570,6 @@ fi
                                         capture_output=True, text=True, timeout=10)
             if docker_check.returncode != 0:
                 raise RuntimeError("Docker is not available")
-            self.logger.info(f"Docker available: {docker_check.stdout.strip()}")
         except (subprocess.TimeoutExpired, FileNotFoundError):
             raise RuntimeError("Docker is not installed or not available")
         
@@ -2730,14 +2628,9 @@ fi
         if limit is not None:
             cmd_args.extend(["--limit", str(limit)])
         
-        self.logger.info(f"Output directory: {output_dir}")
-        self.logger.info(f"Processing {len(file_paths)} files with {cores} cores")
-        self.logger.debug(f"Volume mounts: {len(mount_points)} directories")
         
         # Show mount point details for debugging
-        self.logger.debug("Mount points:")
-        for i, mount_point in enumerate(mount_points, 1):
-            self.logger.debug(f"{i}. {mount_point} → /mnt{mount_point}")
+
         
         # Build Docker command
         docker_cmd = [
@@ -2748,23 +2641,11 @@ fi
             "python", container_script_path
         ] + cmd_args
         
-        self.logger.info("Running Docker command...")
-        self.logger.debug(f"Image: {docker_image}")
-        self.logger.debug(f"Script: {container_script_path}")
-        self.logger.debug(f"Files: {len(container_file_paths)} files")
-        self.logger.debug(f"Cores: {cores}")
-        self.logger.debug(f"Max retries: {max_retries}")
-        self.logger.debug(f"Retry delay: {retry_delay}s")
+        self.logger.info("Running docker-based raw file inspector...")
         if limit:
             self.logger.debug(f"Limit: {limit} files")
         
-        self.logger.debug("Docker command preview:")
-        cmd_preview = " ".join(docker_cmd[:8]) + " ... " + " ".join(docker_cmd[-3:])
-        self.logger.debug(f"{cmd_preview}")
-        
-        self.logger.info("Starting raw data inspection (this may take several minutes)...")
-        self.logger.info("Processing files in batches - watch for progress updates below:")
-        self.logger.info("=" * 70)
+
         
         # Run the Docker command with real-time output
         result = subprocess.run(
@@ -2775,7 +2656,6 @@ fi
             timeout=3600  # 1 hour timeout
         )
         
-        self.logger.info("=" * 70)
         self.logger.info(f"Docker execution completed with exit code: {result.returncode}")
         
         # Since we used capture_output=False, we need to check the output file directly
@@ -2793,9 +2673,7 @@ fi
     
     def _run_gcms_data_inspector(self, file_paths, cores, limit, max_retries, retry_delay):
         """Run GCMS raw data inspector using gcms_data_inspector.py script."""
-        self.logger.info("=" * 70)
-        self.logger.info("GCMS RAW DATA INSPECTION")
-        self.logger.info("=" * 70)
+        self.logger.info("Running GCMS RAW DATA INSPECTION")
         
         try:
             # Get file paths to inspect
@@ -2805,14 +2683,12 @@ fi
                 if mapped_files_path.exists():
                     mapped_df = pd.read_csv(mapped_files_path)
                     file_paths = mapped_df['raw_file_path'].tolist()
-                    self.logger.info(f"Using {len(file_paths)} mapped raw files for inspection")
                 else:
                     # Fallback to all .cdf files in raw_data_directory
                     raw_data_dir = Path(self.raw_data_directory)
                     file_paths = []
                     for ext in ['*.cdf', '*.CDF']:
                         file_paths.extend([str(f) for f in raw_data_dir.rglob(ext)])
-                    self.logger.info(f"Using {len(file_paths)} CDF files from data directory")
             
             if not file_paths:
                 self.logger.warning("No CDF files found to inspect")
@@ -2826,7 +2702,6 @@ fi
             # Check for previous results and filter out successfully inspected files
             previous_results_df = None
             if existing_results_file.exists():
-                self.logger.info(f"Found existing inspection results: {existing_results_file}")
                 try:
                     previous_results_df = pd.read_csv(existing_results_file)
                     previous_file_paths = set(previous_results_df['file_path'].tolist())
@@ -2835,12 +2710,10 @@ fi
                     files_to_inspect = [f for f in file_paths if f not in previous_file_paths]
                     
                     if len(files_to_inspect) < len(file_paths):
-                        self.logger.info(f"{len(previous_results_df)} files already inspected")
-                        self.logger.info(f"{len(files_to_inspect)} new files to inspect")
+
                         file_paths = files_to_inspect
                     
                     if not files_to_inspect:
-                        self.logger.info("All files already inspected!")
                         return str(existing_results_file)
                 except Exception as e:
                     self.logger.warning(f"Could not read previous results: {e}")
@@ -2861,13 +2734,11 @@ fi
             if not docker_image:
                 raise ValueError("Docker configuration required: config['docker']['raw_data_inspector_image'] not found")
             
-            self.logger.info(f"Using Docker image: {docker_image}")
             result = self._run_gcms_inspector_docker(file_paths, output_dir, cores, 
                                                     max_retries, retry_delay, docker_image, script_path)
             
             # Merge with previous results if they exist
             if result is not None and previous_results_df is not None:
-                self.logger.info("Merging previous and new inspection results...")
                 try:
                     if isinstance(result, pd.DataFrame):
                         new_results_df = result
@@ -2887,10 +2758,6 @@ fi
                     # Write combined results
                     combined_df.to_csv(existing_results_file, index=False)
                     
-                    self.logger.info(f"Combined results saved: {existing_results_file}")
-                    self.logger.info(f"Previous results retained: {len(previous_to_keep)}")
-                    self.logger.info(f"New/updated results: {len(new_results_df)}")
-                    self.logger.info(f"Total files in results: {len(combined_df)}")
                     
                     result = str(existing_results_file)
                 except Exception as e:
@@ -2898,7 +2765,7 @@ fi
             
             # Set skip trigger on success
             if result is not None:
-                self.logger.info("GCMS raw data inspection completed successfully!")
+                self.logger.info("GCMS raw data inspection completed successfully.")
                 return True
             else:
                 self.logger.error("GCMS raw data inspection failed")
@@ -2921,7 +2788,6 @@ fi
                                         capture_output=True, text=True, timeout=10)
             if docker_check.returncode != 0:
                 raise RuntimeError("Docker is not available")
-            self.logger.info(f"Docker available: {docker_check.stdout.strip()}")
         except (subprocess.TimeoutExpired, FileNotFoundError):
             raise RuntimeError("Docker is not installed or not available")
         
@@ -2966,10 +2832,7 @@ fi
             "python", container_script_path
         ] + cmd_args
         
-        self.logger.info(f"Output directory: {output_dir}")
-        self.logger.info(f"Processing {len(file_paths)} files with {cores} cores")
-        self.logger.info("Starting GCMS inspection...")
-        self.logger.info("=" * 70)
+
         
         # Run Docker command
         result = subprocess.run(
@@ -2980,7 +2843,6 @@ fi
             timeout=3600
         )
         
-        self.logger.info("=" * 70)
         self.logger.info(f"Docker execution completed with exit code: {result.returncode}")
         
         if result.returncode == 0:
@@ -2998,20 +2860,9 @@ fi
         """Process inspection results from output CSV file."""
         try:
             import pandas as pd
-            self.logger.info(f"Reading inspection results from: {output_file}")
             
             # Read the CSV file
             df = pd.read_csv(output_file)
-            self.logger.info(f"Successfully loaded {len(df)} inspection results")
-            
-            # Show a preview of the results
-            if len(df) > 0:
-                self.logger.debug("Results preview:")
-                self.logger.debug(f"Columns: {list(df.columns)}")
-                self.logger.debug(f"Sample records: {min(3, len(df))}")
-                for i in range(min(3, len(df))):
-                    filename = df.iloc[i].get('filename', 'Unknown')
-                    self.logger.debug(f"{i+1}. {filename}")
             
             return df
         except Exception as e:
@@ -3038,20 +2889,16 @@ fi
                     output_file_path = str(default_output)
             
             if output_file_path and Path(output_file_path).exists():
-                self.logger.info(f"Results saved to: {output_file_path}")
                 
                 # Show summary statistics
                 try:
                     results_df = pd.read_csv(output_file_path)
-                    self.logger.info("Inspection summary:")
-                    self.logger.info(f"Files processed: {len(results_df)}")
+
                     
                     # Count successful vs failed
                     failed_count = len(results_df[results_df['error'].notna()])
                     success_count = len(results_df) - failed_count
-                    self.logger.info(f"Successful: {success_count}")
-                    self.logger.info(f"Failed: {failed_count}")
-                    
+
                     if success_count > 0:
                         # Show instrument summary if available
                         if 'instrument_model' in results_df.columns:
@@ -3066,9 +2913,7 @@ fi
                 
                 return output_file_path
             else:
-                self.logger.warning("Could not find output file")
-                self.logger.warning("Standard output:")
-                self.logger.warning(result.stdout)
+                self.logger.warning(f"Could not find output file: {result.stdout}")
                 return None
         else:
             self.logger.error(f"Raw data inspection failed with return code: {result.returncode}")
@@ -3171,7 +3016,7 @@ fi
         self.logger.debug(f"Unique instrument_instance_specifier values: {file_info_df['instrument_instance_specifier'].unique()}")
         valid_dates = file_info_df['instrument_analysis_end_date'].dropna()
         if len(valid_dates) > 0:
-            self.logger.debug(f"Date range: {valid_dates.min()} to {valid_dates.max()}")
+            pass
         else:
             self.logger.debug("No valid dates found")
         
@@ -3242,10 +3087,9 @@ fi
                 return https_url
             
             merged_df['raw_data_url'] = merged_df['raw_data_file_short'].apply(construct_massive_url)
-            self.logger.info("Validating MASSIVE URL accessibility...")
             self._validate_massive_urls(merged_df['raw_data_url'].head(5).tolist())
         elif raw_data_location.lower() == 'minio':
-            self.logger.info("Using MinIO - raw_data_url will not be included in metadata CSV")
+            pass
         else:
             raise ValueError(f"Unsupported raw_data_location: {raw_data_location}, must be 'massive' or 'minio'")
         
@@ -3299,7 +3143,6 @@ fi
                 total_files += len(output_df)
                 sample_chromat = output_df['chromat_configuration_name'].iloc[0]
                 sample_ms = output_df['mass_spec_configuration_name'].iloc[0]
-                self.logger.info(f"{config_name}_metadata.csv: {len(output_df)} files ({sample_chromat}, {sample_ms})")
             except Exception as e:
                 self.logger.error(f"Error writing {config_name}_metadata.csv: {e}")
                 continue
@@ -3308,8 +3151,7 @@ fi
             self.logger.error("No metadata files were successfully written")
             return False
         
-        self.logger.info(f"Successfully generated {files_written} metadata files with {total_files} total entries")
-        self.logger.info(f"Output directory: {output_dir}")
+
         return True
     
     def _generate_lcms_workflow_metadata_inputs(self) -> bool:
@@ -3360,7 +3202,6 @@ fi
             )
             
             # Match samples to calibration files
-            self.logger.info("Matching samples to calibration files based on chronological order...")
             merged_df = self._assign_calibration_files_to_samples(merged_df, raw_inspection_results)
             
             # Define final columns for GCMS
@@ -3377,6 +3218,7 @@ fi
         
         return self._generate_workflow_metadata_inputs_common(gcms_processor)
        
+        #TODO KRH: CHeck this - is it ever run?
         # Check prerequisites
         biosample_mapping_file = self.workflow_path / "metadata" / "mapped_raw_file_biosample_mapping.csv"
         if not biosample_mapping_file.exists():
@@ -3804,7 +3646,6 @@ fi
         default_mass_spec = metadata_config.get('mass_spec_configuration_name', 'Unknown') 
         default_chromat = metadata_config.get('chromat_configuration_name', 'Unknown')
         
-        self.logger.info(f"Separating {len(merged_df)} files into configurations...")
         
         for config in self.config.get('configurations', []):
             config_name = config['name']
@@ -3826,7 +3667,6 @@ fi
             else:
                 # No filters specified - include all files
                 config_df = merged_df.copy()
-                self.logger.info(f"Configuration '{config_name}': No filters specified, including all files")
             
             # Apply configuration-specific metadata (with fallback to defaults)
             config_df['instrument_used'] = config.get('instrument_used', default_instrument)
@@ -3880,7 +3720,6 @@ fi
                 ms_config = config_df['mass_spec_configuration_name'].iloc[0]
                 metadata_desc = f"chromat='{chromat_config}', ms='{ms_config}'"
                 
-            self.logger.info(f"Configuration '{config_name}': {len(config_df)} files match {filter_desc} ({metadata_desc})")
         
         # Fallback: if no configurations worked, create single dataset with defaults
         if not config_dfs:
@@ -3928,13 +3767,12 @@ fi
                 
                 if response.status == 200:
                     successful_urls += 1
-                    self.logger.info(f"URL {i+1}/{total_tested}: Accessible (Status: {response.status})")
+                    pass
                     
                     # Check if it looks like a file download
-                    content_type = response.headers.get('Content-Type', '')
                     content_length = response.headers.get('Content-Length')
                     if content_length:
-                        self.logger.debug(f"File size: {int(content_length):,} bytes")
+                        pass
                 else:
                     self.logger.warning(f"URL {i+1}/{total_tested}: Unexpected status {response.status}")
                     
@@ -3951,8 +3789,7 @@ fi
         elif successful_urls < total_tested // 2:
             self.logger.warning(f"Only {successful_urls}/{total_tested} URLs are accessible. "
                   "Some files may not be available in MASSIVE.")
-        else:
-            self.logger.info(f"URL validation passed: {successful_urls}/{total_tested} URLs accessible")
+
             
         return True
     
@@ -3997,8 +3834,6 @@ fi
         folder_name = self.config['study']['name'] + "/processed_" + self.config['workflow']['processed_data_date_tag']
         
         self.logger.info("Uploading processed data to MinIO...")
-        self.logger.info(f"Source: {processed_path}")
-        self.logger.info(f"Destination: {bucket_name}/{folder_name}")
         
         try:
             # Use the core upload_to_minio method
@@ -4013,10 +3848,7 @@ fi
             # (both indicate the operation completed successfully)
             self.set_skip_trigger('processed_data_uploaded_to_minio', True)
             
-            if uploaded_count > 0:
-                self.logger.info(f"Successfully uploaded {uploaded_count} processed files to MinIO")
-            else:
-                self.logger.info("All processed files already exist in MinIO - upload complete")
+
             
             return True
                 
@@ -4081,7 +3913,6 @@ fi
         
         # Build URL
         processed_data_url = f"https://nmdcdemo.emsl.pnnl.gov/{bucket}/{folder_path}/"
-        self.logger.debug(f"Constructed processed data URL: {processed_data_url}")
         
         # Get existing data objects from config (if any)
         existing_data_objects = self.config.get('metadata', {}).get('existing_data_objects', [])
@@ -4094,12 +3925,10 @@ fi
             # Remove any trailing slashes from endpoint
             minio_endpoint = minio_endpoint.rstrip('/')
             raw_data_url = f"{minio_endpoint}/{bucket}/{self.study_name}/raw/"
-            self.logger.debug(f"Constructed MinIO raw data URL: {raw_data_url}")
         else:
             # Use configured raw_data_url or None for MASSIVE
             raw_data_url = self.config.get('metadata', {}).get('raw_data_url', None)
-            if raw_data_url:
-                self.logger.debug(f"Using configured raw data URL: {raw_data_url}")
+
         
         # Get GCMS-specific configuration file name if needed
         configuration_file_name = self.config.get('metadata', {}).get('configuration_file_name', None)
@@ -4110,7 +3939,6 @@ fi
         
         # Process each metadata mapping CSV file
         csv_files = list(input_csv_dir.glob("*.csv"))
-        self.logger.info(f"Found {len(csv_files)} metadata mapping files to process")
         
         success_count = 0
         failed_files = []
@@ -4122,12 +3950,8 @@ fi
             
             # Skip if output already exists
             if output_file.exists():
-                self.logger.info(f"Output file already exists, skipping: {output_file.name}")
                 success_count += 1
                 continue
-            
-            self.logger.info(f"Processing: {csv_file.name}")
-            self.logger.info(f"Output: {output_file.name}")
             
             try:
                 # Initialize workflow-specific metadata generator
@@ -4168,7 +3992,6 @@ fi
                     failed_files.append((csv_file.name, "Local validation failed"))
                     continue
                 
-                self.logger.info(f"SUCCESS: {output_file.name}")
                 success_count += 1
                 
             except Exception as e:
@@ -4176,14 +3999,6 @@ fi
                 failed_files.append((csv_file.name, str(e)))
                 import traceback
                 traceback.print_exc()
-        
-        # Report results
-        self.logger.info("="*60)
-        self.logger.info("NMDC Metadata Generation Summary")
-        self.logger.info("="*60)
-        self.logger.info(f"Total files processed: {len(csv_files)}")
-        self.logger.info(f"Successful: {success_count}")
-        self.logger.info(f"Failed: {len(failed_files)}")
         
         if failed_files:
             self.logger.warning("Failed files:")
@@ -4195,7 +4010,6 @@ fi
         # Set skip trigger only if all files succeeded
         if success_count == len(csv_files):
             self.set_skip_trigger('metadata_packages_generated', True)
-            self.logger.info("All metadata packages generated successfully!")
             return True
         else:
             self.logger.warning("Some metadata packages failed - review errors above")
