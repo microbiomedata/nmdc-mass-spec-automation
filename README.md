@@ -60,9 +60,8 @@ manager = NMDCWorkflowManager("studies/your_study/config.json")
 # Step 1: Create directory structure
 manager.create_workflow_structure()
 
-# Step 2: Discover and download raw data
-manager.get_massive_ftp_urls()
-manager.download_from_massive()
+# Step 2: Fetch raw data (automatically uses MASSIVE or MinIO based on config)
+manager.fetch_raw_data()
 
 # Step 3: Map files to biosamples
 manager.get_biosample_attributes()
@@ -73,21 +72,29 @@ manager.run_biosample_mapping_script()
 # Step 4: Inspect raw data
 manager.raw_data_inspector(cores=4)
 
-# Step 5: Generate WDL configurations, make runner script and run workflows
-manager.generate_wdl_jsons()
-manager.generate_wdl_runner_script()
-manager.run_wdl_script()
+# Step 5: Generate metadata inputs
+manager.generate_workflow_metadata_generation_inputs()
 
-# Step 6: Upload to MinIO
+# Step 6: Process data (generate WDL configs and execute workflows)
+manager.process_data(execute=True)
+
+# Step 7: Upload to MinIO
 manager.upload_processed_data_to_minio()
 
-# Step 7: Generate metadata mapping files with URL validation
-metadata_success = manager.generate_metadata_mapping_files()
-
 # Step 8: Generate and submit NMDC metadata packages
-manager.generate_nmdc_metadata_packages()
-manager.submit_metadata_to_nmdc(dev=True, prod=False)
+manager.generate_nmdc_metadata_for_workflow()
+manager.submit_metadata_packages(environment='dev')
 ```
+
+### Configuration-Based Operation
+
+The workflow manager uses configuration files to determine:
+- **Data source**: Presence of `massive_id` in config → MASSIVE; otherwise → MinIO
+- **Batch size**: Configured in `config['workflow']['batch_size']`
+- **File filtering**: Configured in `config['workflow']['file_filters']`
+- **Processing parameters**: Read from `config['configurations']`
+
+All methods use configuration parameters automatically—no need to pass arguments manually.
 
 ## Repository Structure
 

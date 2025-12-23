@@ -984,6 +984,85 @@ class NMDCWorkflowManager:
         
         return True
     
+    @skip_if_complete('raw_data_downloaded', return_value=True)
+    def fetch_raw_data(self) -> bool:
+        """
+        Fetch raw data from configured source (MASSIVE or MinIO).
+        
+        This is a consolidated method that determines the data source from configuration
+        and calls the appropriate download method. The source is determined by:
+        - If 'massive_id' exists in config['workflow']: downloads from MASSIVE
+        - Otherwise: downloads from MinIO
+        
+        Returns:
+            True if data fetching completed successfully, False otherwise
+            
+        Note:
+            This method is automatically skipped if raw_data_downloaded trigger is set.
+            
+        Example:
+            >>> manager = NMDCWorkflowManager('config.json')
+            >>> success = manager.fetch_raw_data()
+        """
+        # Determine source from configuration
+        if 'massive_id' in self.config.get('workflow', {}):
+            # Get FTP URLs and download
+            if not self.get_massive_ftp_urls():
+                return False
+            return self.download_from_massive()
+        else:
+            return self.download_raw_data_from_minio()
+    
+    @skip_if_complete('data_processed', return_value=True)
+    def process_data(self, execute: bool = True, cleanup: bool = True) -> bool:
+        """
+        Generate WDL configurations and optionally execute workflow processing.
+        
+        This is a consolidated method that handles the complete WDL workflow execution:
+        1. Generates WDL JSON configuration files from mapped raw data
+        2. Generates the shell script to run the workflows
+        3. Optionally executes the workflows and processes the data
+        
+        Args:
+            execute: Whether to execute the WDL workflows after generating configs (default: True)
+            cleanup: Whether to clean up temporary execution directory after success (default: True)
+            
+        Returns:
+            True if all steps completed successfully, False otherwise
+            
+        Note:
+            This method is automatically skipped if data_processed trigger is set.
+            Batch size and other parameters are read from configuration.
+            
+        Example:
+            >>> manager = NMDCWorkflowManager('config.json')
+            >>> # Generate configs only (don't execute)
+            >>> success = manager.process_data(execute=False)
+            >>> 
+            >>> # Generate and execute
+            >>> success = manager.process_data(execute=True)
+        """
+        
+        # Step 1: Generate WDL JSON files
+        if not self.generate_wdl_jsons():
+            print("❌ Failed to generate WDL JSON files")
+            return False
+        
+        # Step 2: Generate runner script
+        if not self.generate_wdl_runner_script():
+            print("❌ Failed to generate WDL runner script")
+            return False
+        
+        # Step 3: Execute workflows (optional)
+        if execute:
+            if not self.run_wdl_script():
+                print("❌ WDL workflow execution failed")
+                return False
+        else:
+            print("  3/3 Skipping WDL execution (execute=False)")
+        
+        return True
+    
     @skip_if_complete('data_processed', return_value=True)
     def generate_wdl_jsons(self, batch_size: int = 50) -> bool:
         """
