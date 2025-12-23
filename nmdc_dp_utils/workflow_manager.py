@@ -274,8 +274,8 @@ class NMDCWorkflowManager:
             print("MinIO credentials not found in environment variables")
             return None
     
-    @skip_if_complete('study_structure_created')
-    def create_workflow_structure(self):
+    @skip_if_complete('study_structure_created', return_value=True)
+    def create_workflow_structure(self) -> bool:
         """
         Create the standard directory structure for a workflow for a study.
         
@@ -287,25 +287,33 @@ class NMDCWorkflowManager:
         
         Additional subdirectories are created for each processing configuration
         specified in the config file.
+        
+        Returns:
+            True if structure creation completed successfully, False otherwise
         """
-        directories = [
-            self.workflow_path,
-            self.workflow_path / "scripts",
-            self.workflow_path / "metadata",
-            self.workflow_path / "wdl_jsons",
-            self.workflow_path / "raw_file_info",
-        ]
-        
-        # Add configuration-specific directories
-        if 'configurations' in self.config:
-            for config in self.config['configurations']:
-                directories.append(self.workflow_path / "wdl_jsons" / config['name'])
-        
-        for directory in directories:
-            directory.mkdir(parents=True, exist_ok=True)
-        
-        print(f"Created study structure for {self.workflow_name} at {self.workflow_path}")
-        self.set_skip_trigger('study_structure_created', True)
+        try:
+            directories = [
+                self.workflow_path,
+                self.workflow_path / "scripts",
+                self.workflow_path / "metadata",
+                self.workflow_path / "wdl_jsons",
+                self.workflow_path / "raw_file_info",
+            ]
+            
+            # Add configuration-specific directories
+            if 'configurations' in self.config:
+                for config in self.config['configurations']:
+                    directories.append(self.workflow_path / "wdl_jsons" / config['name'])
+            
+            for directory in directories:
+                directory.mkdir(parents=True, exist_ok=True)
+            
+            print(f"Created study structure for {self.workflow_name} at {self.workflow_path}")
+            self.set_skip_trigger('study_structure_created', True)
+            return True
+        except Exception as e:
+            print(f"❌ Error creating workflow structure: {e}")
+            return False
     
     def get_workflow_info(self) -> Dict:
         """
@@ -525,8 +533,8 @@ class NMDCWorkflowManager:
             print(f"✗ Error parsing log file: {e}")
             return pd.DataFrame(columns=['ftp_location', 'raw_data_file_short'])
     
-    @skip_if_complete('raw_data_downloaded')
-    def get_massive_ftp_urls(self, massive_id: Optional[str] = None):
+    @skip_if_complete('raw_data_downloaded', return_value=True)
+    def get_massive_ftp_urls(self, massive_id: Optional[str] = None) -> bool:
         """
         Complete workflow to discover and catalog MASSIVE dataset files with filtering.
         
@@ -556,6 +564,9 @@ class NMDCWorkflowManager:
         Args:
             massive_id: MASSIVE dataset ID with version path (e.g., 'v07/MSV000094090').
                        Uses config['workflow']['massive_id'] if not provided.
+        
+        Returns:
+            True if discovery and cataloging completed successfully, False otherwise
             
         Note:
             Results are saved to CSV file at workflow_path/raw_file_info/massive_ftp_locs.csv.
@@ -569,7 +580,7 @@ class NMDCWorkflowManager:
         Example:
             >>> manager = NMDCWorkflowManager('config.json')
             >>> # Ensure config has: "file_filters": ["pos", "neg", "hilic"]
-            >>> manager.get_massive_ftp_urls()
+            >>> success = manager.get_massive_ftp_urls()
             >>> # Results saved to: workflow_path/raw_file_info/massive_ftp_locs.csv
         """
         if massive_id is None:
@@ -608,13 +619,16 @@ class NMDCWorkflowManager:
                 print("   Check your file_type and file_filters configuration")
                 print()
             
+            return True
+            
         except Exception as e:
-            print(f"Error in MASSIVE FTP process: {e}")
+            print(f"❌ Error in MASSIVE FTP process: {e}")
+            return False
     
-    @skip_if_complete('raw_data_downloaded')
+    @skip_if_complete('raw_data_downloaded', return_value=True)
     def download_from_massive(self, ftp_file: Optional[str] = None, 
                             download_dir: Optional[str] = None,
-                            massive_id: Optional[str] = None):
+                            massive_id: Optional[str] = None) -> bool:
         """
         Download raw data files from MASSIVE dataset via FTP.
         
@@ -630,10 +644,9 @@ class NMDCWorkflowManager:
                          self.raw_data_directory if not provided.
             massive_id: MASSIVE dataset ID to query directly. Uses
                        config['study']['massive_id'] if not provided.
-            
-        Raises:
-            ValueError: If neither ftp_file nor massive_id is provided and
-                       no massive_id exists in config
+        
+        Returns:
+            True if download completed successfully, False otherwise
                        
         Note:
             Files are downloaded using urllib.request.urlretrieve for reliability.
@@ -664,21 +677,21 @@ class NMDCWorkflowManager:
             # Try to use MASSIVE ID from config
             if 'massive_id' in self.config['workflow']:
                 # Call to discover and save URLs to CSV
-                self.get_massive_ftp_urls()
+                if not self.get_massive_ftp_urls():
+                    print("❌ Failed to discover MASSIVE files")
+                    return False
                 # Read the saved CSV
                 ftp_csv = self.workflow_path / "raw_file_info" / "massive_ftp_locs.csv"
                 ftp_df = pd.read_csv(ftp_csv) if ftp_csv.exists() else pd.DataFrame(columns=['ftp_location', 'raw_data_file_short'])
             else:
-                raise ValueError("Either ftp_file or massive_id must be provided")
+                print("❌ Either ftp_file or massive_id must be provided")
+                return False
         
         if len(ftp_df) == 0:
-            print("No files to download")
-            return
+            print("⚠️  No files to download")
+            return True  # Not an error, just nothing to do
         
-        # Skip if this looks like a template file
-        if 'example_file.raw' in str(ftp_df.iloc[0].get('raw_data_file_short', '')):
-            print("FTP file appears to be a template. Please edit with real FTP URLs first.")
-            return
+
         
         os.makedirs(download_dir, exist_ok=True)
         downloaded_files = []
@@ -725,6 +738,8 @@ class NMDCWorkflowManager:
                 print(f"📄 Downloaded files list saved to: {downloaded_files_csv}")
             
             self.set_skip_trigger('raw_data_downloaded', True)
+        
+        return True
     
     def _download_file_wget(self, ftp_location: str, download_path: str):
         """
@@ -897,9 +912,9 @@ class NMDCWorkflowManager:
         print(f"Downloaded {downloaded_count} new files")
         return downloaded_count
     
-    @skip_if_complete('raw_data_downloaded')
+    @skip_if_complete('raw_data_downloaded', return_value=True)
     def download_raw_data_from_minio(self, bucket_name: Optional[str] = None, 
-                                     folder_name: Optional[str] = None):
+                                     folder_name: Optional[str] = None) -> bool:
         """
         Download raw data files from MinIO object storage.
         
@@ -911,9 +926,9 @@ class NMDCWorkflowManager:
             bucket_name: MinIO bucket name. Uses config['minio']['bucket'] if not provided.
             folder_name: Folder path within bucket. Uses config['study']['name'] + '/raw' 
                         if not provided.
-            
-        Raises:
-            ValueError: If MinIO client is not initialized or bucket_name cannot be determined
+        
+        Returns:
+            True if download completed successfully, False otherwise
                        
         Note:
             Files are downloaded to self.raw_data_directory. Existing files with 
@@ -923,16 +938,18 @@ class NMDCWorkflowManager:
             
         Example:
             >>> manager = NMDCWorkflowManager('config.json')
-            >>> manager.download_raw_data_from_minio()
+            >>> success = manager.download_raw_data_from_minio()
         """
         if not self.minio_client:
-            raise ValueError("MinIO client not initialized")
+            print("❌ MinIO client not initialized")
+            return False
         
         # Use config values if not provided
         if bucket_name is None:
             bucket_name = self.config.get('minio', {}).get('bucket')
             if not bucket_name:
-                raise ValueError("bucket_name not provided and not found in config['minio']['bucket']")
+                print("❌ bucket_name not provided and not found in config['minio']['bucket']")
+                return False
         
         if folder_name is None:
             folder_name = f"{self.config['study']['name']}/raw"
@@ -964,11 +981,16 @@ class NMDCWorkflowManager:
         
             # Set skip trigger for raw_data_downloaded
             self.set_skip_trigger('raw_data_downloaded', True)
+        
+        return True
     
-    @skip_if_complete('data_processed')
-    def generate_wdl_jsons(self, batch_size: int = 50):
+    @skip_if_complete('data_processed', return_value=True)
+    def generate_wdl_jsons(self, batch_size: int = 50) -> bool:
         """
         Generate WDL workflow JSON configuration files for batch processing.
+        
+        Returns:
+            True if WDL generation completed successfully, False otherwise
         
         First moves any processed data from previous WDL execution attempts to ensure
         the processed data directory is up-to-date, then creates JSON files for each 
@@ -1159,6 +1181,9 @@ class NMDCWorkflowManager:
         if json_count == 0:
             print("⚠️  No WDL JSON files created - all files already processed")
             self.set_skip_trigger('data_processed', True)
+            return True
+        
+        return True
 
     def _generate_single_wdl_json(self, config: dict, batch_files: List[Path], batch_num: int) -> int:
         """
@@ -1349,9 +1374,9 @@ class NMDCWorkflowManager:
             print(f"  ✓ Created batch {batch_num}: {len(sample_file_paths)} samples with calibration {Path(calibration_file).name}")
             return 1
 
-    @skip_if_complete('data_processed', return_value="")
+    @skip_if_complete('data_processed', return_value=True)
     def generate_wdl_runner_script(self,
-                                  script_name: Optional[str] = None):
+                                  script_name: Optional[str] = None) -> bool:
         """
         Generate a shell script to run all WDL JSON files using miniwdl.
         
@@ -1362,10 +1387,9 @@ class NMDCWorkflowManager:
         Args:
             script_name: Name for the generated script file. Defaults to 
                         '{study_name}_wdl_runner.sh'
-            
-        Raises:
-            ValueError: If workflow_type is not set in config
-            NotImplementedError: If workflow_type is not yet supported
+        
+        Returns:
+            True if script generation completed successfully, False otherwise
             
         Example:
             >>> manager.generate_wdl_runner_script()
@@ -1535,10 +1559,11 @@ fi
         
         print(f"Generated WDL runner script: {script_path}")
         print("Made script executable (chmod +x)")
+        return True
        # print(f"Script expects to find WDL file at: wdl/{workflow_name}.wdl")
     
-    @skip_if_complete('data_processed')
-    def run_wdl_script(self, script_path: Optional[str] = None, working_directory: Optional[str] = None) -> int:
+    @skip_if_complete('data_processed', return_value=True)
+    def run_wdl_script(self, script_path: Optional[str] = None, working_directory: Optional[str] = None) -> bool:
         """
         Execute WDL workflows by downloading the workflow file from GitHub and running 
         it from a study-level workflow directory.
@@ -1554,7 +1579,7 @@ fi
                              creates 'wdl_execution' directory within the study.
         
         Returns:
-            Exit code from the script execution (0 for success, non-zero for failure)
+            True if WDL execution completed successfully, False otherwise
             
         Note:
             - Downloads WDL file 
@@ -1569,7 +1594,8 @@ fi
         if script_path is None:
             script_path = self.workflow_path / "scripts" / f"{self.workflow_name}_wdl_runner.sh"
             if not script_path.exists():
-                raise FileNotFoundError(f"WDL runner script not found: {script_path}. Run generate_wdl_runner_script() first.")
+                print(f"❌ WDL runner script not found: {script_path}. Run generate_wdl_runner_script() first.")
+                return False
         else:
             script_path = Path(script_path)
         
@@ -1583,7 +1609,7 @@ fi
         # Validate script exists
         if not script_path.exists():
             print(f"❌ Script not found: {script_path}")
-            return 1
+            return False
         
         # Create working directory structure
         working_dir.mkdir(parents=True, exist_ok=True)
@@ -1596,7 +1622,7 @@ fi
         workflow_type = self.config['workflow']['workflow_type']
         if workflow_type not in WORKFLOW_DICT:
             print(f"❌ Unsupported workflow type: {workflow_type}")
-            return 1
+            return False
         wdl_url = WORKFLOW_DICT[workflow_type]["wdl_download_location"]
         wdl_file = wdl_dir / f"{WORKFLOW_DICT[workflow_type]['wdl_workflow_name']}.wdl"
         
@@ -1709,13 +1735,13 @@ fi
                     print("✅ WDL dependencies installed and verified")
                 else:
                     print(f"❌ Installation verification failed: {verify_result.stderr}")
-                    return 1
+                    return False
                     
             except subprocess.CalledProcessError as e:
                 print(f"❌ Failed to install dependencies: {e}")
                 if hasattr(e, 'stderr') and e.stderr:
                     print(f"Error details: {e}")
-                return 1
+                return False
         
         print(f"🚀 Running WDL workflows from: {working_dir}")
         print("This will take a long time for large datasets...")
@@ -1763,6 +1789,7 @@ fi
                     value=True,
                     save=True
                 )
+                return True
             else:
                 print(f"⚠️  Some workflows failed (exit code: {result.returncode})")
                 print("Check the logs above for details.")
@@ -1772,8 +1799,7 @@ fi
                 self._move_processed_files(str(working_dir), clean_up=False)
                 
                 print("To re-run failed workflows, use run_wdl_script() again - it will recreate the execution environment.")
-            
-            return result.returncode
+                return False
             
         except Exception as e:
             print(f"❌ Error executing script: {e}")
@@ -1783,7 +1809,7 @@ fi
             self._move_processed_files(str(working_dir))
             
             print("To retry, use run_wdl_script() again - it will recreate the execution environment.")
-            return 1
+            return False
             
         finally:
             # Always return to original directory
@@ -1977,8 +2003,8 @@ fi
         else:
             print("🧹 Skipping cleanup of WDL execution directory (clean_up=False)")
     
-    @skip_if_complete('biosample_attributes_fetched')
-    def get_biosample_attributes(self, study_id: Optional[str] = None):
+    @skip_if_complete('biosample_attributes_fetched', return_value=True)
+    def get_biosample_attributes(self, study_id: Optional[str] = None) -> bool:
         """
         Fetch biosample attributes from NMDC API and save to CSV file.
         
@@ -1989,6 +2015,9 @@ fi
         Args:
             study_id: NMDC study ID (e.g., 'nmdc:sty-11-dwsv7q78'). 
                      Uses config['study']['id'] if not provided.
+        
+        Returns:
+            True if biosample attributes fetched successfully, False otherwise
             
         Note:
             The CSV file is saved as 'biosample_attributes.csv' in the study's metadata directory.
@@ -2014,7 +2043,7 @@ fi
             if not biosamples:
                 print(f"❌ No biosamples found for study {study_id}")
                 print("Please verify the study ID and check if biosamples are available in NMDC")
-                raise ValueError(f"No biosamples found for study {study_id}")
+                return False
             
             print(f"✅ Found {len(biosamples)} biosamples")
             
@@ -2034,16 +2063,17 @@ fi
             
             # Set skip trigger
             self.set_skip_trigger('biosample_attributes_fetched', True)
+            return True
             
         except Exception as e:
             print(f"❌ Error fetching biosample data: {e}")
             print("Please check your internet connection and verify the study ID")
             print("Make sure nmdc_api_utilities package is installed: pip install nmdc-api-utilities")
-            raise
+            return False
     
-    @skip_if_complete('biosample_mapping_script_generated')
+    @skip_if_complete('biosample_mapping_script_generated', return_value=True)
     def generate_biosample_mapping_script(self, script_name: Optional[str] = None, 
-                                         template_path: Optional[str] = None):
+                                         template_path: Optional[str] = None) -> bool:
         """
         Generate a study-specific TEMPLATE script for mapping raw files to biosamples.
         
@@ -2057,6 +2087,9 @@ fi
                         'map_raw_files_to_biosamples_TEMPLATE.py'
             template_path: Path to template file. Defaults to 
                           'nmdc_dp_utils/templates/biosample_mapping_script_template.py'
+        
+        Returns:
+            True if script generation completed successfully, False otherwise
             
         Note:
             The generated script is labeled as _TEMPLATE to prevent accidental use
@@ -2080,35 +2113,42 @@ fi
         
         # Check if template exists
         if not template_path.exists():
-            raise FileNotFoundError(f"Template file not found: {template_path}")
+            print(f"❌ Template file not found: {template_path}")
+            return False
         
-        # Read the template
-        with open(template_path, 'r') as f:
-            template_content = f.read()
-        
-        # Format the template with study-specific values
-        script_content = template_content.format(
-            study_name=self.study_name,
-            study_description=self.config['study']['description'],
-            script_name=script_name,
-            config_path=self.config_path
-        )
-        
-        # Write the script file
-        with open(script_path, 'w') as f:
-            f.write(script_content)
-        
-        # Make the script executable
-        os.chmod(script_path, 0o755)
-        
-        print(f"📝 Generated biosample mapping TEMPLATE script: {script_path}")
-        print("Made script executable (chmod +x)")
-        print("🔥 IMPORTANT: This is a TEMPLATE file - customize it for your study!")
-        print("   1. Copy to a new filename (remove _TEMPLATE)")
-        print("   2. Modify the parsing and matching logic for your specific file naming patterns")
-        print("   3. Test with a small subset of files before running on the full dataset")
-        
-        self.set_skip_trigger('biosample_mapping_script_generated', True)
+        try:
+            # Read the template
+            with open(template_path, 'r') as f:
+                template_content = f.read()
+            
+            # Format the template with study-specific values
+            script_content = template_content.format(
+                study_name=self.study_name,
+                study_description=self.config['study']['description'],
+                script_name=script_name,
+                config_path=self.config_path
+            )
+            
+            # Write the script file
+            with open(script_path, 'w') as f:
+                f.write(script_content)
+            
+            # Make the script executable
+            os.chmod(script_path, 0o755)
+            
+            print(f"📝 Generated biosample mapping TEMPLATE script: {script_path}")
+            print("Made script executable (chmod +x)")
+            print("🔥 IMPORTANT: This is a TEMPLATE file - customize it for your study!")
+            print("   1. Copy to a new filename (remove _TEMPLATE)")
+            print("   2. Modify the parsing and matching logic for your specific file naming patterns")
+            print("   3. Test with a small subset of files before running on the full dataset")
+            
+            self.set_skip_trigger('biosample_mapping_script_generated', True)
+            return True
+            
+        except Exception as e:
+            print(f"❌ Error generating mapping script: {e}")
+            return False
     
     @skip_if_complete('biosample_mapping_completed', return_value=True)
     def run_biosample_mapping_script(self, script_path: Optional[str] = None) -> bool:
@@ -2306,8 +2346,8 @@ fi
             import traceback
             traceback.print_exc()
 
-    @skip_if_complete('raw_data_inspected')
-    def raw_data_inspector(self, file_paths=None, cores=1, limit=None, max_retries=10, retry_delay=10.0):
+    @skip_if_complete('data_processed', return_value=True)
+    def raw_data_inspector(self, file_paths=None, cores=1, limit=None, max_retries=10, retry_delay=10.0) -> bool:
         """
         Run raw data inspection on raw files to extract metadata using Docker.
         
@@ -2329,6 +2369,9 @@ fi
             limit (int, optional): Limit number of files to process (for testing)
             max_retries (int): Maximum number of retry attempts for transient errors (default: 10)
             retry_delay (float): Delay in seconds between retry attempts (default: 10.0)
+        
+        Returns:
+            True if inspection completed successfully, False otherwise
             
         Note:
             Results are saved to raw_file_info/raw_file_inspection_results.csv.
@@ -2523,17 +2566,16 @@ fi
             # Set the skip trigger on successful completion
             if result is not None:
                 print("✅ Raw data inspection completed successfully!")
-                self.set_skip_trigger('raw_data_inspected', True)
-                return result
+                return True
             else:
                 print("❌ Raw data inspection failed")
-                return None
+                return False
                 
         except Exception as e:
             print(f"❌ Error during raw data inspection: {e}")
             import traceback
             traceback.print_exc()
-            return None
+            return False
     
     def _run_raw_data_inspector_docker(self, file_paths, output_dir, cores, limit, max_retries, retry_delay, docker_image):
         """Run raw data inspector using Docker container."""
@@ -2773,17 +2815,16 @@ fi
             # Set skip trigger on success
             if result is not None:
                 print("✅ GCMS raw data inspection completed successfully!")
-                self.set_skip_trigger('raw_data_inspected', True)
-                return result
+                return True
             else:
                 print("❌ GCMS raw data inspection failed")
-                return None
+                return False
                 
         except Exception as e:
             print(f"❌ Error during GCMS inspection: {e}")
             import traceback
             traceback.print_exc()
-            return None
+            return False
     
     def _run_gcms_inspector_docker(self, file_paths, output_dir, cores, max_retries, 
                                    retry_delay, docker_image, script_path):
