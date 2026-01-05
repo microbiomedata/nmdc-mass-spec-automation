@@ -1,0 +1,105 @@
+{
+  "calibration_set": [
+    {
+      "id": "nmdc:calib-11-mmes5v77",
+      "type": "nmdc:CalibrationInformation",
+      "name": "GC/MS FAMES calibration (GCMS_FAMEs_01_GCMS01_20180115.cdf)",
+      "description": "Full scan GC/MS FAMES calibration run (GCMS_FAMEs_01_GCMS01_20180115.cdf).",
+      "internal_calibration": false,
+      "calibration_target": "retention_index",
+      "calibration_object": "nmdc:dobj-11-kdvdr615",
+      "calibration_standard": "fames"
+    }
+  ],
+  "data_generation_set": [
+    {
+      "id": "nmdc:dgms-11-cs6wfg34",
+      "type": "nmdc:MassSpectrometry",
+      "name": "Blanch_Nat_Met_C_12_AB_M_17",
+      "description": "Generation of mass spectrometry data by GC/MS for the analysis of metabolites.",
+      "has_input": [
+        "nmdc:bsm-11-622k6044"
+      ],
+      "has_output": [
+        "nmdc:dobj-11-h7n1yk49"
+      ],
+      "processing_institution": "EMSL",
+      "end_date": "2018-01-15T08:14:00Z",
+      "analyte_category": "metabolome",
+      "associated_studies": [
+        "nmdc:sty-11-8ws97026"
+      ],
+      "instrument_used": [
+        "nmdc:inst-14-fas8ny90"
+      ],
+      "instrument_instance_specifier": "nan",
+      "eluent_introduction_category": "gas_chromatography",
+      "has_mass_spectrometry_configuration": "nmdc:chrcon-14-qpvt3v15",
+      "generates_calibration": "nmdc:calib-11-mmes5v77",
+      "has_chromatography_configuration": "nmdc:mscon-14-5jk7rg60"
+    }
+  ],
+  "data_object_set": [
+    {
+      "id": "nmdc:dobj-11-kdvdr615",
+      "type": "nmdc:DataObject",
+      "name": "GCMS_FAMEs_01_GCMS01_20180115.cdf",
+      "description": "GC/MS low resolution raw data for metabolomics data acquisition.",
+      "data_category": "instrument_data",
+      "data_object_type": "GC-MS Raw Data",
+      "file_size_bytes": 6773136,
+      "md5_checksum": "d27124d36d3db9e19161e7fc81ce176b",
+      "url": "https://nmdcdemo.emsl.pnnl.gov/metabolomics/blanchard_11_8ws97026/raw/GCMS_FAMEs_01_GCMS01_20180115.cdf"
+    },
+    {
+      "id": "nmdc:dobj-11-h7n1yk49",
+      "type": "nmdc:DataObject",
+      "name": "Blanch_Nat_Met_C_12_AB_M_17.cdf",
+      "description": "GC/MS low resolution raw data for metabolomics data acquisition.",
+      "data_category": "instrument_data",
+      "data_object_type": "GC-MS Raw Data",
+      "file_size_bytes": 19710512,
+      "md5_checksum": "ba272523d2338386cf6b83dd3201de28",
+      "url": "https://nmdcdemo.emsl.pnnl.gov/metabolomics/blanchard_11_8ws97026/raw/Blanch_Nat_Met_C_12_AB_M_17.cdf",
+      "was_generated_by": "nmdc:dgms-11-cs6wfg34"
+    },
+    {
+      "id": "nmdc:dobj-11-cwmw3190",
+      "type": "nmdc:DataObject",
+      "name": "Blanch_Nat_Met_C_12_AB_M_17.csv",
+      "description": "Metabolomics annotations as a result of a GC/MS metabolomics workflow activity.",
+      "data_category": "processed_data",
+      "data_object_type": "GC-MS Metabolomics Results",
+      "file_size_bytes": 593260,
+      "md5_checksum": "f482666c4bab306d906d2b00457fc73a",
+      "url": "https://nmdcdemo.emsl.pnnl.gov/metabolomics/blanchard_11_8ws97026/processed_20251223/Blanch_Nat_Met_C_12_AB_M_17.csv",
+      "was_generated_by": "nmdc:wfmb-11-26ehbs74.1"
+    }
+  ],
+  "workflow_execution_set": [
+    {
+      "id": "nmdc:wfmb-11-26ehbs74.1",
+      "type": "nmdc:MetabolomicsAnalysis",
+      "name": "GC/MS Metabolomics analysis for Blanch_Nat_Met_C_12_AB_M_17.cdf",
+      "description": "Analysis of raw mass spectrometry data for the annotation of metabolites.",
+      "has_input": [
+        "nmdc:dobj-11-5tax4f20",
+        "nmdc:dobj-11-h7n1yk49"
+      ],
+      "has_output": [
+        "nmdc:dobj-11-cwmw3190"
+      ],
+      "processing_institution": "NMDC",
+      "git_url": "https://github.com/microbiomedata/metaMS/wdl/metaMS_gcms.wdl",
+      "started_at_time": "2025-12-23 13:39:34",
+      "was_informed_by": [
+        "nmdc:dgms-11-cs6wfg34"
+      ],
+      "ended_at_time": "2025-12-23 13:39:34",
+      "version": "3.3.1",
+      "metabolomics_analysis_category": "gc_ms_metabolomics",
+      "uses_calibration": "nmdc:calib-11-mmes5v77"
+    }
+  ],
+  "@type": "Database"
+}

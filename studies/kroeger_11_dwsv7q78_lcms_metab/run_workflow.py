@@ -8,10 +8,12 @@ MASSIVE ID: MSV000094090
 import sys
 from pathlib import Path
 
-# Add the utils directory to path (assuming run from root directory)
-sys.path.append(str(Path.cwd() / "nmdc_dp_utils"))
+# Ensure project root is on sys.path so package `nmdc_dp_utils` is importable
+PROJECT_ROOT = Path(__file__).resolve().parents[2]
+if str(PROJECT_ROOT) not in sys.path:
+    sys.path.insert(0, str(PROJECT_ROOT))
 
-from workflow_manager import NMDCWorkflowManager
+from nmdc_dp_utils.workflow_manager import NMDCWorkflowManager
 
 def main():
     """Run the Kroeger study workflow."""

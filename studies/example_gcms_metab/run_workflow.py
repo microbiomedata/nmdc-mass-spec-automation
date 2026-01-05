@@ -6,13 +6,13 @@ Example GCMS metabolomics study, gcms_metabolomics workflow runner.
 import sys
 from pathlib import Path
 
-# Add the utils directory to path (assuming run from root directory)
-sys.path.append(str(Path.cwd() / "nmdc_dp_utils"))
-
-from workflow_manager import NMDCWorkflowManager
-
 def main():
     """Run the Example GCMS Metabolomics workflow."""
+    # Ensure project root is on sys.path so package `nmdc_dp_utils` is importable
+    project_root = Path(__file__).resolve().parents[2]
+    if str(project_root) not in sys.path:
+        sys.path.insert(0, str(project_root))
+    from nmdc_dp_utils.workflow_manager import NMDCWorkflowManager
     
     # Initialize study manager
     config_path = "studies/example_gcms_metab/example_gcms_metab_config.json"
@@ -57,7 +57,7 @@ def main():
 
     # Step 7: Generate and submit NMDC metadata packages
     logger.info("7. Generating NMDC metadata packages...")
-    manager.generate_nmdc_metadata_for_workflow()
+    manager.generate_nmdc_metadata_for_workflow(test=True)
     assert manager.should_skip('metadata_packages_generated'), "NMDC metadata package generation must complete successfully to proceed"
 
 if __name__ == "__main__":

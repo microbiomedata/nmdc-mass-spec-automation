@@ -32,7 +32,7 @@
     ],
     "metadata": {
         "instrument_used": "Agilent 7980A GC-MS",
-        "processing_institution_workflow": "NDMC",
+        "processing_institution_workflow": "NMDC",
         "processing_institution_generation": "EMSL",
         "chromat_configuration_name": "EMSL metabolomics GC/MS mass spectrometry method",
         "mass_spec_configuration_name": "EMSL GC method for metabolites",
@@ -49,7 +49,7 @@
         "biosample_attributes_fetched": true,
         "biosample_mapping_script_generated": true,
         "biosample_mapping_completed": true,
-        "raw_data_inspected": false,
+        "raw_data_inspected": true,
         "metadata_mapping_generated": true,
         "data_processed": true,
         "processed_data_uploaded_to_minio": true,

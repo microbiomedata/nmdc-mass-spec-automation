@@ -3897,7 +3897,7 @@ class WorkflowMetadataManager:
         return True
 
     @skip_if_complete("metadata_packages_generated", return_value=True)
-    def _generate_nmdc_metadata_packages(self) -> bool:
+    def _generate_nmdc_metadata_packages(self, test=False) -> bool:
         """
         Generate NMDC metadata packages for workflow submission (internal method).
 
@@ -3905,6 +3905,9 @@ class WorkflowMetadataManager:
         nmdc-ms-metadata-gen package. Generates one metadata package per
         configuration, using the metadata mapping CSV files created by
         generate_metadata_mapping_files().
+
+        Args:
+            test: If True, runs in test mode (may alter behavior for testing)
 
         Returns:
             True if metadata generation completed successfully, False otherwise
@@ -4036,7 +4039,7 @@ class WorkflowMetadataManager:
                     # LCMS generators accept existing_data_objects
                     generator_kwargs["existing_data_objects"] = existing_data_objects
 
-                generator = metadata_generator_class(**generator_kwargs)
+                generator = metadata_generator_class(test=test, **generator_kwargs)
 
                 # Run metadata generation
                 metadata = generator.run()
@@ -4081,13 +4084,16 @@ class WorkflowMetadataManager:
         """
         raise NotImplementedError("submit_metadata_packages() is not yet implemented.")
 
-    def generate_nmdc_metadata_for_workflow(self) -> bool:
+    def generate_nmdc_metadata_for_workflow(self, test=False) -> bool:
         """
         Generate NMDC metadata for workflow submission.
 
         This consolidated method handles the complete metadata generation workflow:
         1. Generates metadata mapping CSV files with URL validation
         2. Generates NMDC submission packages from the mapping files
+
+        Args:
+            test: If True, runs in test mode (if applicable)
 
         Returns:
             True if all steps completed successfully, False otherwise
@@ -4107,7 +4113,7 @@ class WorkflowMetadataManager:
             return False
 
         # Step 2: Generate NMDC submission packages
-        if not self._generate_nmdc_metadata_packages():
+        if not self._generate_nmdc_metadata_packages(test=test):
             self.logger.error("Failed to generate NMDC metadata packages")
             return False
 
