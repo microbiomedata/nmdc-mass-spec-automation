@@ -5,14 +5,7 @@ to the root samples collected from the same sample bag) was immediately subsampl
 on the most biologically active portion of the root sample, roots <2 mm in diameter were quickly separated
 using tweezers from overall samples in the mortar, placed into a new tube on dry ice while processing, and then
 refrozen. Subsamples from all three metabolomic sample types (leaf, root, and rhizosphere) were then frozen
-in liquid nitrogen and ground using a SPEX Geno/Grinder system. The remainder of the root sample available
-after the metabolomics preps was then used for plant transcriptomic analyses. However, because the amount of
-material remaining in some cases was not enough for RNA extraction 18 (of 109) samples were omitted. Root
-transcriptomics samples were prepared for extraction by freezing fine roots in liquid nitrogen within a 50 mL
-grinding jar and grinding for 30 s with a steel ball at 30 Hz on a Retch MM400 Mixer Mill. Total RNA was then
-extracted 100 mg of ground material from each sample using a combined method that included CTAB lysis
-buffer and a Spectrum Total Plant RNA extraction kit (Sigma) as described previously25. RNA was then shipped
-to JGI on dry ice for cDNA preparation and sequencing.
+in liquid nitrogen and ground using a SPEX Geno/Grinder system. 
 
 Extractions for metabolomic analyses were then further prepared by JGI. For general non-targeted metabolomic
 analysis by liquid chromatography - mass spectrometry (LC-MS), polar and non-polar metabolites
@@ -39,12 +32,3 @@ linolenic acid, #CLM-8386, CIL; 1 μg/mL 13C-ferulic acid, #CLM-9260, CIL; 1 μg
 by initial biomass (200 μL per 150 mg for leaf and root, 200 μL per 500 mg for rhizosphere soil). Either 150 or
 200 μL of resuspended sample volume were then centrifuge-filtered (0.22 μM hydrophilic PVDF membrane,
 #UFC30GV00, Millipore) and transferred to glass LC-MS vials.
-Within the targeted identifications files, observations that exceed level 1 represent our highest level of confidence
-in that they match the fragmentation data, expected retention time, and have no confounding signals
-within our mass tolerance for the precursor m/z. Towards a larger scope of potential compound identifications,
-several observations within the targeted analysis match only the expected retention time and precursor m/z;
-while these are considered Level 1 identifications, they are far lower confidence than the aforementioned observations.
-The largest possible scope of potential compound identifications can be seen in the untargeted data.
-These matches are only when fragmentation data from our experiment agrees with fragmentation data from
-authentic standards. These identifications should be considered as putative identifications but nevertheless can
-be extremely useful to advance discovery due to their broad coverage of the metabolome.

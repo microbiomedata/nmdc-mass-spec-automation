@@ -11,40 +11,7 @@ Immediately on arrival (<48 hr), we processed the biotic core by
 separating it into 10 cm depth intervals, which were then sieved at 4
 mm. The middle section was archived, and all analyses were
 conducted on homogenized top (0-10 cm) and bottom (deepest 10
-cm) sections as described below. We measured microbial biomass C
-and N via chloroform fumigation (30–32). Aliquots of K2SO4
-extractions from the initial (background) steps of microbial
-biomass measurements were archived at - 20° C for later analysis
-of NO3
-- via Cd-reduction method and NH4
-+ via spectroscopic
-determination (33, 34). Inorganic P was extracted from each soil
-section via Bray or Olsen extraction (depending on pH) and
-subsequent analysis via methods outlined in (35, 36). We collected
-sub-samples of soil for DNA extraction and subsequent metagenomic
-sequencing on the Illumina NovaSeq platform (stored at -80° C). We
-measured soil pH using a 1:1 soil to water ratio using a calibrated pH
-probe. Gravimetric water content was determined via oven drying at
-60° C. Remaining soil from each section was air dried prior to the
-analyses below. b-glucosidase potential activity and respiration rates
-were measured using colorimetric assays and the CO2 burst method.
-Bowman et al. 10.3389/fsoil.2023.1120425
-Frontiers in Soil Science 02 frontiersin.org
-Ion concentrations from 1:10 ammonium acetate extraction (K, Ca,
-Mg, Na) and 1:2 soil to diethylenetriaminepentaacetic acid (DPTA)
-extraction solution (Zn, Mg, Cu, Fe, B, SO4
-2--S) extraction were
-measured with Inductively coupled plasma mass spectrometry (ICPMS),
-while SOM concentration was determined by total organic
-carbon-total nitrogen (TOC-TN) analysis and composition from
-liquid chromatography mass spectrometry (LC-MS), and Fourier
-transform ion cyclotron resonance mass spectrometry (FTICR-MS)
-analysis. Details on SOM characterization are provided in the SI.
-The abiotic core was used to determine soil structure and
-hydraulic properties. We used X-ray computed tomography
-(XCT) to measure soil pore size, connectivity, distribution, and
-volume, as detailed below. In addition, soil hydraulic properties
-were measured using a series of instruments by The Meter Group
-(KSat, Hyprop, WP4C, Meter Group, Inc., USA).
-Detailed methods for data collection and analysis for XCT and
-FTICR-MS can be found in the SI.
+cm) sections as described below. 
+
+SOM was extracted from soils using 6 g of air-dried soil with 30 mL of ultrapure DI water. Soil water mixtures were shaken for 2 hours at 800 rpm. After shaking, soil mixtures were centrifuged at 6000 rpm for 8 minutes. The supernatant was collected and divided into aliquots for TOC/TN, LC-MS and FTICR-MS. Aliquots collected for TOC/TN and LC-MS were filtered using an ultrapure DI rinsed 0.45 um PES filter and stored frozen until analysis. TOC/TN was determined via Shimadzu TOC-TN analyzer. The aliquot for LC-MS was lyophilized and concentrated to 50x using an 80:20 methanol:water mixture prior to analysis. LC-MS spectra were collected. Concentrated OM samples were analyzed using the Q-Exactive 2 with, using a Hilic column, samples and run in both positive and negative mode. FTICR-MS samples were acidified to pH 2 using concentrated phosphoric acid and salts were removed using Agilent Bond Elut PPL SPE cartridges. 
+A 7 Tesla (7T) Bruker scimaX Fourier transform ion cyclotron resonance mass spectrometer (FTICR-MS) (Bruker, scimaX, Billerica, MA, USA), was used to collect high-resolution mass spectra of the SOM water extracts. Solutions were injected directly into the instrument using a custom automated direct infusion cart that performed two offline blanks between each sample. The FTICR-MS was outfitted with a standard electrospray ionization (ESI) source, and data was acquired in negative mode with the needle voltage set to +4.0kV. Data is collected from 150 m/z – 1000 m/z at 8M and in 2-omega mode. 
