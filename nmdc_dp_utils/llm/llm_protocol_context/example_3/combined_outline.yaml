@@ -1,0 +1,253 @@
+NOM:
+  steps:
+  - Step 1_NOM:
+      SubSamplingProcess:
+        id: # nmdc:subspr-{shoulder}-{blade}
+        type: nmdc:SubSamplingProcess
+        name: Subsample_soil
+        description: A portion of soil being taken from <Biosample> for extraction
+        has_input:
+        - Biosample
+        has_output:
+        - ProcessedSample1_NOM
+        processing_institution: EMSL
+        protocol_link:
+          url: https://doi.org/10.1101/2024.11.30.626193
+          name: Sorensen et al 2024. Coordinated organic and inorganic nitrogen transformations fuel soil microbial blooms and increase nitrogen retention during snowmelt
+          type: nmdc:Protocol
+        mass:
+          type: nmdc:QuantityValue
+          has_raw_value: 2 g
+          has_unit: g
+          has_numeric_value: 2
+
+  - Step 2_NOM:
+      Extraction:
+        id: # nmdc:extrp-{shoulder}-{blade}
+        type: nmdc:Extraction
+        name: Water extraction for NOM
+        description: Water extraction of <ProcessedSample1_NOM>
+        has_input:
+        - ProcessedSample1_NOM
+        has_output:
+        - ProcessedSample2_NOM
+        - ProcessedSample3_NOM # soil that has already been extracted a bit
+        processing_institution: EMSL
+        protocol_link:
+          url: https://doi.org/10.1101/2024.11.30.626193
+          name: Sorensen et al 2024. Coordinated organic and inorganic nitrogen transformations fuel soil microbial blooms and increase nitrogen retention during snowmelt
+          type: nmdc:Protocol
+        substances_used:
+        - type: nmdc:PortionOfSubstance
+          known_as: water
+          substance_role: solvent
+          volume:
+            type: nmdc:QuantityValue
+            has_raw_value: 1.5 mL
+            has_unit: mL
+            has_numeric_value: 1.5
+        extraction_targets:
+        - natural organic matter
+        input_mass: # from subsampling
+          type: nmdc:QuantityValue
+          has_raw_value: 2 g
+          has_unit: g
+          has_numeric_value: 2
+
+  - Step 3_NOM:
+      Extraction:
+        id: # nmdc:extrp-{shoulder}-{blade}
+        type: nmdc:Extraction
+        name: Methanol extraction for NOM
+        description: Methanol extraction of <ProcessedSample1_NOM>
+        has_input:
+        - ProcessedSample3_NOM
+        has_output:
+        - ProcessedSample4_NOM # this is input to the methanol extraction DataGen records
+        - ProcessedSample5_NOM # soil that has already been extracted a bit
+        processing_institution: EMSL
+        extraction_targets:
+        - natural organic matter
+        substances_used:
+        - type: nmdc:PortionOfSubstance
+          known_as: methanol
+          substance_role: solvent
+
+  - Step 4_NOM:
+      Extraction:
+        id: # nmdc:extrp-{shoulder}-{blade}
+        type: nmdc:Extraction
+        name: Chloroform extraction for NOM
+        description: Chloroform extraction of <ProcessedSample1_NOM>
+        has_input:
+        - ProcessedSample5_NOM
+        has_output:
+        - ProcessedSample6_NOM # this is input to the chloroform DataGen records
+        processing_institution: EMSL
+        extraction_targets:
+        - natural organic matter
+        substances_used:
+        - type: nmdc:PortionOfSubstance
+          known_as: chloroform
+          substance_role: solvent
+
+  processedsamples:
+
+  - ProcessedSample1_NOM:
+      ProcessedSample:
+        id: #nmdc:
+        type: nmdc:ProcessedSample
+        name: <Biosample>_subsample
+        description: A portion of soil from <Biosample> for extraction
+
+  - ProcessedSample2_NOM:
+      ProcessedSample:
+        id: #nmdc:
+        type: nmdc:ProcessedSample
+        name: <Biosample>_NOM_water
+        description: NOM from water extraction of <Biosample>
+        sampled_portion:
+        - aqueous_layer
+
+  - ProcessedSample3_NOM:
+      ProcessedSample:
+        id: #nmdc:
+        type: nmdc:ProcessedSample
+        name: <Biosample>_water_extracted_soil
+        description: Water-extracted soil for further extraction of <Biosample>
+        sampled_portion:
+        - pellet
+
+  - ProcessedSample4_NOM:
+      ProcessedSample:
+        id: #nmdc:
+        type: nmdc:ProcessedSample
+        name: <Biosample>_NOM_methanol
+        description: NOM from methanol extraction of <Biosample>
+        sampled_portion:
+        - methanol_layer
+
+  - ProcessedSample5_NOM:
+      ProcessedSample:
+        id: #nmdc:
+        type: nmdc:ProcessedSample
+        name: <Biosample>_methanol_extracted_soil
+        description: Methanol-extracted soil for further extraction of <Biosample>
+        sampled_portion:
+        - pellet
+
+  - ProcessedSample6_NOM:
+      ProcessedSample:
+        id: #nmdc:
+        type: nmdc:ProcessedSample
+        name: <Biosample>_NOM_chloroform
+        description: NOM from chloroform extraction of <Biosample>
+        sampled_portion:
+        - chloroform_layer
+lipid:
+  steps:
+  - Step 1_lipid:
+      SubSamplingProcess:
+        id: # nmdc:subspr-{shoulder}-{blade}
+        type: nmdc:SubSamplingProcess
+        name: Subsample_soil
+        description: A portion of soil being taken from <Biosample> soil sample for extraction
+        has_input:
+        - Biosample
+        has_output:
+        - ProcessedSample1_lipid
+        processing_institution: EMSL
+        mass:
+          type: nmdc:QuantityValue
+          has_raw_value: 0.3 g
+          has_unit: g
+          has_numeric_value: 0.3
+
+  - Step 2_lipid:
+      Extraction:
+        id: # nmdc:extrp-{shoulder}-{blade}
+        type: nmdc:Extraction
+        name: Water extraction preceding Folch extraction
+        description: Water extraction of <ProcessedSample1_lipid> preceding Folch extraction
+        has_input:
+        - ProcessedSample1_lipid
+        has_output:
+        - ProcessedSample2_lipid # soil that has already been extracted a bit for Folch
+        processing_institution: EMSL
+        input_mass:
+          type: nmdc:QuantityValue
+          has_raw_value: 0.3 g # from subsampling process
+          has_unit: g
+          has_numeric_value: 0.3 # from subsampling process
+        substances_used:
+        - type: nmdc:PortionOfSubstance
+          known_as: water
+          substance_role: solvent
+          volume:
+            type: nmdc:QuantityValue
+            has_raw_value: 1 mL
+            has_unit: mL
+            has_numeric_value: 1
+
+  - Step 3_lipid:
+      Extraction:
+        id: # nmdc:extrp-{shoulder}-{blade}
+        type: nmdc:Extraction
+        name: Folch extraction of soils
+        description: Folch extraction of <ProcessedSample2_lipid> to separate NOM by methanol-chloroform layer
+        has_input:
+        - ProcessedSample2_lipid
+        has_output:
+        - ProcessedSample3_lipid # input to chloroform DataGeneration record
+        processing_institution: EMSL
+        extraction_targets:
+        - lipid
+        substances_used:
+        - type: nmdc:PortionOfSubstance
+          known_as: methanol
+          substance_role: solvent
+          volume:
+            type: nmdc:QuantityValue
+            has_raw_value: 2 mL
+            has_unit: mL
+            has_numeric_value: 2
+        - type: nmdc:PortionOfSubstance
+          known_as: chloroform
+          substance_role: solvent
+          volume:
+            type: nmdc:QuantityValue
+            has_raw_value: 4 mL
+            has_unit: mL
+            has_numeric_value: 4
+        - type: nmdc:PortionOfSubstance
+          known_as: water
+          substance_role: solvent
+          volume:
+            type: nmdc:QuantityValue
+            has_raw_value: 1.5 mL
+            has_unit: mL
+            has_numeric_value: 1.5
+
+  processedsamples:
+  - ProcessedSample1_lipid:
+      ProcessedSample:
+        id: #nmdc:
+        type: nmdc:ProcessedSample
+        name: <Biosample>_Folch-subsample
+        description: The output from subsampling <Biosample> for extraction
+
+  - ProcessedSample2_lipid:
+      ProcessedSample:
+        id: #nmdc:
+        type: nmdc:ProcessedSample
+        name: <Biosample>_water_extracted_soil
+        description: Water-extracted soil for Folch extraction of <Biosample>
+
+  - ProcessedSample3_lipid:
+      ProcessedSample:
+        id: #nmdc:
+        type: nmdc:ProcessedSample
+        name: <Biosample>_chloroform_lipids
+        description: Chloroform layer of the Folch extract of <Biosample>
+        sampled_portion:
+        - chloroform_layer
