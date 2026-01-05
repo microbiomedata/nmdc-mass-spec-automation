@@ -25,3 +25,8 @@ File descriptions
 Notes
 - Folder names may be renamed to anonymized labels (e.g., example_1, example_2). Subfolder READMEs retain the original names for provenance.
 - See the parent README in llm_protocol_context for high-level guidance across studies.
+
+References
+- Instructions: [nmdc_dp_utils/llm/llm_protocol_context/instructions.py](nmdc_dp_utils/llm/llm_protocol_context/instructions.py) — guidance for extracting text and generating outlines/inputs.
+- Schema: [nmdc_dp_utils/llm/llm_protocol_context/schema.py](nmdc_dp_utils/llm/llm_protocol_context/schema.py) — definitions/utilities describing the expected `combined_outline.yaml` structure.
+- Examples: See `combined_outline.yaml` within each `example_*` subfolder for concrete instances of the outline format.
