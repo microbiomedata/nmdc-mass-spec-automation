@@ -1,0 +1,369 @@
+NOM:
+# Water extraction and SPE
+  steps:
+  - Step 1_NOM:
+      SubSamplingProcess:
+        id: # nmdc:subspr-{shoulder}-{blade}
+        type: nmdc:SubSamplingProcess
+        name: Subsample_soil
+        description: Portions of soil being taken from <Biosample>
+        has_input:
+        - Biosample
+        has_output:
+        - ProcessedSample1_NOM
+        - ProcessedSample2_NOM
+        - ProcessedSample3_NOM
+        processing_institution: EMSL
+        mass:
+          type: nmdc:QuantityValue
+          has_raw_value: 6 g
+          has_unit: g
+          has_numeric_value: 6
+        protocol_link:
+          url: https://doi.org/10.3389/fsoil.2023.1120425
+          name: Bowman et al 2023. One thousand soils for molecular understanding of belowground carbon cycling
+          type: nmdc:Protocol
+
+  - Step 2_NOM:
+      Extraction:
+        id: # nmdc:extrp-{shoulder}-{blade}
+        type: nmdc:Extraction
+        name: Water_extraction_NOM
+        description: Water extraction of <ProcessedSample1_NOM>
+        has_input:
+        - ProcessedSample1_NOM
+        has_output:
+        - ProcessedSample4_NOM
+        processing_institution: EMSL
+        extraction_targets:
+        - natural organic matter
+        input_mass:
+          type: nmdc:QuantityValue
+          has_raw_value: 6 g # from subsampling process
+          has_unit: g
+          has_numeric_value: 6 # from subsampling process
+        substances_used:
+        - type: nmdc:PortionOfSubstance
+          known_as: water
+          substance_role: solvent
+          volume:
+            type: nmdc:QuantityValue
+            has_raw_value: 30 mL
+            has_unit: mL
+            has_numeric_value: 30
+        protocol_link:
+          url: https://doi.org/10.3389/fsoil.2023.1120425
+          name: Bowman et al 2023. One thousand soils for molecular understanding of belowground carbon cycling
+          type: nmdc:Protocol
+
+  - Step 3_NOM:
+      # From publication: "FTICR-MS samples were acidified to pH 2 using concentrated phosphoric acid and salts were removed using Agilent Bond Elut PPL SPE cartridges."
+      # This ChromatographicSeparationProcess is based on the SPE protocol supplied for another project and we are assuming the protocol was the same.
+      ChromatographicSeparationProcess:
+        id: # nmdc:cspro-{shoulder}-{blade}
+        type: nmdc:ChromatographicSeparationProcess
+        name: Water extract SPE
+        description: Solid phase extraction of dissolved organic matter from <ProcessedSample4_NOM>
+        has_input:
+        - ProcessedSample4_NOM
+        has_output:
+        - ProcessedSample5_NOM # input to NOM DataGeneration records
+        processing_institution: EMSL
+        protocol_link:
+          url: https://doi.org/10.4319/lom.2008.6.230
+          name: Dittmar et al 2008. A simple and efficient method for the solid-phase extraction of dissolved organic matter (SPE-DOM) from seawater
+          type: nmdc:Protocol
+        chromatographic_category: solid_phase_extraction
+        ordered_mobile_phases:
+        - type: nmdc:MobilePhaseSegment   # "Load the acidified sample onto the cartridge"
+          substances_used:
+          - type: nmdc:PortionOfSubstance
+            known_as: phosphoric_acid
+            substance_role: acid
+          - type: nmdc:PortionOfSubstance
+            known_as: water     # containing sample
+            substance_role: solvent
+            volume:
+              type: nmdc:QuantityValue
+              has_raw_value: 5 mL
+              has_unit: mL
+              has_numeric_value: 5
+        - type: nmdc:MobilePhaseSegment   # Wash the cartridge 17+x with HCl"
+          substances_used:
+          - type: nmdc:PortionOfSubstance
+            known_as: hydrochloric_acid
+            substance_role: acid
+            source_concentration:
+              type: nmdc:QuantityValue
+              has_raw_value: 10 mmol/L
+              has_unit: mmol/L
+              has_numeric_value: 10
+            volume:
+              type: nmdc:QuantityValue
+              has_raw_value: 3 mL
+              has_unit: mL
+              has_numeric_value: 3
+        - type: nmdc:MobilePhaseSegment   # "Elute with 1.5 mL methanol"
+          substances_used:
+          - type: nmdc:PortionOfSubstance
+            known_as: methanol
+            substance_role: solvent
+            volume:
+              type: nmdc:QuantityValue
+              has_raw_value: 1.5 mL
+              has_unit: mL
+              has_numeric_value: 1.5
+        stationary_phase: PS-DVB
+
+  - Step 4_NOM:
+      Extraction:
+        id: # nmdc:extrp-{shoulder}-{blade}
+        type: nmdc:Extraction
+        name: Water_extraction_NOM
+        description: Water extraction of <ProcessedSample2_NOM>
+        has_input:
+        - ProcessedSample2_NOM
+        has_output:
+        - ProcessedSample6_NOM
+        processing_institution: EMSL
+        extraction_targets:
+        - natural organic matter
+        input_mass:
+          type: nmdc:QuantityValue
+          has_raw_value: 6 g # from subsampling process
+          has_unit: g
+          has_numeric_value: 6 # from subsampling process
+        substances_used:
+        - type: nmdc:PortionOfSubstance
+          known_as: water
+          substance_role: solvent
+          volume:
+            type: nmdc:QuantityValue
+            has_raw_value: 30 mL
+            has_unit: mL
+            has_numeric_value: 30
+        protocol_link:
+          url: https://doi.org/10.3389/fsoil.2023.1120425
+          name: Bowman et al 2023. One thousand soils for molecular understanding of belowground carbon cycling
+          type: nmdc:Protocol
+
+  - Step 5_NOM:
+      # From publication: "FTICR-MS samples were acidified to pH 2 using concentrated phosphoric acid and salts were removed using Agilent Bond Elut PPL SPE cartridges."
+      # This ChromatographicSeparationProcess is based on the SPE protocol supplied for another project and we are assuming the protocol was the same.
+      ChromatographicSeparationProcess:
+        id: # nmdc:cspro-{shoulder}-{blade}
+        type: nmdc:ChromatographicSeparationProcess
+        name: Water extract SPE
+        description: Solid phase extraction of dissolved organic matter from <ProcessedSample6_NOM>
+        has_input:
+        - ProcessedSample6_NOM
+        has_output:
+        - ProcessedSample7_NOM # input to NOM DataGeneration records
+        processing_institution: EMSL
+        protocol_link:
+          url: https://doi.org/10.4319/lom.2008.6.230
+          name: Dittmar et al 2008. A simple and efficient method for the solid-phase extraction of dissolved organic matter (SPE-DOM) from seawater
+          type: nmdc:Protocol
+        chromatographic_category: solid_phase_extraction
+        ordered_mobile_phases:
+        - type: nmdc:MobilePhaseSegment   # "Load the acidified sample onto the cartridge"
+          substances_used:
+          - type: nmdc:PortionOfSubstance
+            known_as: phosphoric_acid
+            substance_role: acid
+          - type: nmdc:PortionOfSubstance
+            known_as: water     # containing sample
+            substance_role: solvent
+            volume:
+              type: nmdc:QuantityValue
+              has_raw_value: 5 mL
+              has_unit: mL
+              has_numeric_value: 5
+        - type: nmdc:MobilePhaseSegment   # Wash the cartridge 17+x with HCl"
+          substances_used:
+          - type: nmdc:PortionOfSubstance
+            known_as: hydrochloric_acid
+            substance_role: acid
+            source_concentration:
+              type: nmdc:QuantityValue
+              has_raw_value: 10 mmol/L
+              has_unit: mmol/L
+              has_numeric_value: 10
+            volume:
+              type: nmdc:QuantityValue
+              has_raw_value: 3 mL
+              has_unit: mL
+              has_numeric_value: 3
+        - type: nmdc:MobilePhaseSegment   # "Elute with 1.5 mL methanol"
+          substances_used:
+          - type: nmdc:PortionOfSubstance
+            known_as: methanol
+            substance_role: solvent
+            volume:
+              type: nmdc:QuantityValue
+              has_raw_value: 1.5 mL
+              has_unit: mL
+              has_numeric_value: 1.5
+        stationary_phase: PS-DVB
+
+  - Step 6_NOM:
+      Extraction:
+        id: # nmdc:extrp-{shoulder}-{blade}
+        type: nmdc:Extraction
+        name: Water_extraction_NOM
+        description: Water extraction of <ProcessedSample3_NOM>
+        has_input:
+        - ProcessedSample3_NOM
+        has_output:
+        - ProcessedSample8_NOM
+        processing_institution: EMSL
+        extraction_targets:
+        - natural organic matter
+        input_mass:
+          type: nmdc:QuantityValue
+          has_raw_value: 6 g # from subsampling process
+          has_unit: g
+          has_numeric_value: 6 # from subsampling process
+        substances_used:
+        - type: nmdc:PortionOfSubstance
+          known_as: water
+          substance_role: solvent
+          volume:
+            type: nmdc:QuantityValue
+            has_raw_value: 30 mL
+            has_unit: mL
+            has_numeric_value: 30
+        protocol_link:
+          url: https://doi.org/10.3389/fsoil.2023.1120425
+          name: Bowman et al 2023. One thousand soils for molecular understanding of belowground carbon cycling
+          type: nmdc:Protocol
+
+  - Step 7_NOM:
+      # From publication: "FTICR-MS samples were acidified to pH 2 using concentrated phosphoric acid and salts were removed using Agilent Bond Elut PPL SPE cartridges."
+      # This ChromatographicSeparationProcess is based on the SPE protocol supplied for another project and we are assuming the protocol was the same.
+      ChromatographicSeparationProcess:
+        id: # nmdc:cspro-{shoulder}-{blade}
+        type: nmdc:ChromatographicSeparationProcess
+        name: Water extract SPE
+        description: Solid phase extraction of dissolved organic matter from <ProcessedSample8_NOM>
+        has_input:
+        - ProcessedSample8_NOM
+        has_output:
+        - ProcessedSample9_NOM # input to NOM DataGeneration records
+        processing_institution: EMSL
+        protocol_link:
+          url: https://doi.org/10.4319/lom.2008.6.230
+          name: Dittmar et al 2008. A simple and efficient method for the solid-phase extraction of dissolved organic matter (SPE-DOM) from seawater
+          type: nmdc:Protocol
+        chromatographic_category: solid_phase_extraction
+        ordered_mobile_phases:
+        - type: nmdc:MobilePhaseSegment   # "Load the acidified sample onto the cartridge"
+          substances_used:
+          - type: nmdc:PortionOfSubstance
+            known_as: phosphoric_acid
+            substance_role: acid
+          - type: nmdc:PortionOfSubstance
+            known_as: water     # containing sample
+            substance_role: solvent
+            volume:
+              type: nmdc:QuantityValue
+              has_raw_value: 5 mL
+              has_unit: mL
+              has_numeric_value: 5
+        - type: nmdc:MobilePhaseSegment   # Wash the cartridge 17+x with HCl"
+          substances_used:
+          - type: nmdc:PortionOfSubstance
+            known_as: hydrochloric_acid
+            substance_role: acid
+            source_concentration:
+              type: nmdc:QuantityValue
+              has_raw_value: 10 mmol/L
+              has_unit: mmol/L
+              has_numeric_value: 10
+            volume:
+              type: nmdc:QuantityValue
+              has_raw_value: 3 mL
+              has_unit: mL
+              has_numeric_value: 3
+        - type: nmdc:MobilePhaseSegment   # "Elute with 1.5 mL methanol"
+          substances_used:
+          - type: nmdc:PortionOfSubstance
+            known_as: methanol
+            substance_role: solvent
+            volume:
+              type: nmdc:QuantityValue
+              has_raw_value: 1.5 mL
+              has_unit: mL
+              has_numeric_value: 1.5
+        stationary_phase: PS-DVB
+
+  processedsamples:
+
+  - ProcessedSample1_NOM:
+      ProcessedSample:
+        id: #nmdc:
+        type: nmdc:ProcessedSample
+        name: <Biosample>_subsample
+        description: Subsample of <Biosample>, corresponding to subsampled portion 1 of 3 for <Biosample>
+
+  - ProcessedSample2_NOM:
+      ProcessedSample:
+        id: #nmdc:
+        type: nmdc:ProcessedSample
+        name: <Biosample>_subsample
+        description: Subsample of <Biosample>, corresponding to subsampled portion 2 of 3 for <Biosample>
+
+  - ProcessedSample3_NOM:
+      ProcessedSample:
+        id: #nmdc:
+        type: nmdc:ProcessedSample
+        name: <Biosample>_subsample
+        description: Subsample of <Biosample>, corresponding to subsampled portion 3 of 3 for <Biosample>
+
+  - ProcessedSample4_NOM:
+      ProcessedSample:
+        id: #nmdc:
+        type: nmdc:ProcessedSample
+        name: <ProcessedSample1_NOM>_water_extract
+        description: Water-extracted NOM from <ProcessedSample1_NOM>, corresponding to subsampled portion 1 of 3 for <Biosample>
+        sampled_portion: aqueous_layer
+
+  - ProcessedSample5_NOM:
+      ProcessedSample:
+        id: #nmdc:
+        type: nmdc:ProcessedSample
+        name: <ProcessedSample1_NOM>_NOM_water_SPE
+        description: NOM from water and solid phase extraction of <ProcessedSample1_NOM>, corresponding to subsampled portion 1 of 3 for <Biosample>
+        sampled_portion: aqueous_layer
+
+  - ProcessedSample6_NOM:
+      ProcessedSample:
+        id: #nmdc:
+        type: nmdc:ProcessedSample
+        name: <ProcessedSample2_NOM>_water_extract
+        description: Water-extracted NOM from <ProcessedSample2_NOM>, corresponding to subsampled portion 2 of 3 for <Biosample>
+        sampled_portion: aqueous_layer
+
+  - ProcessedSample7_NOM:
+      ProcessedSample:
+        id: #nmdc:
+        type: nmdc:ProcessedSample
+        name: <ProcessedSample2_NOM>_NOM_water_SPE
+        description: NOM from water and solid phase extraction of <ProcessedSample2_NOM>, corresponding to subsampled portion 2 of 3 for <Biosample>
+        sampled_portion: aqueous_layer
+
+  - ProcessedSample8_NOM:
+      ProcessedSample:
+        id: #nmdc:
+        type: nmdc:ProcessedSample
+        name: <ProcessedSample3_NOM>_water_extract
+        description: Water-extracted NOM from <ProcessedSample3_NOM>, corresponding to subsampled portion 3 of 3 for <Biosample>
+        sampled_portion: aqueous_layer
+
+  - ProcessedSample9_NOM:
+      ProcessedSample:
+        id: #nmdc:
+        type: nmdc:ProcessedSample
+        name: <ProcessedSample3_NOM>_NOM_water_SPE
+        description: NOM from water and solid phase extraction of <ProcessedSample3_NOM>, corresponding to subsampled portion 3 of 3 for <Biosample>
+        sampled_portion: aqueous_layer
