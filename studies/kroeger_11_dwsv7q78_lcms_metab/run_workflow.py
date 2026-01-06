@@ -61,7 +61,7 @@ def main():
 
     # Step 7: Generate and submit NMDC metadata packages
     logger.info("7. Generating NMDC metadata packages...")
-    manager.generate_nmdc_metadata_for_workflow()
+    manager.generate_nmdc_metadata_for_workflow(test=True)
     assert manager.should_skip('metadata_packages_generated'), "NMDC metadata package generation must complete successfully to proceed"
 
 if __name__ == "__main__":
