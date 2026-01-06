@@ -4017,12 +4017,9 @@ class WorkflowMetadataManager:
                 generator_kwargs = {
                     "metadata_file": str(csv_file),
                     "database_dump_json_path": str(output_file),
-                    "process_data_url": processed_data_url
+                    "process_data_url": processed_data_url,
+                    "raw_data_url": raw_data_url,
                 }
-
-                # Add raw_data_url if available (required for MinIO, optional for MASSIVE)
-                if raw_data_url:
-                    generator_kwargs["raw_data_url"] = raw_data_url
 
                 # Add workflow-specific parameters
                 if workflow_type == "GCMS Metabolomics":
