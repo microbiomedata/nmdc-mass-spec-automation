@@ -106,8 +106,8 @@
         }
     ],
     "metadata": {
-        "instrument_used": "Q Exactive Orbitrap",
-        "processing_institution_workflow": "NDMC",
+        "instrument_used": "Thermo Orbitrap Q-Exactive",
+        "processing_institution_workflow": "NMDC",
         "processing_institution_generation": "JGI",
         "chromat_configuration_name": "N/A, should be overwritten",
         "mass_spec_configuration_name": "N/A, should be overwritten",
@@ -130,7 +130,7 @@
         "metadata_mapping_generated": true,
         "data_processed": true,
         "processed_data_uploaded_to_minio": true,
-        "metadata_packages_generated": false,
+        "metadata_packages_generated": true,
         "metadata_submitted_dev": false,
         "metadata_submitted_prod": false
     }
