@@ -17,10 +17,12 @@ import pandas as pd
 import re
 from pathlib import Path
 
-# Add the utils directory to path
-sys.path.append(str(Path.cwd() / "nmdc_dp_utils"))
+# Ensure project root is on sys.path so package `nmdc_dp_utils` is importable
+PROJECT_ROOT = Path(__file__).resolve().parents[3]
+if str(PROJECT_ROOT) not in sys.path:
+    sys.path.insert(0, str(PROJECT_ROOT))
 
-from workflow_manager import NMDCWorkflowManager
+from nmdc_dp_utils.workflow_manager import NMDCWorkflowManager
 
 
 def extract_sample_info_from_filename(filename):

@@ -38,8 +38,7 @@ def main():
 
     mapping_success = manager.run_biosample_mapping_script()
     if not mapping_success:
-        logger.warning("Biosample mapping needs manual review - check the mapping file and customize the script")
-        logger.warning("Re-run after making changes to improve matching")
+        logger.error("Biosample mapping failed - check the mapping file and customize the script")
     else:
         logger.info("Biosample mapping completed successfully")
 
