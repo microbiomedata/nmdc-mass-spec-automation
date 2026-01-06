@@ -2,3 +2,4 @@ nmdc_ms_metadata_gen @ git+https://github.com/microbiomedata/nmdc_mass_spectrome
 minio==7.2.18
 miniwdl
 openai
+openai-agents

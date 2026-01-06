@@ -1,0 +1,31 @@
+metab:
+  steps:
+  - Step 1_metab:
+      FiltrationProcess:
+        id: # nmdc:filtpr-{shoulder}-{blade}
+        type: nmdc:FiltrationProcess
+        name: <Biosample>_extract_filtration
+        description: Syringe filtering the EcoFab growth medium of <Biosample>
+        has_input:
+        - Biosample
+        has_output:
+        - ProcessedSample1_metab
+        protocol_link:
+          name: "Use of EcoFAB 2.0 for reproducible plant-microbe interaction experiments"
+          url: dx.doi.org/10.17504/protocols.io.kxygxyydkl8j/v1
+          type: nmdc:Protocol
+        filter_material: supor
+        filter_pore_size:
+          type: nmdc:QuantityValue
+          has_raw_value: 0.2 um
+          has_unit: um
+          has_numeric_value: 0.2
+      separation_method: syringe
+
+  processedsamples:
+  - ProcessedSample1_metab:
+      ProcessedSample:
+        id: #nmdc:
+        type: nmdc:ProcessedSample
+        name: <Biosample>_exudate
+        description: Exudates of of <Biosample> for metabolomics analysis

@@ -3,7 +3,7 @@ Manager for handling conversation messages with the LLM.
 They need to persist across multiple calls to the LLM API.
 An instance of this class will need to be created for each conversation.
 """
-from llm.llm_protocol_context.instructions import system_prompt as PROTOCOL_SYSTEM_PROMPT
+from llm_protocol_context.instructions import system_prompt as PROTOCOL_SYSTEM_PROMPT
 
 class ConversationManager:
     """

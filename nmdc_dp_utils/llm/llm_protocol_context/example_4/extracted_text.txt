@@ -1,0 +1,4 @@
+Sample growth medium for metabolomics: Uncap the septa. Draw all EcoFAB
+growth medium with a sterile syringe attached to a needle. Remove the needle, attach
+a 0.2 µm filter to the syringe, and filter the spent medium into a 15 mL tube (if clotting
+occurs, replace the filter). Store the filtrate at -80°C.

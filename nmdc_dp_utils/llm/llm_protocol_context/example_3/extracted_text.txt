@@ -1,0 +1,39 @@
+This is the protocol that I used. The sample masses are adjusted differently but the solvent ratios are the same. 
+
+Modified Folch Extraction SOP
+
+For Soils >10%C:
+1.	User will have pre-weighed 300mg* of soil into a 15mL Olympus tube (Genesee Sci., Cat# 28-103)
+2.	1mL of MilliQ H2O will be added to the sample and put on a vortex mixer (Thermo Scientific, Cat# 88880017TS) at RT and 1000 RPM for 2 hours.
+3.	Centrifuge sample at 6000 RPM for 5 minutes on an angled rotor that accommodates 15mL falcon tubes.
+4.	Pull off supernatant using 200uL micropipette while avoiding disturbing and pulling up sediment and place in a pre-labeled 2mL Sorensen tube (part no.) [It is always made sure that most of the supernatant is taken off]. Supernatants are then placed in a sample box and stored at -80oC.
+5.	2mL of Optima LC/MS-grade MeOH is added to the sample using a glass serological pipette and vortexed for 5 seconds.
+6.	4mL of EtOH-stabilized CHCl3 is added to the sample in a fume hood using a glass serological pipette and vortexed for 5 seconds.
+7.	0.25mL of MilliQ H2O are added to the sample using a micropipette and sample is placed on a vortex mixer at RT and 1000 RPM for 1 hour.
+8.	1.25mL of MilliQ H2O are added to the sample and given a gentle shake by hand to get a bi-layer separation.
+9.	Sample is then incubated overnight at 4oC
+10.	Centrifuge sample at 6000 RPM for 5 minutes on an angled rotor that accommodates 15mL falcon tubes.
+11.	In a fume hood, pull off bottom layer (lipid layer) using a 9” glass Pasteur pipette and split sample between a pre-lableled 2ml glass Mircosolv vial (Microsolv, Cat# 9502S-WCV) and a pre-labeled Waters vial (Waters, Cat# 186002805) and cap both with non-slit caps (Microsolv, Cat# 9502S-10C-B-M) (IF PLASTIC MICROPIPETTE TIPS ARE USED, SAMPLES WILL BE CONTAMINATED WITH PEG AND UNUSABLE). Samples are then placed in separate sample boxes and stored at -80oC
+12.	Centrifuge sample again at 6000 RPM for 5 minutes on an angled rotor that accommodates 15mL falcon tubes.
+13.	Pull off top layer (metabolite layer) using a 1mL micropipette or 9” glass Pasteur pipette and transfer supernatant into pre-labeled 2mL glass Microsolv vial (if using micropipette be careful not to plunge tip below bi-layer if there is remnant CHCl3). Sample is then placed in a sample box and stored at -80oC 
+Modified Folch Extraction SOP
+
+For Soils and Sediments <10%C:
+1.	User will have pre-weighed 2g* of soil into a 15mL Olympus tube+ (Genesee Sci., Cat# 28-103)
+2.	5mL of MilliQ H2O will be added to the sample and put on a vortex mixer (Thermo Scientific, Cat# 88880017TS) at RT and 1000 RPM for 2 hours.
+3.	Centrifuge sample at 6000 RPM for 5 minutes on an angled rotor that accommodates 15mL falcon tubes.
+4.	Pull off supernatant using 200uL micropipette while avoiding disturbing and pulling up sediment and place in a pre-labeled 15mL Olympus tube [It is always made sure that most of the supernatant is taken off]. Supernatants are then stored on their sides to prevent cracking at -80oC.
+5.	4mL of Optima LC/MS-grade MeOH is added to the sample using a glass serological pipette and vortexed for 5 seconds.
+6.	8mL of EtOH-stabilized CHCl3 is added to the sample in a fume hood using a glass serological pipette and vortexed for 5 seconds.
+7.	0.50mL of MilliQ H2O are added to the sample using a micropipette and sample is placed on a vortex mixer at RT and 1000 RPM for 1 hour.
+8.	2.50mL of MilliQ H2O are added to the sample and given a gentle shake by hand to get a bi-layer separation.
+9.	Sample is then incubated overnight at 4oC
+10.	Centrifuge sample at 6000 RPM for 5 minutes on an angled rotor that accommodates 15mL falcon tubes.
+11.	In a fume hood, pull off bottom layer (lipid layer) using a 9” glass Pasteur pipette and transferred to a 15mL Olympus tube (IF PLASTIC MICROPIPETTE TIPS ARE USED, SAMPLES WILL BE CONTAMINATED WITH PEG AND UNUSABLE). Samples are then concentrated using N2 evaporator.
+12.	Centrifuge sample again at 6000 RPM for 5 minutes on an angled rotor that accommodates 15mL falcon tubes.
+13.	Pull off top layer (metabolite layer) using a 1mL micropipette or 9” glass Pasteur pipette and transfer supernatant into pre-labeled 2mL glass Microsolv vial (if using micropipette be careful not to plunge tip below bi-layer if there is remnant CHCl3). Sample is then placed in a sample box and stored at -80oC 
+
+*Amount of soil can vary by how much sample the user has available as well as the type of soil 
++Depending on bulkiness of soil can also be done in 50mL tube
+
+

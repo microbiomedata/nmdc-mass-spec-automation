@@ -1,0 +1,53 @@
+For Lybrand: 300mg of sample were weighed into 2mL Microsolv vials and had the sequential extraction protocol done on them (1mL H2O shaken for 2h at 2000rpm on a thermomixer, followed by MeOH and CHCl3 in that order [Tfaily et al, 2016]). H2O samples were SPE’d following normal SPE protocol (Modified Dittmar et al, 2008 [attached]). CHCl3 samples were run on ICR and through lipidomics pipeline
+
+Sequential Extraction SOP
+
+For soils with >10%C:
+1.	User will have weighed 300mg* of soil into a 2mL glass Microsolv vial (Microsolv, Cat# 9502S-WCV) with a non-slit cap (Microsolv, Cat# 9502S-10C-B-M).
+2.	1mL of MilliQ H2O is pipetted into each sample and shaken on a thermomixer (Eppendorf, Cat# 2231000667) at RT and 2000 RPM for 2 hours.
+3.	Centrifuge samples at 4500 RPM for 5 minutes on a plate spinner that accommodates 54 sample autosampler tray.
+4.	Pull off supernatant using 200uL micropipette while avoiding disturbing and pulling up sediment and place in a pre-labeled 2mL Sorensen tube (part no.) [Make sure that most of the supernatant is taken off or else this will affect the rest of the extraction]. Supernatants are then placed in a sample box and stored at -80oC.
+5.	1mL of Optima LC/MS-grade methanol is pipetted into each sample and shaken on a thermomixer at RT and 2000 RPM for 2 hours.
+6.	Centrifuge samples (Repeat Step 3)
+7.	Pull of supernatant using 200uL micropipette (Step 4) but instead place supernatant into a pre-labeled 2mL Microsolv vial and capped with a non-slit cap. Supernatants are then placed in a sample box and stored at -80oC.
+8.	1mL of ethanol-stabilized chloroform is pipetted into the sample using a glass syringe or a pre-marked Pasteur pipette in a fume hood (IF PLASTIC MICROPIPETTE TIPS ARE USED, SAMPLES WILL BE CONTAMINATED WITH PEG AND UNUSABLE). Samples are then shaken on a thermomixer at RT and 2000 RPM for 2 hours.
+9.	Centrifuge samples (Repeat Step 3)
+10.	In a fume hood, pull off supernatant using 5-3/4” glass Pasteur pipette and transfer supernatant to 2mL glass Microsolv vial and cap with non-slip cap. Supernatants are then placed in a sample box and stored at -80oC.
+
+For Soils and Sediment with <10%C:
+1.	User will have weighed 2g* of soil into a 15mL Olympus tube (Genesee Sci., Cat# 28-103).
+2.	5mL of MilliQ H2O is pipetted into each sample and shaken on a vortex mixer (Thermo Scientific, Cat# 88880017TS) at RT and 1000 RPM for 2 hours.
+3.	Centrifuge samples at 6000 RPM for 5 minutes in an angled rotor that accommodates 15mL falcon tubes.
+4.	Pull off supernatant using 1mL micropipette while avoiding disturbing and pulling up sediment and place in a pre-labeled 15mL Olympus tube [Make sure that most of the supernatant is taken off or else this will affect the rest of the extraction]. Supernatants are then stored at -80oC with tubes resting on their sides to prevent cracking.
+5.	Steps 2-4 are then repeated with the supernatant going into the same sample tube as before.
+6.	5mL of Optima LC/MS-grade Methanol is pipetted into each sample and shaken on a vortex mixer at RT and 1000 RPM for 2 hours.
+7.	Centrifuge samples (Repeat Step 3).
+8.	Pull of supernatant using 1mL micropipette the same as the H2O fraction. Supernatants are then stored at -80oC.
+9.	5mL of ethanol-stabilized chloroform is pipetted into the sample using a glass serological pipette in a fume hood (IF PLASTIC MICROPIPETTE TIPS ARE USED, SAMPLES WILL BE CONTAMINATED WITH PEG AND UNUSABLE). Samples are then shaken on a vortex mixer at RT and 1000 RPM for 2 hours.
+10.	Centrifuge samples (Repeat Step 3).
+11.	In a fume hood, pull off supernatant using 9” glass Pasteur pipette and transfer supernatant to 15mL Olympus tube. Supernatants are then stored at -80oC.
+
+
+*Amount of soil can vary by how much sample the user has available as well as the type of soil e.g. peat will be less dense/fluffier and have more C than a permafrost sample and thus 300mg of soil would be more than necessary and would most likely not fit into a 2mL Microsolv vial. 
+
+
+
+Solid Phase Extraction (SPE) of DOM SOP
+
+Bond Elut PPL SPE:
+1.	Place labeled SPE cartridge (Agilent, Cat# 12105004) onto SPE vacuum manifold (Sigma-Aldrich (Supelco), Cat# 57250-U) with 15mL falcon tube underneath to collect waste.
+2.	Prepare 5mL* of H2O sample in a 15mL Olympus tube (Genesee Sci., Cat# 28-103) by acidifying the sample to at least pH2 with 2µL of 37% HCl.
+a.	Depending on sample volume, sample may need to be diluted to 5mL with MilliQ H2O.
+b.	Depending on sample alkalinity and natural buffers within the sample, more 37% HCl may be needed to acidify the sample to pH2. 
+c.	Test acidity with 0-6pH strip by pipetting 20µL of the sample on the pH strip.
+3.	Activate each SPE cartridge with 3mL of Optima LC/MS-grade methanol and let excess drain off into waste.
+4.	Equilibrate cartridge with 5mL 10mM HCl.
+5.	Load the acidified sample onto the cartridge and allow the sample to flow through the column#.
+6.	Wash the cartridge 17X+, # with 3mL of 10mM HCl, emptying waste tubes into a larger waste container once they are 80% full.
+7.	Dry each cartridge with N2(g) until packing material returns to original color (about 5 minutes)
+a.	If top filter has moved during drying, tamp down gently with pipette tip.
+8.	After cartridge is dry, expel any remaining HCl rinse in cartridge port and solvent guide needle by gently pushing N2(g) through the port.
+9.	Replace cartridge onto original port and elute with 1.5mL of Optima LC/MS-grade MeOH into a 2mL Microsolv vial (Microsolv, Cat# 9502S-WCV) and cap with a non-slit cap (Microsolv, Cat# 9502S-10C-B-M) until ready to run. Sample is then placed in a sample box and stored at -80oC
+*More than 5mL of sample can be used, especially if total volume of sample received is greater than 5mL and/or is of low concentration
+#If samples are having a hard time flowing through with gravity and capillary action, gently pull vacuum to pull the sample or solvent through the column
++ Samples can be rinsed more than 17X depending on salt concentration
