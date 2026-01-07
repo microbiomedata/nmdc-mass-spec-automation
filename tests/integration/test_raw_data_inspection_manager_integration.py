@@ -169,8 +169,8 @@ class TestWorkflowRawDataInspectionManagerIntegration:
         
         manager = NMDCWorkflowManager(str(integration_raw_data_config_file))
         
-        # Set the data_processed skip trigger
-        manager.set_skip_trigger("data_processed", True)
+        # Set the raw_data_inspected skip trigger
+        manager.set_skip_trigger("raw_data_inspected", True)
         
         # Create a dummy raw file
         raw_data_dir = Path(manager.raw_data_directory)
@@ -182,7 +182,7 @@ class TestWorkflowRawDataInspectionManagerIntegration:
         result = manager.raw_data_inspector(file_paths=[str(dummy_file)])
         
         # Should return True immediately without running (decorator skips execution)
-        assert result is True, "Should skip when data_processed trigger is set"
+        assert result is True, "Should skip when raw_data_inspected trigger is set"
         
         # Results file should not be created since we skipped
         results_csv = manager.workflow_path / "raw_file_info" / "raw_file_inspection_results.csv"
