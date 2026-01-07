@@ -2681,6 +2681,13 @@ class WorkflowRawDataInspectionManager:
         mount_points.add(str(output_dir.resolve()))
         mount_points.add(str(script_path.parent.resolve()))
 
+        # Ensure all mount points exist before Docker tries to mount them
+        # This is critical when running with --user flag, as Docker can't create
+        # directories without proper permissions in that mode
+        for mount_point in mount_points:
+            mount_path = Path(mount_point)
+            mount_path.mkdir(parents=True, exist_ok=True)
+
         # Build Docker volume arguments
         volume_args = []
         container_file_paths = []
@@ -2932,6 +2939,13 @@ class WorkflowRawDataInspectionManager:
         mount_points.add(str(raw_data_dir))
         mount_points.add(str(output_dir.resolve()))
         mount_points.add(str(script_path.parent.resolve()))
+
+        # Ensure all mount points exist before Docker tries to mount them
+        # This is critical when running with --user flag, as Docker can't create
+        # directories without proper permissions in that mode
+        for mount_point in mount_points:
+            mount_path = Path(mount_point)
+            mount_path.mkdir(parents=True, exist_ok=True)
 
         # Build volume arguments
         volume_args = []

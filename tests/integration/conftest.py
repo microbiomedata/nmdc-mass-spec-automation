@@ -106,3 +106,83 @@ def integration_test_raw_file():
         if raw_file_path.exists():
             raw_file_path.unlink()
         raise RuntimeError(f"Failed to download test file: {e}") from e
+
+
+@pytest.fixture(scope="session")
+def integration_test_gcms_file():
+    """
+    Download and cache a real .cdf file for GCMS integration testing.
+    
+    Downloads once per test session and caches in tests/integration/test_data/.
+    The file is ~6.5MB and comes from NMDC example GCMS dataset.
+    
+    Returns:
+        Path: Path to the downloaded CDF file
+    """
+    # Define test data directory
+    test_data_dir = Path(__file__).parent / "test_data"
+    test_data_dir.mkdir(exist_ok=True)
+    
+    # Define file details
+    cdf_file_name = "GCMS_FAMEs_01_GCMS01_20180115.cdf"
+    cdf_file_path = test_data_dir / cdf_file_name
+    expected_md5 = "d27124d36d3db9e19161e7fc81ce176b"  # From metadata
+    
+    # Check if file already exists with correct checksum
+    if cdf_file_path.exists():
+        # Verify checksum
+        md5_hash = hashlib.md5()
+        with open(cdf_file_path, 'rb') as f:
+            for chunk in iter(lambda: f.read(8192), b''):
+                md5_hash.update(chunk)
+        
+        if md5_hash.hexdigest() == expected_md5:
+            print(f"\n✓ Using cached GCMS test file: {cdf_file_path.name} ({cdf_file_path.stat().st_size / (1024*1024):.1f} MB)")
+            return cdf_file_path
+        else:
+            print(f"\n⚠ Cached file has incorrect checksum, re-downloading...")
+            cdf_file_path.unlink()
+    
+    # Download the file
+    cdf_file_url = "https://nmdcdemo.emsl.pnnl.gov/metabolomics/blanchard_11_8ws97026/raw/GCMS_FAMEs_01_GCMS01_20180115.cdf"
+    
+    print(f"\nDownloading GCMS integration test file...")
+    print(f"Target: {cdf_file_path}")
+    print(f"Size: ~6.5 MB")
+    
+    try:
+        response = requests.get(cdf_file_url, stream=True, timeout=120)
+        response.raise_for_status()
+        
+        # Write file in chunks with progress
+        total_size = int(response.headers.get('content-length', 0))
+        block_size = 8192
+        downloaded = 0
+        
+        with open(cdf_file_path, 'wb') as f:
+            for chunk in response.iter_content(chunk_size=block_size):
+                if chunk:
+                    f.write(chunk)
+                    downloaded += len(chunk)
+                    if total_size > 0:
+                        percent = (downloaded / total_size) * 100
+                        print(f"\rDownload progress: {percent:.1f}%", end='', flush=True)
+        
+        print(f"\n✓ Download complete: {cdf_file_path.stat().st_size / (1024*1024):.1f} MB")
+        
+        # Verify checksum
+        md5_hash = hashlib.md5()
+        with open(cdf_file_path, 'rb') as f:
+            for chunk in iter(lambda: f.read(8192), b''):
+                md5_hash.update(chunk)
+        
+        if md5_hash.hexdigest() != expected_md5:
+            raise ValueError(f"Downloaded file has incorrect MD5 checksum")
+        
+        print(f"✓ Checksum verified")
+        return cdf_file_path
+        
+    except Exception as e:
+        if cdf_file_path.exists():
+            cdf_file_path.unlink()
+        raise RuntimeError(f"Failed to download GCMS test file: {e}") from e
