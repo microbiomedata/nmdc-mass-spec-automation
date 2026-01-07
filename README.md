@@ -60,34 +60,37 @@ manager = NMDCWorkflowManager("studies/your_study/config.json")
 # Step 1: Create directory structure
 manager.create_workflow_structure()
 
-# Step 2: Discover and download raw data
-ftp_df = manager.get_massive_ftp_urls()
-downloaded_files = manager.download_from_massive()
+# Step 2: Fetch raw data (automatically uses MASSIVE or MinIO based on config)
+manager.fetch_raw_data()
 
 # Step 3: Map files to biosamples
-biosample_csv = manager.get_biosample_attributes()
-mapping_script = manager.generate_biosample_mapping_script()
+manager.get_biosample_attributes()
+manager.generate_biosample_mapping_script()
 ## Manually edit and run the mapping script as instructed in the generated script
 manager.run_biosample_mapping_script()
 
 # Step 4: Inspect raw data
-inspection_results = manager.raw_data_inspector(cores=4)
+manager.raw_data_inspector(cores=4)
 
-# Step 5: Generate WDL configurations, make runner script and run workflows
-json_count = manager.generate_wdl_jsons()
-script_path = manager.generate_wdl_runner_script()
-manager.run_wdl_script(script_path)
+# Step 5: Process data (generate WDL configs and execute workflows)
+manager.process_data(execute=True)
 
 # Step 6: Upload to MinIO
 manager.upload_processed_data_to_minio()
 
-# Step 7: Generate metadata mapping files with URL validation
-metadata_success = manager.generate_metadata_mapping_files()
-
-# Step 8: Generate and submit NMDC metadata packages
-manager.generate_nmdc_metadata_packages()
-manager.submit_metadata_to_nmdc(dev=True, prod=False)
+# Step 7: Generate NMDC metadata packages
+manager.generate_nmdc_metadata_for_workflow()
 ```
+
+### Configuration-Based Operation
+
+The workflow manager uses configuration files to determine:
+- **Data source**: Presence of `massive_id` in config → MASSIVE; otherwise → MinIO
+- **Batch size**: Configured in `config['workflow']['batch_size']`
+- **File filtering**: Configured in `config['workflow']['file_filters']`
+- **Processing parameters**: Read from `config['configurations']`
+
+All methods use configuration parameters automatically—no need to pass arguments manually.
 
 ## Repository Structure
 

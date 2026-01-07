@@ -1,0 +1,60 @@
+{
+    "study": {
+        "name": "blanchard_11_8ws97026",
+        "id": "nmdc:sty-11-8ws97026",
+        "description": "Molecular mechanisms underlying changes in the temperature sensitive respiration response of forest soils to long-term experimental warming"
+    },
+    "workflow": {
+        "name": "example_gcms_metab",
+        "file_type": ".cdf",
+        "processed_data_date_tag": "20251223",
+        "workflow_type": "GCMS Metabolomics",
+        "batch_size": 25
+    },
+    "paths": {
+        "base_directory": "/Users/heal742/LOCAL/05_NMDC/07_automation/nmdc_mass_spec_automation",
+        "data_directory": "/Volumes/LaCie/nmdc_data"
+    },
+    "docker": {
+        "raw_data_inspector_image": "microbiomedata/metams:3.3.3"
+    },
+    "minio": {
+        "endpoint": "admin.nmdcdemo.emsl.pnl.gov",
+        "secure": true,
+        "bucket": "metabolomics"
+    },
+    "configurations": [
+        {
+            "name": "gcms",
+            "corems_toml": "workflow_inputs/metams_gcms_corems.toml",
+            "cores": 5
+        }
+    ],
+    "metadata": {
+        "instrument_used": "Agilent 7980A GC-MS",
+        "processing_institution_workflow": "NMDC",
+        "processing_institution_generation": "EMSL",
+        "chromat_configuration_name": "EMSL GC method for metabolites",
+        "mass_spec_configuration_name": "EMSL metabolomics GC/MS mass spectrometry method",
+        "serial_numbers_to_remove": [
+            "Unknown",
+            "Exactive Series slot #1"
+        ],
+        "raw_data_location": "MinIO",
+        "configuration_file_name": "emsl_gcms_corems_params.toml"
+    },
+    "skip_triggers": {
+        "study_structure_created": true,
+        "raw_data_downloaded": true,
+        "biosample_attributes_fetched": true,
+        "biosample_mapping_script_generated": true,
+        "biosample_mapping_completed": true,
+        "raw_data_inspected": true,
+        "metadata_mapping_generated": true,
+        "data_processed": true,
+        "processed_data_uploaded_to_minio": true,
+        "metadata_packages_generated": true,
+        "metadata_submitted_dev": false,
+        "metadata_submitted_prod": false
+    }
+}

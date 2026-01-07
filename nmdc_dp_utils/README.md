@@ -17,6 +17,7 @@ See the [Workflow Manager](workflow_manager.py)'s `show_available_workflow_types
 As of now, the supported workflow types are:
 - LCMS Metabolomics
 - LCMS Lipidomics
+- GCMS Metabolomics
 
 ## Setup
 You need Python 3.8+ and Docker installed prior to using this system.

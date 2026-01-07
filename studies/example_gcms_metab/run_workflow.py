@@ -1,34 +1,30 @@
 #!/usr/bin/env python3
 """
-Kroeger study, lcms_metabolomics workflow runner.
-Study: Microbial regulation of soil water repellency to control soil degradation
-MASSIVE ID: MSV000094090
+Example GCMS metabolomics study, gcms_metabolomics workflow runner.
 """
 
 import sys
 from pathlib import Path
 
-# Ensure project root is on sys.path so package `nmdc_dp_utils` is importable
-PROJECT_ROOT = Path(__file__).resolve().parents[2]
-if str(PROJECT_ROOT) not in sys.path:
-    sys.path.insert(0, str(PROJECT_ROOT))
-
-from nmdc_dp_utils.workflow_manager import NMDCWorkflowManager
-
 def main():
-    """Run the Kroeger study workflow."""
-
+    """Run the Example GCMS Metabolomics workflow."""
+    # Ensure project root is on sys.path so package `nmdc_dp_utils` is importable
+    project_root = Path(__file__).resolve().parents[2]
+    if str(project_root) not in sys.path:
+        sys.path.insert(0, str(project_root))
+    from nmdc_dp_utils.workflow_manager import NMDCWorkflowManager
+    
     # Initialize study manager
-    config_path = "studies/kroeger_11_dwsv7q78_lcms_metab/kroeger_lcms_metab_config.json"
+    config_path = "studies/example_gcms_metab/example_gcms_metab_config.json"
     manager = NMDCWorkflowManager(str(config_path))
 
     logger = manager.logger
     logger.info(f"=== {manager.workflow_name.upper()} WORKFLOW ===")
-
+    
     # Step 1: Create workflow structure
     logger.info("1. Creating workflow structure...")
     manager.create_workflow_structure()
-
+    
     # Step 2: Fetch raw data (MinIO or MASSIVE based on config)
     logger.info("2. Fetching raw data...")
     manager.fetch_raw_data()
@@ -37,14 +33,14 @@ def main():
     logger.info("3. Mapping raw data files to biosamples...")
     manager.get_biosample_attributes()
     manager.generate_biosample_mapping_script()
-
+    
     mapping_success = manager.run_biosample_mapping_script()
     if not mapping_success:
         logger.warning("Biosample mapping needs manual review - check the mapping file and customize the script")
         logger.warning("Re-run after making changes to improve matching")
     else:
         logger.info("Biosample mapping completed successfully")
-
+    
     # Step 4: Inspect raw data files for metadata and QC
     logger.info("4. Inspecting raw data files...")
     manager.raw_data_inspector(cores=4)
