@@ -12,60 +12,7 @@ Tests cover core workflow management functionality including:
 import json
 import pytest
 from pathlib import Path
-from unittest.mock import Mock, patch, MagicMock
-import tempfile
-import shutil
-
-
-@pytest.fixture
-def temp_config_dir():
-    """Create a temporary directory for test configs."""
-    temp_dir = tempfile.mkdtemp()
-    yield Path(temp_dir)
-    shutil.rmtree(temp_dir)
-
-
-@pytest.fixture
-def minimal_config():
-    """Provide a minimal valid configuration for testing."""
-    return {
-        "workflow": {
-            "name": "test_workflow",
-            "type": "gcms_metabolomics",
-            "massive_id": "MSV000012345",
-            "file_type": ".raw",
-            "file_filters": ["GCMS"]
-        },
-        "study": {
-            "name": "test_study",
-            "id": "nmdc:sty-11-test123"
-        },
-        "paths": {
-            "base_directory": "/tmp/test_base",
-            "data_directory": "/tmp/test_data"
-        },
-        "minio": {
-            "endpoint": "localhost:9000",
-            "bucket": "test-bucket",
-            "secure": False
-        },
-        "configurations": [
-            {
-                "name": "test_config",
-                "file_filter": ["TEST"],
-                "metadata_overrides": {}
-            }
-        ]
-    }
-
-
-@pytest.fixture
-def config_file(temp_config_dir, minimal_config):
-    """Create a temporary config file for testing."""
-    config_path = temp_config_dir / "test_config.json"
-    with open(config_path, "w") as f:
-        json.dump(minimal_config, f)
-    return config_path
+from unittest.mock import Mock, patch
 
 
 class TestNMDCWorkflowManager:
@@ -153,15 +100,15 @@ class TestNMDCWorkflowManager:
         assert manager.config["skip_triggers"]["trigger2"] is False
 
     @patch.dict('os.environ', {}, clear=True)
-    def test_path_construction(self, config_file):
+    def test_path_construction(self, config_file, temp_config_dir):
         """Test that paths are constructed correctly."""
         from nmdc_dp_utils.workflow_manager import NMDCWorkflowManager
         
         manager = NMDCWorkflowManager(str(config_file))
         
-        assert manager.base_path == Path("/tmp/test_base")
-        assert manager.workflow_path == Path("/tmp/test_base/studies/test_workflow")
-        assert manager.raw_data_directory == Path("/tmp/test_data/test_study/raw")
+        assert manager.base_path == temp_config_dir / "test_base"
+        assert manager.workflow_path == temp_config_dir / "test_base/studies/test_workflow"
+        assert manager.raw_data_directory == temp_config_dir / "test_data/test_study/raw"
 
     @patch.dict('os.environ', {}, clear=True)
     def test_processed_data_directory_with_date_tag(self, temp_config_dir, minimal_config):
@@ -176,7 +123,7 @@ class TestNMDCWorkflowManager:
         
         manager = NMDCWorkflowManager(str(config_path))
         
-        expected_path = Path("/tmp/test_data/test_study/processed_20250107")
+        expected_path = temp_config_dir / "test_data/test_study/processed_20250107"
         assert manager.processed_data_directory == expected_path
 
     @patch.dict('os.environ', {}, clear=True)
