@@ -131,8 +131,23 @@ class NMDCWorkflowManager(
                 self.data_directory / f"{self.study_name}" / "processed"
             )
 
-        # Initialize MinIO client if credentials available
-        self.minio_client = self._init_minio_client()
+        # MinIO client will be lazy-loaded when first accessed
+        self._minio_client = None
+
+    @property
+    def minio_client(self) -> Optional[Minio]:
+        """
+        Get MinIO client, initializing it on first access if credentials are available.
+        
+        This lazy-loads the MinIO client only when actually needed, avoiding
+        initialization errors when MinIO is not required for the workflow.
+        
+        Returns:
+            Configured MinIO client, or None if credentials unavailable
+        """
+        if self._minio_client is None:
+            self._minio_client = self._init_minio_client()
+        return self._minio_client
 
     def show_available_workflow_types(self) -> List[str]:
         """
@@ -261,7 +276,6 @@ class NMDCWorkflowManager(
                 secure=self.config["minio"]["secure"],
             )
         except KeyError:
-            self.logger.warning("MinIO credentials not found in environment variables")
             return None
 
     @skip_if_complete("study_structure_created", return_value=True)

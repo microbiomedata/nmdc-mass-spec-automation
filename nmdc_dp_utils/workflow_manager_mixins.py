@@ -616,7 +616,9 @@ class WorkflowDataMovementManager:
             >>> manager.upload_to_minio('/path/to/processed', 'metabolomics', 'study_data')
         """
         if not self.minio_client:
-            raise ValueError("MinIO client not initialized")
+            raise ValueError(
+                "MinIO client not available. Please set MINIO_ACCESS_KEY and MINIO_SECRET_KEY environment variables."
+            )
 
         local_path = Path(local_directory)
         if not local_path.exists():
@@ -682,7 +684,9 @@ class WorkflowDataMovementManager:
             >>> print(f"Downloaded {count} files")
         """
         if not self.minio_client:
-            raise ValueError("MinIO client not initialized")
+            raise ValueError(
+                "MinIO client not available. Please set MINIO_ACCESS_KEY and MINIO_SECRET_KEY environment variables."
+            )
 
         # Create local directory
         Path(local_directory).mkdir(parents=True, exist_ok=True)
@@ -750,7 +754,9 @@ class WorkflowDataMovementManager:
             >>> success = manager.download_raw_data_from_minio()
         """
         if not self.minio_client:
-            self.logger.error("MinIO client not initialized")
+            self.logger.error(
+                "MinIO client not available. Please set MINIO_ACCESS_KEY and MINIO_SECRET_KEY environment variables."
+            )
             return False
 
         # Use config values if not provided
@@ -3094,7 +3100,9 @@ class WorkflowRawDataInspectionManager:
             Creates folder structure: bucket/study_name/processed_data/
         """
         if not self.minio_client:
-            self.logger.error("MinIO client not initialized")
+            self.logger.error(
+                "MinIO client not available. Please set MINIO_ACCESS_KEY and MINIO_SECRET_KEY environment variables."
+            )
             self.logger.error(
                 "Set MINIO_ACCESS_KEY and MINIO_SECRET_KEY environment variables"
             )
