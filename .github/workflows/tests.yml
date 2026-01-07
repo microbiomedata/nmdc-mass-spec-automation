@@ -54,8 +54,21 @@ jobs:
         python -m pip install --upgrade pip
         pip install -r requirements.txt
     
+    - name: Verify Docker is available
+      run: |
+        docker --version
+        docker info
+    
+    - name: Pull required Docker images
+      run: |
+        docker pull microbiomedata/metams:3.3.3
+    
+    - name: Download test data
+      run: |
+        make download-test-data
+    
     - name: Run integration tests with pytest
-      timeout-minutes: 10
+      timeout-minutes: 15
       run: |
         pytest tests/integration/ -v --tb=short -s
     

@@ -2393,7 +2393,7 @@ class WorkflowRawDataInspectionManager:
     Mixin class for managing raw data inspection using Docker containers.
     """
 
-    @skip_if_complete("data_processed", return_value=True)
+    @skip_if_complete("raw_data_inspected", return_value=True)
     def raw_data_inspector(
         self, file_paths=None, cores=1, limit=None, max_retries=10, retry_delay=10.0
     ) -> bool:
@@ -2625,6 +2625,7 @@ class WorkflowRawDataInspectionManager:
             # Set the skip trigger on successful completion
             if result is not None:
                 self.logger.info("Raw data inspection completed successfully")
+                self.set_skip_trigger("raw_data_inspected", True)
                 return True
             else:
                 self.logger.error("Raw data inspection failed")
@@ -2889,6 +2890,7 @@ class WorkflowRawDataInspectionManager:
             # Set skip trigger on success
             if result is not None:
                 self.logger.info("GCMS raw data inspection completed successfully.")
+                self.set_skip_trigger("raw_data_inspected", True)
                 return True
             else:
                 self.logger.error("GCMS raw data inspection failed")

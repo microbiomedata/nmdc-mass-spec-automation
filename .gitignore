@@ -17,3 +17,7 @@ __pycache__/
 # Testing and coverage reports
 htmlcov/
 .coverage
+.pytest_cache/
+
+# Integration test data (downloaded files)
+tests/integration/test_data/
