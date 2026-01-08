@@ -1796,8 +1796,9 @@ fi
         # Check if Docker is running
         self.logger.info("Checking Docker availability...")
         try:
+            docker_cmd = WorkflowRawDataInspectionManager._find_docker_command()
             docker_check = subprocess.run(
-                ["docker", "info"], capture_output=True, text=True, timeout=10
+                [docker_cmd, "info"], capture_output=True, text=True, timeout=10
             )
             if docker_check.returncode != 0:
                 self.logger.error("Docker is not running or not available")
@@ -1805,9 +1806,9 @@ fi
         except subprocess.TimeoutExpired:
             self.logger.error("Docker check timed out - Docker may not be running")
             return 1
-        except FileNotFoundError:
+        except FileNotFoundError as e:
             self.logger.error(
-                "Docker command not found - please install Docker Desktop"
+                f"Docker command not found - please install Docker Desktop: {e}"
             )
             return 1
         except Exception as e:
@@ -2393,6 +2394,42 @@ class WorkflowRawDataInspectionManager:
     Mixin class for managing raw data inspection using Docker containers.
     """
 
+    @staticmethod
+    def _find_docker_command():
+        """
+        Find the docker command in the system.
+        
+        Checks common locations and PATH to find docker executable.
+        This ensures docker can be found even when subprocess doesn't inherit
+        the full shell environment.
+        
+        Returns:
+            str: Path to docker executable
+            
+        Raises:
+            FileNotFoundError: If docker cannot be found
+        """
+        # Try to find docker using shutil.which (checks PATH)
+        docker_path = shutil.which('docker')
+        if docker_path:
+            return docker_path
+        
+        # Check common installation locations if not in PATH
+        common_locations = [
+            '/usr/local/bin/docker',
+            '/usr/bin/docker',
+            '/opt/homebrew/bin/docker',
+        ]
+        
+        for location in common_locations:
+            if Path(location).exists():
+                return location
+        
+        # If still not found, raise error
+        raise FileNotFoundError(
+            "Docker command not found. Please ensure Docker is installed and accessible."
+        )
+
     @skip_if_complete("raw_data_inspected", return_value=True)
     def raw_data_inspector(
         self, file_paths=None, cores=1, limit=None, max_retries=10, retry_delay=10.0
@@ -2652,13 +2689,14 @@ class WorkflowRawDataInspectionManager:
 
         # Check if Docker is available
         try:
+            docker_exe = self._find_docker_command()
             docker_check = subprocess.run(
-                ["docker", "--version"], capture_output=True, text=True, timeout=10
+                [docker_exe, "--version"], capture_output=True, text=True, timeout=10
             )
             if docker_check.returncode != 0:
                 raise RuntimeError("Docker is not available")
-        except (subprocess.TimeoutExpired, FileNotFoundError):
-            raise RuntimeError("Docker is not installed or not available")
+        except (subprocess.TimeoutExpired, FileNotFoundError) as e:
+            raise RuntimeError(f"Docker is not installed or not available: {e}")
 
         # Get script path
         script_path = Path(__file__).parent / "raw_data_inspector.py"
@@ -2736,7 +2774,7 @@ class WorkflowRawDataInspectionManager:
         # Build Docker command
         docker_cmd = (
             [
-                "docker",
+                docker_exe,
                 "run",
                 "--rm",
                 "--user",
@@ -2925,13 +2963,14 @@ class WorkflowRawDataInspectionManager:
 
         # Check if Docker is available
         try:
+            docker_exe = self._find_docker_command()
             docker_check = subprocess.run(
-                ["docker", "--version"], capture_output=True, text=True, timeout=10
+                [docker_exe, "--version"], capture_output=True, text=True, timeout=10
             )
             if docker_check.returncode != 0:
                 raise RuntimeError("Docker is not available")
-        except (subprocess.TimeoutExpired, FileNotFoundError):
-            raise RuntimeError("Docker is not installed or not available")
+        except (subprocess.TimeoutExpired, FileNotFoundError) as e:
+            raise RuntimeError(f"Docker is not installed or not available: {e}")
 
         # Prepare volume mounts
         mount_points = set()
@@ -2981,7 +3020,7 @@ class WorkflowRawDataInspectionManager:
         # Build Docker command
         docker_cmd = (
             [
-                "docker",
+                docker_exe,
                 "run",
                 "--rm",
                 "--user",

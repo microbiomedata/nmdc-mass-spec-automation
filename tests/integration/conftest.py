@@ -8,19 +8,25 @@ import pytest
 from pathlib import Path
 import requests
 import hashlib
+import os
 
 
 # Integration tests can be marked with @pytest.mark.slow or @pytest.mark.network
 # for finer-grained control in CI/CD
 
 def pytest_configure(config):
-    """Register integration-specific markers."""
+    """Register integration-specific markers and ensure Docker is in PATH."""
     config.addinivalue_line(
         "markers", "slow: marks tests as slow (deselect with '-m \"not slow\"')"
     )
     config.addinivalue_line(
         "markers", "network: marks tests as requiring network access"
     )
+    
+    # Ensure /usr/local/bin is in PATH for Docker (macOS/Linux)
+    current_path = os.environ.get('PATH', '')
+    if '/usr/local/bin' not in current_path:
+        os.environ['PATH'] = f"/usr/local/bin:{current_path}"
 
 
 @pytest.fixture(scope="session")
@@ -233,6 +239,10 @@ def integration_lcms_config(tmp_path):
             {
                 "name": "rp_pos",
                 "file_filter": ["C18", "_POS_"],
+                "corems_toml": "workflow_inputs/metams_rp_corems.toml",
+                "reference_db": "workflow_inputs/20250407_database.msp",
+                "scan_translator": "workflow_inputs/metams_jgi_scan_translator.toml",
+                "cores": 1,
                 "chromat_configuration_name": "JGI/LBNL Metabolomics Standard LC Method - Nonpolar C18",
                 "mass_spec_configuration_name": "JGI/LBNL Standard Metabolomics Method, positive",
                 "metadata_overrides": {
@@ -245,6 +255,10 @@ def integration_lcms_config(tmp_path):
             {
                 "name": "rp_neg",
                 "file_filter": ["C18", "_NEG_"],
+                "corems_toml": "workflow_inputs/metams_rp_corems.toml",
+                "reference_db": "workflow_inputs/20250407_database.msp",
+                "scan_translator": "workflow_inputs/metams_jgi_scan_translator.toml",
+                "cores": 1,
                 "chromat_configuration_name": "JGI/LBNL Metabolomics Standard LC Method - Nonpolar C18",
                 "mass_spec_configuration_name": "JGI/LBNL Standard Metabolomics Method, negative",
                 "metadata_overrides": {
@@ -312,6 +326,8 @@ def integration_gcms_config(tmp_path):
         "configurations": [
             {
                 "name": "gcms",
+                "corems_toml": "workflow_inputs/metams_gcms_corems.toml",
+                "cores": 1,
                 "chromat_configuration_name": "EMSL_Agilent_GC",
                 "mass_spec_configuration_name": "Agilent_5977_MSD"
             }

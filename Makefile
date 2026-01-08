@@ -4,6 +4,9 @@
 PYTHON := $(shell if [ -f venv/bin/python ]; then echo venv/bin/python; else echo python; fi)
 PYTEST := $(PYTHON) -m pytest
 
+# Ensure /usr/local/bin is in PATH for Docker
+export PATH := /usr/local/bin:$(PATH)
+
 # Default target
 help:
 	@echo "Available targets:"

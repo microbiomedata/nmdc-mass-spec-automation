@@ -30,19 +30,6 @@ class TestWorkflowRawDataInspectionManagerIntegration:
         """
         from nmdc_dp_utils.workflow_manager import NMDCWorkflowManager
         
-        # Check if Docker is available before attempting test
-        try:
-            docker_check = subprocess.run(
-                ["docker", "--version"],
-                capture_output=True,
-                text=True,
-                timeout=10
-            )
-            if docker_check.returncode != 0:
-                pytest.skip("Docker is not available")
-        except (subprocess.TimeoutExpired, FileNotFoundError):
-            pytest.skip("Docker is not installed or not available")
-        
         # Create manager
         manager = NMDCWorkflowManager(str(integration_config_file))
         
@@ -114,19 +101,6 @@ class TestWorkflowRawDataInspectionManagerIntegration:
         Integration test: Verify inspector handles non-existent files gracefully.
         """
         from nmdc_dp_utils.workflow_manager import NMDCWorkflowManager
-        
-        # Check Docker availability
-        try:
-            docker_check = subprocess.run(
-                ["docker", "--version"],
-                capture_output=True,
-                text=True,
-                timeout=10
-            )
-            if docker_check.returncode != 0:
-                pytest.skip("Docker is not available")
-        except (subprocess.TimeoutExpired, FileNotFoundError):
-            pytest.skip("Docker is not installed")
         
         manager = NMDCWorkflowManager(str(integration_config_file))
         
@@ -204,19 +178,6 @@ class TestWorkflowRawDataInspectionManagerIntegration:
         """
         from nmdc_dp_utils.workflow_manager import NMDCWorkflowManager
         import json
-        
-        # Check if Docker is available
-        try:
-            docker_check = subprocess.run(
-                ["docker", "--version"],
-                capture_output=True,
-                text=True,
-                timeout=10
-            )
-            if docker_check.returncode != 0:
-                pytest.skip("Docker is not available")
-        except (subprocess.TimeoutExpired, FileNotFoundError):
-            pytest.skip("Docker is not installed or not available")
         
         # Create GCMS workflow config
         gcms_config = {
