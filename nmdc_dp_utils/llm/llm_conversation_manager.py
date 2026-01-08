@@ -4,6 +4,7 @@ They need to persist across multiple calls to the LLM API.
 An instance of this class will need to be created for each conversation.
 """
 from llm_protocol_context.instructions import system_prompt as PROTOCOL_SYSTEM_PROMPT
+import yaml
 
 class ConversationManager:
     """
@@ -46,8 +47,13 @@ class ConversationManager:
         """
         Add the currated description -> YAML examples to the context.
         """
-        dir = []
-        for example in dir: 
+        dirs = ["nmdc_dp_utils/llm/llm_protocol_context/example_1", "nmdc_dp_utils/llm/llm_protocol_context/example_2", "nmdc_dp_utils/llm/llm_protocol_context/example_3"]
+        for dir in dirs: 
+            with open(f"{dir}/extracted_text.txt", "r") as f:
+                example = f.read()
+            with open(f"{dir}/combined_outline.yaml", "r") as f:
+                yaml = f.read()
             self.add_message(role="system", content="Here is an example of a lab protocol description that was translated to YAML:\n" + example )
+            self.add_message(role="system", content="Here is the corresponding YAML outline:\n" + yaml )
 
     

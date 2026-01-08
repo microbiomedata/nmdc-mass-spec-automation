@@ -21,7 +21,7 @@ async def get_llm_yaml_outline(llm_client:LLMClient, conversation_obj:Conversati
 
 if __name__ == "__main__":
     # read in the protocol description
-    protocol_description_path = "path/to/description"
+    protocol_description_path = "nmdc_dp_utils/llm/llm_protocol_context/example_4/extracted_text.txt"
     with open(protocol_description_path, "r") as f:
         protocol_description = f.read()
 
@@ -31,6 +31,12 @@ if __name__ == "__main__":
     conversation_obj = ConversationManager(interaction_type="protocol_conversion")
     # use the converation obj to add the protocol decsription
     conversation_obj.add_protocol_description(description=protocol_description)
+    conversation_obj.add_protocol_desc_and_json_examples()
     response = asyncio.run(get_llm_yaml_outline(llm_client=llm_client, conversation_obj=conversation_obj))
+    # save as yaml 
+    output_path = "nmdc_dp_utils/llm/llm_protocol_context/example_4/llm_generated_outline.yaml"
+    with open(output_path, "w") as f:
+        f.write(response)
+    print(f"LLM generated YAML outline saved to: {output_path}")
 
 
