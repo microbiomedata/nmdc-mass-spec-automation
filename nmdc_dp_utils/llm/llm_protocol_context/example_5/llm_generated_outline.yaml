@@ -1,0 +1,1264 @@
+lcms_swabs:
+  steps:
+    - Step 1_lcms_swabs:
+        Extraction:
+          id: # nmdc:extrp-{shoulder}-{blade}
+          type: nmdc:Extraction
+          name: Swab Metabolite Extraction
+          description: Swabs from <Biosample> dissolved in ethanol/water with ultrasonic bath for metabolite extraction
+          has_input:
+            - Biosample
+          has_output:
+            - ProcessedSample1_lcms_swabs
+          processing_institution: University of California San Diego
+          substances_used:
+            - type: nmdc:PortionOfSubstance
+              known_as: ethanol
+              substance_role: solvent
+              volume:
+                type: nmdc:QuantityValue
+                has_raw_value: 0.9 mL
+                has_unit: mL
+                has_numeric_value: 0.9
+            - type: nmdc:PortionOfSubstance
+              known_as: water
+              substance_role: solvent
+              volume:
+                type: nmdc:QuantityValue
+                has_raw_value: 0.1 mL
+                has_unit: mL
+                has_numeric_value: 0.1
+
+    - Step 2_lcms_swabs:
+        DryingProcess:
+          id: # nmdc:drypr-{shoulder}-{blade}
+          type: nmdc:DryingProcess
+          name: Dry Swab Metabolite Extract
+          description: Drying of <ProcessedSample1_lcms_swabs> using a vacuum concentrator
+          has_input:
+            - ProcessedSample1_lcms_swabs
+          has_output:
+            - ProcessedSample2_lcms_swabs
+          processing_institution: University of California San Diego
+          drying_method: vacuum_drying
+
+    - Step 3_lcms_swabs:
+        DissolvingProcess:
+          id: # nmdc:dispr-{shoulder}-{blade}
+          type: nmdc:DissolvingProcess
+          name: Resuspension for SPE (Swabs)
+          description: Redissolving dried <ProcessedSample2_lcms_swabs> in methanol/water for solid phase microextraction
+          has_input:
+            - ProcessedSample2_lcms_swabs
+          has_output:
+            - ProcessedSample3_lcms_swabs
+          processing_institution: University of California San Diego
+          substances_used:
+            - type: nmdc:PortionOfSubstance
+              known_as: methanol
+              substance_role: solvent
+              volume:
+                type: nmdc:QuantityValue
+                has_raw_value: 0.21 mL
+                has_unit: mL
+                has_numeric_value: 0.21
+            - type: nmdc:PortionOfSubstance
+              known_as: water
+              substance_role: solvent
+              volume:
+                type: nmdc:QuantityValue
+                has_raw_value: 0.09 mL
+                has_unit: mL
+                has_numeric_value: 0.09
+
+    - Step 4_lcms_swabs:
+        ChromatographicSeparationProcess:
+          id: # nmdc:cspro-{shoulder}-{blade}
+          type: nmdc:ChromatographicSeparationProcess
+          name: Solid Phase Extraction (Swabs)
+          description: Solid phase extraction of <ProcessedSample3_lcms_swabs> using Oasis HLB to remove salts and extreme compounds
+          has_input:
+            - ProcessedSample3_lcms_swabs
+          has_output:
+            - ProcessedSample4_lcms_swabs
+          processing_institution: University of California San Diego
+          chromatographic_category: solid_phase_extraction
+          stationary_phase: Oasis HLB
+          ordered_mobile_phases:
+            - type: nmdc:MobilePhaseSegment
+              substances_used:
+                - type: nmdc:PortionOfSubstance
+                  known_as: methanol
+                  substance_role: solvent
+            - type: nmdc:MobilePhaseSegment
+              substances_used:
+                - type: nmdc:PortionOfSubstance
+                  known_as: water
+                  substance_role: solvent
+            - type: nmdc:MobilePhaseSegment
+              substances_used:
+                - type: nmdc:PortionOfSubstance
+                  known_as: water
+                  substance_role: solvent
+                  volume:
+                    type: nmdc:QuantityValue
+                    has_raw_value: 600 µL
+                    has_unit: µL
+                    has_numeric_value: 600
+            - type: nmdc:MobilePhaseSegment
+              substances_used:
+                - type: nmdc:PortionOfSubstance
+                  known_as: methanol
+                  substance_role: solvent
+                  volume:
+                    type: nmdc:QuantityValue
+                    has_raw_value: 0.42 mL
+                    has_unit: mL
+                    has_numeric_value: 0.42
+                - type: nmdc:PortionOfSubstance
+                  known_as: water
+                  substance_role: solvent
+                  volume:
+                    type: nmdc:QuantityValue
+                    has_raw_value: 0.18 mL
+                    has_unit: mL
+                    has_numeric_value: 0.18
+            - type: nmdc:MobilePhaseSegment
+              substances_used:
+                - type: nmdc:PortionOfSubstance
+                  known_as: methanol
+                  substance_role: solvent
+                  volume:
+                    type: nmdc:QuantityValue
+                    has_raw_value: 600 µL
+                    has_unit: µL
+                    has_numeric_value: 600
+
+    - Step 5_lcms_swabs:
+        DryingProcess:
+          id: # nmdc:drypr-{shoulder}-{blade}
+          type: nmdc:DryingProcess
+          name: Dry SPE Eluate (Swabs)
+          description: Drying of <ProcessedSample4_lcms_swabs> after solid phase extraction using a vacuum concentrator
+          has_input:
+            - ProcessedSample4_lcms_swabs
+          has_output:
+            - ProcessedSample5_lcms_swabs
+          processing_institution: University of California San Diego
+          drying_method: vacuum_drying
+
+    - Step 6_lcms_swabs:
+        DissolvingProcess:
+          id: # nmdc:dispr-{shoulder}-{blade}
+          type: nmdc:DissolvingProcess
+          name: Resuspension for LC-MS Analysis (Swabs)
+          description: Resuspending dried <ProcessedSample5_lcms_swabs> in methanol/water with internal standard for LC-MS analysis
+          has_input:
+            - ProcessedSample5_lcms_swabs
+          has_output:
+            - ProcessedSample6_lcms_swabs
+          processing_institution: University of California San Diego
+          substances_used:
+            - type: nmdc:PortionOfSubstance
+              known_as: methanol
+              substance_role: solvent
+              volume:
+                type: nmdc:QuantityValue
+                has_raw_value: 0.091 mL
+                has_unit: mL
+                has_numeric_value: 0.091
+            - type: nmdc:PortionOfSubstance
+              known_as: water
+              substance_role: solvent
+              volume:
+                type: nmdc:QuantityValue
+                has_raw_value: 0.039 mL
+                has_unit: mL
+                has_numeric_value: 0.039
+            - type: nmdc:PortionOfSubstance
+              known_as: amitriptyline
+              substance_role: internal_standard
+              final_concentration:
+                type: nmdc:QuantityValue
+                has_raw_value: 0.2 µM
+                has_unit: µM
+                has_numeric_value: 0.2
+
+  processedsamples:
+    - ProcessedSample1_lcms_swabs:
+        ProcessedSample:
+          id: #nmdc:
+          type: nmdc:ProcessedSample
+          name: <Biosample>_swab_extract
+          description: Metabolite extract from <Biosample> swabs after initial extraction
+          sampled_portion: aqueous_layer
+    - ProcessedSample2_lcms_swabs:
+        ProcessedSample:
+          id: #nmdc:
+          type: nmdc:ProcessedSample
+          name: <Biosample>_dried_swab_extract
+          description: Dried metabolite extract from <Biosample> swabs
+    - ProcessedSample3_lcms_swabs:
+        ProcessedSample:
+          id: #nmdc:
+          type: nmdc:ProcessedSample
+          name: <Biosample>_spe_resuspension
+          description: Resuspended dried extract from <Biosample> swabs, prepared for SPE
+          sampled_portion: aqueous_layer
+    - ProcessedSample4_lcms_swabs:
+        ProcessedSample:
+          id: #nmdc:
+          type: nmdc:ProcessedSample
+          name: <Biosample>_spe_eluate
+          description: Eluate containing metabolites after solid phase extraction of <Biosample> swab extract
+          sampled_portion: aqueous_layer
+    - ProcessedSample5_lcms_swabs:
+        ProcessedSample:
+          id: #nmdc:
+          type: nmdc:ProcessedSample
+          name: <Biosample>_dried_spe_eluate
+          description: Dried SPE eluate from <Biosample> swab extract
+    - ProcessedSample6_lcms_swabs:
+        ProcessedSample:
+          id: #nmdc:
+          type: nmdc:ProcessedSample
+          name: <Biosample>_lcms_ready
+          description: Resuspended and internal standard-spiked sample from <Biosample> swabs, ready for LC-MS analysis
+          sampled_portion: aqueous_layer
+
+lcms_filters:
+  steps:
+    - Step 1_lcms_filters:
+        Extraction:
+          id: # nmdc:extrp-{shoulder}-{blade}
+          type: nmdc:Extraction
+          name: Filter Metabolite Extraction
+          description: Filter samples from <Biosample> dissolved in methanol/water with ultrasonic bath for metabolite extraction
+          has_input:
+            - Biosample
+          has_output:
+            - ProcessedSample1_lcms_filters
+          processing_institution: University of California San Diego
+          substances_used:
+            - type: nmdc:PortionOfSubstance
+              known_as: methanol
+              substance_role: solvent
+              volume:
+                type: nmdc:QuantityValue
+                has_raw_value: 1.05 mL
+                has_unit: mL
+                has_numeric_value: 1.05
+            - type: nmdc:PortionOfSubstance
+              known_as: water
+              substance_role: solvent
+              volume:
+                type: nmdc:QuantityValue
+                has_raw_value: 0.45 mL
+                has_unit: mL
+                has_numeric_value: 0.45
+
+    - Step 2_lcms_filters:
+        DryingProcess:
+          id: # nmdc:drypr-{shoulder}-{blade}
+          type: nmdc:DryingProcess
+          name: Dry Filter Metabolite Extract
+          description: Drying of <ProcessedSample1_lcms_filters> using a vacuum concentrator
+          has_input:
+            - ProcessedSample1_lcms_filters
+          has_output:
+            - ProcessedSample2_lcms_filters
+          processing_institution: University of California San Diego
+          drying_method: vacuum_drying
+
+    - Step 3_lcms_filters:
+        DissolvingProcess:
+          id: # nmdc:dispr-{shoulder}-{blade}
+          type: nmdc:DissolvingProcess
+          name: Resuspension for SPE (Filters)
+          description: Redissolving dried <ProcessedSample2_lcms_filters> in methanol/water for solid phase microextraction
+          has_input:
+            - ProcessedSample2_lcms_filters
+          has_output:
+            - ProcessedSample3_lcms_filters
+          processing_institution: University of California San Diego
+          substances_used:
+            - type: nmdc:PortionOfSubstance
+              known_as: methanol
+              substance_role: solvent
+              volume:
+                type: nmdc:QuantityValue
+                has_raw_value: 0.21 mL
+                has_unit: mL
+                has_numeric_value: 0.21
+            - type: nmdc:PortionOfSubstance
+              known_as: water
+              substance_role: solvent
+              volume:
+                type: nmdc:QuantityValue
+                has_raw_value: 0.09 mL
+                has_unit: mL
+                has_numeric_value: 0.09
+
+    - Step 4_lcms_filters:
+        ChromatographicSeparationProcess:
+          id: # nmdc:cspro-{shoulder}-{blade}
+          type: nmdc:ChromatographicSeparationProcess
+          name: Solid Phase Extraction (Filters)
+          description: Solid phase extraction of <ProcessedSample3_lcms_filters> using Oasis HLB to remove salts and extreme compounds
+          has_input:
+            - ProcessedSample3_lcms_filters
+          has_output:
+            - ProcessedSample4_lcms_filters
+          processing_institution: University of California San Diego
+          chromatographic_category: solid_phase_extraction
+          stationary_phase: Oasis HLB
+          ordered_mobile_phases:
+            - type: nmdc:MobilePhaseSegment
+              substances_used:
+                - type: nmdc:PortionOfSubstance
+                  known_as: methanol
+                  substance_role: solvent
+            - type: nmdc:MobilePhaseSegment
+              substances_used:
+                - type: nmdc:PortionOfSubstance
+                  known_as: water
+                  substance_role: solvent
+            - type: nmdc:MobilePhaseSegment
+              substances_used:
+                - type: nmdc:PortionOfSubstance
+                  known_as: water
+                  substance_role: solvent
+                  volume:
+                    type: nmdc:QuantityValue
+                    has_raw_value: 600 µL
+                    has_unit: µL
+                    has_numeric_value: 600
+            - type: nmdc:MobilePhaseSegment
+              substances_used:
+                - type: nmdc:PortionOfSubstance
+                  known_as: methanol
+                  substance_role: solvent
+                  volume:
+                    type: nmdc:QuantityValue
+                    has_raw_value: 0.42 mL
+                    has_unit: mL
+                    has_numeric_value: 0.42
+                - type: nmdc:PortionOfSubstance
+                  known_as: water
+                  substance_role: solvent
+                  volume:
+                    type: nmdc:QuantityValue
+                    has_raw_value: 0.18 mL
+                    has_unit: mL
+                    has_numeric_value: 0.18
+            - type: nmdc:MobilePhaseSegment
+              substances_used:
+                - type: nmdc:PortionOfSubstance
+                  known_as: methanol
+                  substance_role: solvent
+                  volume:
+                    type: nmdc:QuantityValue
+                    has_raw_value: 600 µL
+                    has_unit: µL
+                    has_numeric_value: 600
+
+    - Step 5_lcms_filters:
+        DryingProcess:
+          id: # nmdc:drypr-{shoulder}-{blade}
+          type: nmdc:DryingProcess
+          name: Dry SPE Eluate (Filters)
+          description: Drying of <ProcessedSample4_lcms_filters> after solid phase extraction using a vacuum concentrator
+          has_input:
+            - ProcessedSample4_lcms_filters
+          has_output:
+            - ProcessedSample5_lcms_filters
+          processing_institution: University of California San Diego
+          drying_method: vacuum_drying
+
+    - Step 6_lcms_filters:
+        DissolvingProcess:
+          id: # nmdc:dispr-{shoulder}-{blade}
+          type: nmdc:DissolvingProcess
+          name: Resuspension for LC-MS Analysis (Filters)
+          description: Resuspending dried <ProcessedSample5_lcms_filters> in methanol/water with internal standard for LC-MS analysis
+          has_input:
+            - ProcessedSample5_lcms_filters
+          has_output:
+            - ProcessedSample6_lcms_filters
+          processing_institution: University of California San Diego
+          substances_used:
+            - type: nmdc:PortionOfSubstance
+              known_as: methanol
+              substance_role: solvent
+              volume:
+                type: nmdc:QuantityValue
+                has_raw_value: 0.091 mL
+                has_unit: mL
+                has_numeric_value: 0.091
+            - type: nmdc:PortionOfSubstance
+              known_as: water
+              substance_role: solvent
+              volume:
+                type: nmdc:QuantityValue
+                has_raw_value: 0.039 mL
+                has_unit: mL
+                has_numeric_value: 0.039
+            - type: nmdc:PortionOfSubstance
+              known_as: amitriptyline
+              substance_role: internal_standard
+              final_concentration:
+                type: nmdc:QuantityValue
+                has_raw_value: 0.2 µM
+                has_unit: µM
+                has_numeric_value: 0.2
+
+  processedsamples:
+    - ProcessedSample1_lcms_filters:
+        ProcessedSample:
+          id: #nmdc:
+          type: nmdc:ProcessedSample
+          name: <Biosample>_filter_extract
+          description: Metabolite extract from <Biosample> filter samples after initial extraction
+          sampled_portion: aqueous_layer
+    - ProcessedSample2_lcms_filters:
+        ProcessedSample:
+          id: #nmdc:
+          type: nmdc:ProcessedSample
+          name: <Biosample>_dried_filter_extract
+          description: Dried metabolite extract from <Biosample> filter samples
+    - ProcessedSample3_lcms_filters:
+        ProcessedSample:
+          id: #nmdc:
+          type: nmdc:ProcessedSample
+          name: <Biosample>_spe_resuspension
+          description: Resuspended dried extract from <Biosample> filter samples, prepared for SPE
+          sampled_portion: aqueous_layer
+    - ProcessedSample4_lcms_filters:
+        ProcessedSample:
+          id: #nmdc:
+          type: nmdc:ProcessedSample
+          name: <Biosample>_spe_eluate
+          description: Eluate containing metabolites after solid phase extraction of <Biosample> filter extract
+          sampled_portion: aqueous_layer
+    - ProcessedSample5_lcms_filters:
+        ProcessedSample:
+          id: #nmdc:
+          type: nmdc:ProcessedSample
+          name: <Biosample>_dried_spe_eluate
+          description: Dried SPE eluate from <Biosample> filter extract
+    - ProcessedSample6_lcms_filters:
+        ProcessedSample:
+          id: #nmdc:
+          type: nmdc:ProcessedSample
+          name: <Biosample>_lcms_ready
+          description: Resuspended and internal standard-spiked sample from <Biosample> filter samples, ready for LC-MS analysis
+          sampled_portion: aqueous_layer
+
+lcms_bulk:
+  steps:
+    - Step 1_lcms_bulk:
+        CellLysisProcess:
+          id: # nmdc:clprs-{shoulder}-{blade}
+          type: nmdc:CellLysisProcess
+          name: Bulk Sample Homogenization
+          description: Homogenizing <Biosample> bulk samples using a tissue-lyser
+          has_input:
+            - Biosample
+          has_output:
+            - ProcessedSample1_lcms_bulk
+          processing_institution: University of California San Diego
+          cell_lysis_method: mechanical_lysis
+
+    - Step 2_lcms_bulk:
+        Extraction:
+          id: # nmdc:extrp-{shoulder}-{blade}
+          type: nmdc:Extraction
+          name: Bulk Sample Metabolite Extraction
+          description: Extracting metabolites from homogenized <ProcessedSample1_lcms_bulk> with methanol/water
+          has_input:
+            - ProcessedSample1_lcms_bulk
+          has_output:
+            - ProcessedSample2_lcms_bulk
+          processing_institution: University of California San Diego
+          substances_used:
+            - type: nmdc:PortionOfSubstance
+              known_as: methanol
+              substance_role: solvent
+              volume:
+                type: nmdc:QuantityValue
+                has_minimum_numeric_value: 0.42
+                has_maximum_numeric_value: 1.05
+                has_unit: mL
+            - type: nmdc:PortionOfSubstance
+              known_as: water
+              substance_role: solvent
+              volume:
+                type: nmdc:QuantityValue
+                has_minimum_numeric_value: 0.18
+                has_maximum_numeric_value: 0.45
+                has_unit: mL
+
+    - Step 3_lcms_bulk:
+        DryingProcess:
+          id: # nmdc:drypr-{shoulder}-{blade}
+          type: nmdc:DryingProcess
+          name: Dry Bulk Metabolite Extract
+          description: Drying of <ProcessedSample2_lcms_bulk> using a vacuum concentrator
+          has_input:
+            - ProcessedSample2_lcms_bulk
+          has_output:
+            - ProcessedSample3_lcms_bulk
+          processing_institution: University of California San Diego
+          drying_method: vacuum_drying
+
+    - Step 4_lcms_bulk:
+        DissolvingProcess:
+          id: # nmdc:dispr-{shoulder}-{blade}
+          type: nmdc:DissolvingProcess
+          name: Resuspension for SPE (Bulk)
+          description: Redissolving dried <ProcessedSample3_lcms_bulk> in methanol/water for solid phase microextraction
+          has_input:
+            - ProcessedSample3_lcms_bulk
+          has_output:
+            - ProcessedSample4_lcms_bulk
+          processing_institution: University of California San Diego
+          substances_used:
+            - type: nmdc:PortionOfSubstance
+              known_as: methanol
+              substance_role: solvent
+              volume:
+                type: nmdc:QuantityValue
+                has_raw_value: 0.21 mL
+                has_unit: mL
+                has_numeric_value: 0.21
+            - type: nmdc:PortionOfSubstance
+              known_as: water
+              substance_role: solvent
+              volume:
+                type: nmdc:QuantityValue
+                has_raw_value: 0.09 mL
+                has_unit: mL
+                has_numeric_value: 0.09
+
+    - Step 5_lcms_bulk:
+        ChromatographicSeparationProcess:
+          id: # nmdc:cspro-{shoulder}-{blade}
+          type: nmdc:ChromatographicSeparationProcess
+          name: Solid Phase Extraction (Bulk)
+          description: Solid phase extraction of <ProcessedSample4_lcms_bulk> using Oasis HLB to remove salts and extreme compounds
+          has_input:
+            - ProcessedSample4_lcms_bulk
+          has_output:
+            - ProcessedSample5_lcms_bulk
+          processing_institution: University of California San Diego
+          chromatographic_category: solid_phase_extraction
+          stationary_phase: Oasis HLB
+          ordered_mobile_phases:
+            - type: nmdc:MobilePhaseSegment
+              substances_used:
+                - type: nmdc:PortionOfSubstance
+                  known_as: methanol
+                  substance_role: solvent
+            - type: nmdc:MobilePhaseSegment
+              substances_used:
+                - type: nmdc:PortionOfSubstance
+                  known_as: water
+                  substance_role: solvent
+            - type: nmdc:MobilePhaseSegment
+              substances_used:
+                - type: nmdc:PortionOfSubstance
+                  known_as: water
+                  substance_role: solvent
+                  volume:
+                    type: nmdc:QuantityValue
+                    has_raw_value: 600 µL
+                    has_unit: µL
+                    has_numeric_value: 600
+            - type: nmdc:MobilePhaseSegment
+              substances_used:
+                - type: nmdc:PortionOfSubstance
+                  known_as: methanol
+                  substance_role: solvent
+                  volume:
+                    type: nmdc:QuantityValue
+                    has_raw_value: 0.42 mL
+                    has_unit: mL
+                    has_numeric_value: 0.42
+                - type: nmdc:PortionOfSubstance
+                  known_as: water
+                  substance_role: solvent
+                  volume:
+                    type: nmdc:QuantityValue
+                    has_raw_value: 0.18 mL
+                    has_unit: mL
+                    has_numeric_value: 0.18
+            - type: nmdc:MobilePhaseSegment
+              substances_used:
+                - type: nmdc:PortionOfSubstance
+                  known_as: methanol
+                  substance_role: solvent
+                  volume:
+                    type: nmdc:QuantityValue
+                    has_raw_value: 600 µL
+                    has_unit: µL
+                    has_numeric_value: 600
+
+    - Step 6_lcms_bulk:
+        DryingProcess:
+          id: # nmdc:drypr-{shoulder}-{blade}
+          type: nmdc:DryingProcess
+          name: Dry SPE Eluate (Bulk)
+          description: Drying of <ProcessedSample5_lcms_bulk> after solid phase extraction using a vacuum concentrator
+          has_input:
+            - ProcessedSample5_lcms_bulk
+          has_output:
+            - ProcessedSample6_lcms_bulk
+          processing_institution: University of California San Diego
+          drying_method: vacuum_drying
+
+    - Step 7_lcms_bulk:
+        DissolvingProcess:
+          id: # nmdc:dispr-{shoulder}-{blade}
+          type: nmdc:DissolvingProcess
+          name: Resuspension for LC-MS Analysis (Bulk)
+          description: Resuspending dried <ProcessedSample6_lcms_bulk> in methanol/water with internal standard for LC-MS analysis
+          has_input:
+            - ProcessedSample6_lcms_bulk
+          has_output:
+            - ProcessedSample7_lcms_bulk
+          processing_institution: University of California San Diego
+          substances_used:
+            - type: nmdc:PortionOfSubstance
+              known_as: methanol
+              substance_role: solvent
+              volume:
+                type: nmdc:QuantityValue
+                has_raw_value: 0.091 mL
+                has_unit: mL
+                has_numeric_value: 0.091
+            - type: nmdc:PortionOfSubstance
+              known_as: water
+              substance_role: solvent
+              volume:
+                type: nmdc:QuantityValue
+                has_raw_value: 0.039 mL
+                has_unit: mL
+                has_numeric_value: 0.039
+            - type: nmdc:PortionOfSubstance
+              known_as: amitriptyline
+              substance_role: internal_standard
+              final_concentration:
+                type: nmdc:QuantityValue
+                has_raw_value: 0.2 µM
+                has_unit: µM
+                has_numeric_value: 0.2
+
+  processedsamples:
+    - ProcessedSample1_lcms_bulk:
+        ProcessedSample:
+          id: #nmdc:
+          type: nmdc:ProcessedSample
+          name: <Biosample>_homogenized_bulk
+          description: Homogenized <Biosample> bulk sample after tissue-lyser treatment
+    - ProcessedSample2_lcms_bulk:
+        ProcessedSample:
+          id: #nmdc:
+          type: nmdc:ProcessedSample
+          name: <Biosample>_bulk_extract
+          description: Metabolite extract from <Biosample> bulk samples after homogenization and extraction
+          sampled_portion: aqueous_layer
+    - ProcessedSample3_lcms_bulk:
+        ProcessedSample:
+          id: #nmdc:
+          type: nmdc:ProcessedSample
+          name: <Biosample>_dried_bulk_extract
+          description: Dried metabolite extract from <Biosample> bulk samples
+    - ProcessedSample4_lcms_bulk:
+        ProcessedSample:
+          id: #nmdc:
+          type: nmdc:ProcessedSample
+          name: <Biosample>_spe_resuspension
+          description: Resuspended dried extract from <Biosample> bulk samples, prepared for SPE
+          sampled_portion: aqueous_layer
+    - ProcessedSample5_lcms_bulk:
+        ProcessedSample:
+          id: #nmdc:
+          type: nmdc:ProcessedSample
+          name: <Biosample>_spe_eluate
+          description: Eluate containing metabolites after solid phase extraction of <Biosample> bulk extract
+          sampled_portion: aqueous_layer
+    - ProcessedSample6_lcms_bulk:
+        ProcessedSample:
+          id: #nmdc:
+          type: nmdc:ProcessedSample
+          name: <Biosample>_dried_spe_eluate
+          description: Dried SPE eluate from <Biosample> bulk extract
+    - ProcessedSample7_lcms_bulk:
+        ProcessedSample:
+          id: #nmdc:
+          type: nmdc:ProcessedSample
+          name: <Biosample>_lcms_ready
+          description: Resuspended and internal standard-spiked sample from <Biosample> bulk samples, ready for LC-MS analysis
+          sampled_portion: aqueous_layer
+
+lcms_controls:
+  steps:
+    - Step 1_lcms_controls:
+        Extraction:
+          id: # nmdc:extrp-{shoulder}-{blade}
+          type: nmdc:Extraction
+          name: Material Control Metabolite Extraction
+          description: Extraction of metabolites from <Biosample> material controls using methanol/water
+          has_input:
+            - Biosample
+          has_output:
+            - ProcessedSample1_lcms_controls
+          processing_institution: University of California San Diego
+          substances_used:
+            - type: nmdc:PortionOfSubstance
+              known_as: methanol
+              substance_role: solvent
+              volume:
+                type: nmdc:QuantityValue
+                has_raw_value: 0.6 mL
+                has_unit: mL
+                has_numeric_value: 0.6
+            - type: nmdc:PortionOfSubstance
+              known_as: water
+              substance_role: solvent
+              volume:
+                type: nmdc:QuantityValue
+                has_raw_value: 2.4 mL
+                has_unit: mL
+                has_numeric_value: 2.4
+
+    - Step 2_lcms_controls:
+        DryingProcess:
+          id: # nmdc:drypr-{shoulder}-{blade}
+          type: nmdc:DryingProcess
+          name: Dry Material Control Extract
+          description: Drying of <ProcessedSample1_lcms_controls> using a vacuum concentrator
+          has_input:
+            - ProcessedSample1_lcms_controls
+          has_output:
+            - ProcessedSample2_lcms_controls
+          processing_institution: University of California San Diego
+          drying_method: vacuum_drying
+
+    - Step 3_lcms_controls:
+        DissolvingProcess:
+          id: # nmdc:dispr-{shoulder}-{blade}
+          type: nmdc:DissolvingProcess
+          name: Resuspension for SPE (Material Controls)
+          description: Redissolving dried <ProcessedSample2_lcms_controls> in methanol/water for solid phase microextraction
+          has_input:
+            - ProcessedSample2_lcms_controls
+          has_output:
+            - ProcessedSample3_lcms_controls
+          processing_institution: University of California San Diego
+          substances_used:
+            - type: nmdc:PortionOfSubstance
+              known_as: methanol
+              substance_role: solvent
+              volume:
+                type: nmdc:QuantityValue
+                has_raw_value: 0.21 mL
+                has_unit: mL
+                has_numeric_value: 0.21
+            - type: nmdc:PortionOfSubstance
+              known_as: water
+              substance_role: solvent
+              volume:
+                type: nmdc:QuantityValue
+                has_raw_value: 0.09 mL
+                has_unit: mL
+                has_numeric_value: 0.09
+
+    - Step 4_lcms_controls:
+        ChromatographicSeparationProcess:
+          id: # nmdc:cspro-{shoulder}-{blade}
+          type: nmdc:ChromatographicSeparationProcess
+          name: Solid Phase Extraction (Material Controls)
+          description: Solid phase extraction of <ProcessedSample3_lcms_controls> using Oasis HLB to remove salts and extreme compounds
+          has_input:
+            - ProcessedSample3_lcms_controls
+          has_output:
+            - ProcessedSample4_lcms_controls
+          processing_institution: University of California San Diego
+          chromatographic_category: solid_phase_extraction
+          stationary_phase: Oasis HLB
+          ordered_mobile_phases:
+            - type: nmdc:MobilePhaseSegment
+              substances_used:
+                - type: nmdc:PortionOfSubstance
+                  known_as: methanol
+                  substance_role: solvent
+            - type: nmdc:MobilePhaseSegment
+              substances_used:
+                - type: nmdc:PortionOfSubstance
+                  known_as: water
+                  substance_role: solvent
+            - type: nmdc:MobilePhaseSegment
+              substances_used:
+                - type: nmdc:PortionOfSubstance
+                  known_as: water
+                  substance_role: solvent
+                  volume:
+                    type: nmdc:QuantityValue
+                    has_raw_value: 600 µL
+                    has_unit: µL
+                    has_numeric_value: 600
+            - type: nmdc:MobilePhaseSegment
+              substances_used:
+                - type: nmdc:PortionOfSubstance
+                  known_as: methanol
+                  substance_role: solvent
+                  volume:
+                    type: nmdc:QuantityValue
+                    has_raw_value: 0.42 mL
+                    has_unit: mL
+                    has_numeric_value: 0.42
+                - type: nmdc:PortionOfSubstance
+                  known_as: water
+                  substance_role: solvent
+                  volume:
+                    type: nmdc:QuantityValue
+                    has_raw_value: 0.18 mL
+                    has_unit: mL
+                    has_numeric_value: 0.18
+            - type: nmdc:MobilePhaseSegment
+              substances_used:
+                - type: nmdc:PortionOfSubstance
+                  known_as: methanol
+                  substance_role: solvent
+                  volume:
+                    type: nmdc:QuantityValue
+                    has_raw_value: 600 µL
+                    has_unit: µL
+                    has_numeric_value: 600
+
+    - Step 5_lcms_controls:
+        DryingProcess:
+          id: # nmdc:drypr-{shoulder}-{blade}
+          type: nmdc:DryingProcess
+          name: Dry SPE Eluate (Material Controls)
+          description: Drying of <ProcessedSample4_lcms_controls> after solid phase extraction using a vacuum concentrator
+          has_input:
+            - ProcessedSample4_lcms_controls
+          has_output:
+            - ProcessedSample5_lcms_controls
+          processing_institution: University of California San Diego
+          drying_method: vacuum_drying
+
+    - Step 6_lcms_controls:
+        DissolvingProcess:
+          id: # nmdc:dispr-{shoulder}-{blade}
+          type: nmdc:DissolvingProcess
+          name: Resuspension for LC-MS Analysis (Material Controls)
+          description: Resuspending dried <ProcessedSample5_lcms_controls> in methanol/water with internal standard for LC-MS analysis
+          has_input:
+            - ProcessedSample5_lcms_controls
+          has_output:
+            - ProcessedSample6_lcms_controls
+          processing_institution: University of California San Diego
+          substances_used:
+            - type: nmdc:PortionOfSubstance
+              known_as: methanol
+              substance_role: solvent
+              volume:
+                type: nmdc:QuantityValue
+                has_raw_value: 0.091 mL
+                has_unit: mL
+                has_numeric_value: 0.091
+            - type: nmdc:PortionOfSubstance
+              known_as: water
+              substance_role: solvent
+              volume:
+                type: nmdc:QuantityValue
+                has_raw_value: 0.039 mL
+                has_unit: mL
+                has_numeric_value: 0.039
+            - type: nmdc:PortionOfSubstance
+              known_as: amitriptyline
+              substance_role: internal_standard
+              final_concentration:
+                type: nmdc:QuantityValue
+                has_raw_value: 0.2 µM
+                has_unit: µM
+                has_numeric_value: 0.2
+
+  processedsamples:
+    - ProcessedSample1_lcms_controls:
+        ProcessedSample:
+          id: #nmdc:
+          type: nmdc:ProcessedSample
+          name: <Biosample>_material_control_extract
+          description: Metabolite extract from <Biosample> material controls after initial extraction
+          sampled_portion: aqueous_layer
+    - ProcessedSample2_lcms_controls:
+        ProcessedSample:
+          id: #nmdc:
+          type: nmdc:ProcessedSample
+          name: <Biosample>_dried_material_control_extract
+          description: Dried metabolite extract from <Biosample> material controls
+    - ProcessedSample3_lcms_controls:
+        ProcessedSample:
+          id: #nmdc:
+          type: nmdc:ProcessedSample
+          name: <Biosample>_spe_resuspension
+          description: Resuspended dried extract from <Biosample> material controls, prepared for SPE
+          sampled_portion: aqueous_layer
+    - ProcessedSample4_lcms_controls:
+        ProcessedSample:
+          id: #nmdc:
+          type: nmdc:ProcessedSample
+          name: <Biosample>_spe_eluate
+          description: Eluate containing metabolites after solid phase extraction of <Biosample> material control extract
+          sampled_portion: aqueous_layer
+    - ProcessedSample5_lcms_controls:
+        ProcessedSample:
+          id: #nmdc:
+          type: nmdc:ProcessedSample
+          name: <Biosample>_dried_spe_eluate
+          description: Dried SPE eluate from <Biosample> material control extract
+    - ProcessedSample6_lcms_controls:
+        ProcessedSample:
+          id: #nmdc:
+          type: nmdc:ProcessedSample
+          name: <Biosample>_lcms_ready
+          description: Resuspended and internal standard-spiked sample from <Biosample> material controls, ready for LC-MS analysis
+          sampled_portion: aqueous_layer
+
+gcms_soil:
+  steps:
+    - Step 1_gcms_soil:
+        CellLysisProcess:
+          id: # nmdc:clprs-{shoulder}-{blade}
+          type: nmdc:CellLysisProcess
+          name: Soil Sample Subsampling and Lysis
+          description: Subsampling and lysing <Biosample> soil with water and beads using a tissue-lyser
+          has_input:
+            - Biosample
+          has_output:
+            - ProcessedSample1_gcms_soil
+          processing_institution: Pacific Northwest National Laboratory
+          cell_lysis_method: mechanical_lysis
+          substances_used:
+            - type: nmdc:PortionOfSubstance
+              known_as: water
+              substance_role: solvent
+              volume:
+                type: nmdc:QuantityValue
+                has_raw_value: 2 mL
+                has_unit: mL
+                has_numeric_value: 2
+
+    - Step 2_gcms_soil:
+        Extraction:
+          id: # nmdc:extrp-{shoulder}-{blade}
+          type: nmdc:Extraction
+          name: Chloroform-Methanol Extraction (Soil)
+          description: Metabolite extraction from <ProcessedSample1_gcms_soil> using chloroform and methanol, followed by phase separation and drying
+          has_input:
+            - ProcessedSample1_gcms_soil
+          has_output:
+            - ProcessedSample2_gcms_soil
+          processing_institution: Pacific Northwest National Laboratory
+          substances_used:
+            - type: nmdc:PortionOfSubstance
+              known_as: chloroform
+              substance_role: solvent
+              volume:
+                type: nmdc:QuantityValue
+                has_raw_value: 6.67 mL
+                has_unit: mL
+                has_numeric_value: 6.67
+            - type: nmdc:PortionOfSubstance
+              known_as: methanol
+              substance_role: solvent
+              volume:
+                type: nmdc:QuantityValue
+                has_raw_value: 3.33 mL
+                has_unit: mL
+                has_numeric_value: 3.33
+
+    - Step 3_gcms_soil:
+        DissolvingProcess:
+          id: # nmdc:dispr-{shoulder}-{blade}
+          type: nmdc:DissolvingProcess
+          name: Extract Resuspension and Cleanup (Soil)
+          description: Resuspending dried <ProcessedSample2_gcms_soil> in chloroform/methanol, centrifuging to remove debris, and drying again
+          has_input:
+            - ProcessedSample2_gcms_soil
+          has_output:
+            - ProcessedSample3_gcms_soil
+          processing_institution: Pacific Northwest National Laboratory
+          substances_used:
+            - type: nmdc:PortionOfSubstance
+              known_as: chloroform
+              substance_role: solvent
+              volume:
+                type: nmdc:QuantityValue
+                has_raw_value: 0.67 mL
+                has_unit: mL
+                has_numeric_value: 0.67
+            - type: nmdc:PortionOfSubstance
+              known_as: methanol
+              substance_role: solvent
+              volume:
+                type: nmdc:QuantityValue
+                has_raw_value: 0.33 mL
+                has_unit: mL
+                has_numeric_value: 0.33
+
+    - Step 4_gcms_soil:
+        DerivatizationProcess:
+          id: # nmdc:dervp-{shoulder}-{blade}
+          type: nmdc:DerivatizationProcess
+          name: Methoxyamination Derivatization (Soil)
+          description: Performing methoxyamination on <ProcessedSample3_gcms_soil> to protect ketones and aldehydes
+          has_input:
+            - ProcessedSample3_gcms_soil
+          has_output:
+            - ProcessedSample4_gcms_soil
+          processing_institution: Pacific Northwest National Laboratory
+          substances_used:
+            - type: nmdc:PortionOfSubstance
+              known_as: methoxyamine
+              substance_role: reactant
+              source_concentration:
+                type: nmdc:QuantityValue
+                has_raw_value: 30 mg/mL
+                has_unit: mg/mL
+                has_numeric_value: 30
+            - type: nmdc:PortionOfSubstance
+              known_as: pyridine
+              substance_role: solvent
+          volume:
+            type: nmdc:QuantityValue
+            has_raw_value: 20 µL
+            has_unit: µL
+            has_numeric_value: 20
+
+    - Step 5_gcms_soil:
+        DerivatizationProcess:
+          id: # nmdc:dervp-{shoulder}-{blade}
+          type: nmdc:DerivatizationProcess
+          name: Trimethylsilylation Derivatization (Soil)
+          description: Performing trimethylsilylation on <ProcessedSample4_gcms_soil> to increase volatility and improve chromatographic separation
+          has_input:
+            - ProcessedSample4_gcms_soil
+          has_output:
+            - ProcessedSample5_gcms_soil
+          processing_institution: Pacific Northwest National Laboratory
+          substances_used:
+            - type: nmdc:PortionOfSubstance
+              known_as: MSTFA
+              substance_role: reactant
+            - type: nmdc:PortionOfSubstance
+              known_as: trimethylchlorosilane
+              substance_role: reactant
+              final_concentration:
+                type: nmdc:QuantityValue
+                has_raw_value: 1%
+                has_unit: percent
+                has_numeric_value: 1
+          volume:
+            type: nmdc:QuantityValue
+            has_raw_value: 80 µL
+            has_unit: µL
+            has_numeric_value: 80
+
+  processedsamples:
+    - ProcessedSample1_gcms_soil:
+        ProcessedSample:
+          id: #nmdc:
+          type: nmdc:ProcessedSample
+          name: <Biosample>_lysed_soil
+          description: Lysed <Biosample> soil after tissue-lyser treatment with water and beads
+    - ProcessedSample2_gcms_soil:
+        ProcessedSample:
+          id: #nmdc:
+          type: nmdc:ProcessedSample
+          name: <Biosample>_chloroform_methanol_extract
+          description: Chloroform-methanol extract from <Biosample> soil after phase separation and drying
+          sampled_portion: organic_layer
+    - ProcessedSample3_gcms_soil:
+        ProcessedSample:
+          id: #nmdc:
+          type: nmdc:ProcessedSample
+          name: <Biosample>_cleaned_dried_extract
+          description: Resuspended, cleaned, and dried extract from <Biosample> soil
+    - ProcessedSample4_gcms_soil:
+        ProcessedSample:
+          id: #nmdc:
+          type: nmdc:ProcessedSample
+          name: <Biosample>_methoximated
+          description: Methoxyaminated sample from <Biosample> soil
+    - ProcessedSample5_gcms_soil:
+        ProcessedSample:
+          id: #nmdc:
+          type: nmdc:ProcessedSample
+          name: <Biosample>_gcms_ready
+          description: Trimethylsilylated sample from <Biosample> soil, ready for GC-MS analysis
+
+gcms_fecal:
+  steps:
+    - Step 1_gcms_fecal:
+        CellLysisProcess:
+          id: # nmdc:clprs-{shoulder}-{blade}
+          type: nmdc:CellLysisProcess
+          name: Fecal Sample MPLex Extraction and Lysis
+          description: Multi-phase extraction (MPLex) of <Biosample> fecal pellet with water, chloroform, methanol and stainless steel beads
+          has_input:
+            - Biosample
+          has_output:
+            - ProcessedSample1_gcms_fecal
+          processing_institution: Pacific Northwest National Laboratory
+          cell_lysis_method: mechanical_lysis
+          substances_used:
+            - type: nmdc:PortionOfSubstance
+              known_as: water
+              substance_role: solvent
+              volume:
+                type: nmdc:QuantityValue
+                has_raw_value: 0.3 mL
+                has_unit: mL
+                has_numeric_value: 0.3
+            - type: nmdc:PortionOfSubstance
+              known_as: chloroform
+              substance_role: solvent
+              volume:
+                type: nmdc:QuantityValue
+                has_raw_value: 0.8 mL
+                has_unit: mL
+                has_numeric_value: 0.8
+            - type: nmdc:PortionOfSubstance
+              known_as: methanol
+              substance_role: solvent
+              volume:
+                type: nmdc:QuantityValue
+                has_raw_value: 0.4 mL
+                has_unit: mL
+                has_numeric_value: 0.4
+
+    - Step 2_gcms_fecal:
+        CentrifugationProcess:
+          id: # nmdc:cntrp-{shoulder}-{blade}
+          type: nmdc:CentrifugationProcess
+          name: Phase Separation (Fecal)
+          description: Separating phases of <ProcessedSample1_gcms_fecal> by centrifugation
+          has_input:
+            - ProcessedSample1_gcms_fecal
+          has_output:
+            - ProcessedSample2_gcms_fecal
+          processing_institution: Pacific Northwest National Laboratory
+          g_force:
+            type: nmdc:QuantityValue
+            has_raw_value: 10000 x g
+            has_unit: xg
+            has_numeric_value: 10000
+
+    - Step 3_gcms_fecal:
+        DryingProcess:
+          id: # nmdc:drypr-{shoulder}-{blade}
+          type: nmdc:DryingProcess
+          name: Extract Collection and Drying (Fecal)
+          description: Collecting polar and nonpolar layers from <ProcessedSample2_gcms_fecal> and drying via SpeedVac
+          has_input:
+            - ProcessedSample2_gcms_fecal
+          has_output:
+            - ProcessedSample3_gcms_fecal
+          processing_institution: Pacific Northwest National Laboratory
+          drying_method: vacuum_drying
+
+    - Step 4_gcms_fecal:
+        DerivatizationProcess:
+          id: # nmdc:dervp-{shoulder}-{blade}
+          type: nmdc:DerivatizationProcess
+          name: Methoxyamination Derivatization (Fecal)
+          description: Performing methoxyamination on <ProcessedSample3_gcms_fecal> to protect ketones and aldehydes
+          has_input:
+            - ProcessedSample3_gcms_fecal
+          has_output:
+            - ProcessedSample4_gcms_fecal
+          processing_institution: Pacific Northwest National Laboratory
+          substances_used:
+            - type: nmdc:PortionOfSubstance
+              known_as: methoxyamine
+              substance_role: reactant
+              source_concentration:
+                type: nmdc:QuantityValue
+                has_raw_value: 30 mg/mL
+                has_unit: mg/mL
+                has_numeric_value: 30
+            - type: nmdc:PortionOfSubstance
+              known_as: pyridine
+              substance_role: solvent
+          volume:
+            type: nmdc:QuantityValue
+            has_raw_value: 20 µL
+            has_unit: µL
+            has_numeric_value: 20
+
+    - Step 5_gcms_fecal:
+        DerivatizationProcess:
+          id: # nmdc:dervp-{shoulder}-{blade}
+          type: nmdc:DerivatizationProcess
+          name: Trimethylsilylation Derivatization (Fecal)
+          description: Performing trimethylsilylation on <ProcessedSample4_gcms_fecal> to increase volatility and improve chromatographic separation
+          has_input:
+            - ProcessedSample4_gcms_fecal
+          has_output:
+            - ProcessedSample5_gcms_fecal
+          processing_institution: Pacific Northwest National Laboratory
+          substances_used:
+            - type: nmdc:PortionOfSubstance
+              known_as: MSTFA
+              substance_role: reactant
+            - type: nmdc:PortionOfSubstance
+              known_as: trimethylchlorosilane
+              substance_role: reactant
+              final_concentration:
+                type: nmdc:QuantityValue
+                has_raw_value: 1%
+                has_unit: percent
+                has_numeric_value: 1
+          volume:
+            type: nmdc:QuantityValue
+            has_raw_value: 80 µL
+            has_unit: µL
+            has_numeric_value: 80
+
+  processedsamples:
+    - ProcessedSample1_gcms_fecal:
+        ProcessedSample:
+          id: #nmdc:
+          type: nmdc:ProcessedSample
+          name: <Biosample>_mplex_extract
+          description: MPLex extracted sample from <Biosample> fecal pellet
+    - ProcessedSample2_gcms_fecal:
+        ProcessedSample:
+          id: #nmdc:
+          type: nmdc:ProcessedSample
+          name: <Biosample>_phase_separated
+          description: Phase-separated extract from <Biosample> fecal pellet after centrifugation
+          sampled_portion: aqueous_layer # This assumes polar/nonpolar layers are combined before drying. If not, this should be split.
+    - ProcessedSample3_gcms_fecal:
+        ProcessedSample:
+          id: #nmdc:
+          type: nmdc:ProcessedSample
+          name: <Biosample>_dried_mplex_extract
+          description: Dried collected layers from <Biosample> fecal pellet extract
+    - ProcessedSample4_gcms_fecal:
+        ProcessedSample:
+          id: #nmdc:
+          type: nmdc:ProcessedSample
+          name: <Biosample>_methoximated
+          description: Methoxyaminated sample from <Biosample> fecal pellet extract
+    - ProcessedSample5_gcms_fecal:
+        ProcessedSample:
+          id: #nmdc:
+          type: nmdc:ProcessedSample
+          name: <Biosample>_gcms_ready
+          description: Trimethylsilylated sample from <Biosample> fecal pellet extract, ready for GC-MS analysis

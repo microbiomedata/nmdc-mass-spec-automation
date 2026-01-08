@@ -1,0 +1,302 @@
+lybrand_sequential_extraction:
+  steps:
+  - Step 1_lybrand_sequential_extraction:
+      SubSamplingProcess:
+        id: # nmdc:subspr-{shoulder}-{blade}
+        type: nmdc:SubSamplingProcess
+        name: Subsample soil for sequential extraction
+        description: 300mg of <Biosample> weighed into a 2mL Microsolv vial for sequential extraction.
+        has_input:
+        - Biosample
+        has_output:
+        - ProcessedSample1_lybrand_sequential_extraction
+        processing_institution: EMSL
+        mass:
+          type: nmdc:QuantityValue
+          has_raw_value: 300 mg
+          has_unit: mg
+          has_numeric_value: 300
+        protocol_link:
+          url: https://doi.org/10.1016/j.soilbio.2016.02.011
+          name: Tfaily et al. 2016. Chemical characterization of plant, microbial, and soil metabolomes by high-resolution mass spectrometry
+          type: nmdc:Protocol
+
+  - Step 2_lybrand_sequential_extraction:
+      Extraction:
+        id: # nmdc:extrp-{shoulder}-{blade}
+        type: nmdc:Extraction
+        name: Water extraction
+        description: 1mL MilliQ H2O added to <ProcessedSample1_lybrand_sequential_extraction>, shaken for 2h at 2000rpm on a thermomixer, then centrifuged. Supernatant collected.
+        has_input:
+        - ProcessedSample1_lybrand_sequential_extraction
+        has_output:
+        - ProcessedSample2_lybrand_sequential_extraction
+        - ProcessedSample3_lybrand_sequential_extraction
+        processing_institution: EMSL
+        instrument_used: thermomixer
+        duration:
+          type: nmdc:QuantityValue
+          has_raw_value: 2 hours
+          has_unit: hour
+          has_numeric_value: 2
+        substances_used:
+        - type: nmdc:PortionOfSubstance
+          known_as: water
+          substance_role: solvent
+          volume:
+            type: nmdc:QuantityValue
+            has_raw_value: 1 mL
+            has_unit: mL
+            has_numeric_value: 1
+        extraction_targets:
+        - natural organic matter
+        protocol_link:
+          url: https://doi.org/10.1016/j.soilbio.2016.02.011
+          name: Tfaily et al. 2016. Chemical characterization of plant, microbial, and soil metabolomes by high-resolution mass spectrometry
+          type: nmdc:Protocol
+
+  - Step 3_lybrand_sequential_extraction:
+      Extraction:
+        id: # nmdc:extrp-{shoulder}-{blade}
+        type: nmdc:Extraction
+        name: Methanol extraction
+        description: 1mL Optima LC/MS-grade methanol added to <ProcessedSample3_lybrand_sequential_extraction>, shaken for 2h at 2000rpm on a thermomixer, then centrifuged. Supernatant collected.
+        has_input:
+        - ProcessedSample3_lybrand_sequential_extraction
+        has_output:
+        - ProcessedSample4_lybrand_sequential_extraction
+        - ProcessedSample5_lybrand_sequential_extraction
+        processing_institution: EMSL
+        instrument_used: thermomixer
+        duration:
+          type: nmdc:QuantityValue
+          has_raw_value: 2 hours
+          has_unit: hour
+          has_numeric_value: 2
+        substances_used:
+        - type: nmdc:PortionOfSubstance
+          known_as: methanol
+          substance_role: solvent
+          volume:
+            type: nmdc:QuantityValue
+            has_raw_value: 1 mL
+            has_unit: mL
+            has_numeric_value: 1
+        extraction_targets:
+        - natural organic matter
+        protocol_link:
+          url: https://doi.org/10.1016/j.soilbio.2016.02.011
+          name: Tfaily et al. 2016. Chemical characterization of plant, microbial, and soil metabolomes by high-resolution mass spectrometry
+          type: nmdc:Protocol
+
+  - Step 4_lybrand_sequential_extraction:
+      Extraction:
+        id: # nmdc:extrp-{shoulder}-{blade}
+        type: nmdc:Extraction
+        name: Chloroform extraction
+        description: 1mL ethanol-stabilized chloroform added to <ProcessedSample5_lybrand_sequential_extraction>, shaken for 2h at 2000rpm on a thermomixer, then centrifuged. Supernatant collected.
+        has_input:
+        - ProcessedSample5_lybrand_sequential_extraction
+        has_output:
+        - ProcessedSample6_lybrand_sequential_extraction
+        processing_institution: EMSL
+        instrument_used: thermomixer
+        duration:
+          type: nmdc:QuantityValue
+          has_raw_value: 2 hours
+          has_unit: hour
+          has_numeric_value: 2
+        substances_used:
+        - type: nmdc:PortionOfSubstance
+          known_as: chloroform
+          substance_role: solvent
+          volume:
+            type: nmdc:QuantityValue
+            has_raw_value: 1 mL
+            has_unit: mL
+            has_numeric_value: 1
+        extraction_targets:
+        - lipid
+        protocol_link:
+          url: https://doi.org/10.1016/j.soilbio.2016.02.011
+          name: Tfaily et al. 2016. Chemical characterization of plant, microbial, and soil metabolomes by high-resolution mass spectrometry
+          type: nmdc:Protocol
+
+  processedsamples:
+  - ProcessedSample1_lybrand_sequential_extraction:
+      ProcessedSample:
+        id: #nmdc:
+        type: nmdc:ProcessedSample
+        name: <Biosample>_subsampled_soil
+        description: 300mg subsample of <Biosample> for sequential extraction.
+  - ProcessedSample2_lybrand_sequential_extraction:
+      ProcessedSample:
+        id: #nmdc:
+        type: nmdc:ProcessedSample
+        name: <Biosample>_water_extract_supernatant
+        description: Water extract supernatant from <ProcessedSample1_lybrand_sequential_extraction>.
+        sampled_portion: aqueous_layer
+  - ProcessedSample3_lybrand_sequential_extraction:
+      ProcessedSample:
+        id: #nmdc:
+        type: nmdc:ProcessedSample
+        name: <Biosample>_water_extracted_soil_pellet
+        description: Remaining soil pellet after water extraction of <ProcessedSample1_lybrand_sequential_extraction>.
+        sampled_portion: pellet
+  - ProcessedSample4_lybrand_sequential_extraction:
+      ProcessedSample:
+        id: #nmdc:
+        type: nmdc:ProcessedSample
+        name: <Biosample>_methanol_extract_supernatant
+        description: Methanol extract supernatant from <ProcessedSample3_lybrand_sequential_extraction>.
+        sampled_portion: methanol_layer
+  - ProcessedSample5_lybrand_sequential_extraction:
+      ProcessedSample:
+        id: #nmdc:
+        type: nmdc:ProcessedSample
+        name: <Biosample>_methanol_extracted_soil_pellet
+        description: Remaining soil pellet after methanol extraction of <ProcessedSample3_lybrand_sequential_extraction>.
+        sampled_portion: pellet
+  - ProcessedSample6_lybrand_sequential_extraction:
+      ProcessedSample:
+        id: #nmdc:
+        type: nmdc:ProcessedSample
+        name: <Biosample>_chloroform_extract_supernatant
+        description: Chloroform extract supernatant from <ProcessedSample5_lybrand_sequential_extraction>.
+        sampled_portion: chloroform_layer
+
+lybrand_spe:
+  steps:
+  - Step 1_lybrand_spe:
+      ChemicalConversionProcess:
+        id: # nmdc:chcpr-{shoulder}-{blade}
+        type: nmdc:ChemicalConversionProcess
+        name: Acidify water extract for SPE
+        description: Acidified <Biosample> (water extract from sequential extraction) to at least pH 2 using 2µL of 37% HCl. Sample may be diluted to 5mL with MilliQ H2O.
+        has_input:
+        - ProcessedSample2_lybrand_sequential_extraction # This is the water extract from the previous protocol
+        has_output:
+        - ProcessedSample1_lybrand_spe
+        processing_institution: EMSL
+        chemical_conversion_category: acid_base
+        substances_used:
+        - type: nmdc:PortionOfSubstance
+          known_as: hydrochloric_acid
+          substance_role: acid
+          volume:
+            type: nmdc:QuantityValue
+            has_raw_value: 2 uL
+            has_unit: uL
+            has_numeric_value: 2
+          source_concentration:
+            type: nmdc:QuantityValue
+            has_raw_value: 37 %
+            has_unit: "%"
+            has_numeric_value: 37
+        - type: nmdc:PortionOfSubstance
+          known_as: water
+          substance_role: solvent
+          volume: # This is a maximum value for dilution
+            type: nmdc:QuantityValue
+            has_raw_value: 5 mL
+            has_unit: mL
+            has_numeric_value: 5
+        protocol_link:
+          url: https://doi.org/10.4319/lom.2008.6.230
+          name: Dittmar et al 2008. A simple and efficient method for the solid-phase extraction of dissolved organic matter (SPE-DOM) from seawater
+          type: nmdc:Protocol
+
+  - Step 2_lybrand_spe:
+      ChromatographicSeparationProcess:
+        id: # nmdc:cspro-{shoulder}-{blade}
+        type: nmdc:ChromatographicSeparationProcess
+        name: Solid Phase Extraction (SPE) of water extract
+        description: SPE of <ProcessedSample1_lybrand_spe> using Bond Elut PPL SPE cartridge. Cartridge activated with methanol, equilibrated with 10mM HCl, sample loaded, washed with 10mM HCl, dried with N2(g), and eluted with methanol.
+        has_input:
+        - ProcessedSample1_lybrand_spe
+        has_output:
+        - ProcessedSample2_lybrand_spe
+        processing_institution: EMSL
+        chromatographic_category: solid_phase_extraction
+        stationary_phase: PS-DVB
+        instrument_used: SPE vacuum manifold
+        ordered_mobile_phases:
+        - type: nmdc:MobilePhaseSegment
+          substances_used:
+          - type: nmdc:PortionOfSubstance
+            known_as: methanol
+            substance_role: solvent
+            volume:
+              type: nmdc:QuantityValue
+              has_raw_value: 3 mL
+              has_unit: mL
+              has_numeric_value: 3
+        - type: nmdc:MobilePhaseSegment
+          substances_used:
+          - type: nmdc:PortionOfSubstance
+            known_as: hydrochloric_acid
+            substance_role: solvent
+            source_concentration:
+              type: nmdc:QuantityValue
+              has_raw_value: 10 mM
+              has_unit: mM
+              has_numeric_value: 10
+            volume:
+              type: nmdc:QuantityValue
+              has_raw_value: 5 mL
+              has_unit: mL
+              has_numeric_value: 5
+        - type: nmdc:MobilePhaseSegment # Sample loading segment
+          substances_used:
+          - type: nmdc:PortionOfSubstance
+            known_as: water
+            substance_role: solvent
+            volume: # At least 5 mL
+              type: nmdc:QuantityValue
+              has_raw_value: 5 mL
+              has_unit: mL
+              has_numeric_value: 5
+        - type: nmdc:MobilePhaseSegment
+          substances_used:
+          - type: nmdc:PortionOfSubstance
+            known_as: hydrochloric_acid
+            substance_role: solvent
+            source_concentration:
+              type: nmdc:QuantityValue
+              has_raw_value: 10 mM
+              has_unit: mM
+              has_numeric_value: 10
+            volume:
+              type: nmdc:QuantityValue
+              has_raw_value: 3 mL
+              has_unit: mL
+              has_numeric_value: 3
+        - type: nmdc:MobilePhaseSegment
+          substances_used:
+          - type: nmdc:PortionOfSubstance
+            known_as: methanol
+            substance_role: solvent
+            volume:
+              type: nmdc:QuantityValue
+              has_raw_value: 1.5 mL
+              has_unit: mL
+              has_numeric_value: 1.5
+        protocol_link:
+          url: https://doi.org/10.4319/lom.2008.6.230
+          name: Dittmar et al 2008. A simple and efficient method for the solid-phase extraction of dissolved organic matter (SPE-DOM) from seawater
+          type: nmdc:Protocol
+
+  processedsamples:
+  - ProcessedSample1_lybrand_spe:
+      ProcessedSample:
+        id: #nmdc:
+        type: nmdc:ProcessedSample
+        name: <Biosample>_acidified_water_extract
+        description: Water extract from sequential extraction of <Biosample>, acidified to pH 2 for SPE.
+        sampled_portion: aqueous_layer
+  - ProcessedSample2_lybrand_spe:
+      ProcessedSample:
+        id: #nmdc:
+        type: nmdc:ProcessedSample
+        name: <Biosample>_spe_eluate
+        description: Final eluate after Solid Phase Extraction of the acidified water extract from <Biosample>.

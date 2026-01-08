@@ -1,0 +1,622 @@
+water_sequential_extraction:
+  steps:
+  - Step 1_water_sequential_extraction:
+      SubSamplingProcess:
+        id: # nmdc:subspr-{shoulder}-{blade}
+        type: nmdc:SubSamplingProcess
+        name: Subsample_soil_for_sequential_water_extraction
+        description: A 1 g portion of bulk soil taken from <Biosample> for sequential water extraction.
+        has_input:
+        - Biosample
+        has_output:
+        - ProcessedSample1_water_sequential_extraction
+        mass:
+          type: nmdc:QuantityValue
+          has_raw_value: 1 g
+          has_unit: g
+          has_numeric_value: 1
+        processing_institution: EMSL
+
+  - Step 2_water_sequential_extraction:
+      Extraction:
+        id: # nmdc:extrp-{shoulder}-{blade}
+        type: nmdc:Extraction
+        name: Cold_Water_Extraction_of_DOM
+        description: Extraction of C-WEOM from <ProcessedSample1_water_sequential_extraction> using ultrapure DI water at 20 °C.
+        has_input:
+        - ProcessedSample1_water_sequential_extraction
+        has_output:
+        - ProcessedSample2_water_sequential_extraction # C-WEOM supernatant
+        - ProcessedSample3_water_sequential_extraction # Remaining soil after C-WEOM extraction
+        extraction_targets:
+        - natural organic matter
+        temperature:
+          type: nmdc:QuantityValue
+          has_raw_value: 20 °C
+          has_unit: degree Celsius
+          has_numeric_value: 20
+        duration:
+          type: nmdc:QuantityValue
+          has_raw_value: 2 h
+          has_unit: h
+          has_numeric_value: 2
+        substances_used:
+        - type: nmdc:PortionOfSubstance
+          known_as: water
+          substance_role: solvent
+          volume:
+            type: nmdc:QuantityValue
+            has_raw_value: 30 mL
+            has_unit: mL
+            has_numeric_value: 30
+        instrument_used:
+        - Fisherbrand Isotemp Shaking Water Bath
+        processing_institution: EMSL
+
+  - Step 3_water_sequential_extraction:
+      FiltrationProcess:
+        id: # nmdc:filtpr-{shoulder}-{blade}
+        type: nmdc:FiltrationProcess
+        name: Filtration_of_CWEOM_supernatant
+        description: Filtering C-WEOM supernatant from <ProcessedSample2_water_sequential_extraction>.
+        has_input:
+        - ProcessedSample2_water_sequential_extraction
+        has_output:
+        - ProcessedSample4_water_sequential_extraction
+        filter_material: combusted glass fiber filters size F
+        filter_pore_size:
+          type: nmdc:QuantityValue
+          has_raw_value: 0.7 um
+          has_unit: micrometres
+          has_numeric_value: 0.7
+        instrument_used:
+        - combusted fritted glass filter assembly
+        processing_institution: EMSL
+
+  - Step 4_water_sequential_extraction:
+      Extraction:
+        id: # nmdc:extrp-{shoulder}-{blade}
+        type: nmdc:Extraction
+        name: Hot_Water_Extraction_of_DOM
+        description: Extraction of H-WEOM from <ProcessedSample3_water_sequential_extraction> using ultrapure DI water at 80 °C.
+        has_input:
+        - ProcessedSample3_water_sequential_extraction
+        has_output:
+        - ProcessedSample5_water_sequential_extraction # H-WEOM supernatant
+        - ProcessedSample6_water_sequential_extraction # Remaining soil after H-WEOM extraction
+        extraction_targets:
+        - natural organic matter
+        temperature:
+          type: nmdc:QuantityValue
+          has_raw_value: 80 °C
+          has_unit: degree Celsius
+          has_numeric_value: 80
+        duration:
+          type: nmdc:QuantityValue
+          has_raw_value: 16 h
+          has_unit: h
+          has_numeric_value: 16
+        substances_used:
+        - type: nmdc:PortionOfSubstance
+          known_as: water
+          substance_role: solvent
+          volume:
+            type: nmdc:QuantityValue
+            has_raw_value: 30 mL
+            has_unit: mL
+            has_numeric_value: 30
+        instrument_used:
+        - hot water bath
+        processing_institution: EMSL
+
+  - Step 5_water_sequential_extraction:
+      FiltrationProcess:
+        id: # nmdc:filtpr-{shoulder}-{blade}
+        type: nmdc:FiltrationProcess
+        name: Filtration_of_HWEOM_supernatant
+        description: Filtering H-WEOM supernatant from <ProcessedSample5_water_sequential_extraction>.
+        has_input:
+        - ProcessedSample5_water_sequential_extraction
+        has_output:
+        - ProcessedSample7_water_sequential_extraction
+        filter_material: combusted glass fiber filters size F
+        filter_pore_size:
+          type: nmdc:QuantityValue
+          has_raw_value: 0.7 um
+          has_unit: micrometres
+          has_numeric_value: 0.7
+        instrument_used:
+        - combusted fritted glass filter assembly
+        processing_institution: EMSL
+
+  - Step 6_water_sequential_extraction:
+      # This is a dilution step, 'DissolvingProcess' is the closest fit for adding a solvent to change concentration.
+      DissolvingProcess:
+        id: # nmdc:dispro-{shoulder}-{blade}
+        type: nmdc:DissolvingProcess
+        name: Dilution_of_CWEOM_and_HWEOM_samples
+        description: Diluting filtered C-WEOM from <ProcessedSample4_water_sequential_extraction> and filtered H-WEOM from <ProcessedSample7_water_sequential_extraction> sixfold.
+        has_input:
+        - ProcessedSample4_water_sequential_extraction
+        - ProcessedSample7_water_sequential_extraction
+        has_output:
+        - ProcessedSample8_water_sequential_extraction # Diluted C-WEOM
+        - ProcessedSample9_water_sequential_extraction # Diluted H-WEOM
+        substances_used:
+        - type: nmdc:PortionOfSubstance
+          known_as: water
+          substance_role: solvent
+        processing_institution: EMSL
+
+  processedsamples:
+  - ProcessedSample1_water_sequential_extraction:
+      ProcessedSample:
+        id: #nmdc:
+        type: nmdc:ProcessedSample
+        name: <Biosample>_water_extraction_subsample
+        description: A 1 g subsample of <Biosample> for sequential water extraction.
+  - ProcessedSample2_water_sequential_extraction:
+      ProcessedSample:
+        id: #nmdc:
+        type: nmdc:ProcessedSample
+        name: <Biosample>_CWEOM_supernatant
+        description: Cold water extractable organic matter (C-WEOM) supernatant from <ProcessedSample1_water_sequential_extraction>.
+        sampled_portion: aqueous_layer
+  - ProcessedSample3_water_sequential_extraction:
+      ProcessedSample:
+        id: #nmdc:
+        type: nmdc:ProcessedSample
+        name: <Biosample>_soil_after_CWEOM
+        description: Remaining soil after cold water extraction of <ProcessedSample1_water_sequential_extraction>.
+        sampled_portion: pellet
+  - ProcessedSample4_water_sequential_extraction:
+      ProcessedSample:
+        id: #nmdc:
+        type: nmdc:ProcessedSample
+        name: <Biosample>_filtered_CWEOM
+        description: Filtered cold water extractable organic matter (C-WEOM) from <ProcessedSample2_water_sequential_extraction>.
+        sampled_portion: aqueous_layer
+  - ProcessedSample5_water_sequential_extraction:
+      ProcessedSample:
+        id: #nmdc:
+        type: nmdc:ProcessedSample
+        name: <Biosample>_HWEOM_supernatant
+        description: Hot water extractable organic matter (H-WEOM) supernatant from <ProcessedSample3_water_sequential_extraction>.
+        sampled_portion: aqueous_layer
+  - ProcessedSample6_water_sequential_extraction:
+      ProcessedSample:
+        id: #nmdc:
+        type: nmdc:ProcessedSample
+        name: <Biosample>_soil_after_HWEOM
+        description: Remaining soil after hot water extraction of <ProcessedSample3_water_sequential_extraction>.
+        sampled_portion: pellet
+  - ProcessedSample7_water_sequential_extraction:
+      ProcessedSample:
+        id: #nmdc:
+        type: nmdc:ProcessedSample
+        name: <Biosample>_filtered_HWEOM
+        description: Filtered hot water extractable organic matter (H-WEOM) from <ProcessedSample5_water_sequential_extraction>.
+        sampled_portion: aqueous_layer
+  - ProcessedSample8_water_sequential_extraction:
+      ProcessedSample:
+        id: #nmdc:
+        type: nmdc:ProcessedSample
+        name: <Biosample>_diluted_CWEOM
+        description: Diluted cold water extractable organic matter (C-WEOM) from <ProcessedSample4_water_sequential_extraction>.
+        sampled_portion: aqueous_layer
+  - ProcessedSample9_water_sequential_extraction:
+      ProcessedSample:
+        id: #nmdc:
+        type: nmdc:ProcessedSample
+        name: <Biosample>_diluted_HWEOM
+        description: Diluted hot water extractable organic matter (H-WEOM) from <ProcessedSample7_water_sequential_extraction>.
+        sampled_portion: aqueous_layer
+
+multi_solvent_spe_extraction:
+  steps:
+  - Step 1_multi_solvent_spe_extraction:
+      SubSamplingProcess:
+        id: # nmdc:subspr-{shoulder}-{blade}
+        type: nmdc:SubSamplingProcess
+        name: Subsample_soil_for_multi_solvent_extraction
+        description: A 1 g portion of air-dried, sieved bulk soil taken from <Biosample> for sequential multi-solvent extraction.
+        has_input:
+        - Biosample
+        has_output:
+        - ProcessedSample1_multi_solvent_spe_extraction
+        mass:
+          type: nmdc:QuantityValue
+          has_raw_value: 1 g
+          has_unit: g
+          has_numeric_value: 1
+        processing_institution: EMSL
+
+  - Step 2_multi_solvent_spe_extraction:
+      Extraction:
+        id: # nmdc:extrp-{shoulder}-{blade}
+        type: nmdc:Extraction
+        name: Water_Extraction_Multi_Solvent
+        description: Water extraction of DOM from <ProcessedSample1_multi_solvent_spe_extraction>.
+        has_input:
+        - ProcessedSample1_multi_solvent_spe_extraction
+        has_output:
+        - ProcessedSample2_multi_solvent_spe_extraction # Water extract supernatant
+        - ProcessedSample3_multi_solvent_spe_extraction # Remaining soil after water extraction
+        extraction_targets:
+        - natural organic matter
+        duration:
+          type: nmdc:QuantityValue
+          has_raw_value: 2 h
+          has_unit: h
+          has_numeric_value: 2
+        substances_used:
+        - type: nmdc:PortionOfSubstance
+          known_as: water
+          substance_role: solvent
+          volume:
+            type: nmdc:QuantityValue
+            has_raw_value: 5 mL
+            has_unit: mL
+            has_numeric_value: 5
+        instrument_used:
+        - orbital shaker
+        processing_institution: EMSL
+        protocol_link:
+          url: https://doi.org/10.1021/acs.est.7b01851
+          name: Tfaily et al. 2017. Molecular-Level Characterization of Organic Matter in Soil Extracts by Mass Spectrometry.
+          type: nmdc:Protocol
+
+  - Step 3_multi_solvent_spe_extraction:
+      Extraction:
+        id: # nmdc:extrp-{shoulder}-{blade}
+        type: nmdc:Extraction
+        name: Methanol_Extraction_Multi_Solvent
+        description: Methanol extraction of DOM from <ProcessedSample3_multi_solvent_spe_extraction>.
+        has_input:
+        - ProcessedSample3_multi_solvent_spe_extraction
+        has_output:
+        - ProcessedSample4_multi_solvent_spe_extraction # Methanol extract supernatant
+        - ProcessedSample5_multi_solvent_spe_extraction # Remaining soil after methanol extraction
+        extraction_targets:
+        - natural organic matter
+        duration:
+          type: nmdc:QuantityValue
+          has_raw_value: 2 h
+          has_unit: h
+          has_numeric_value: 2
+        substances_used:
+        - type: nmdc:PortionOfSubstance
+          known_as: methanol
+          substance_role: solvent
+          volume:
+            type: nmdc:QuantityValue
+            has_raw_value: 5 mL
+            has_unit: mL
+            has_numeric_value: 5
+        instrument_used:
+        - orbital shaker
+        processing_institution: EMSL
+        protocol_link:
+          url: https://doi.org/10.1021/acs.est.7b01851
+          name: Tfaily et al. 2017. Molecular-Level Characterization of Organic Matter in Soil Extracts by Mass Spectrometry.
+          type: nmdc:Protocol
+
+  - Step 4_multi_solvent_spe_extraction:
+      Extraction:
+        id: # nmdc:extrp-{shoulder}-{blade}
+        type: nmdc:Extraction
+        name: Chloroform_Extraction_Multi_Solvent
+        description: Chloroform extraction of DOM from <ProcessedSample5_multi_solvent_spe_extraction>.
+        has_input:
+        - ProcessedSample5_multi_solvent_spe_extraction
+        has_output:
+        - ProcessedSample6_multi_solvent_spe_extraction # Chloroform extract supernatant
+        extraction_targets:
+        - lipid # chloroform extracts are a proxy for lipids
+        duration:
+          type: nmdc:QuantityValue
+          has_raw_value: 2 h
+          has_unit: h
+          has_numeric_value: 2
+        substances_used:
+        - type: nmdc:PortionOfSubstance
+          known_as: chloroform
+          substance_role: solvent
+          volume:
+            type: nmdc:QuantityValue
+            has_raw_value: 5 mL
+            has_unit: mL
+            has_numeric_value: 5
+        instrument_used:
+        - orbital shaker
+        processing_institution: EMSL
+        protocol_link:
+          url: https://doi.org/10.1021/acs.est.7b01851
+          name: Tfaily et al. 2017. Molecular-Level Characterization of Organic Matter in Soil Extracts by Mass Spectrometry.
+          type: nmdc:Protocol
+
+  - Step 5_multi_solvent_spe_extraction:
+      # This is a dilution step, 'DissolvingProcess' is the closest fit for adding a solvent to change concentration.
+      DissolvingProcess:
+        id: # nmdc:dispro-{shoulder}-{blade}
+        type: nmdc:DissolvingProcess
+        name: Dilute_Methanol_Extract_for_SPE
+        description: Diluting methanol extract from <ProcessedSample4_multi_solvent_spe_extraction> with ultrapure DI water prior to SPE.
+        has_input:
+        - ProcessedSample4_multi_solvent_spe_extraction
+        has_output:
+        - ProcessedSample7_multi_solvent_spe_extraction # Diluted Methanol extract
+        substances_used:
+        - type: nmdc:PortionOfSubstance
+          known_as: water
+          substance_role: solvent
+        processing_institution: EMSL
+
+  - Step 6_multi_solvent_spe_extraction:
+      ChemicalConversionProcess:
+        id: # nmdc:chcpr-{shoulder}-{blade}
+        type: nmdc:ChemicalConversionProcess
+        name: Acidification_of_Water_and_Methanol_Extracts
+        description: Acidifying water extract from <ProcessedSample2_multi_solvent_spe_extraction> and diluted methanol extract from <ProcessedSample7_multi_solvent_spe_extraction> to pH 2 with H3PO4.
+        has_input:
+        - ProcessedSample2_multi_solvent_spe_extraction
+        - ProcessedSample7_multi_solvent_spe_extraction
+        has_output:
+        - ProcessedSample8_multi_solvent_spe_extraction # Acidified Water extract
+        - ProcessedSample9_multi_solvent_spe_extraction # Acidified Methanol extract
+        substances_used:
+        - type: nmdc:PortionOfSubstance
+          known_as: phosphoric_acid
+          substance_role: acid
+        chemical_conversion_category: acid_base
+        processing_institution: EMSL
+
+  - Step 7_multi_solvent_spe_extraction:
+      ChromatographicSeparationProcess:
+        id: # nmdc:cspro-{shoulder}-{blade}
+        type: nmdc:ChromatographicSeparationProcess
+        name: SPE_of_Acidified_Water_Extract
+        description: Solid Phase Extraction of dissolved organic matter from acidified water extract (<ProcessedSample8_multi_solvent_spe_extraction>).
+        has_input:
+        - ProcessedSample8_multi_solvent_spe_extraction
+        has_output:
+        - ProcessedSample10_multi_solvent_spe_extraction # Eluted Water SPE
+        processing_institution: EMSL
+        protocol_link:
+          url: "https://www.agilent.com/cs/library/usermanuals/public/5991-9430EN.pdf" # Placeholder for a general Agilent SPE manual if a specific one isn't found. This could also be the Dittmar et al. link if it matches.
+          name: Agilent Bond Elut PPL SPE Cartridge Protocol
+          type: nmdc:Protocol
+        chromatographic_category: solid_phase_extraction
+        stationary_phase: PS-DVB
+        instrument_used:
+        - SPE vacuum manifold
+        ordered_mobile_phases:
+        - type: nmdc:MobilePhaseSegment
+          substances_used:
+          - type: nmdc:PortionOfSubstance
+            known_as: methanol
+            substance_role: solvent
+            volume:
+              type: nmdc:QuantityValue
+              has_raw_value: 3 mL
+              has_unit: mL
+              has_numeric_value: 3
+          # Description: Activate SPE cartridge with 3mL methanol
+        - type: nmdc:MobilePhaseSegment
+          substances_used:
+          - type: nmdc:PortionOfSubstance
+            known_as: hydrochloric_acid
+            substance_role: acid
+            source_concentration:
+              type: nmdc:QuantityValue
+              has_raw_value: 10 mM
+              has_unit: millimolar
+              has_numeric_value: 10
+            volume:
+              type: nmdc:QuantityValue
+              has_raw_value: 5 mL
+              has_unit: mL
+              has_numeric_value: 5
+          # Description: Equilibrate cartridge with 5mL 10mM HCl
+        - type: nmdc:MobilePhaseSegment
+          substances_used:
+          - type: nmdc:PortionOfSubstance
+            known_as: water # This represents the acidified sample
+            substance_role: solvent
+            volume:
+              type: nmdc:QuantityValue
+              has_raw_value: 5 mL
+              has_unit: mL
+              has_numeric_value: 5
+          # Description: Load the acidified sample onto the cartridge. Note: sample volume can vary.
+        - type: nmdc:MobilePhaseSegment
+          substances_used:
+          - type: nmdc:PortionOfSubstance
+            known_as: hydrochloric_acid
+            substance_role: acid
+            source_concentration:
+              type: nmdc:QuantityValue
+              has_raw_value: 10 mM
+              has_unit: millimolar
+              has_numeric_value: 10
+            volume:
+              type: nmdc:QuantityValue
+              has_raw_value: 3 mL
+              has_unit: mL
+              has_numeric_value: 3
+          # Description: Wash the cartridge with 3mL of 10mM HCl (repeatedly, "17X+")
+        - type: nmdc:MobilePhaseSegment
+          substances_used:
+          - type: nmdc:PortionOfSubstance
+            known_as: methanol
+            substance_role: solvent
+            volume:
+              type: nmdc:QuantityValue
+              has_raw_value: 1.5 mL
+              has_unit: mL
+              has_numeric_value: 1.5
+          # Description: Elute with 1.5mL methanol
+
+  - Step 8_multi_solvent_spe_extraction:
+      ChromatographicSeparationProcess:
+        id: # nmdc:cspro-{shoulder}-{blade}
+        type: nmdc:ChromatographicSeparationProcess
+        name: SPE_of_Acidified_Methanol_Extract
+        description: Solid Phase Extraction of dissolved organic matter from acidified methanol extract (<ProcessedSample9_multi_solvent_spe_extraction>).
+        has_input:
+        - ProcessedSample9_multi_solvent_spe_extraction
+        has_output:
+        - ProcessedSample11_multi_solvent_spe_extraction # Eluted Methanol SPE
+        processing_institution: EMSL
+        protocol_link:
+          url: "https://www.agilent.com/cs/library/usermanuals/public/5991-9430EN.pdf" # Placeholder
+          name: Agilent Bond Elut PPL SPE Cartridge Protocol
+          type: nmdc:Protocol
+        chromatographic_category: solid_phase_extraction
+        stationary_phase: PS-DVB
+        instrument_used:
+        - SPE vacuum manifold
+        ordered_mobile_phases:
+        - type: nmdc:MobilePhaseSegment
+          substances_used:
+          - type: nmdc:PortionOfSubstance
+            known_as: methanol
+            substance_role: solvent
+            volume:
+              type: nmdc:QuantityValue
+              has_raw_value: 3 mL
+              has_unit: mL
+              has_numeric_value: 3
+          # Description: Activate SPE cartridge with 3mL methanol
+        - type: nmdc:MobilePhaseSegment
+          substances_used:
+          - type: nmdc:PortionOfSubstance
+            known_as: hydrochloric_acid
+            substance_role: acid
+            source_concentration:
+              type: nmdc:QuantityValue
+              has_raw_value: 10 mM
+              has_unit: millimolar
+              has_numeric_value: 10
+            volume:
+              type: nmdc:QuantityValue
+              has_raw_value: 5 mL
+              has_unit: mL
+              has_numeric_value: 5
+          # Description: Equilibrate cartridge with 5mL 10mM HCl
+        - type: nmdc:MobilePhaseSegment
+          substances_used:
+          - type: nmdc:PortionOfSubstance
+            known_as: water # This represents the acidified sample
+            substance_role: solvent
+            volume:
+              type: nmdc:QuantityValue
+              has_raw_value: 5 mL
+              has_unit: mL
+              has_numeric_value: 5
+          # Description: Load the acidified sample onto the cartridge. Note: sample volume can vary.
+        - type: nmdc:MobilePhaseSegment
+          substances_used:
+          - type: nmdc:PortionOfSubstance
+            known_as: hydrochloric_acid
+            substance_role: acid
+            source_concentration:
+              type: nmdc:QuantityValue
+              has_raw_value: 10 mM
+              has_unit: millimolar
+              has_numeric_value: 10
+            volume:
+              type: nmdc:QuantityValue
+              has_raw_value: 3 mL
+              has_unit: mL
+              has_numeric_value: 3
+          # Description: Wash the cartridge with 3mL of 10mM HCl (repeatedly, "17X+")
+        - type: nmdc:MobilePhaseSegment
+          substances_used:
+          - type: nmdc:PortionOfSubstance
+            known_as: methanol
+            substance_role: solvent
+            volume:
+              type: nmdc:QuantityValue
+              has_raw_value: 1.5 mL
+              has_unit: mL
+              has_numeric_value: 1.5
+          # Description: Elute with 1.5mL methanol
+
+  processedsamples:
+  - ProcessedSample1_multi_solvent_spe_extraction:
+      ProcessedSample:
+        id: #nmdc:
+        type: nmdc:ProcessedSample
+        name: <Biosample>_multi_solvent_extraction_subsample
+        description: A 1 g subsample of air-dried, sieved bulk soil from <Biosample> for sequential multi-solvent extraction.
+  - ProcessedSample2_multi_solvent_spe_extraction:
+      ProcessedSample:
+        id: #nmdc:
+        type: nmdc:ProcessedSample
+        name: <Biosample>_water_extract_supernatant
+        description: Water extract supernatant from <ProcessedSample1_multi_solvent_spe_extraction>.
+        sampled_portion: aqueous_layer
+  - ProcessedSample3_multi_solvent_spe_extraction:
+      ProcessedSample:
+        id: #nmdc:
+        type: nmdc:ProcessedSample
+        name: <Biosample>_soil_after_water_extraction
+        description: Remaining soil after water extraction of <ProcessedSample1_multi_solvent_spe_extraction>.
+        sampled_portion: pellet
+  - ProcessedSample4_multi_solvent_spe_extraction:
+      ProcessedSample:
+        id: #nmdc:
+        type: nmdc:ProcessedSample
+        name: <Biosample>_methanol_extract_supernatant
+        description: Methanol extract supernatant from <ProcessedSample3_multi_solvent_spe_extraction>.
+        sampled_portion: methanol_layer
+  - ProcessedSample5_multi_solvent_spe_extraction:
+      ProcessedSample:
+        id: #nmdc:
+        type: nmdc:ProcessedSample
+        name: <Biosample>_soil_after_methanol_extraction
+        description: Remaining soil after methanol extraction of <ProcessedSample3_multi_solvent_spe_extraction>.
+        sampled_portion: pellet
+  - ProcessedSample6_multi_solvent_spe_extraction:
+      ProcessedSample:
+        id: #nmdc:
+        type: nmdc:ProcessedSample
+        name: <Biosample>_chloroform_extract_supernatant
+        description: Chloroform extract supernatant from <ProcessedSample5_multi_solvent_spe_extraction>.
+        sampled_portion: chloroform_layer
+  - ProcessedSample7_multi_solvent_spe_extraction:
+      ProcessedSample:
+        id: #nmdc:
+        type: nmdc:ProcessedSample
+        name: <Biosample>_diluted_methanol_extract
+        description: Diluted methanol extract from <ProcessedSample4_multi_solvent_spe_extraction> for SPE.
+        sampled_portion: aqueous_layer
+  - ProcessedSample8_multi_solvent_spe_extraction:
+      ProcessedSample:
+        id: #nmdc:
+        type: nmdc:ProcessedSample
+        name: <Biosample>_acidified_water_extract
+        description: Acidified water extract from <ProcessedSample2_multi_solvent_spe_extraction> for SPE.
+        sampled_portion: aqueous_layer
+  - ProcessedSample9_multi_solvent_spe_extraction:
+      ProcessedSample:
+        id: #nmdc:
+        type: nmdc:ProcessedSample
+        name: <Biosample>_acidified_methanol_extract
+        description: Acidified methanol extract from <ProcessedSample7_multi_solvent_spe_extraction> for SPE.
+        sampled_portion: aqueous_layer
+  - ProcessedSample10_multi_solvent_spe_extraction:
+      ProcessedSample:
+        id: #nmdc:
+        type: nmdc:ProcessedSample
+        name: <Biosample>_eluted_water_spe
+        description: Eluted water extract after Solid Phase Extraction from <ProcessedSample8_multi_solvent_spe_extraction>.
+        sampled_portion: aqueous_layer
+  - ProcessedSample11_multi_solvent_spe_extraction:
+      ProcessedSample:
+        id: #nmdc:
+        type: nmdc:ProcessedSample
+        name: <Biosample>_eluted_methanol_spe
+        description: Eluted methanol extract after Solid Phase Extraction from <ProcessedSample9_multi_solvent_spe_extraction>.
+        sampled_portion: aqueous_layer
