@@ -11,6 +11,7 @@ import pytest
 import tempfile
 import shutil
 from pathlib import Path
+from unittest.mock import Mock, patch
 
 # Add project root to sys.path so nmdc_dp_utils can be imported
 project_root = Path(__file__).parent.parent
@@ -23,6 +24,28 @@ def pytest_configure(config):
     config.addinivalue_line(
         "markers", "integration: marks tests as integration tests (may be slow, require network)"
     )
+
+
+@pytest.fixture(autouse=True)
+def clean_environment():
+    """Clear environment variables for test isolation (applied to all tests automatically)."""
+    with patch.dict('os.environ', {}, clear=True):
+        yield
+
+
+@pytest.fixture
+def mock_subprocess_run():
+    """Mock subprocess.run for Docker/command execution tests."""
+    with patch('subprocess.run') as mock_run:
+        mock_run.return_value = Mock(returncode=0, stdout="", stderr="")
+        yield mock_run
+
+
+@pytest.fixture
+def mock_biosample_search():
+    """Mock NMDC API BiosampleSearch for biosample attribute tests."""
+    with patch('nmdc_api_utilities.biosample_search.BiosampleSearch') as mock_search:
+        yield mock_search
 
 
 @pytest.fixture

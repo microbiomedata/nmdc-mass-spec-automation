@@ -20,7 +20,6 @@ import subprocess
 class TestWorkflowRawDataInspectionManager:
     """Test suite for WorkflowRawDataInspectionManager mixin."""
 
-    @patch.dict('os.environ', {}, clear=True)
     def test_raw_data_inspector_initialization(self, lcms_config_file):
         """Test that raw data inspector initializes correctly with Docker config."""
         from nmdc_dp_utils.workflow_manager import NMDCWorkflowManager
@@ -30,9 +29,7 @@ class TestWorkflowRawDataInspectionManager:
         assert "docker" in manager.config
         assert "raw_data_inspector_image" in manager.config["docker"]
 
-    @patch.dict('os.environ', {}, clear=True)
-    @patch('subprocess.run')
-    def test_raw_data_inspector_skip_when_complete(self, mock_run, lcms_config_file):
+    def test_raw_data_inspector_skip_when_complete(self, mock_subprocess_run, lcms_config_file):
         """Test that raw data inspector is skipped when raw_data_inspected trigger is set."""
         from nmdc_dp_utils.workflow_manager import NMDCWorkflowManager
         
@@ -46,16 +43,14 @@ class TestWorkflowRawDataInspectionManager:
         
         # Should return True and not run subprocess
         assert result is True
-        mock_run.assert_not_called()
+        mock_subprocess_run.assert_not_called()
 
-    @patch.dict('os.environ', {}, clear=True)
-    @patch('subprocess.run')
-    def test_lcms_inspector_docker_check(self, mock_run, lcms_config_file, temp_config_dir):
+    def test_lcms_inspector_docker_check(self, mock_subprocess_run, lcms_config_file, temp_config_dir):
         """Test that LCMS inspector checks for Docker availability."""
         from nmdc_dp_utils.workflow_manager import NMDCWorkflowManager
         
         # Mock Docker check to fail
-        mock_run.return_value = Mock(returncode=1)
+        mock_subprocess_run.return_value = Mock(returncode=1)
         
         manager = NMDCWorkflowManager(str(lcms_config_file))
         
@@ -71,7 +66,6 @@ class TestWorkflowRawDataInspectionManager:
         # Should fail due to Docker unavailability
         assert result is False
 
-    @patch.dict('os.environ', {}, clear=True)
     def test_raw_inspector_no_files_warning(self, lcms_config_file):
         """Test that inspector warns when no files are found."""
         from nmdc_dp_utils.workflow_manager import NMDCWorkflowManager
@@ -84,16 +78,14 @@ class TestWorkflowRawDataInspectionManager:
         # Should return None for no files
         assert result is None
 
-    @patch.dict('os.environ', {}, clear=True)
-    @patch('subprocess.run')
     def test_lcms_inspector_forces_single_core_for_raw_files(
-        self, mock_run, lcms_config_file, temp_config_dir, caplog
+        self, mock_subprocess_run, lcms_config_file, temp_config_dir, caplog
     ):
         """Test that .raw files force single-core processing."""
         from nmdc_dp_utils.workflow_manager import NMDCWorkflowManager
         
         # Mock successful Docker check and execution
-        mock_run.side_effect = [
+        mock_subprocess_run.side_effect = [
             Mock(returncode=0),  # Docker check
             Mock(returncode=0)   # Docker run
         ]
@@ -125,10 +117,8 @@ class TestWorkflowRawDataInspectionManager:
         # Should skip because file is already inspected and return file path
         assert isinstance(result, str) and 'raw_file_inspection_results.csv' in result
 
-    @patch.dict('os.environ', {}, clear=True)
-    @patch('subprocess.run')
     def test_lcms_inspector_uses_mapped_files(
-        self, mock_run, lcms_config_file, temp_config_dir
+        self, mock_subprocess_run, lcms_config_file, temp_config_dir
     ):
         """Test that inspector uses mapped_raw_files.csv when available."""
         from nmdc_dp_utils.workflow_manager import NMDCWorkflowManager
@@ -151,7 +141,7 @@ class TestWorkflowRawDataInspectionManager:
         output_dir.mkdir(parents=True, exist_ok=True)
         
         # Mock Docker available and successful run
-        mock_run.side_effect = [
+        mock_subprocess_run.side_effect = [
             Mock(returncode=0),  # Docker check
             Mock(returncode=0)   # Docker run
         ]
@@ -171,7 +161,6 @@ class TestWorkflowRawDataInspectionManager:
         # Should complete successfully (returns True or file path string)
         assert result is True or (isinstance(result, str) and 'raw_file_inspection_results.csv' in result)
 
-    @patch.dict('os.environ', {}, clear=True)
     def test_gcms_inspector_route_selection(self, gcms_config_file):
         """Test that GCMS workflow type routes to GCMS inspector."""
         from nmdc_dp_utils.workflow_manager import NMDCWorkflowManager
@@ -181,10 +170,8 @@ class TestWorkflowRawDataInspectionManager:
         # Verify workflow type is GCMS
         assert manager.config["workflow"]["workflow_type"] == "GCMS Metabolomics"
 
-    @patch.dict('os.environ', {}, clear=True)
-    @patch('subprocess.run')
     def test_inspector_merges_previous_results(
-        self, mock_run, lcms_config_file, temp_config_dir
+        self, mock_subprocess_run, lcms_config_file, temp_config_dir
     ):
         """Test that new inspection results are merged with previous results."""
         from nmdc_dp_utils.workflow_manager import NMDCWorkflowManager
@@ -211,7 +198,7 @@ class TestWorkflowRawDataInspectionManager:
         new_file.write_text("dummy")
         
         # Mock Docker available and successful run
-        mock_run.side_effect = [
+        mock_subprocess_run.side_effect = [
             Mock(returncode=0),  # Docker check
             Mock(returncode=0)   # Docker run
         ]
@@ -238,10 +225,8 @@ class TestWorkflowRawDataInspectionManager:
         assert 'file1.raw' in final_df['file_path'].values
         assert 'file2.raw' in final_df['file_path'].values
 
-    @patch.dict('os.environ', {}, clear=True)
-    @patch('subprocess.run')
     def test_inspector_skips_already_inspected_files(
-        self, mock_run, lcms_config_file, temp_config_dir
+        self, mock_subprocess_run, lcms_config_file, temp_config_dir
     ):
         """Test that already-inspected files are skipped."""
         from nmdc_dp_utils.workflow_manager import NMDCWorkflowManager
@@ -275,7 +260,6 @@ class TestWorkflowRawDataInspectionManager:
         # Skip trigger should be set
         assert manager.should_skip("raw_data_inspected") is True
 
-    @patch.dict('os.environ', {}, clear=True)
     def test_inspector_missing_docker_config_error(self, lcms_config_file):
         """Test that missing Docker config raises appropriate error."""
         from nmdc_dp_utils.workflow_manager import NMDCWorkflowManager
@@ -295,7 +279,6 @@ class TestWorkflowRawDataInspectionManager:
         # Should return False due to missing Docker config (raises error and returns False)
         assert result is False
 
-    @patch.dict('os.environ', {}, clear=True)
     def test_inspector_with_limit_parameter(
         self, lcms_config_file, temp_config_dir
     ):
