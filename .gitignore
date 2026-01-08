@@ -13,6 +13,7 @@ __pycache__/
 
 *.xlsx
 *.msp
+!tests/integration/test_data/test_database.msp
 
 # Testing and coverage reports
 htmlcov/

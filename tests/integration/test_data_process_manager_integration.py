@@ -26,29 +26,9 @@ class TestWDLGenerationEndToEnd:
         # Setup paths
         integration_lcms_config["paths"]["base_directory"] = str(tmp_path)
         config_file = tmp_path / "lcms_config.json"
+        
+        # Write config file (MSP file already exists in test_data, TOML files use real workflow_inputs)
         config_file.write_text(json.dumps(integration_lcms_config))
-        
-        # Create workflow_inputs directory with dummy files
-        workflow_inputs_dir = tmp_path / "workflow_inputs"
-        workflow_inputs_dir.mkdir(parents=True)
-        
-        # Create minimal dummy MSP file (just header, no actual data needed)
-        (workflow_inputs_dir / "20250407_database.msp").write_text(
-            "NAME: Dummy Reference Database\n"
-            "PRECURSORMZ: 100.0\n"
-            "PRECURSORTYPE: [M+H]+\n"
-            "Num Peaks: 0\n\n"
-        )
-        
-        # Create minimal dummy TOML files
-        (workflow_inputs_dir / "metams_rp_corems.toml").write_text(
-            "[MolecularSearch]\n"
-            "url_database = 'postgresql://localhost:5432/coremsdb'\n"
-        )
-        (workflow_inputs_dir / "metams_jgi_scan_translator.toml").write_text(
-            "[ScanTranslation]\n"
-            "enabled = true\n"
-        )
         
         # Create directory structure
         workflow_name = integration_lcms_config["workflow"]["name"]
@@ -119,17 +99,9 @@ class TestWDLGenerationEndToEnd:
         # Setup
         integration_gcms_config["paths"]["base_directory"] = str(tmp_path)
         config_file = tmp_path / "gcms_config.json"
+        
+        # Write config file (TOML files use real workflow_inputs)
         config_file.write_text(json.dumps(integration_gcms_config))
-        
-        # Create workflow_inputs directory with dummy files
-        workflow_inputs_dir = tmp_path / "workflow_inputs"
-        workflow_inputs_dir.mkdir(parents=True)
-        
-        # Create minimal dummy TOML file for GCMS
-        (workflow_inputs_dir / "metams_gcms_corems.toml").write_text(
-            "[MolecularSearch]\n"
-            "url_database = 'postgresql://localhost:5432/coremsdb'\n"
-        )
         
         # Create structure
         workflow_name = integration_gcms_config["workflow"]["name"]
