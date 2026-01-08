@@ -21,22 +21,22 @@ class TestWorkflowRawDataInspectionManager:
     """Test suite for WorkflowRawDataInspectionManager mixin."""
 
     @patch.dict('os.environ', {}, clear=True)
-    def test_raw_data_inspector_initialization(self, config_file_with_docker):
+    def test_raw_data_inspector_initialization(self, lcms_config_file):
         """Test that raw data inspector initializes correctly with Docker config."""
         from nmdc_dp_utils.workflow_manager import NMDCWorkflowManager
         
-        manager = NMDCWorkflowManager(str(config_file_with_docker))
+        manager = NMDCWorkflowManager(str(lcms_config_file))
         
         assert "docker" in manager.config
         assert "raw_data_inspector_image" in manager.config["docker"]
 
     @patch.dict('os.environ', {}, clear=True)
     @patch('subprocess.run')
-    def test_raw_data_inspector_skip_when_complete(self, mock_run, config_file_with_docker):
+    def test_raw_data_inspector_skip_when_complete(self, mock_run, lcms_config_file):
         """Test that raw data inspector is skipped when raw_data_inspected trigger is set."""
         from nmdc_dp_utils.workflow_manager import NMDCWorkflowManager
         
-        manager = NMDCWorkflowManager(str(config_file_with_docker))
+        manager = NMDCWorkflowManager(str(lcms_config_file))
         
         # Set the skip trigger
         manager.set_skip_trigger("raw_data_inspected", True)
@@ -50,14 +50,14 @@ class TestWorkflowRawDataInspectionManager:
 
     @patch.dict('os.environ', {}, clear=True)
     @patch('subprocess.run')
-    def test_lcms_inspector_docker_check(self, mock_run, config_file_with_docker, temp_config_dir):
+    def test_lcms_inspector_docker_check(self, mock_run, lcms_config_file, temp_config_dir):
         """Test that LCMS inspector checks for Docker availability."""
         from nmdc_dp_utils.workflow_manager import NMDCWorkflowManager
         
         # Mock Docker check to fail
         mock_run.return_value = Mock(returncode=1)
         
-        manager = NMDCWorkflowManager(str(config_file_with_docker))
+        manager = NMDCWorkflowManager(str(lcms_config_file))
         
         # Create a dummy raw file
         raw_dir = temp_config_dir / "test_data" / "raw"
@@ -72,11 +72,11 @@ class TestWorkflowRawDataInspectionManager:
         assert result is False
 
     @patch.dict('os.environ', {}, clear=True)
-    def test_raw_inspector_no_files_warning(self, config_file_with_docker):
+    def test_raw_inspector_no_files_warning(self, lcms_config_file):
         """Test that inspector warns when no files are found."""
         from nmdc_dp_utils.workflow_manager import NMDCWorkflowManager
         
-        manager = NMDCWorkflowManager(str(config_file_with_docker))
+        manager = NMDCWorkflowManager(str(lcms_config_file))
         
         # Call with empty file list
         result = manager.raw_data_inspector(file_paths=[])
@@ -87,7 +87,7 @@ class TestWorkflowRawDataInspectionManager:
     @patch.dict('os.environ', {}, clear=True)
     @patch('subprocess.run')
     def test_lcms_inspector_forces_single_core_for_raw_files(
-        self, mock_run, config_file_with_docker, temp_config_dir, caplog
+        self, mock_run, lcms_config_file, temp_config_dir, caplog
     ):
         """Test that .raw files force single-core processing."""
         from nmdc_dp_utils.workflow_manager import NMDCWorkflowManager
@@ -98,7 +98,7 @@ class TestWorkflowRawDataInspectionManager:
             Mock(returncode=0)   # Docker run
         ]
         
-        manager = NMDCWorkflowManager(str(config_file_with_docker))
+        manager = NMDCWorkflowManager(str(lcms_config_file))
         
         # Create output directory and results file
         output_dir = manager.workflow_path / "raw_file_info"
@@ -128,12 +128,12 @@ class TestWorkflowRawDataInspectionManager:
     @patch.dict('os.environ', {}, clear=True)
     @patch('subprocess.run')
     def test_lcms_inspector_uses_mapped_files(
-        self, mock_run, config_file_with_docker, temp_config_dir
+        self, mock_run, lcms_config_file, temp_config_dir
     ):
         """Test that inspector uses mapped_raw_files.csv when available."""
         from nmdc_dp_utils.workflow_manager import NMDCWorkflowManager
         
-        manager = NMDCWorkflowManager(str(config_file_with_docker))
+        manager = NMDCWorkflowManager(str(lcms_config_file))
         
         # Create mapped files CSV
         metadata_dir = manager.workflow_path / "metadata"
@@ -172,11 +172,11 @@ class TestWorkflowRawDataInspectionManager:
         assert result is True or (isinstance(result, str) and 'raw_file_inspection_results.csv' in result)
 
     @patch.dict('os.environ', {}, clear=True)
-    def test_gcms_inspector_route_selection(self, gcms_config_file_with_docker):
+    def test_gcms_inspector_route_selection(self, gcms_config_file):
         """Test that GCMS workflow type routes to GCMS inspector."""
         from nmdc_dp_utils.workflow_manager import NMDCWorkflowManager
         
-        manager = NMDCWorkflowManager(str(gcms_config_file_with_docker))
+        manager = NMDCWorkflowManager(str(gcms_config_file))
         
         # Verify workflow type is GCMS
         assert manager.config["workflow"]["workflow_type"] == "GCMS Metabolomics"
@@ -184,12 +184,12 @@ class TestWorkflowRawDataInspectionManager:
     @patch.dict('os.environ', {}, clear=True)
     @patch('subprocess.run')
     def test_inspector_merges_previous_results(
-        self, mock_run, config_file_with_docker, temp_config_dir
+        self, mock_run, lcms_config_file, temp_config_dir
     ):
         """Test that new inspection results are merged with previous results."""
         from nmdc_dp_utils.workflow_manager import NMDCWorkflowManager
         
-        manager = NMDCWorkflowManager(str(config_file_with_docker))
+        manager = NMDCWorkflowManager(str(lcms_config_file))
         
         # Create output directory with previous results
         output_dir = manager.workflow_path / "raw_file_info"
@@ -241,12 +241,12 @@ class TestWorkflowRawDataInspectionManager:
     @patch.dict('os.environ', {}, clear=True)
     @patch('subprocess.run')
     def test_inspector_skips_already_inspected_files(
-        self, mock_run, config_file_with_docker, temp_config_dir
+        self, mock_run, lcms_config_file, temp_config_dir
     ):
         """Test that already-inspected files are skipped."""
         from nmdc_dp_utils.workflow_manager import NMDCWorkflowManager
         
-        manager = NMDCWorkflowManager(str(config_file_with_docker))
+        manager = NMDCWorkflowManager(str(lcms_config_file))
         
         # Create output directory with previous results
         output_dir = manager.workflow_path / "raw_file_info"
@@ -276,12 +276,12 @@ class TestWorkflowRawDataInspectionManager:
         assert manager.should_skip("raw_data_inspected") is True
 
     @patch.dict('os.environ', {}, clear=True)
-    def test_inspector_missing_docker_config_error(self, config_file):
+    def test_inspector_missing_docker_config_error(self, lcms_config_file):
         """Test that missing Docker config raises appropriate error."""
         from nmdc_dp_utils.workflow_manager import NMDCWorkflowManager
         
         # Use config without Docker settings
-        manager = NMDCWorkflowManager(str(config_file))
+        manager = NMDCWorkflowManager(str(lcms_config_file))
         
         # Create a dummy raw file
         raw_dir = manager.workflow_path.parent / "test_data" / "raw"
@@ -297,12 +297,12 @@ class TestWorkflowRawDataInspectionManager:
 
     @patch.dict('os.environ', {}, clear=True)
     def test_inspector_with_limit_parameter(
-        self, config_file_with_docker, temp_config_dir
+        self, lcms_config_file, temp_config_dir
     ):
         """Test that limit parameter is accepted without error."""
         from nmdc_dp_utils.workflow_manager import NMDCWorkflowManager
         
-        manager = NMDCWorkflowManager(str(config_file_with_docker))
+        manager = NMDCWorkflowManager(str(lcms_config_file))
         
         # Create multiple raw files
         raw_dir = temp_config_dir / "test_data" / "raw"

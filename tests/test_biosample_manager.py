@@ -20,7 +20,7 @@ class TestNMDCWorkflowBiosampleManager:
 
     @patch.dict('os.environ', {}, clear=True)
     @patch('nmdc_api_utilities.biosample_search.BiosampleSearch')
-    def test_get_biosample_attributes_success(self, mock_biosample_search_class, config_file, temp_config_dir):
+    def test_get_biosample_attributes_success(self, mock_biosample_search_class, lcms_config_file, temp_config_dir):
         """Test successful fetching of biosample attributes."""
         from nmdc_dp_utils.workflow_manager import NMDCWorkflowManager
         
@@ -46,7 +46,7 @@ class TestNMDCWorkflowBiosampleManager:
         mock_search_instance.get_record_by_filter.return_value = mock_biosamples
         
         # Create manager
-        manager = NMDCWorkflowManager(str(config_file))
+        manager = NMDCWorkflowManager(str(lcms_config_file))
         
         # Call the method
         result = manager.get_biosample_attributes()
@@ -58,7 +58,7 @@ class TestNMDCWorkflowBiosampleManager:
         # Verify the API was called correctly
         mock_search_instance.get_record_by_filter.assert_called_once()
         call_kwargs = mock_search_instance.get_record_by_filter.call_args[1]
-        assert "nmdc:sty-11-test123" in call_kwargs['filter']
+        assert "nmdc:sty-11-test" in call_kwargs['filter']
         
         # Verify CSV was created
         csv_path = manager.workflow_path / "metadata" / "biosample_attributes.csv"
@@ -72,7 +72,7 @@ class TestNMDCWorkflowBiosampleManager:
 
     @patch.dict('os.environ', {}, clear=True)
     @patch('nmdc_api_utilities.biosample_search.BiosampleSearch')
-    def test_get_biosample_attributes_no_results(self, mock_biosample_search_class, config_file):
+    def test_get_biosample_attributes_no_results(self, mock_biosample_search_class, lcms_config_file):
         """Test handling of no biosamples found."""
         from nmdc_dp_utils.workflow_manager import NMDCWorkflowManager
         
@@ -81,7 +81,7 @@ class TestNMDCWorkflowBiosampleManager:
         mock_biosample_search_class.return_value = mock_search_instance
         mock_search_instance.get_record_by_filter.return_value = []
         
-        manager = NMDCWorkflowManager(str(config_file))
+        manager = NMDCWorkflowManager(str(lcms_config_file))
         
         result = manager.get_biosample_attributes()
         
@@ -90,7 +90,7 @@ class TestNMDCWorkflowBiosampleManager:
 
     @patch.dict('os.environ', {}, clear=True)
     @patch('nmdc_api_utilities.biosample_search.BiosampleSearch')
-    def test_get_biosample_attributes_api_error(self, mock_biosample_search_class, config_file):
+    def test_get_biosample_attributes_api_error(self, mock_biosample_search_class, lcms_config_file):
         """Test handling of API errors."""
         from nmdc_dp_utils.workflow_manager import NMDCWorkflowManager
         
@@ -99,18 +99,18 @@ class TestNMDCWorkflowBiosampleManager:
         mock_biosample_search_class.return_value = mock_search_instance
         mock_search_instance.get_record_by_filter.side_effect = Exception("API connection failed")
         
-        manager = NMDCWorkflowManager(str(config_file))
+        manager = NMDCWorkflowManager(str(lcms_config_file))
         
         result = manager.get_biosample_attributes()
         
         assert result is False
 
     @patch.dict('os.environ', {}, clear=True)
-    def test_generate_biosample_mapping_script_default(self, config_file):
+    def test_generate_biosample_mapping_script_default(self, lcms_config_file):
         """Test generation of biosample mapping script with defaults."""
         from nmdc_dp_utils.workflow_manager import NMDCWorkflowManager
         
-        manager = NMDCWorkflowManager(str(config_file))
+        manager = NMDCWorkflowManager(str(lcms_config_file))
         
         # Create scripts directory
         scripts_dir = manager.workflow_path / "scripts"
@@ -130,15 +130,15 @@ class TestNMDCWorkflowBiosampleManager:
         
         # Verify script contains study-specific values
         content = script_path.read_text()
-        assert "test_study" in content
-        assert "Test study for unit testing" in content
+        assert "test_lcms_study" in content
+        assert "Test LCMS study for unit testing" in content
 
     @patch.dict('os.environ', {}, clear=True)
-    def test_generate_biosample_mapping_script_custom_name(self, config_file):
+    def test_generate_biosample_mapping_script_custom_name(self, lcms_config_file):
         """Test generation with custom script name."""
         from nmdc_dp_utils.workflow_manager import NMDCWorkflowManager
         
-        manager = NMDCWorkflowManager(str(config_file))
+        manager = NMDCWorkflowManager(str(lcms_config_file))
         
         # Create scripts directory
         scripts_dir = manager.workflow_path / "scripts"
@@ -152,11 +152,11 @@ class TestNMDCWorkflowBiosampleManager:
         assert script_path.exists()
 
     @patch.dict('os.environ', {}, clear=True)
-    def test_generate_biosample_mapping_script_missing_template(self, config_file, temp_config_dir):
+    def test_generate_biosample_mapping_script_missing_template(self, lcms_config_file, temp_config_dir):
         """Test handling of missing template file."""
         from nmdc_dp_utils.workflow_manager import NMDCWorkflowManager
         
-        manager = NMDCWorkflowManager(str(config_file))
+        manager = NMDCWorkflowManager(str(lcms_config_file))
         
         # Try with non-existent template
         fake_template = temp_config_dir / "nonexistent_template.py"
@@ -165,11 +165,11 @@ class TestNMDCWorkflowBiosampleManager:
         assert result is False
 
     @patch.dict('os.environ', {}, clear=True)
-    def test_run_biosample_mapping_script_template_error(self, config_file):
+    def test_run_biosample_mapping_script_template_error(self, lcms_config_file):
         """Test that running TEMPLATE script directly is prevented."""
         from nmdc_dp_utils.workflow_manager import NMDCWorkflowManager
         
-        manager = NMDCWorkflowManager(str(config_file))
+        manager = NMDCWorkflowManager(str(lcms_config_file))
         
         # Generate template
         manager.generate_biosample_mapping_script()
@@ -181,11 +181,11 @@ class TestNMDCWorkflowBiosampleManager:
         assert result is False
 
     @patch.dict('os.environ', {}, clear=True)
-    def test_run_biosample_mapping_script_not_found(self, config_file):
+    def test_run_biosample_mapping_script_not_found(self, lcms_config_file):
         """Test handling of missing mapping script."""
         from nmdc_dp_utils.workflow_manager import NMDCWorkflowManager
         
-        manager = NMDCWorkflowManager(str(config_file))
+        manager = NMDCWorkflowManager(str(lcms_config_file))
         
         result = manager.run_biosample_mapping_script()
         
@@ -193,11 +193,11 @@ class TestNMDCWorkflowBiosampleManager:
 
     @patch.dict('os.environ', {}, clear=True)
     @patch('subprocess.run')
-    def test_run_biosample_mapping_script_success(self, mock_subprocess, config_file):
+    def test_run_biosample_mapping_script_success(self, mock_subprocess, lcms_config_file):
         """Test successful execution of biosample mapping script."""
         from nmdc_dp_utils.workflow_manager import NMDCWorkflowManager
         
-        manager = NMDCWorkflowManager(str(config_file))
+        manager = NMDCWorkflowManager(str(lcms_config_file))
         
         # Create a non-template script
         script_path = manager.workflow_path / "scripts" / "map_raw_files_to_biosamples.py"
@@ -234,11 +234,11 @@ class TestNMDCWorkflowBiosampleManager:
 
     @patch.dict('os.environ', {}, clear=True)
     @patch('subprocess.run')
-    def test_run_biosample_mapping_script_failure(self, mock_subprocess, config_file):
+    def test_run_biosample_mapping_script_failure(self, mock_subprocess, lcms_config_file):
         """Test handling of script execution failure."""
         from nmdc_dp_utils.workflow_manager import NMDCWorkflowManager
         
-        manager = NMDCWorkflowManager(str(config_file))
+        manager = NMDCWorkflowManager(str(lcms_config_file))
         
         # Create a non-template script
         script_path = manager.workflow_path / "scripts" / "map_raw_files_to_biosamples.py"
@@ -256,11 +256,11 @@ class TestNMDCWorkflowBiosampleManager:
         assert manager.should_skip("biosample_mapping_completed") is False
 
     @patch.dict('os.environ', {}, clear=True)
-    def test_generate_mapped_files_list_with_file_types(self, config_file):
+    def test_generate_mapped_files_list_with_file_types(self, lcms_config_file):
         """Test generation of mapped files list with raw_file_type column."""
         from nmdc_dp_utils.workflow_manager import NMDCWorkflowManager
         
-        manager = NMDCWorkflowManager(str(config_file))
+        manager = NMDCWorkflowManager(str(lcms_config_file))
         
         # Create metadata directory
         metadata_dir = manager.workflow_path / "metadata"
@@ -295,11 +295,11 @@ class TestNMDCWorkflowBiosampleManager:
         assert "cal1.raw" in result_df["raw_file_path"].apply(lambda x: Path(x).name).values
 
     @patch.dict('os.environ', {}, clear=True)
-    def test_generate_mapped_files_list_legacy_format(self, config_file):
+    def test_generate_mapped_files_list_legacy_format(self, lcms_config_file):
         """Test generation of mapped files list without raw_file_type (backwards compatibility)."""
         from nmdc_dp_utils.workflow_manager import NMDCWorkflowManager
         
-        manager = NMDCWorkflowManager(str(config_file))
+        manager = NMDCWorkflowManager(str(lcms_config_file))
         
         # Create metadata directory
         metadata_dir = manager.workflow_path / "metadata"
@@ -330,11 +330,11 @@ class TestNMDCWorkflowBiosampleManager:
         assert len(result_df) == 2  # Only high and medium
 
     @patch.dict('os.environ', {}, clear=True)
-    def test_generate_mapped_files_list_no_matches(self, config_file):
+    def test_generate_mapped_files_list_no_matches(self, lcms_config_file):
         """Test handling of no matched files."""
         from nmdc_dp_utils.workflow_manager import NMDCWorkflowManager
         
-        manager = NMDCWorkflowManager(str(config_file))
+        manager = NMDCWorkflowManager(str(lcms_config_file))
         
         # Create metadata directory
         metadata_dir = manager.workflow_path / "metadata"
@@ -358,11 +358,11 @@ class TestNMDCWorkflowBiosampleManager:
         assert not output_file.exists()
 
     @patch.dict('os.environ', {}, clear=True)
-    def test_skip_triggers_for_biosample_workflow(self, config_file):
+    def test_skip_triggers_for_biosample_workflow(self, lcms_config_file):
         """Test that skip triggers work correctly for biosample workflow steps."""
         from nmdc_dp_utils.workflow_manager import NMDCWorkflowManager
         
-        manager = NMDCWorkflowManager(str(config_file))
+        manager = NMDCWorkflowManager(str(lcms_config_file))
         
         # Initially all should be False
         assert manager.should_skip("biosample_attributes_fetched") is False

@@ -18,7 +18,7 @@ class TestWorkflowRawDataInspectionManagerIntegration:
     @pytest.mark.network
     @pytest.mark.slow
     def test_raw_data_inspector_real_file_download_and_inspection(
-        self, integration_raw_data_config_file, integration_test_raw_file
+        self, integration_config_file, integration_test_raw_file
     ):
         """
         Integration test: Download real .raw file from MASSIVE and inspect it.
@@ -44,7 +44,7 @@ class TestWorkflowRawDataInspectionManagerIntegration:
             pytest.skip("Docker is not installed or not available")
         
         # Create manager
-        manager = NMDCWorkflowManager(str(integration_raw_data_config_file))
+        manager = NMDCWorkflowManager(str(integration_config_file))
         
         # Copy the cached test file to the manager's raw data directory
         raw_data_dir = Path(manager.raw_data_directory)
@@ -108,7 +108,7 @@ class TestWorkflowRawDataInspectionManagerIntegration:
     @pytest.mark.network
     @pytest.mark.slow  
     def test_raw_data_inspector_handles_errors_gracefully(
-        self, integration_raw_data_config_file
+        self, integration_config_file
     ):
         """
         Integration test: Verify inspector handles non-existent files gracefully.
@@ -128,7 +128,7 @@ class TestWorkflowRawDataInspectionManagerIntegration:
         except (subprocess.TimeoutExpired, FileNotFoundError):
             pytest.skip("Docker is not installed")
         
-        manager = NMDCWorkflowManager(str(integration_raw_data_config_file))
+        manager = NMDCWorkflowManager(str(integration_config_file))
         
         # Try to inspect a non-existent file
         result = manager.raw_data_inspector(
@@ -142,14 +142,14 @@ class TestWorkflowRawDataInspectionManagerIntegration:
     @pytest.mark.network
     @pytest.mark.slow
     def test_raw_data_inspector_empty_file_list(
-        self, integration_raw_data_config_file
+        self, integration_config_file
     ):
         """
         Integration test: Verify inspector handles empty file list.
         """
         from nmdc_dp_utils.workflow_manager import NMDCWorkflowManager
         
-        manager = NMDCWorkflowManager(str(integration_raw_data_config_file))
+        manager = NMDCWorkflowManager(str(integration_config_file))
         
         # Call with empty file list
         result = manager.raw_data_inspector(file_paths=[])
@@ -160,14 +160,14 @@ class TestWorkflowRawDataInspectionManagerIntegration:
     @pytest.mark.network
     @pytest.mark.slow
     def test_raw_data_inspector_skip_trigger_prevents_rerun(
-        self, integration_raw_data_config_file
+        self, integration_config_file
     ):
         """
         Integration test: Verify skip trigger prevents re-running inspection.
         """
         from nmdc_dp_utils.workflow_manager import NMDCWorkflowManager
         
-        manager = NMDCWorkflowManager(str(integration_raw_data_config_file))
+        manager = NMDCWorkflowManager(str(integration_config_file))
         
         # Set the raw_data_inspected skip trigger
         manager.set_skip_trigger("raw_data_inspected", True)

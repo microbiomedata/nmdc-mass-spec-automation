@@ -19,56 +19,56 @@ class TestNMDCWorkflowManager:
     """Test suite for NMDCWorkflowManager class."""
 
     @patch.dict('os.environ', {}, clear=True)
-    def test_initialization(self, config_file):
+    def test_initialization(self, lcms_config_file):
         """Test that workflow manager initializes correctly with valid config."""
         from nmdc_dp_utils.workflow_manager import NMDCWorkflowManager
         
-        manager = NMDCWorkflowManager(str(config_file))
+        manager = NMDCWorkflowManager(str(lcms_config_file))
         
-        assert manager.workflow_name == "test_workflow"
-        assert manager.study_name == "test_study"
-        assert manager.study_id == "nmdc:sty-11-test123"
-        assert manager.config_path == str(config_file.resolve())
+        assert manager.workflow_name == "test_lcms_workflow"
+        assert manager.study_name == "test_lcms_study"
+        assert manager.study_id == "nmdc:sty-11-test"
+        assert manager.config_path == str(lcms_config_file.resolve())
 
     @patch.dict('os.environ', {}, clear=True)
-    def test_load_config(self, config_file, minimal_config):
+    def test_load_config(self, lcms_config_file, lcms_config):
         """Test configuration loading from JSON file."""
         from nmdc_dp_utils.workflow_manager import NMDCWorkflowManager
         
-        manager = NMDCWorkflowManager(str(config_file))
+        manager = NMDCWorkflowManager(str(lcms_config_file))
         
-        assert manager.config["workflow"]["name"] == minimal_config["workflow"]["name"]
-        assert manager.config["study"]["id"] == minimal_config["study"]["id"]
+        assert manager.config["workflow"]["name"] == lcms_config["workflow"]["name"]
+        assert manager.config["study"]["id"] == lcms_config["study"]["id"]
         assert "skip_triggers" in manager.config
 
     @patch.dict('os.environ', {}, clear=True)
-    def test_skip_triggers_initialization(self, config_file):
+    def test_skip_triggers_initialization(self, lcms_config_file):
         """Test that skip triggers are initialized if not present in config."""
         from nmdc_dp_utils.workflow_manager import NMDCWorkflowManager
         
-        manager = NMDCWorkflowManager(str(config_file))
+        manager = NMDCWorkflowManager(str(lcms_config_file))
         
         assert "skip_triggers" in manager.config
         assert isinstance(manager.config["skip_triggers"], dict)
         assert manager.config["skip_triggers"]["study_structure_created"] is False
 
     @patch.dict('os.environ', {}, clear=True)
-    def test_should_skip(self, config_file):
+    def test_should_skip(self, lcms_config_file):
         """Test skip trigger checking."""
         from nmdc_dp_utils.workflow_manager import NMDCWorkflowManager
         
-        manager = NMDCWorkflowManager(str(config_file))
+        manager = NMDCWorkflowManager(str(lcms_config_file))
         manager.config["skip_triggers"]["test_trigger"] = True
         
         assert manager.should_skip("test_trigger") is True
         assert manager.should_skip("nonexistent_trigger") is False
 
     @patch.dict('os.environ', {}, clear=True)
-    def test_set_skip_trigger(self, config_file):
+    def test_set_skip_trigger(self, lcms_config_file):
         """Test setting skip trigger values."""
         from nmdc_dp_utils.workflow_manager import NMDCWorkflowManager
         
-        manager = NMDCWorkflowManager(str(config_file))
+        manager = NMDCWorkflowManager(str(lcms_config_file))
         
         # Test setting without saving
         manager.set_skip_trigger("test_trigger", True, save=False)
@@ -78,16 +78,16 @@ class TestNMDCWorkflowManager:
         manager.set_skip_trigger("another_trigger", True, save=True)
         
         # Reload config and verify persistence
-        with open(config_file, "r") as f:
+        with open(lcms_config_file, "r") as f:
             saved_config = json.load(f)
         assert saved_config["skip_triggers"]["another_trigger"] is True
 
     @patch.dict('os.environ', {}, clear=True)
-    def test_reset_all_triggers(self, config_file):
+    def test_reset_all_triggers(self, lcms_config_file):
         """Test resetting all skip triggers."""
         from nmdc_dp_utils.workflow_manager import NMDCWorkflowManager
         
-        manager = NMDCWorkflowManager(str(config_file))
+        manager = NMDCWorkflowManager(str(lcms_config_file))
         
         # Set some triggers
         manager.set_skip_trigger("trigger1", True, save=False)
@@ -100,54 +100,54 @@ class TestNMDCWorkflowManager:
         assert manager.config["skip_triggers"]["trigger2"] is False
 
     @patch.dict('os.environ', {}, clear=True)
-    def test_path_construction(self, config_file, temp_config_dir):
+    def test_path_construction(self, lcms_config_file, temp_config_dir):
         """Test that paths are constructed correctly."""
         from nmdc_dp_utils.workflow_manager import NMDCWorkflowManager
         
-        manager = NMDCWorkflowManager(str(config_file))
+        manager = NMDCWorkflowManager(str(lcms_config_file))
         
-        assert manager.base_path == temp_config_dir / "test_base"
-        assert manager.workflow_path == temp_config_dir / "test_base/studies/test_workflow"
-        assert manager.raw_data_directory == temp_config_dir / "test_data/test_study/raw"
+        assert manager.base_path == temp_config_dir / "lcms_base"
+        assert manager.workflow_path == temp_config_dir / "lcms_base/studies/test_lcms_workflow"
+        assert manager.raw_data_directory == temp_config_dir / "lcms_data/test_lcms_study/raw"
 
     @patch.dict('os.environ', {}, clear=True)
-    def test_processed_data_directory_with_date_tag(self, temp_config_dir, minimal_config):
+    def test_processed_data_directory_with_date_tag(self, temp_config_dir, lcms_config):
         """Test processed data directory path with date tag."""
         from nmdc_dp_utils.workflow_manager import NMDCWorkflowManager
         
         # Add date tag to config
-        minimal_config["workflow"]["processed_data_date_tag"] = "20250107"
+        lcms_config["workflow"]["processed_data_date_tag"] = "20250107"
         config_path = temp_config_dir / "test_config_with_date.json"
         with open(config_path, "w") as f:
-            json.dump(minimal_config, f)
+            json.dump(lcms_config, f)
         
         manager = NMDCWorkflowManager(str(config_path))
         
-        expected_path = temp_config_dir / "test_data/test_study/processed_20250107"
+        expected_path = temp_config_dir / "lcms_data/test_lcms_study/processed_20250107"
         assert manager.processed_data_directory == expected_path
 
     @patch.dict('os.environ', {}, clear=True)
-    def test_get_workflow_info(self, config_file):
+    def test_get_workflow_info(self, lcms_config_file):
         """Test workflow info retrieval."""
         from nmdc_dp_utils.workflow_manager import NMDCWorkflowManager
         
-        manager = NMDCWorkflowManager(str(config_file))
+        manager = NMDCWorkflowManager(str(lcms_config_file))
         info = manager.get_workflow_info()
         
-        assert info["workflow_name"] == "test_workflow"
-        assert info["study_name"] == "test_study"
-        assert info["study_id"] == "nmdc:sty-11-test123"
-        assert info["massive_id"] == "MSV000012345"
+        assert info["workflow_name"] == "test_lcms_workflow"
+        assert info["study_name"] == "test_lcms_study"
+        assert info["study_id"] == "nmdc:sty-11-test"
+        assert info["massive_id"] == "MSV000094090"
         assert info["file_type"] == ".raw"
-        assert "test_config" in info["configuration_names"]
+        assert "hilic_pos" in info["configuration_names"]
         assert info["minio_enabled"] is False  # No credentials in env
 
     @patch.dict('os.environ', {}, clear=True)
-    def test_show_available_workflow_types(self, config_file):
+    def test_show_available_workflow_types(self, lcms_config_file):
         """Test listing available workflow types."""
         from nmdc_dp_utils.workflow_manager import NMDCWorkflowManager
         
-        manager = NMDCWorkflowManager(str(config_file))
+        manager = NMDCWorkflowManager(str(lcms_config_file))
         workflow_types = manager.show_available_workflow_types()
         
         assert isinstance(workflow_types, list)
@@ -157,21 +157,21 @@ class TestNMDCWorkflowManager:
     #TODO: Add test for minio with valid credentials in env for GHA
 
     @patch.dict('os.environ', {}, clear=True)
-    def test_minio_client_initialization_without_credentials(self, config_file):
+    def test_minio_client_initialization_without_credentials(self, lcms_config_file):
         """Test MinIO client is None when credentials are missing."""
         from nmdc_dp_utils.workflow_manager import NMDCWorkflowManager
         
-        manager = NMDCWorkflowManager(str(config_file))
+        manager = NMDCWorkflowManager(str(lcms_config_file))
         
         # MinIO client should return None when credentials are not available
         assert manager.minio_client is None
 
     @patch.dict('os.environ', {}, clear=True)
-    def test_minio_client_lazy_loading(self, config_file):
+    def test_minio_client_lazy_loading(self, lcms_config_file):
         """Test that MinIO client is only initialized when first accessed."""
         from nmdc_dp_utils.workflow_manager import NMDCWorkflowManager
         
-        manager = NMDCWorkflowManager(str(config_file))
+        manager = NMDCWorkflowManager(str(lcms_config_file))
         
         # Private attribute should be None before first access
         assert manager._minio_client is None
