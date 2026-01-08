@@ -186,3 +186,145 @@ def integration_test_gcms_file():
         if cdf_file_path.exists():
             cdf_file_path.unlink()
         raise RuntimeError(f"Failed to download GCMS test file: {e}") from e
+
+
+@pytest.fixture
+def integration_lcms_config(tmp_path):
+    """
+    Provides a realistic LCMS configuration for integration testing.
+    
+    This configuration mirrors real NMDC LCMS workflows with:
+    - Multiple chromatography configurations (RP positive/negative)
+    - Metadata overrides for collision energy patterns
+    - MinIO for local testing (no network dependency)
+    - Realistic instrument and processing metadata
+    - Full metadata package generation support
+    
+    Args:
+        tmp_path: pytest tmp_path fixture
+        
+    Returns:
+        dict: Complete LCMS workflow configuration
+    """
+    return {
+        "study": {
+            "name": "test_lcms_study",
+            "id": "nmdc:sty-11-test-lcms",
+            "description": "Test LCMS study for integration testing"
+        },
+        "workflow": {
+            "name": "test_lcms_workflow",
+            "massive_id": "MSV000094090",
+            "file_type": ".raw",
+            "workflow_type": "LCMS Lipidomics",
+            "processed_data_date_tag": "20250108"
+        },
+        "paths": {
+            "base_directory": str(tmp_path),
+            "data_directory": str(tmp_path / "data")
+        },
+        "minio": {
+            "endpoint": "admin.nmdcdemo.emsl.pnl.gov",
+            "secure": True,
+            "bucket": "metabolomics",
+            "public_url_base": "https://nmdcdemo.emsl.pnnl.gov"
+        },
+        "configurations": [
+            {
+                "name": "rp_pos",
+                "file_filter": ["C18", "_POS_"],
+                "chromat_configuration_name": "JGI/LBNL Metabolomics Standard LC Method - Nonpolar C18",
+                "mass_spec_configuration_name": "JGI/LBNL Standard Metabolomics Method, positive",
+                "metadata_overrides": {
+                    "mass_spec_configuration_name": {
+                        "CE102040": "JGI/LBNL Standard Metabolomics Method, positive @10,20,40CE",
+                        "CE205060": "JGI/LBNL Standard Metabolomics Method, positive @20,50,60CE"
+                    }
+                }
+            },
+            {
+                "name": "rp_neg",
+                "file_filter": ["C18", "_NEG_"],
+                "chromat_configuration_name": "JGI/LBNL Metabolomics Standard LC Method - Nonpolar C18",
+                "mass_spec_configuration_name": "JGI/LBNL Standard Metabolomics Method, negative",
+                "metadata_overrides": {
+                    "mass_spec_configuration_name": {
+                        "CE102040": "JGI/LBNL Standard Metabolomics Method, negative @10,20,40CE",
+                        "CE205060": "JGI/LBNL Standard Metabolomics Method, negative @20,50,60CE"
+                    }
+                }
+            }
+        ],
+        "metadata": {
+            "instrument_used": "Thermo Orbitrap Q-Exactive",
+            "processing_institution_workflow": "NMDC",
+            "processing_institution_generation": "JGI",
+            "raw_data_location": "minio",
+            "existing_data_objects": []
+        },
+        "skip_triggers": {
+            "metadata_mapping_generated": False,
+            "metadata_packages_generated": False
+        }
+    }
+
+
+@pytest.fixture
+def integration_gcms_config(tmp_path):
+    """
+    Provides a realistic GCMS configuration for integration testing.
+    
+    This configuration mirrors real NMDC GCMS workflows with:
+    - Single chromatography configuration (typical for GCMS)
+    - Calibration file handling
+    - MinIO for local testing (no network dependency)
+    - Realistic instrument and processing metadata
+    - Full metadata package generation support
+    
+    Args:
+        tmp_path: pytest tmp_path fixture
+        
+    Returns:
+        dict: Complete GCMS workflow configuration
+    """
+    return {
+        "study": {
+            "name": "test_gcms_study",
+            "id": "nmdc:sty-11-test-gcms",
+            "description": "Test GCMS study for integration testing"
+        },
+        "workflow": {
+            "name": "test_gcms_workflow",
+            "file_type": ".cdf",
+            "workflow_type": "GCMS Metabolomics",
+            "processed_data_date_tag": "20250108"
+        },
+        "paths": {
+            "base_directory": str(tmp_path),
+            "data_directory": str(tmp_path / "data")
+        },
+        "minio": {
+            "endpoint": "admin.nmdcdemo.emsl.pnl.gov",
+            "secure": True,
+            "bucket": "metabolomics",
+            "public_url_base": "https://nmdcdemo.emsl.pnnl.gov"
+        },
+        "configurations": [
+            {
+                "name": "gcms",
+                "chromat_configuration_name": "EMSL_Agilent_GC",
+                "mass_spec_configuration_name": "Agilent_5977_MSD"
+            }
+        ],
+        "metadata": {
+            "instrument_used": "Agilent 7980A GC-MS",
+            "processing_institution_workflow": "NMDC",
+            "processing_institution_generation": "EMSL",
+            "raw_data_location": "minio",
+            "configuration_file_name": "test_gcms_corems_params.toml"
+        },
+        "skip_triggers": {
+            "metadata_mapping_generated": False,
+            "metadata_packages_generated": False
+        }
+    }
