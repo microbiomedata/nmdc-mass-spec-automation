@@ -1,4 +1,4 @@
-.PHONY: help test test-unit test-integration download-test-data clean-test-data
+.PHONY: help test test-unit test-integration test-coverage download-test-data clean-test-data
 
 # Python and pytest commands (use venv if available, otherwise system)
 PYTHON := $(shell if [ -f venv/bin/python ]; then echo venv/bin/python; else echo python; fi)
@@ -10,6 +10,7 @@ help:
 	@echo "  test                 - Run all tests (unit + integration)"
 	@echo "  test-unit            - Run unit tests only"
 	@echo "  test-integration     - Run integration tests (requires Docker and network)"
+	@echo "  test-coverage        - Run all tests with coverage report"
 	@echo "  download-test-data   - Download required test data files"
 	@echo "  clean-test-data      - Remove downloaded test data"
 	@echo "  clean                - Clean all generated files"
@@ -24,6 +25,12 @@ test-unit:
 # Run integration tests (downloads test data if needed)
 test-integration: download-test-data
 	$(PYTEST) tests/integration/ -v -s
+
+# Run all tests with coverage report
+test-coverage: download-test-data
+	$(PYTEST) tests/ --cov=nmdc_dp_utils --cov-report=html --cov-report=term-missing
+	@echo ""
+	@echo "Coverage report generated in htmlcov/index.html"
 
 # Download required test data for integration tests
 download-test-data:
