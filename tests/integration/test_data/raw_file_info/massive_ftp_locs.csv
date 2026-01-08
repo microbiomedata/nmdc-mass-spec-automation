@@ -1,0 +1,6 @@
+raw_data_file_short,ftp_location
+sample01_C18_POS_CE102040.raw,ftp://massive.ucsd.edu/MSV000094090/raw/sample01_C18_POS_CE102040.raw
+sample02_C18_POS_CE205060.raw,ftp://massive.ucsd.edu/MSV000094090/raw/sample02_C18_POS_CE205060.raw
+sample03_C18_NEG_CE102040.raw,ftp://massive.ucsd.edu/MSV000094090/raw/sample03_C18_NEG_CE102040.raw
+sample04_C18_NEG_CE205060.raw,ftp://massive.ucsd.edu/MSV000094090/raw/sample04_C18_NEG_CE205060.raw
+sample05_C18_POS_CE102040.raw,ftp://massive.ucsd.edu/MSV000094090/raw/sample05_C18_POS_CE102040.raw

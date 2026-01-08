@@ -1,0 +1,6 @@
+raw_file_name,raw_file_type,biosample_id,biosample_name,match_confidence
+sample01_gcms.cdf,sample,nmdc:bsm-11-gcms001,GCMS_Sample01,high
+sample02_gcms.cdf,sample,nmdc:bsm-11-gcms002,GCMS_Sample02,high
+sample03_gcms.cdf,sample,nmdc:bsm-11-gcms003,GCMS_Sample03,high
+sample04_gcms.cdf,sample,nmdc:bsm-11-gcms004,GCMS_Sample04,high
+GCMS_FAMEs_calibration.cdf,calibration,,,high

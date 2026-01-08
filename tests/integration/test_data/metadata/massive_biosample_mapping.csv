@@ -1,0 +1,4 @@
+raw_file_name,biosample_id,match_confidence,raw_file_type
+20210819_HILICZ_USHXG01490_POS_MSMS_9_S32-D30_C_Rg70to1050-CE102040-soil-S1_Run178.raw,nmdc:bsm-11-test001,high,sample
+20210819_HILICZ_USHXG01490_POS_MSMS_10_S32-D30_C_Rg70to1050-CE205060-soil-S1_Run179.raw,nmdc:bsm-11-test002,high,sample
+20210819_HILICZ_USHXG01490_POS_MSMS_11_S32-D30_C_Rg70to1050-CE102040-soil-S2_Run180.raw,nmdc:bsm-11-test003,high,sample
