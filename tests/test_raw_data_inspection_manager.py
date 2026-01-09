@@ -9,12 +9,8 @@ Tests cover raw data inspection functionality including:
 - Error handling
 """
 
-import json
-import pytest
-from pathlib import Path
-from unittest.mock import Mock, patch, MagicMock, call
+from unittest.mock import Mock
 import pandas as pd
-import subprocess
 
 
 class TestWorkflowRawDataInspectionManager:

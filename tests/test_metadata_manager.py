@@ -10,8 +10,7 @@ Tests the metadata generation workflow including:
 
 import pytest
 import pandas as pd
-from pathlib import Path
-from unittest.mock import Mock, patch, MagicMock
+from unittest.mock import patch, MagicMock
 import json
 
 

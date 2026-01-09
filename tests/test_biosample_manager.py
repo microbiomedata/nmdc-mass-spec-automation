@@ -8,10 +8,8 @@ Tests cover biosample management functionality including:
 - Filtering mapped files for processing
 """
 
-import json
-import pytest
 from pathlib import Path
-from unittest.mock import Mock, patch, MagicMock, call
+from unittest.mock import MagicMock
 import pandas as pd
 
 

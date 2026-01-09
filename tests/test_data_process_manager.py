@@ -6,10 +6,7 @@ without actually executing WDL workflows. Uses mocks for complex file system ope
 """
 
 import json
-import pytest
-import pandas as pd
-from pathlib import Path
-from unittest.mock import Mock, patch, call, MagicMock
+from unittest.mock import patch
 from nmdc_dp_utils.workflow_manager import NMDCWorkflowManager
 
 
