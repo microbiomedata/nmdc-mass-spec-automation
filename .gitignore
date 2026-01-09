@@ -13,3 +13,13 @@ __pycache__/
 
 *.xlsx
 *.msp
+!tests/integration/test_data/test_database.msp
+
+# Testing and coverage reports
+htmlcov/
+.coverage
+.pytest_cache/
+
+# Integration test data (downloaded files only)
+tests/integration/test_data/20210819_JGI-AK_MK_506588_SoilWaterRep_final_QE-139_HILICZ_USHXG01490_NEG_MSMS_19_S16-D89_A_Rg70to1050-CE102040-soil-S1_Run84.raw
+tests/integration/test_data/GCMS_FAMEs_01_GCMS01_20180115.cdf

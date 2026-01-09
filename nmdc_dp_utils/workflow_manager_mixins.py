@@ -616,7 +616,9 @@ class WorkflowDataMovementManager:
             >>> manager.upload_to_minio('/path/to/processed', 'metabolomics', 'study_data')
         """
         if not self.minio_client:
-            raise ValueError("MinIO client not initialized")
+            raise ValueError(
+                "MinIO client not available. Please set MINIO_ACCESS_KEY and MINIO_SECRET_KEY environment variables."
+            )
 
         local_path = Path(local_directory)
         if not local_path.exists():
@@ -682,7 +684,9 @@ class WorkflowDataMovementManager:
             >>> print(f"Downloaded {count} files")
         """
         if not self.minio_client:
-            raise ValueError("MinIO client not initialized")
+            raise ValueError(
+                "MinIO client not available. Please set MINIO_ACCESS_KEY and MINIO_SECRET_KEY environment variables."
+            )
 
         # Create local directory
         Path(local_directory).mkdir(parents=True, exist_ok=True)
@@ -750,7 +754,9 @@ class WorkflowDataMovementManager:
             >>> success = manager.download_raw_data_from_minio()
         """
         if not self.minio_client:
-            self.logger.error("MinIO client not initialized")
+            self.logger.error(
+                "MinIO client not available. Please set MINIO_ACCESS_KEY and MINIO_SECRET_KEY environment variables."
+            )
             return False
 
         # Use config values if not provided
@@ -1790,8 +1796,9 @@ fi
         # Check if Docker is running
         self.logger.info("Checking Docker availability...")
         try:
+            docker_cmd = WorkflowRawDataInspectionManager._find_docker_command()
             docker_check = subprocess.run(
-                ["docker", "info"], capture_output=True, text=True, timeout=10
+                [docker_cmd, "info"], capture_output=True, text=True, timeout=10
             )
             if docker_check.returncode != 0:
                 self.logger.error("Docker is not running or not available")
@@ -1799,9 +1806,9 @@ fi
         except subprocess.TimeoutExpired:
             self.logger.error("Docker check timed out - Docker may not be running")
             return 1
-        except FileNotFoundError:
+        except FileNotFoundError as e:
             self.logger.error(
-                "Docker command not found - please install Docker Desktop"
+                f"Docker command not found - please install Docker Desktop: {e}"
             )
             return 1
         except Exception as e:
@@ -2387,7 +2394,43 @@ class WorkflowRawDataInspectionManager:
     Mixin class for managing raw data inspection using Docker containers.
     """
 
-    @skip_if_complete("data_processed", return_value=True)
+    @staticmethod
+    def _find_docker_command():
+        """
+        Find the docker command in the system.
+        
+        Checks common locations and PATH to find docker executable.
+        This ensures docker can be found even when subprocess doesn't inherit
+        the full shell environment.
+        
+        Returns:
+            str: Path to docker executable
+            
+        Raises:
+            FileNotFoundError: If docker cannot be found
+        """
+        # Try to find docker using shutil.which (checks PATH)
+        docker_path = shutil.which('docker')
+        if docker_path:
+            return docker_path
+        
+        # Check common installation locations if not in PATH
+        common_locations = [
+            '/usr/local/bin/docker',
+            '/usr/bin/docker',
+            '/opt/homebrew/bin/docker',
+        ]
+        
+        for location in common_locations:
+            if Path(location).exists():
+                return location
+        
+        # If still not found, raise error
+        raise FileNotFoundError(
+            "Docker command not found. Please ensure Docker is installed and accessible."
+        )
+
+    @skip_if_complete("raw_data_inspected", return_value=True)
     def raw_data_inspector(
         self, file_paths=None, cores=1, limit=None, max_retries=10, retry_delay=10.0
     ) -> bool:
@@ -2619,6 +2662,7 @@ class WorkflowRawDataInspectionManager:
             # Set the skip trigger on successful completion
             if result is not None:
                 self.logger.info("Raw data inspection completed successfully")
+                self.set_skip_trigger("raw_data_inspected", True)
                 return True
             else:
                 self.logger.error("Raw data inspection failed")
@@ -2645,13 +2689,14 @@ class WorkflowRawDataInspectionManager:
 
         # Check if Docker is available
         try:
+            docker_exe = self._find_docker_command()
             docker_check = subprocess.run(
-                ["docker", "--version"], capture_output=True, text=True, timeout=10
+                [docker_exe, "--version"], capture_output=True, text=True, timeout=10
             )
             if docker_check.returncode != 0:
                 raise RuntimeError("Docker is not available")
-        except (subprocess.TimeoutExpired, FileNotFoundError):
-            raise RuntimeError("Docker is not installed or not available")
+        except (subprocess.TimeoutExpired, FileNotFoundError) as e:
+            raise RuntimeError(f"Docker is not installed or not available: {e}")
 
         # Get script path
         script_path = Path(__file__).parent / "raw_data_inspector.py"
@@ -2673,6 +2718,13 @@ class WorkflowRawDataInspectionManager:
         # Always mount the output directory and script directory
         mount_points.add(str(output_dir.resolve()))
         mount_points.add(str(script_path.parent.resolve()))
+
+        # Ensure all mount points exist before Docker tries to mount them
+        # This is critical when running with --user flag, as Docker can't create
+        # directories without proper permissions in that mode
+        for mount_point in mount_points:
+            mount_path = Path(mount_point)
+            mount_path.mkdir(parents=True, exist_ok=True)
 
         # Build Docker volume arguments
         volume_args = []
@@ -2722,7 +2774,7 @@ class WorkflowRawDataInspectionManager:
         # Build Docker command
         docker_cmd = (
             [
-                "docker",
+                docker_exe,
                 "run",
                 "--rm",
                 "--user",
@@ -2883,6 +2935,7 @@ class WorkflowRawDataInspectionManager:
             # Set skip trigger on success
             if result is not None:
                 self.logger.info("GCMS raw data inspection completed successfully.")
+                self.set_skip_trigger("raw_data_inspected", True)
                 return True
             else:
                 self.logger.error("GCMS raw data inspection failed")
@@ -2910,13 +2963,14 @@ class WorkflowRawDataInspectionManager:
 
         # Check if Docker is available
         try:
+            docker_exe = self._find_docker_command()
             docker_check = subprocess.run(
-                ["docker", "--version"], capture_output=True, text=True, timeout=10
+                [docker_exe, "--version"], capture_output=True, text=True, timeout=10
             )
             if docker_check.returncode != 0:
                 raise RuntimeError("Docker is not available")
-        except (subprocess.TimeoutExpired, FileNotFoundError):
-            raise RuntimeError("Docker is not installed or not available")
+        except (subprocess.TimeoutExpired, FileNotFoundError) as e:
+            raise RuntimeError(f"Docker is not installed or not available: {e}")
 
         # Prepare volume mounts
         mount_points = set()
@@ -2924,6 +2978,13 @@ class WorkflowRawDataInspectionManager:
         mount_points.add(str(raw_data_dir))
         mount_points.add(str(output_dir.resolve()))
         mount_points.add(str(script_path.parent.resolve()))
+
+        # Ensure all mount points exist before Docker tries to mount them
+        # This is critical when running with --user flag, as Docker can't create
+        # directories without proper permissions in that mode
+        for mount_point in mount_points:
+            mount_path = Path(mount_point)
+            mount_path.mkdir(parents=True, exist_ok=True)
 
         # Build volume arguments
         volume_args = []
@@ -2959,7 +3020,7 @@ class WorkflowRawDataInspectionManager:
         # Build Docker command
         docker_cmd = (
             [
-                "docker",
+                docker_exe,
                 "run",
                 "--rm",
                 "--user",
@@ -3094,7 +3155,9 @@ class WorkflowRawDataInspectionManager:
             Creates folder structure: bucket/study_name/processed_data/
         """
         if not self.minio_client:
-            self.logger.error("MinIO client not initialized")
+            self.logger.error(
+                "MinIO client not available. Please set MINIO_ACCESS_KEY and MINIO_SECRET_KEY environment variables."
+            )
             self.logger.error(
                 "Set MINIO_ACCESS_KEY and MINIO_SECRET_KEY environment variables"
             )

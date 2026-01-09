@@ -1,0 +1,73 @@
+name: Run Tests
+
+on:
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  unit-tests:
+    name: Unit Tests
+    runs-on: ubuntu-latest
+    
+    strategy:
+      matrix:
+        python-version: ['3.11', '3.12']
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+    
+    - name: Set up Python ${{ matrix.python-version }}
+      uses: actions/setup-python@v5
+      with:
+        python-version: ${{ matrix.python-version }}
+    
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install -r requirements.txt
+    
+    - name: Run unit tests with pytest
+      run: |
+        pytest tests/ --ignore=tests/integration/ -v --tb=short
+
+  integration-tests:
+    name: Integration Tests
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+    
+    - name: Set up Python 3.12
+      uses: actions/setup-python@v5
+      with:
+        python-version: '3.12'
+    
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install -r requirements.txt
+    
+    - name: Verify Docker is available
+      run: |
+        docker --version
+        docker info
+    
+    - name: Pull required Docker images
+      run: |
+        docker pull microbiomedata/metams:3.3.3
+    
+    - name: Download test data
+      run: |
+        make download-test-data
+    
+    - name: Run integration tests with pytest
+      timeout-minutes: 15
+      run: |
+        pytest tests/integration/ -v --tb=short -s
+    
+    - name: Report integration test failures
+      if: failure()
+      run: |
+        echo "::warning::Integration tests failed. This may indicate issues with external APIs or network connectivity."
