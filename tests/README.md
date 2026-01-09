@@ -1,156 +1,136 @@
 # Tests
 
-This directory contains the test suite for the NMDC Mass Spec Automation tools.
+Test suite for NMDC Mass Spectrometry automation workflows. Tests are organized by scope (unit vs integration) and cover the mixin-based workflow manager architecture.
 
-## Test Structure
+## Test Organization
 
 ```
 tests/
-├── conftest.py                                      # Shared fixtures and pytest configuration
-├── test_workflow_manager.py                         # Unit tests for core workflow manager
-├── test_biosample_manager.py                        # Unit tests for biosample manager mixin
-├── test_raw_data_inspection_manager.py              # Unit tests for raw data inspection mixin
-└── integration/                                     # Integration tests (separate directory)
-    ├── README.md                                    # Integration test documentation
-    ├── conftest.py                                  # Integration-specific configuration
-    ├── test_biosample_manager_integration.py        # Integration tests for biosample manager
-    ├── test_raw_data_inspection_manager_integration.py  # Integration tests for raw data inspection
-    └── test_data/                                   # Downloaded test data (gitignored)
-        └── README.md                                # Test data documentation
+├── conftest.py                      # Shared fixtures (configs, managers, mocks)
+├── test_*.py                        # Unit tests per mixin/component
+└── integration/
+    ├── conftest.py                  # Integration-specific fixtures
+    ├── test_*_integration.py        # End-to-end workflow tests
+    └── test_data/                   # Large test files (auto-downloaded)
 ```
 
-## Test Types
+## Testing Philosophy
 
-### Unit Tests (`tests/*.py`)
-- Fast, isolated tests with mocked external dependencies
-- Run on every commit via GitHub Actions
-- Use mocks for API calls, file I/O, and external services
+**Unit Tests** - Fast, isolated validation of individual methods:
+- Mock external dependencies (FTP, APIs, Docker, file I/O)
+- Test configuration handling and routing logic
+- Verify error handling and edge cases
+- Target: <5s total runtime for rapid development feedback
 
-### Integration Tests (`tests/integration/`)
-- Slower tests that interact with real external services
-- Run on main branch, PRs to main, and nightly schedule
-- Verify end-to-end functionality with real NMDC API, etc.
+**Integration Tests** - Real-world workflow validation:
+- Interact with actual MASSIVE FTP, Docker containers, and test datasets
+- Validate end-to-end data movement and processing
+- Network-dependent, marked with `@pytest.mark.integration`
+- Auto-download required test data on first run
 
-## Running Tests Locally
-
-### Prerequisites
-
-Ensure pytest is installed:
+## Quick Start
 
 ```bash
-pip install pytest pytest-cov
-```
-
-### Run All Unit Tests (Recommended for Development)
-
-```bash
-pytest tests/ --ignore=tests/integration/ -v
-# Or using Makefile:
+# Unit tests only (fast, recommended for development)
 make test-unit
-```
 
-### Run All Tests (Unit + Integration)
-
-```bash
-pytest tests/ -v
-# Or using Makefile:
+# All tests (unit + integration, downloads test data)
 make test
-```
 
-### Run Integration Tests Only
-
-**Note**: Integration tests require large test data files (~95MB). These are automatically downloaded on first run and cached locally.
-
-```bash
-pytest tests/integration/ -v -s
-# Or using Makefile (downloads test data first):
+# Integration tests only
 make test-integration
+
+# Coverage report (generates htmlcov/index.html)
+make test-coverage
 ```
 
-### Run Specific Test File
+## Running Specific Tests
 
 ```bash
-pytest tests/test_workflow_manager.py -v
+# Single test file
+pytest tests/test_biosample_manager.py -v
+
+# Specific test class or method
+pytest tests/test_biosample_manager.py::TestBiosampleManager::test_fetch_attributes -v
+
+# By keyword pattern
+pytest -k "biosample" -v
+
+# Stop on first failure
+pytest -x
 ```
 
-### Run Specific Test
+## Writing New Tests
 
-```bash
-pytest tests/test_workflow_manager.py::TestNMDCWorkflowManager::test_initialization -v
+### Unit Test Pattern
+
+Test individual class methods with mocked dependencies:
+
+```python
+from unittest.mock import patch, MagicMock
+
+class TestMyMixin:
+    def test_method_behavior(self, lcms_config_file):
+        """Test that method handles expected input correctly."""
+        from nmdc_dp_utils.workflow_manager import NMDCWorkflowManager
+        
+        manager = NMDCWorkflowManager(str(lcms_config_file))
+        
+        with patch.object(manager, 'external_dependency') as mock:
+            mock.return_value = expected_result
+            result = manager.my_method()
+            assert result == expected_output
 ```
 
-### Run with Coverage Report
+**Guidelines:**
+- One test file per class (`test_<mixin_name>.py`)
+- Mixin classes tested in separation from full workflow manager
+- Use fixtures from `conftest.py` for consistent configs
+- Mock at the boundary (FTP connections, API calls, file I/O, Docker)
+- Test configuration validation and error handling
 
-```bash
-pytest tests/ --ignore=tests/integration/ --cov=nmdc_dp_utils --cov-report=html
+### Integration Test Pattern
+
+Test end-to-end workflows with real external services:
+
+```python
+@pytest.mark.integration
+@pytest.mark.network  # If requires internet
+class TestMyWorkflow:
+    def test_real_workflow(self, tmp_path, gcms_config):
+        """Test complete workflow with real MASSIVE FTP crawl."""
+        from nmdc_dp_utils.workflow_manager import NMDCWorkflowManager
+        
+        config_file = tmp_path / "config.json"
+        config_file.write_text(json.dumps(gcms_config))
+        
+        manager = NMDCWorkflowManager(str(config_file))
+        manager.create_workflow_structure()
+        
+        result = manager.real_external_operation()
+        assert result is True
 ```
 
-This will generate a coverage report in `htmlcov/index.html`.
+**Guidelines:**
+- Mark with `@pytest.mark.integration` and `@pytest.mark.network` if applicable
+- Use real services but limit to small datasets/operations
+- Expect occasional failures due to external service issues
+- Provide clear failure messages distinguishing service vs code issues
 
-## Common pytest Options
+## Fixtures Reference
 
-- `-v` or `--verbose`: Verbose output showing each test
-- `-s`: Show print statements (don't capture stdout)
-- `-x`: Stop on first failure
-- `--tb=short`: Shorter traceback format
-- `-k EXPRESSION`: Run tests matching the expression (e.g., `pytest -k "biosample"`)
-- `-m MARKER`: Run tests with specific marker (e.g., `pytest -m "not slow"`)
-- `--lf`: Run last failed tests
-- `--ff`: Run failures first, then the rest
-- `--ignore=DIR`: Ignore directory (e.g., `--ignore=tests/integration/`)
-- `--collect-only`: Show what tests would be run without executing them
+Common fixtures from `conftest.py`:
+- `lcms_config`, `gcms_config` - Pre-configured study configs
+- `lcms_config_file`, `gcms_config_file` - Config files in temp directory
+- `tmp_path` - Pytest's temporary directory fixture
 
-## Test Data Management
-
-Integration tests use large data files that are not stored in the repository. The test framework provides several ways to manage this data:
-
-### Automatic Download (Default)
-The pytest fixture `integration_test_raw_file` automatically downloads required files on first run and caches them in `tests/integration/test_data/`. Files are verified using MD5 checksums.
-
-### Manual Download via Makefile
-```bash
-# Download all required test data
-make download-test-data
-
-# Clean downloaded test data
-make clean-test-data
-```
-
-### Direct Download
-See `tests/integration/test_data/README.md` for direct download commands.
+See [conftest.py](conftest.py) for complete fixture list.
 
 ## CI/CD
 
-GitHub Actions runs tests automatically:
-- **Unit tests**: Every PR to main (Python 3.10, 3.11, 3.12)
-- **Integration tests**: Main branch, PRs to main, and nightly at 2 AM UTC
-  - Test data is downloaded automatically via `make download-test-data`
+GitHub Actions runs on every PR or manual trigger:
+- **Unit tests**: Python 3.11 and 3.12, ~5s runtime
+- **Integration tests**: Python 3.12 only, pulls Docker images, downloads test data, 15min timeout
 
-See [../.github/workflows/tests.yml](../.github/workflows/tests.yml) for configuration.
-
-## Writing Tests
-
-### Unit Tests
-- Use fixtures from `conftest.py` (e.g., `config_file`, `minimal_config`)
-- Mock external dependencies with `@patch` decorators
-- Keep tests fast and isolated
-- Place in `tests/` directory
-
-### Integration Tests
-- Place in `tests/integration/` directory
-- Use `integration_config_file` fixture for real study data
-- Mark with `@pytest.mark.network` if requiring internet
-- Include clear error messages distinguishing API vs code issues
-
-Example:
-```python
-@pytest.mark.network
-def test_real_api_call(integration_config_file):
-    """Test description."""
-    try:
-        # test logic
-        assert result is True
-    except Exception as e:
-        pytest.fail(f"Test failed: {e}")
-```
+See [.github/workflows/tests.yml](../.github/workflows/tests.yml) for configuration.
 

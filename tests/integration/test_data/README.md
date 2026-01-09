@@ -1,53 +1,53 @@
 # Integration Test Data
 
-This directory contains test data files used by integration tests. These files are **not** stored in the repository due to their large size.
+Large MS data files for integration testing. Auto-downloaded on first test run, cached locally, gitignored.
 
-## Test Files
+## Files
 
-### LCMS Raw MS Data File
-- **File**: `20210819_JGI-AK_MK_506588_SoilWaterRep_final_QE-139_HILICZ_USHXG01490_NEG_MSMS_19_S16-D89_A_Rg70to1050-CE102040-soil-S1_Run84.raw`
-- **Size**: ~95 MB
-- **Source**: MASSIVE dataset MSV000094090
-- **MD5**: `b75d46305e8459bc7c81ba1b2b17d63b`
-- **Used by**: `test_raw_data_inspection_manager_integration.py` (LCMS tests)
+| File | Size | Source | Purpose |
+|------|------|--------|----------|
+| `20210819_JGI-AK_..._Run84.raw` | ~95 MB | MASSIVE MSV000094090 | LCMS raw data inspection |
+| `GCMS_FAMEs_01_GCMS01_20180115.cdf` | ~6.5 MB | NMDC blanchard_11_8ws97026 | GCMS data inspection |
 
-### GCMS Data File
-- **File**: `GCMS_FAMEs_01_GCMS01_20180115.cdf`
-- **Size**: ~6.5 MB
-- **Source**: NMDC example GCMS dataset (blanchard_11_8ws97026)
-- **MD5**: `d27124d36d3db9e19161e7fc81ce176b`
-- **Used by**: `test_raw_data_inspection_manager_integration.py` (GCMS tests)
+## Usage
 
-## Downloading Test Data
+**Automatic** (recommended): Files download automatically on first `make test-integration` run.
 
-### Automatic Download (Recommended)
-Integration tests will automatically download required files on first run using a session-scoped pytest fixture. The files are cached here for subsequent test runs.
-
-### Manual Download via Makefile
+**Manual download**:
 ```bash
-# Download all required test data
-make download-test-data
-
-# Clean downloaded test data
-make clean-test-data
+make download-test-data  # Download all
+make clean-test-data     # Remove all
 ```
 
-### Direct Download
-```bash
-mkdir -p tests/integration/test_data
+**Direct URLs** (see [Makefile](../../../Makefile) for curl commands).
 
-# LCMS .raw file
-curl -L -o tests/integration/test_data/20210819_JGI-AK_MK_506588_SoilWaterRep_final_QE-139_HILICZ_USHXG01490_NEG_MSMS_19_S16-D89_A_Rg70to1050-CE102040-soil-S1_Run84.raw \
-  "https://massive.ucsd.edu/ProteoSAFe/DownloadResultFile?file=f.MSV000094090%2Fraw%2F20210819_JGI-AK_MK_506588_SoilWaterRep_final_QE-139_HILICZ_USHXG01490%2Frawdata%2F20210819_JGI-AK_MK_506588_SoilWaterRep_final_QE-139_HILICZ_USHXG01490_NEG_MSMS_19_S16-D89_A_Rg70to1050-CE102040-soil-S1_Run84.raw&forceDownload=true"
+## Directory Structure
 
-# GCMS .cdf file
-curl -L -o tests/integration/test_data/GCMS_FAMEs_01_GCMS01_20180115.cdf \
-  "https://nmdcdemo.emsl.pnnl.gov/metabolomics/blanchard_11_8ws97026/raw/GCMS_FAMEs_01_GCMS01_20180115.cdf"
+```
+test_data/
+├── *.raw, *.cdf           # Large MS data files (downloaded)
+├── test_database.msp      # Reference spectral database
+├── metadata/              # Biosample mapping CSVs for tests
+│   ├── gcms_biosample_mapping.csv
+│   ├── lcms_biosample_mapping.csv
+│   └── massive_biosample_mapping.csv
+└── raw_file_info/         # Expected inspection outputs for validation
+    ├── gcms_inspection_results.csv
+    ├── lcms_inspection_results.csv
+    ├── massive_inspection_results.csv
+    └── massive_ftp_*.csv
 ```
 
-## CI/CD Integration
+**metadata/** - Pre-generated biosample mappings used by integration tests to validate mapping logic without NMDC API calls.
 
-In GitHub Actions, test data is downloaded before running integration tests:
+**raw_file_info/** - Expected outputs from raw data inspection, used to verify Docker-based inspection produces correct results.
+
+## Adding New Test Files
+
+1. Add download logic to `Makefile` `download-test-data` target
+2. Update the files table with details
+3. Reference in integration test fixtures (see `conftest.py`)
+4. Keep files small (<100MB) when possible
 
 ```yaml
 - name: Download test data

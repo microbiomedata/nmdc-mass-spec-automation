@@ -1,55 +1,58 @@
 # Integration Tests
 
-This directory contains integration tests that interact with real external services (NMDC API, MinIO, etc.).
+End-to-end tests validating workflows with real external services and data files.
 
-## Running Integration Tests
+## Purpose
 
-### Run all integration tests:
-```bash
-pytest tests/integration/ -v
-```
-
-### Run specific integration test file:
-```bash
-pytest tests/integration/test_biosample_manager_integration.py -v -s
-```
-
-### Run in CI/CD:
-- **Unit tests**: Run on every push to any branch
-- **Integration tests**: Run on:
-  - Pushes to `main` branch
-  - Pull requests to `main`
-  - Scheduled nightly runs (2 AM UTC)
+Integration tests verify:
+- **MASSIVE FTP operations** - Crawling, parsing, file discovery on real FTP server
+- **Docker-based processing** - Raw data inspection with actual MS files
+- **Workflow routing** - Configuration-driven data source detection
+- **Data movement** - Complete fetch/download workflows
 
 ## Characteristics
 
-- **Slower**: These tests make real network calls and may take several seconds
-- **Network-dependent**: Require internet connection to reach external APIs
-- **May be flaky**: External service downtime can cause test failures
-- **Use real data**: Tests interact with production NMDC study data
+- **Network-dependent**: Require internet for MASSIVE FTP, NMDC API access
+- **Data-dependent**: Auto-download test files (~100MB total) on first run
+- **Slower execution**: 20-60s runtime due to FTP crawling and Docker operations
+- **Potentially flaky**: External service downtime may cause transient failures
 
-## Markers
+## Running
 
-Integration tests can use these pytest markers:
-- `@pytest.mark.network` - Requires network access
-- `@pytest.mark.slow` - Takes significant time to run
+```bash
+# All integration tests (auto-downloads test data)
+make test-integration
 
-## Adding New Integration Tests
+# Specific test file
+pytest tests/integration/test_data_movement_manager_integration.py -v -s
 
-When adding integration tests:
-1. Use the `integration_config_file` fixture for consistent test configuration
-2. Add `@pytest.mark.network` to tests requiring external APIs
-3. Include clear error messages that distinguish API failures from code bugs
-4. Use try/except with `pytest.fail()` for meaningful error reporting
-
-Example:
-```python
-@pytest.mark.network
-def test_my_integration(integration_config_file):
-    """Test description with real API."""
-    try:
-        # Test logic
-        assert result is True
-    except Exception as e:
-        pytest.fail(f"Integration failed: {e}")
+# Skip slow tests
+pytest tests/integration/ -m "not slow" -v
 ```
+
+## Writing Integration Tests
+
+**Use real services but limit scope:**
+
+```python
+@pytest.mark.integration
+@pytest.mark.network
+class TestMyWorkflow:
+    def test_small_real_operation(self, tmp_path, gcms_config):
+        """Test with real FTP but limited to small dataset."""
+        # Use known small datasets or limit file counts
+        # Expect occasional failures - include helpful messages
+```
+
+**Mark appropriately:**
+- `@pytest.mark.integration` - All tests in this directory
+- `@pytest.mark.network` - Requires internet connection
+- `@pytest.mark.slow` - Takes >10s (allows selective skipping)
+
+## Test Data
+
+Large MS files are auto-downloaded on first run and cached in `test_data/`:
+- LCMS .raw file (~95MB) for LCMS workflows
+- GCMS .cdf file (~6.5MB) for GCMS workflows
+
+See [test_data/README.md](test_data/README.md) for details.
