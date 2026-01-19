@@ -52,11 +52,10 @@ class LLMClient():
             result = await Runner.run(
                 Agent(
                     name="Assistant",
-                    instructions="You are a helpful assistant",
                     mcp_servers=[mcp_server_instance],
                     model=self.model_object
                 ),
-                input=messages
+                input=messages,
             )
             return result.final_output
 
