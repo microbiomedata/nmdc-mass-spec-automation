@@ -1,5 +1,5 @@
-from llm_client import LLMClient
-from llm_conversation_manager import ConversationManager
+from nmdc_dp_utils.llm.llm_client import LLMClient
+from nmdc_dp_utils.llm.llm_conversation_manager import ConversationManager
 import asyncio
 
 async def get_llm_yaml_outline(llm_client:LLMClient, conversation_obj:ConversationManager):
