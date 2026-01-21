@@ -1,5 +1,5 @@
-from llm_client import LLMClient
-from llm_conversation_manager import ConversationManager
+from nmdc_dp_utils.llm.llm_client import LLMClient
+from nmdc_dp_utils.llm.llm_conversation_manager import ConversationManager
 import asyncio
 
 async def get_llm_yaml_outline(llm_client:LLMClient, conversation_obj:ConversationManager):
@@ -16,12 +16,14 @@ async def get_llm_yaml_outline(llm_client:LLMClient, conversation_obj:Conversati
     response = await llm_client.get_response(conversation_obj.messages)
 
     conversation_obj.add_message(role="assistant", content=response)
+    conversation_obj.add_message(role="user", content="Now, validate the generated YAML outline against the NMDC schema using the `validate_generated_yaml` tool. If there are any validation errors, please fix them and provide a corrected YAML outline that passes validation.")
+    response = await llm_client.get_response(conversation_obj.messages)
     return response
 
 
 if __name__ == "__main__":
     # read in the protocol description
-    protocol_description_path = "path/to/description"
+    protocol_description_path = "nmdc_dp_utils/llm/llm_protocol_context/example_4/extracted_text.txt"
     with open(protocol_description_path, "r") as f:
         protocol_description = f.read()
 
@@ -32,5 +34,10 @@ if __name__ == "__main__":
     # use the converation obj to add the protocol decsription
     conversation_obj.add_protocol_description(description=protocol_description)
     response = asyncio.run(get_llm_yaml_outline(llm_client=llm_client, conversation_obj=conversation_obj))
+    # save as yaml 
+    output_path = "nmdc_dp_utils/llm/llm_protocol_context/example_4/llm_generated_outline.yaml"
+    with open(output_path, "w") as f:
+        f.write(response)
+    print(f"LLM generated YAML outline saved to: {output_path}")
 
 

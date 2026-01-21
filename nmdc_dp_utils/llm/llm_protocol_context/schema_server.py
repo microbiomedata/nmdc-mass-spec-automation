@@ -5,6 +5,9 @@ Extract specific classes from NMDC LinkML schema and convert to LLM-friendly for
 import os
 from linkml_runtime.utils.schemaview import SchemaView
 import nmdc_schema
+from nmdc_ms_metadata_gen.validate_yaml_outline import validate_yaml_outline
+import logging
+logging.basicConfig(level=logging.INFO)
 
 from mcp.server.fastmcp import FastMCP
 mcp = FastMCP(
@@ -19,7 +22,7 @@ def get_protocol_schema_context() -> dict:
     Extract classes related to 'MaterialProcessing' from NMDC schema
     and convert them to a JSON format suitable for LLM context.
     """
-
+    logging.info("Within get_protocol_schema_context mcp tool.")
     # Initialize SchemaView from NMDC schema package
     nmdc_path = os.path.dirname(nmdc_schema.__file__)
     schema_path = os.path.join(nmdc_path, "nmdc_materialized_patterns.yaml")
@@ -107,6 +110,49 @@ def get_protocol_schema_context() -> dict:
     schema_output["slots"] = all_slot_definitions
     
     return schema_output
+
+def clean_yaml_response(response: str) -> str:
+    """Remove markdown code fences from LLM response."""
+    # Remove ```yaml and ``` markers
+    response = response.strip()
+    if response.startswith("```yaml"):
+        response = response[7:]  # Remove ```yaml
+    elif response.startswith("```"):
+        response = response[3:]  # Remove ```
+    if response.endswith("```"):
+        response = response[:-3]  # Remove trailing ```
+    return response.strip()
+
+
+@mcp.tool()
+def validate_generated_yaml(yaml_outline: str) -> dict:
+    """
+    Validate the provided YAML outline against NMDC schema.
+    You must call this function at least once after generating the outline to ensure compliance.
+
+    Parameters
+    ----------
+        yaml_outline (str): The YAML outline as a string.
+
+    Returns
+    -------
+    dict: Validation results including errors and warnings.
+    """
+    clean_yaml_res = clean_yaml_response(yaml_outline)
+    logging.info("Within validate_yaml_outline MCP tool.")
+    # save the yaml outline to a temporary file
+    import tempfile
+    with tempfile.NamedTemporaryFile(mode="w+", delete=False, suffix=".yaml") as temp_yaml_file:
+        temp_yaml_file.write(clean_yaml_res)
+        temp_yaml_file_path = temp_yaml_file.name
+    logging.info(f"Temporary YAML outline saved to: {temp_yaml_file_path}")
+    try:
+        validation_results = validate_yaml_outline(temp_yaml_file_path, test=True)
+    except Exception as e:
+        logging.error(f"Error during YAML validation: {e}")
+        validation_results = {"errors": [str(e)], "warnings": []}
+    logging.info(f"Validation results: {validation_results}")
+    return validation_results
 
 def main() -> None:
     mcp.run()
