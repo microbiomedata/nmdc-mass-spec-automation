@@ -47,7 +47,7 @@ class ConversationManager:
         """
         Add the currated description -> YAML examples to the context.
         """
-        dirs = ["nmdc_dp_utils/llm/llm_protocol_context/example_1", "nmdc_dp_utils/llm/llm_protocol_context/example_2", "nmdc_dp_utils/llm/llm_protocol_context/example_3"]
+        dirs = ["nmdc_dp_utils/llm/llm_protocol_context/example_1", "nmdc_dp_utils/llm/llm_protocol_context/example_2", "nmdc_dp_utils/llm/llm_protocol_context/example_3", "nmdc_dp_utils/llm/llm_protocol_context/example_4", "nmdc_dp_utils/llm/llm_protocol_context/example_5", "nmdc_dp_utils/llm/llm_protocol_context/example_6", "nmdc_dp_utils/llm/llm_protocol_context/example_7"]
         for dir in dirs: 
             with open(f"{dir}/extracted_text.txt", "r") as f:
                 example = f.read()

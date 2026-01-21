@@ -33,7 +33,6 @@ if __name__ == "__main__":
     conversation_obj = ConversationManager(interaction_type="protocol_conversion")
     # use the converation obj to add the protocol decsription
     conversation_obj.add_protocol_description(description=protocol_description)
-    conversation_obj.add_protocol_desc_and_json_examples()
     response = asyncio.run(get_llm_yaml_outline(llm_client=llm_client, conversation_obj=conversation_obj))
     # save as yaml 
     output_path = "nmdc_dp_utils/llm/llm_protocol_context/example_4/llm_generated_outline.yaml"
