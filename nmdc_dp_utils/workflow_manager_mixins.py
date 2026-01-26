@@ -13,6 +13,10 @@ from tqdm import tqdm
 from dotenv import load_dotenv
 from minio.error import S3Error
 
+from nmdc_dp_utils.llm.llm_pipeline import get_llm_yaml_outline
+from nmdc_dp_utils.llm.llm_conversation_manager import ConversationManager
+from nmdc_dp_utils.llm.llm_client import LLMClient
+
 # Import workflow mapping defined in workflow_manager (defined before mixins import)
 from nmdc_ms_metadata_gen.lcms_metab_metadata_generator import (
     LCMSMetabolomicsMetadataGenerator,
@@ -23,6 +27,8 @@ from nmdc_ms_metadata_gen.lcms_lipid_metadata_generator import (
 from nmdc_ms_metadata_gen.gcms_metab_metadata_generator import (
     GCMSMetabolomicsMetadataGenerator,
 )
+
+
 
 # Workflow configuration mapping used across manager and mixins
 WORKFLOW_DICT = {
@@ -4178,3 +4184,71 @@ class WorkflowMetadataManager:
             return False
 
         return True
+
+
+class LLMWorkflowManagerMixin:
+    """
+    Mixin class for LLM workflow management.
+    """
+
+    def __init__(self):
+        """
+        Initialize LLMWorkflowManagerMixin.
+        """
+        self.llm_client = LLMClient()
+        self.conversation_obj = ConversationManager(interaction_type="protocol_conversion")
+        
+
+    def load_protocol_description_to_context(self, protocol_description_path: str) -> None:
+        """
+        Load protocol description from a text file to the LLM conversation context.
+
+        Parameters
+        ----------
+        protocol_description_path : str
+            Path to the text file containing the protocol description.
+
+        Returns
+        -------
+        None
+        """
+        with open(protocol_description_path, "r") as f:
+            protocol_description = f.read()
+        self.conversation_obj.add_protocol_description(description=protocol_description)
+
+    def save_output_to_file(self, output_path: str, content: str) -> None:
+        """
+        Save content to a specified file.
+
+        Parameters
+        ----------
+        output_path : str
+            Path to the output file.
+        content : str
+            Content to be saved to the file.
+
+        Returns
+        -------
+        None
+        """
+        with open(output_path, "w") as f:
+            f.write(content)
+
+    async def get_llm_generated_yaml_outline(self) -> str:
+        """
+        Get the LLM generated YAML outline for the loaded protocol description.
+
+        Parameters
+        ----------
+        llm_client : LLMClient
+            Object that holds LLM configuration information.
+
+        Returns
+        -------
+        str
+            The LLM generated YAML outline.
+        """
+        
+        response = await get_llm_yaml_outline(llm_client=self.llm_client, conversation_obj=self.conversation_obj)
+        return response
+    
