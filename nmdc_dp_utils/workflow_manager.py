@@ -182,7 +182,7 @@ class NMDCWorkflowManager(
         default_triggers = {
             "study_structure_created": False,
             "raw_data_downloaded": False,
-            "protocol_outline_created": True,
+            "protocol_outline_created": False,
             "biosample_attributes_fetched": False,
             "biosample_mapping_script_generated": False,
             "biosample_mapping_completed": False,
