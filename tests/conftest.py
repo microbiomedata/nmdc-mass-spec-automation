@@ -165,7 +165,7 @@ def gcms_config(temp_config_dir):
             "endpoint": "localhost:9000",
             "bucket": "test-bucket",
             "secure": False
-        }   
+        }
     }
 
 
@@ -215,7 +215,7 @@ def integration_config(temp_config_dir):
         },
         "docker": {
             "raw_data_inspector_image": "microbiomedata/metams:3.3.3"
-        } 
+        }
     }
 
 
