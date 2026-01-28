@@ -27,6 +27,7 @@ from nmdc_dp_utils.workflow_manager_mixins import (
     WorkflowRawDataInspectionManager,
     WorkflowMetadataManager,
     WORKFLOW_DICT,
+    LLMWorkflowManagerMixin
 )
 
 
@@ -36,6 +37,7 @@ class NMDCWorkflowManager(
     NMDCWorkflowBiosampleManager,
     WorkflowRawDataInspectionManager,
     WorkflowMetadataManager,
+    LLMWorkflowManagerMixin
 ):
     """
     A configurable class for managing NMDC mass spectrometry data workflows.
@@ -133,6 +135,7 @@ class NMDCWorkflowManager(
 
         # MinIO client will be lazy-loaded when first accessed
         self._minio_client = None
+        super().__init__()
 
     @property
     def minio_client(self) -> Optional[Minio]:

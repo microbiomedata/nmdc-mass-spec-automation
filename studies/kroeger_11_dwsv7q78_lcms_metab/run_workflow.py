@@ -7,6 +7,7 @@ MASSIVE ID: MSV000094090
 
 import sys
 from pathlib import Path
+import asyncio
 
 # Ensure project root is on sys.path so package `nmdc_dp_utils` is importable
 PROJECT_ROOT = Path(__file__).resolve().parents[2]
@@ -15,7 +16,7 @@ if str(PROJECT_ROOT) not in sys.path:
 
 from nmdc_dp_utils.workflow_manager import NMDCWorkflowManager
 
-def main():
+async def main():
     """Run the Kroeger study workflow."""
 
     # Initialize study manager
@@ -29,12 +30,23 @@ def main():
     logger.info("1. Creating workflow structure...")
     manager.create_workflow_structure()
 
-    # Step 2: Fetch raw data (MinIO or MASSIVE based on config)
-    logger.info("2. Fetching raw data...")
+    # New - step 2: load protocol description into LLM conversation context
+    manager.load_protocol_description_to_context(
+        protocol_description_path="studies/kroeger_11_dwsv7q78_lcms_metab/protocol_info/protocol_description.txt"
+    )
+    logger.info("2. Protocol description loaded into LLM context.")
+    # 2.1 Generate protocol outline from LLM
+    outline = await manager.get_llm_generated_yaml_outline()
+    output_path = "studies/kroeger_11_dwsv7q78_lcms_metab/protocol_info/llm_generated_protocol_outline.yaml"
+    manager.save_yaml_to_file(output_path=output_path, content=outline)
+    logger.info(f"LLM-generated protocol outline saved to {output_path}")
+
+    # Step 3: Fetch raw data (MinIO or MASSIVE based on config)
+    logger.info("3. Fetching raw data...")
     manager.fetch_raw_data()
 
-    # Step 3: Map raw data files to biosamples by generating mapping script and running it
-    logger.info("3. Mapping raw data files to biosamples...")
+    # Step 4: Map raw data files to biosamples by generating mapping script and running it
+    logger.info("4. Mapping raw data files to biosamples...")
     manager.get_biosample_attributes()
     manager.generate_biosample_mapping_script()
 
@@ -65,4 +77,4 @@ def main():
     assert manager.should_skip('metadata_packages_generated'), "NMDC metadata package generation must complete successfully to proceed"
 
 if __name__ == "__main__":
-    main()
+    asyncio.run(main())

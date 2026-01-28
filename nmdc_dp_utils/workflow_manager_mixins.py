@@ -4216,7 +4216,7 @@ class LLMWorkflowManagerMixin:
             protocol_description = f.read()
         self.conversation_obj.add_protocol_description(description=protocol_description)
 
-    def save_output_to_file(self, output_path: str, content: str) -> None:
+    def save_yaml_to_file(self, output_path: str, content: str) -> None:
         """
         Save content to a specified file.
 
@@ -4231,6 +4231,10 @@ class LLMWorkflowManagerMixin:
         -------
         None
         """
+        if content.startswith("```yaml"):
+            content = content.replace("```yaml", "").strip()
+        if content.endswith("```"):
+            content = content[:-3].strip()  
         with open(output_path, "w") as f:
             f.write(content)
 
