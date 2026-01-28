@@ -4235,9 +4235,20 @@ class LLMWorkflowManagerMixin:
         if content.startswith("```yaml"):
             content = content.replace("```yaml", "").strip()
         if content.endswith("```"):
-            content = content[:-3].strip()  
-        with open(output_path, "w") as f:
-            f.write(content)
+            content = content[:-3].strip()
+
+        # Ensure the parent directory exists before writing
+        output_path_obj = Path(output_path)
+        parent_dir = output_path_obj.parent
+        if parent_dir and str(parent_dir) != "":
+            parent_dir.mkdir(parents=True, exist_ok=True)
+
+        # Write content to file with basic error handling
+        try:
+            with open(output_path_obj, "w") as f:
+                f.write(content)
+        except OSError as e:
+            raise RuntimeError(f"Failed to write YAML content to '{output_path}': {e}") from e
     
     @skip_if_complete("protocol_outline_created", return_value=True)
     async def get_llm_generated_yaml_outline(self) -> str:
