@@ -4266,11 +4266,6 @@ class LLMWorkflowManagerMixin:
         """
         Get the LLM generated YAML outline for the loaded protocol description.
 
-        Parameters
-        ----------
-        llm_client : LLMClient
-            Object that holds LLM configuration information.
-
         Returns
         -------
         str
