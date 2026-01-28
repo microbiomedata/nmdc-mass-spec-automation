@@ -27,6 +27,7 @@ from nmdc_dp_utils.workflow_manager_mixins import (
     WorkflowRawDataInspectionManager,
     WorkflowMetadataManager,
     WORKFLOW_DICT,
+    LLMWorkflowManagerMixin
 )
 
 
@@ -36,6 +37,7 @@ class NMDCWorkflowManager(
     NMDCWorkflowBiosampleManager,
     WorkflowRawDataInspectionManager,
     WorkflowMetadataManager,
+    LLMWorkflowManagerMixin
 ):
     """
     A configurable class for managing NMDC mass spectrometry data workflows.
@@ -133,6 +135,7 @@ class NMDCWorkflowManager(
 
         # MinIO client will be lazy-loaded when first accessed
         self._minio_client = None
+        super().__init__()
 
     @property
     def minio_client(self) -> Optional[Minio]:
@@ -175,17 +178,25 @@ class NMDCWorkflowManager(
         with open(config_path, "r") as f:
             config = json.load(f)
 
-        # Initialize skip_triggers if not present
+        # Initialize skip_triggers with default values, preserving existing ones
+        default_triggers = {
+            "study_structure_created": False,
+            "raw_data_downloaded": False,
+            "protocol_outline_created": False,
+            "biosample_attributes_fetched": False,
+            "biosample_mapping_script_generated": False,
+            "biosample_mapping_completed": False,
+            "wdls_generated": False,
+            "data_processed": False,
+        }
+        
         if "skip_triggers" not in config:
-            config["skip_triggers"] = {
-                "study_structure_created": False,
-                "raw_data_downloaded": False,
-                "biosample_attributes_fetched": False,
-                "biosample_mapping_script_generated": False,
-                "biosample_mapping_completed": False,
-                "wdls_generated": False,
-                "data_processed": False,
-            }
+            config["skip_triggers"] = default_triggers
+        else:
+            # Merge defaults with existing triggers, preserving existing values
+            for key, value in default_triggers.items():
+                if key not in config["skip_triggers"]:
+                    config["skip_triggers"][key] = value
 
         return config
 
@@ -302,6 +313,7 @@ class NMDCWorkflowManager(
                 self.workflow_path / "metadata",
                 self.workflow_path / "wdl_jsons",
                 self.workflow_path / "raw_file_info",
+                self.workflow_path / "protocol_info",
             ]
 
             # Add configuration-specific directories
@@ -347,3 +359,25 @@ class NMDCWorkflowManager(
             "minio_enabled": self.minio_client is not None,
         }
         return info
+    
+    async def generate_material_processing_yaml(self) -> str:
+        """
+        Generate material processing YAML using LLM.
+
+        Returns
+        -------
+        str
+            The generated material processing YAML.
+        """
+        
+        # load protocol description into LLM conversation context
+        self.load_protocol_description_to_context(
+            protocol_description_path=self.workflow_path / "protocol_info" / "protocol_description.txt"
+        )
+        # Generate protocol outline from LLM
+        outline = await self.get_llm_generated_yaml_outline()
+        output_path = self.workflow_path / "protocol_info" / "llm_generated_protocol_outline.yaml"
+        self.save_yaml_to_file(output_path=output_path, content=outline)
+        # set skip trigger
+        self.set_skip_trigger("protocol_outline_created", True)
+        return outline

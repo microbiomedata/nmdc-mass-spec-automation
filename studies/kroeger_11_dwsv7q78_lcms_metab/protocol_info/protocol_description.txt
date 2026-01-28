@@ -1,0 +1,1 @@
+Briefly, for nonpolar analysis, soil samples were extracted w/ 100% methanol while for polar analysis, samples were extracted with 100% water. In preparation for LC-MS, samples were resuspended in 120 ul of 100% MeOH containing isotopically labeled internal standards. More details can be found in the manuscript.

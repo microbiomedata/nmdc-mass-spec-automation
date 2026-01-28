@@ -7,11 +7,17 @@ import sys
 from pathlib import Path
 from typing import List, Optional
 from functools import wraps
+import asyncio
+import inspect
 
 import pandas as pd
 from tqdm import tqdm
 from dotenv import load_dotenv
 from minio.error import S3Error
+
+from nmdc_dp_utils.llm.llm_pipeline import get_llm_yaml_outline
+from nmdc_dp_utils.llm.llm_conversation_manager import ConversationManager
+from nmdc_dp_utils.llm.llm_client import LLMClient
 
 # Import workflow mapping defined in workflow_manager (defined before mixins import)
 from nmdc_ms_metadata_gen.lcms_metab_metadata_generator import (
@@ -23,6 +29,8 @@ from nmdc_ms_metadata_gen.lcms_lipid_metadata_generator import (
 from nmdc_ms_metadata_gen.gcms_metab_metadata_generator import (
     GCMSMetabolomicsMetadataGenerator,
 )
+
+
 
 # Workflow configuration mapping used across manager and mixins
 WORKFLOW_DICT = {
@@ -59,6 +67,8 @@ load_dotenv()
 def skip_if_complete(trigger_name: str, return_value=None):
     """
     Decorator to skip a method if the specified trigger is set to True.
+    
+    Compatible with both sync and async functions.
 
     Args:
         trigger_name: Name of the skip trigger to check
@@ -68,19 +78,34 @@ def skip_if_complete(trigger_name: str, return_value=None):
         @skip_if_complete('data_processed', return_value=0)
         def some_method(self):
             # method implementation
+            
+        @skip_if_complete('protocol_outline_created', return_value=True)
+        async def async_method(self):
+            # async method implementation
     """
 
     def decorator(func):
-        @wraps(func)
-        def wrapper(self, *args, **kwargs):
-            if self.should_skip(trigger_name):
-                self.logger.info(
-                    f"Skipping {func.__name__} ({trigger_name} already complete)"
-                )
-                return return_value
-            return func(self, *args, **kwargs)
-
-        return wrapper
+        # Check if the function is async
+        if asyncio.iscoroutinefunction(func):
+            @wraps(func)
+            async def async_wrapper(self, *args, **kwargs):
+                if self.should_skip(trigger_name):
+                    self.logger.info(
+                        f"Skipping {func.__name__} ({trigger_name} already complete)"
+                    )
+                    return return_value
+                return await func(self, *args, **kwargs)
+            return async_wrapper
+        else:
+            @wraps(func)
+            def sync_wrapper(self, *args, **kwargs):
+                if self.should_skip(trigger_name):
+                    self.logger.info(
+                        f"Skipping {func.__name__} ({trigger_name} already complete)"
+                    )
+                    return return_value
+                return func(self, *args, **kwargs)
+            return sync_wrapper
 
     return decorator
 
@@ -4178,3 +4203,98 @@ class WorkflowMetadataManager:
             return False
 
         return True
+
+
+class LLMWorkflowManagerMixin:
+    """
+    Mixin class for LLM workflow management.
+    """
+
+    def __init__(self):
+        """
+        Initialize LLMWorkflowManagerMixin.
+        """
+        self._llm_client = None
+        self._conversation_obj = None
+    
+    @property
+    def llm_client(self):
+        """Lazy-load LLM client on first access."""
+        if self._llm_client is None:
+            self._llm_client = LLMClient()
+        return self._llm_client
+    
+    @property
+    def conversation_obj(self):
+        """Lazy-load conversation object on first access."""
+        if self._conversation_obj is None:
+            self._conversation_obj = ConversationManager(interaction_type="protocol_conversion")
+        return self._conversation_obj
+        
+    @skip_if_complete("protocol_outline_created", return_value=None)
+    def load_protocol_description_to_context(self, protocol_description_path: str) -> None:
+        """
+        Load protocol description from a text file to the LLM conversation context.
+
+        Parameters
+        ----------
+        protocol_description_path : str
+            Path to the text file containing the protocol description.
+
+        Returns
+        -------
+        None
+        """
+        with open(protocol_description_path, "r") as f:
+            protocol_description = f.read()
+        self.conversation_obj.add_protocol_description(description=protocol_description)
+    
+    @skip_if_complete("protocol_outline_created", return_value=None)
+    def save_yaml_to_file(self, output_path: str, content: str) -> None:
+        """
+        Save content to a specified file.
+
+        Parameters
+        ----------
+        output_path : str
+            Path to the output file.
+        content : str
+            Content to be saved to the file.
+
+        Returns
+        -------
+        None
+        """
+        if content.startswith("```yaml"):
+            content = content.replace("```yaml", "").strip()
+        if content.endswith("```"):
+            content = content[:-3].strip()
+
+        # Ensure the parent directory exists before writing
+        output_path_obj = Path(output_path)
+        parent_dir = output_path_obj.parent
+        if parent_dir and str(parent_dir) != "":
+            parent_dir.mkdir(parents=True, exist_ok=True)
+
+        # Write content to file with basic error handling
+        try:
+            with open(output_path_obj, "w") as f:
+                f.write(content)
+        except OSError as e:
+            raise RuntimeError(f"Failed to write YAML content to '{output_path}': {e}") from e
+    
+    @skip_if_complete("protocol_outline_created", return_value=True)
+    async def get_llm_generated_yaml_outline(self) -> str:
+        """
+        Get the LLM generated YAML outline for the loaded protocol description.
+
+        Returns
+        -------
+        str
+            The LLM generated YAML outline.
+        """
+        
+        response = await get_llm_yaml_outline(llm_client=self.llm_client, conversation_obj=self.conversation_obj)
+        return response
+
+
