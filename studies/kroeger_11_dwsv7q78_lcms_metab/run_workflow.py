@@ -30,16 +30,9 @@ async def main():
     logger.info("1. Creating workflow structure...")
     manager.create_workflow_structure()
 
-    # New - step 2: load protocol description into LLM conversation context
-    manager.load_protocol_description_to_context(
-        protocol_description_path="studies/kroeger_11_dwsv7q78_lcms_metab/protocol_info/protocol_description.txt"
-    )
-    logger.info("2. Protocol description loaded into LLM context.")
-    # 2.1 Generate protocol outline from LLM
-    outline = await manager.get_llm_generated_yaml_outline()
-    output_path = "studies/kroeger_11_dwsv7q78_lcms_metab/protocol_info/llm_generated_protocol_outline.yaml"
-    manager.save_yaml_to_file(output_path=output_path, content=outline)
-    logger.info(f"LLM-generated protocol outline saved to {output_path}")
+    # Step 2: Generate protocol YAML outline using LLM
+    logger.info("2. Generating protocol YAML outline using LLM...")
+    outline = await manager.generate_material_processing_yaml()
 
     # Step 3: Fetch raw data (MinIO or MASSIVE based on config)
     logger.info("3. Fetching raw data...")
@@ -57,22 +50,22 @@ async def main():
     else:
         logger.info("Biosample mapping completed successfully")
 
-    # Step 4: Inspect raw data files for metadata and QC
-    logger.info("4. Inspecting raw data files...")
+    # Step 5: Inspect raw data files for metadata and QC
+    logger.info("5. Inspecting raw data files...")
     manager.raw_data_inspector(cores=4)
 
-    # Step 5: Process data (generate WDL configs and execute workflows)
-    logger.info("5. Processing data with WDL workflows...")
+    # Step 6: Process data (generate WDL configs and execute workflows)
+    logger.info("6. Processing data with WDL workflows...")
     manager.process_data(execute=True)
     assert manager.should_skip('data_processed'), "WDL workflows must complete successfully to proceed"
 
-    # Step 6: Upload processed data to MinIO
-    logger.info("6. Uploading processed data to MinIO...")
+    # Step 7: Upload processed data to MinIO
+    logger.info("7. Uploading processed data to MinIO...")
     manager.upload_processed_data_to_minio()
     assert manager.should_skip('processed_data_uploaded_to_minio'), "Processed data upload to MinIO must complete successfully to proceed"
 
-    # Step 7: Generate and submit NMDC metadata packages
-    logger.info("7. Generating NMDC metadata packages...")
+    # Step 8: Generate and submit NMDC metadata packages
+    logger.info("8. Generating NMDC metadata packages...")
     manager.generate_nmdc_metadata_for_workflow(test=True)
     assert manager.should_skip('metadata_packages_generated'), "NMDC metadata package generation must complete successfully to proceed"
 
