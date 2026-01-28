@@ -4231,7 +4231,7 @@ class LLMWorkflowManagerMixin:
             self._conversation_obj = ConversationManager(interaction_type="protocol_conversion")
         return self._conversation_obj
         
-    @skip_if_complete("protocol_outline_created", return_value=True)
+    @skip_if_complete("protocol_outline_created", return_value=None)
     def load_protocol_description_to_context(self, protocol_description_path: str) -> None:
         """
         Load protocol description from a text file to the LLM conversation context.
@@ -4249,7 +4249,7 @@ class LLMWorkflowManagerMixin:
             protocol_description = f.read()
         self.conversation_obj.add_protocol_description(description=protocol_description)
     
-    @skip_if_complete("protocol_outline_created", return_value=True)
+    @skip_if_complete("protocol_outline_created", return_value=None)
     def save_yaml_to_file(self, output_path: str, content: str) -> None:
         """
         Save content to a specified file.
