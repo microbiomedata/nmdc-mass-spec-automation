@@ -34,7 +34,13 @@ You need Python 3.8+ and Docker installed prior to using this system.
    ```
 
 3. **Set up environment variables** :
-   **Create a `.env` file in the project root directory and add the environment variables you'll need:**
+   **Create a `.env` file in the project root directory by copying the example file:**
+
+   ```bash
+   cp .env-example .env
+   ```
+
+   **Then edit `.env` and fill in your actual values. At minimum, you'll need:**
 
    **For uploading data to MinIO:**
    ```bash
@@ -42,8 +48,18 @@ You need Python 3.8+ and Docker installed prior to using this system.
    MINIO_SECRET_KEY="your_secret_key"
    ```
 
+   **For using LLM-based protocol context features:**
+   ```bash
+   AI_INCUBATOR_API_KEY="your_api_key"
+   ```
+
    **For submitting metadata to NMDC:**
-   coming soon!
+   ```bash
+   CLIENT_ID="your_client_id"
+   CLIENT_SECRET="your_client_secret"
+   ```
+
+   **See `.env-example` for a complete list of available environment variables and their descriptions.**
 
 ## Configuration
 

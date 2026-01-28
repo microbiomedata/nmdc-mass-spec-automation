@@ -40,12 +40,18 @@ pip install -r requirements.txt
 
 ### 2. Set Up Environment Variables
 
-Create a `.env` file in the project root:
+Create a `.env` file in the project root by copying the example file:
 
 ```bash
-MINIO_ACCESS_KEY="your_access_key"
-MINIO_SECRET_KEY="your_secret_key"
+cp .env-example .env
 ```
+
+Then edit `.env` and fill in your actual values. At minimum, you'll need:
+- **MINIO_ACCESS_KEY** and **MINIO_SECRET_KEY**: For uploading/downloading processed data to/from MinIO object storage
+- **AI_INCUBATOR_API_KEY**: Required only if using LLM-based protocol context features
+- **CLIENT_ID** and **CLIENT_SECRET**: Required for minting IDs and testing metadata generation (can be fake values for testing)
+
+See `.env-example` for a complete list of available environment variables and their descriptions.
 
 ## Quick Start
 
