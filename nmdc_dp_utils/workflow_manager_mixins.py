@@ -7,6 +7,8 @@ import sys
 from pathlib import Path
 from typing import List, Optional
 from functools import wraps
+import asyncio
+import inspect
 
 import pandas as pd
 from tqdm import tqdm
@@ -65,6 +67,8 @@ load_dotenv()
 def skip_if_complete(trigger_name: str, return_value=None):
     """
     Decorator to skip a method if the specified trigger is set to True.
+    
+    Compatible with both sync and async functions.
 
     Args:
         trigger_name: Name of the skip trigger to check
@@ -74,19 +78,34 @@ def skip_if_complete(trigger_name: str, return_value=None):
         @skip_if_complete('data_processed', return_value=0)
         def some_method(self):
             # method implementation
+            
+        @skip_if_complete('protocol_outline_created', return_value=True)
+        async def async_method(self):
+            # async method implementation
     """
 
     def decorator(func):
-        @wraps(func)
-        def wrapper(self, *args, **kwargs):
-            if self.should_skip(trigger_name):
-                self.logger.info(
-                    f"Skipping {func.__name__} ({trigger_name} already complete)"
-                )
-                return return_value
-            return func(self, *args, **kwargs)
-
-        return wrapper
+        # Check if the function is async
+        if asyncio.iscoroutinefunction(func):
+            @wraps(func)
+            async def async_wrapper(self, *args, **kwargs):
+                if self.should_skip(trigger_name):
+                    self.logger.info(
+                        f"Skipping {func.__name__} ({trigger_name} already complete)"
+                    )
+                    return return_value
+                return await func(self, *args, **kwargs)
+            return async_wrapper
+        else:
+            @wraps(func)
+            def sync_wrapper(self, *args, **kwargs):
+                if self.should_skip(trigger_name):
+                    self.logger.info(
+                        f"Skipping {func.__name__} ({trigger_name} already complete)"
+                    )
+                    return return_value
+                return func(self, *args, **kwargs)
+            return sync_wrapper
 
     return decorator
 
@@ -4195,19 +4214,22 @@ class LLMWorkflowManagerMixin:
         """
         Initialize LLMWorkflowManagerMixin.
         """
-        # Ensure environment variables from a .env file are loaded, if present.
-        load_dotenv()
-
-        # Validate that the required API key is available before initializing the LLM client.
-        api_key = os.getenv("AI_INCUBATOR_API_KEY")
-        if not api_key:
-            raise RuntimeError(
-                "Missing required environment variable 'AI_INCUBATOR_API_KEY'. "
-                "This key is needed to initialize LLMClient for LLM-based workflows. "
-                "Please set 'AI_INCUBATOR_API_KEY' in your environment or .env file."
-            )
-        self.llm_client = LLMClient()
-        self.conversation_obj = ConversationManager(interaction_type="protocol_conversion")
+        self._llm_client = None
+        self._conversation_obj = None
+    
+    @property
+    def llm_client(self):
+        """Lazy-load LLM client on first access."""
+        if self._llm_client is None:
+            self._llm_client = LLMClient()
+        return self._llm_client
+    
+    @property
+    def conversation_obj(self):
+        """Lazy-load conversation object on first access."""
+        if self._conversation_obj is None:
+            self._conversation_obj = ConversationManager(interaction_type="protocol_conversion")
+        return self._conversation_obj
         
     @skip_if_complete("protocol_outline_created", return_value=True)
     def load_protocol_description_to_context(self, protocol_description_path: str) -> None:
