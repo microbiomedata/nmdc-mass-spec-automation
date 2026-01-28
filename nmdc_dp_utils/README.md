@@ -53,6 +53,13 @@ You need Python 3.8+ and Docker installed prior to using this system.
    AI_INCUBATOR_API_KEY="your_api_key"
    ```
 
+   **For metadata generation (production mode):**
+   ```bash
+   CLIENT_ID="your_client_id"
+   CLIENT_SECRET="your_client_secret"
+   ```
+   These credentials are used for minting IDs and submitting metadata to NMDC in production mode. They are not required if generating metadata in testing mode.
+
    **See `.env-example` for a complete list of available environment variables and their descriptions.**
 
 ## Configuration
