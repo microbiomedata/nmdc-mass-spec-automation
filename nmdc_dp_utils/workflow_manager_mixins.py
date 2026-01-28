@@ -4198,7 +4198,7 @@ class LLMWorkflowManagerMixin:
         self.llm_client = LLMClient()
         self.conversation_obj = ConversationManager(interaction_type="protocol_conversion")
         
-
+    @skip_if_complete("protocol_outline_created", return_value=True)
     def load_protocol_description_to_context(self, protocol_description_path: str) -> None:
         """
         Load protocol description from a text file to the LLM conversation context.
@@ -4215,7 +4215,8 @@ class LLMWorkflowManagerMixin:
         with open(protocol_description_path, "r") as f:
             protocol_description = f.read()
         self.conversation_obj.add_protocol_description(description=protocol_description)
-
+    
+    @skip_if_complete("protocol_outline_created", return_value=True)
     def save_yaml_to_file(self, output_path: str, content: str) -> None:
         """
         Save content to a specified file.
@@ -4237,7 +4238,8 @@ class LLMWorkflowManagerMixin:
             content = content[:-3].strip()  
         with open(output_path, "w") as f:
             f.write(content)
-
+    
+    @skip_if_complete("protocol_outline_created", return_value=True)
     async def get_llm_generated_yaml_outline(self) -> str:
         """
         Get the LLM generated YAML outline for the loaded protocol description.

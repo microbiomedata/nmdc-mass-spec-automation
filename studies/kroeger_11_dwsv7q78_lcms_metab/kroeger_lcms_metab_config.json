@@ -123,6 +123,7 @@
     "skip_triggers": {
         "study_structure_created": true,
         "raw_data_downloaded": true,
+        "protocol_outline_created": false,
         "biosample_attributes_fetched": true,
         "biosample_mapping_script_generated": true,
         "biosample_mapping_completed": true,
