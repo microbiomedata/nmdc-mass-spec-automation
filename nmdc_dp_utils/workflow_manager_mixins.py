@@ -4195,6 +4195,17 @@ class LLMWorkflowManagerMixin:
         """
         Initialize LLMWorkflowManagerMixin.
         """
+        # Ensure environment variables from a .env file are loaded, if present.
+        load_dotenv()
+
+        # Validate that the required API key is available before initializing the LLM client.
+        api_key = os.getenv("AI_INCUBATOR_API_KEY")
+        if not api_key:
+            raise RuntimeError(
+                "Missing required environment variable 'AI_INCUBATOR_API_KEY'. "
+                "This key is needed to initialize LLMClient for LLM-based workflows. "
+                "Please set 'AI_INCUBATOR_API_KEY' in your environment or .env file."
+            )
         self.llm_client = LLMClient()
         self.conversation_obj = ConversationManager(interaction_type="protocol_conversion")
         
