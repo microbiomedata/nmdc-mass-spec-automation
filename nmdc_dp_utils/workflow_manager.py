@@ -178,17 +178,25 @@ class NMDCWorkflowManager(
         with open(config_path, "r") as f:
             config = json.load(f)
 
-        # Initialize skip_triggers if not present
+        # Initialize skip_triggers with default values, preserving existing ones
+        default_triggers = {
+            "study_structure_created": False,
+            "raw_data_downloaded": False,
+            "protocol_outline_created": True,
+            "biosample_attributes_fetched": False,
+            "biosample_mapping_script_generated": False,
+            "biosample_mapping_completed": False,
+            "wdls_generated": False,
+            "data_processed": False,
+        }
+        
         if "skip_triggers" not in config:
-            config["skip_triggers"] = {
-                "study_structure_created": False,
-                "raw_data_downloaded": False,
-                "biosample_attributes_fetched": False,
-                "biosample_mapping_script_generated": False,
-                "biosample_mapping_completed": False,
-                "wdls_generated": False,
-                "data_processed": False,
-            }
+            config["skip_triggers"] = default_triggers
+        else:
+            # Merge defaults with existing triggers, preserving existing values
+            for key, value in default_triggers.items():
+                if key not in config["skip_triggers"]:
+                    config["skip_triggers"][key] = value
 
         return config
 
