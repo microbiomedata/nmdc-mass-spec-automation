@@ -4172,73 +4172,6 @@ class WorkflowMetadataManager:
         """
         raise NotImplementedError("submit_metadata_packages() is not yet implemented.")
 
-    def generate_material_processing_input_csv(self) -> bool:
-        """
-        Generate combined_input.csv for material processing metadata generation.
-
-        Creates a CSV with columns required by MaterialProcessingMetadataGenerator:
-        - biosample_id: NMDC biosample ID
-        - raw_data_identifier: Placeholder for processed sample linking
-        - processedsample_placeholder: Final processed sample name from biosample mapping
-        - material_processing_protocol_id: Protocol identifier from biosample mapping
-
-        Reads from mapped_raw_file_biosample_mapping.csv which includes per-biosample
-        processedsample_placeholder and protocol_id values set during biosample mapping.
-
-        Returns:
-            True if successful, False otherwise
-
-        Example:
-            >>> manager = NMDCWorkflowManager('config.json')
-            >>> success = manager.generate_material_processing_input_csv()
-        """
-        self.logger.info("Generating material processing input CSV...")
-
-        try:
-            # Read mapped_raw_file_biosample_mapping.csv (has all columns including processedsample_placeholder)
-            mapping_path = self.workflow_path / "metadata" / "mapped_raw_file_biosample_mapping.csv"
-            if not mapping_path.exists():
-                self.logger.error(f"Biosample mapping file not found at {mapping_path}")
-                self.logger.error("Run biosample mapping script first")
-                return False
-
-            df = pd.read_csv(mapping_path)
-
-            # Get unique biosamples with their processedsample_placeholder and protocol_id
-            # Group by biosample to get one entry per biosample
-            unique_biosamples = df[
-                df['biosample_id'].notna()
-            ][['biosample_id', 'biosample_name', 'processedsample_placeholder', 'material_processing_protocol_id']].drop_duplicates(subset=['biosample_id'])
-
-            if len(unique_biosamples) == 0:
-                self.logger.error("No biosamples found in mapping file")
-                return False
-
-            # Create combined_input dataframe
-            combined_input = pd.DataFrame({
-                'biosample_id': unique_biosamples['biosample_id'],
-                'raw_data_identifier': unique_biosamples['biosample_id'].apply(lambda x: f"{x}_placeholder"),
-                'processedsample_placeholder': unique_biosamples['processedsample_placeholder'],
-                'material_processing_protocol_id': unique_biosamples['material_processing_protocol_id']
-            })
-
-            # Save to material_processing directory
-            mp_dir = self.workflow_path / "material_processing"
-            mp_dir.mkdir(parents=True, exist_ok=True)
-            output_path = mp_dir / "combined_input.csv"
-            combined_input.to_csv(output_path, index=False)
-
-            self.logger.info(f"Created combined_input.csv with {len(combined_input)} biosample entries")
-            self.logger.info(f"Output: {output_path}")
-
-            return True
-
-        except Exception as e:
-            self.logger.error(f"Error generating material processing input CSV: {e}")
-            import traceback
-            traceback.print_exc()
-            return False
-
     def generate_material_processing_metadata(self, test=False) -> bool:
         """
         Generate material processing metadata using MaterialProcessingMetadataGenerator.
@@ -4262,16 +4195,19 @@ class WorkflowMetadataManager:
 
         try:
             # Check for required files
-            mp_dir = self.workflow_path / "material_processing"
-            yaml_path = mp_dir / "material_processing_outline.yaml"
-            input_csv_path = mp_dir / "combined_input.csv"
+            prot_dir = self.workflow_path / "protocol_info"
+            yaml_path = prot_dir / "llm_generated_protocol_outline.yaml"
+
 
             if not yaml_path.exists():
                 self.logger.error(f"Material processing YAML not found: {yaml_path}")
                 return False
 
+            # Check for mapped biosample raw data file processed sample
+            #TODO: Update this input_csv_path once LLM-helper works.
+            input_csv_path = self.workflow_path / "metadata" / "mapped_raw_files_wprocessed_MANUAL.csv"
             if not input_csv_path.exists():
-                self.logger.error(f"Combined input CSV not found: {input_csv_path}")
+                self.logger.error(f"Input CSV for material processing metadata generation not found: {input_csv_path}")
                 self.logger.error("Run generate_material_processing_input_csv() first")
                 return False
 
@@ -4281,9 +4217,10 @@ class WorkflowMetadataManager:
                 self.logger.error("study_id not found in config['study']['id']")
                 return False
 
-            # Create output directory
-            output_dir = mp_dir / "metadata_output"
+            # Outputs will be written into self.workflow_path / "metadata" / "nmdc_submission_packages"
+            output_dir = self.workflow_path / "metadata" / "nmdc_submission_packages"
             output_dir.mkdir(parents=True, exist_ok=True)
+            db_path = output_dir / "material_processing_metadata.json"
 
             # Get minting config credentials path from config or use default
             minting_config = self.config.get("material_processing", {}).get(
@@ -4293,7 +4230,7 @@ class WorkflowMetadataManager:
 
             # Initialize MaterialProcessingMetadataGenerator
             generator = MaterialProcessingMetadataGenerator(
-                database_dump_json_path=str(output_dir),
+                database_dump_json_path=str(db_path),
                 study_id=study_id,
                 yaml_outline_path=str(yaml_path),
                 sample_to_dg_mapping_path=str(input_csv_path),
@@ -4351,11 +4288,6 @@ class WorkflowMetadataManager:
 
         # Step 1: Generate material processing metadata
         self.logger.info("Step 1: Generating material processing metadata...")
-
-        # Generate combined_input.csv from mapped_raw_files
-        if not self.generate_material_processing_input_csv():
-            self.logger.error("Failed to generate material processing input CSV")
-            return False
 
         # Generate material processing metadata
         if not self.generate_material_processing_metadata(test=test):
