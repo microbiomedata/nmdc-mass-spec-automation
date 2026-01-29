@@ -32,13 +32,14 @@ async def main():
 
     # Step 2: Generate protocol YAML outline using LLM
     logger.info("2. Generating protocol YAML outline using LLM...")
-    outline = await manager.generate_material_processing_yaml()
+    await manager.generate_material_processing_yaml()
 
     # Step 3: Fetch raw data (MinIO or MASSIVE based on config)
     logger.info("3. Fetching raw data...")
     manager.fetch_raw_data()
 
     # Step 4: Map raw data files to biosamples by generating mapping script and running it
+    # TO BE REPLACED BY AN LLM-DRIVEN APPROACH
     logger.info("4. Mapping raw data files to biosamples...")
     manager.get_biosample_attributes()
     manager.generate_biosample_mapping_script()

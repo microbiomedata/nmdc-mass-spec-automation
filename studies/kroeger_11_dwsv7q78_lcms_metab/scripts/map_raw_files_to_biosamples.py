@@ -19,10 +19,10 @@ import pandas as pd
 import re
 from pathlib import Path
 
-# Add the utils directory to path
-sys.path.append(str(Path.cwd() / "nmdc_dp_utils"))
+# Add the project root to path
+sys.path.insert(0, str(Path(__file__).resolve().parents[3]))
 
-from workflow_manager import NMDCWorkflowManager
+from nmdc_dp_utils.workflow_manager import NMDCWorkflowManager
 
 
 def extract_sample_info_from_filename(filename):
@@ -121,9 +121,12 @@ def match_to_biosamples(raw_files_info, biosample_df):
     for raw_info in raw_files_info:
         mapping = {
             'raw_file_name': Path(raw_info['raw_filename']).name,
+            'raw_file_type': 'sample',  # Will be updated for controls below
             'biosample_id': None,
             'biosample_name': None,
-            'match_confidence': 'no_match'
+            'match_confidence': 'no_match',
+            'processedsample_placeholder': 'ProcessedSample2_metabolomics_extraction',
+            'material_processing_protocol_id': 'metabolomics_extraction'
         }
         
         filename = Path(raw_info['raw_filename']).name
@@ -136,13 +139,15 @@ def match_to_biosamples(raw_files_info, biosample_df):
         # Strategy 1: Control identification (highest priority)
         control_patterns = ['ExCtrl', 'Neg-', 'Sterile-', 'QC']
         if any(pattern in filename for pattern in control_patterns):
-            mapping['match_confidence'] = 'control_sample'  
+            mapping['raw_file_type'] = 'qc' if 'QC' in filename else 'blank'
+            mapping['match_confidence'] = 'no_match'  # Controls don't map to biosamples
             mappings.append(mapping)
             continue
         
         # Strategy 2: Pilot study identification
         if 'pilot' in filename:
-            mapping['match_confidence'] = 'control_sample'
+            mapping['raw_file_type'] = 'unknown'
+            mapping['match_confidence'] = 'no_match'
             mappings.append(mapping)
             continue
         

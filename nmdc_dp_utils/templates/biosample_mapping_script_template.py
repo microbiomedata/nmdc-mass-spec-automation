@@ -110,6 +110,8 @@ def match_to_biosamples(raw_files_info, biosample_df):
         - 'biosample_id': str or None - NMDC biosample ID (e.g., 'nmdc:bsm-...')
         - 'biosample_name': str or None - Biosample name from NMDC
         - 'match_confidence': str - MUST be one of: 'high', 'medium', 'low', 'multiple_matches', 'no_match'
+        - 'processedsample_placeholder': str - Final processed sample name from material processing YAML (e.g., 'ProcessedSample2_metabolomics_extraction')
+        - 'material_processing_protocol_id': str - Protocol identifier from material processing YAML (e.g., 'metabolomics_extraction')
         
         MATCHING CONFIDENCE GUIDELINES:
         - 'high': Exact match on unique identifier (e.g., sample ID matches exactly)
@@ -149,7 +151,9 @@ def match_to_biosamples(raw_files_info, biosample_df):
             'raw_file_type': None,
             'biosample_id': None,
             'biosample_name': None,
-            'match_confidence': 'no_match'
+            'match_confidence': 'no_match',
+            'processedsample_placeholder': None,  # CUSTOMIZE by biosample if needed
+            'material_processing_protocol_id': None  # CUSTOMIZE by biosample if needed
         }}
         
         # CUSTOMIZE: Implement your matching logic here
