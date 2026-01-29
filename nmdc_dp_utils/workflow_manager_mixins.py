@@ -4228,27 +4228,51 @@ class WorkflowMetadataManager:
                 str(Path.home() / ".nmdc" / "config.toml")
             )
 
-            # Initialize MaterialProcessingMetadataGenerator
+            # First attempt to generate and validate metadata in test mode 
+            # Initialize MaterialProcessingMetadataGenerator in test mode
             generator = MaterialProcessingMetadataGenerator(
                 database_dump_json_path=str(db_path),
                 study_id=study_id,
                 yaml_outline_path=str(yaml_path),
                 sample_to_dg_mapping_path=str(input_csv_path),
                 minting_config_creds=minting_config,
-                test=test,
+                test=True,
             )
 
             # Run metadata generation
-            self.logger.info("Running MaterialProcessingMetadataGenerator...")
+            self.logger.info("Running MaterialProcessingMetadataGenerator in test mode...")
             metadata = generator.run()
 
             # Validate generated metadata
             self.logger.info("Validating generated metadata...")
-            validate = generator.validate_nmdc_database(str(output_dir), use_api=False)
+            validate = generator.validate_nmdc_database(str(db_path), use_api=False)
 
             if validate["result"] != "All Okay!":
-                self.logger.error(f"Validation failed: {validate}")
+                self.logger.error(f"Validation of test mode MaterialProcessingMetadataGenerator failed: {validate}")
                 return False
+            
+            # If test mode succeeded and test=False, run again in normal mode
+            if not test:
+                self.logger.info("Test mode succeeded, running MaterialProcessingMetadataGenerator in production mode...")
+                generator = MaterialProcessingMetadataGenerator(
+                    database_dump_json_path=str(db_path),
+                    study_id=study_id,
+                    yaml_outline_path=str(yaml_path),
+                    sample_to_dg_mapping_path=str(input_csv_path),
+                    minting_config_creds=minting_config,
+                    test=False,
+                )
+                # Run metadata generation
+                self.logger.info("Running MaterialProcessingMetadataGenerator in production mode...")
+                metadata = generator.run()
+
+                # Validate generated metadata
+                self.logger.info("Validating generated metadata...")
+                validate = generator.validate_nmdc_database(str(db_path), use_api=False)
+
+                if validate["result"] != "All Okay!":
+                    self.logger.error(f"Validation of production mode MaterialProcessingMetadataGenerator failed in: {validate}")
+                    return False
 
             self.logger.info(f"Material processing metadata generated successfully")
             self.logger.info(f"Output directory: {output_dir}")
@@ -4286,19 +4310,20 @@ class WorkflowMetadataManager:
             >>> success = manager.generate_nmdc_metadata_for_workflow()
         """
 
-        # Step 1: Generate material processing metadata
-        self.logger.info("Step 1: Generating material processing metadata...")
+        # Step 2: Generate workflow metadata mapping CSV files
+        self.logger.info("Step 2: Generating workflow metadata input CSVs...")
+        if not self.generate_workflow_metadata_generation_inputs():
+            self.logger.error("Failed to generate metadata mapping files")
+            return False
+
+        # Step 2: Generate material processing metadata
+        self.logger.info("Step 2: Generating material processing metadata...")
 
         # Generate material processing metadata
         if not self.generate_material_processing_metadata(test=test):
             self.logger.error("Failed to generate material processing metadata")
             return False
 
-        # Step 2: Generate workflow metadata mapping CSV files
-        self.logger.info("Step 2: Generating workflow metadata input CSVs...")
-        if not self.generate_workflow_metadata_generation_inputs():
-            self.logger.error("Failed to generate metadata mapping files")
-            return False
 
         # Step 3: Generate NMDC workflow submission packages
         self.logger.info("Step 3: Generating workflow metadata packages...")
