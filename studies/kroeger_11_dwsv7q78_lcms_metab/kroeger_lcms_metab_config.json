@@ -132,7 +132,7 @@
         "metadata_mapping_generated": true,
         "data_processed": true,
         "processed_data_uploaded_to_minio": true,
-        "metadata_packages_generated": true,
+        "metadata_packages_generated": false,
         "metadata_submitted_dev": false,
         "metadata_submitted_prod": false
     }

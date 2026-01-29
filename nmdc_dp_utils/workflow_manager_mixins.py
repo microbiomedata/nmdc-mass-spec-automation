@@ -3774,6 +3774,10 @@ class WorkflowMetadataManager:
             # Call workflow-specific processing function
             success = wf_input_gen()
 
+            # Replace biosample_id (sample_id) with processed_sample_id from material processing metadata
+            if success:
+                success = self._update_sample_ids_to_processed_sample_ids()
+            
             if success:
                 self.set_skip_trigger("metadata_mapping_generated", True)
                 return True
@@ -3784,6 +3788,151 @@ class WorkflowMetadataManager:
             self.logger.error(f"Error generating metadata mapping files: {e}")
             import traceback
 
+            traceback.print_exc()
+            return False
+
+    def _update_sample_ids_to_processed_sample_ids(self) -> bool:
+        """
+        Update sample_id in metadata CSV files to use processed_sample_id from material processing metadata.
+
+        Reads the material processing metadata workflowreference CSV to get the mapping from
+        raw_data_identifier to processed_sample_id, then updates all the metadata CSV files in
+        metadata_gen_input_csvs directory to use processed_sample_id instead of biosample_id.
+        
+        The merge is done on raw_data_identifier (from workflow reference) matching the filename
+        extracted from raw_data_file (from input CSVs), since a single biosample can have multiple
+        processed samples corresponding to different raw data files.
+
+        Returns:
+            True if successful, False otherwise
+        """
+        self.logger.info("Updating sample_id to processed_sample_id in metadata CSV files...")
+
+        try:
+            # Load the material processing workflowreference CSV
+            workflowref_file = (
+                self.workflow_path / "metadata" / "nmdc_submission_packages" / 
+                "material_processing_metadata_workflowreference.csv"
+            )
+            
+            if not workflowref_file.exists():
+                self.logger.error(
+                    f"Material processing workflowreference file not found: {workflowref_file}"
+                )
+                self.logger.error(
+                    "Run generate_material_processing_metadata() first"
+                )
+                return False
+
+            # Read the mapping from raw_data_identifier to last_processed_sample
+            workflowref_df = pd.read_csv(workflowref_file)
+            
+            # Verify required columns exist
+            if "raw_data_identifier" not in workflowref_df.columns or "last_processed_sample" not in workflowref_df.columns:
+                self.logger.error(
+                    f"Material processing workflowreference file missing required columns. "
+                    f"Expected: 'raw_data_identifier', 'last_processed_sample'. "
+                    f"Found columns: {list(workflowref_df.columns)}"
+                )
+                return False
+
+            # Select only the columns we need for the merge and rename for clarity
+            mapping_df = workflowref_df[["raw_data_identifier", "last_processed_sample"]].copy()
+            mapping_df = mapping_df.rename(columns={"last_processed_sample": "processed_sample_id"})
+
+            self.logger.info(
+                f"Found {len(mapping_df)} raw_data_identifier to processed_sample_id mappings"
+            )
+
+            # Update all metadata CSV files in metadata_gen_input_csvs directory
+            input_dir = self.workflow_path / "metadata" / "metadata_gen_input_csvs"
+            if not input_dir.exists():
+                self.logger.error(f"Metadata input directory not found: {input_dir}")
+                return False
+
+            csv_files = list(input_dir.glob("*.csv"))
+            if not csv_files:
+                self.logger.error(f"No CSV files found in {input_dir}")
+                return False
+
+            updated_count = 0
+            total_rows_updated = 0
+
+            for csv_file in csv_files:
+                # Read the CSV
+                df = pd.read_csv(csv_file)
+                
+                # Check if required columns exist
+                if "sample_id" not in df.columns:
+                    self.logger.warning(f"Skipping {csv_file.name}: no sample_id column found")
+                    continue
+                    
+                if "raw_data_file" not in df.columns:
+                    self.logger.warning(f"Skipping {csv_file.name}: no raw_data_file column found")
+                    continue
+
+                # Extract raw data filename from the full path
+                df["raw_data_file_short"] = df["raw_data_file"].apply(lambda x: Path(x).name)
+                
+                # Store original row count for reporting
+                original_row_count = len(df)
+                
+                # Merge with mapping to get processed_sample_id based on raw data filename
+                # Left merge to keep all rows from df, adding processed_sample_id column
+                df_merged = df.merge(
+                    mapping_df,
+                    left_on="raw_data_file_short",
+                    right_on="raw_data_identifier",
+                    how="left"
+                )
+                
+                # Check for any unmapped raw data files (would have NaN in processed_sample_id)
+                unmapped_mask = df_merged["processed_sample_id"].isna()
+                if unmapped_mask.any():
+                    self.logger.warning(
+                        f"In {csv_file.name}: {unmapped_mask.sum()} rows have raw data files that could not be mapped to processed_sample_id"
+                    )
+                    continue # Skip this file
+
+                # Check that the shape was preserved
+                if len(df_merged) != original_row_count:
+                    self.logger.error(
+                        f"Mismatch in row count after merging to processed_sample_id for {csv_file.name}: "
+                    )
+                    continue # Skip this file
+
+                # Replace sample_id with processed_sample_id
+                df_merged["sample_id"] = df_merged["processed_sample_id"]
+                
+                # Drop the temporary columns from the merge
+                df_merged = df_merged.drop(columns=["raw_data_file_short", "raw_data_identifier", "processed_sample_id"])
+
+                # Write updated CSV back to file
+                df_merged.to_csv(csv_file, index=False)
+                updated_count += 1
+                total_rows_updated += len(df_merged)
+                self.logger.info(
+                    f"Updated {csv_file.name}: {len(df_merged)} rows with processed_sample_id"
+                )
+
+            if updated_count == 0:
+                self.logger.error("No CSV files were successfully updated")
+                return False
+            
+            if updated_count < len(csv_files):
+                self.logger.warning(
+                    f"Only {updated_count} out of {len(csv_files)} CSV files were updated successfully"
+                )
+                return False
+
+            self.logger.info(
+                f"Successfully updated {updated_count} CSV files with {total_rows_updated} total rows"
+            )
+            return True
+
+        except Exception as e:
+            self.logger.error(f"Error updating sample_ids to processed_sample_ids: {e}")
+            import traceback
             traceback.print_exc()
             return False
 
@@ -3988,9 +4137,9 @@ class WorkflowMetadataManager:
         return True
 
     @skip_if_complete("metadata_packages_generated", return_value=True)
-    def _generate_nmdc_metadata_packages(self, test=False) -> bool:
+    def _generate_processing_metadata(self, test=False) -> bool:
         """
-        Generate NMDC metadata packages for workflow submission (internal method).
+        Generate NMDC metadata packages for workflow execution and related records
 
         Creates workflow metadata JSON files for NMDC submission using the
         nmdc-ms-metadata-gen package. Generates one metadata package per
@@ -4097,13 +4246,7 @@ class WorkflowMetadataManager:
             config_name = csv_file.stem.replace("_metadata", "")
             output_file = output_dir / f"workflow_metadata_{config_name}.json"
 
-            # Skip if output already exists
-            if output_file.exists():
-                success_count += 1
-                continue
-
             try:
-                # Initialize workflow-specific metadata generator
                 # Build kwargs based on workflow type
                 generator_kwargs = {
                     "metadata_file": str(csv_file),
@@ -4127,20 +4270,41 @@ class WorkflowMetadataManager:
                     # LCMS generators accept existing_data_objects
                     generator_kwargs["existing_data_objects"] = existing_data_objects
 
-                generator = metadata_generator_class(test=test, **generator_kwargs)
+                # First attempt to generate and validate metadata in test mode
+                # Initialize workflow-specific metadata generator in test mode
+                self.logger.info(f"Running {config_name} metadata generation in test mode...")
+                generator = metadata_generator_class(test=True, **generator_kwargs)
 
                 # Run metadata generation
                 metadata = generator.run()
 
                 # Validate without API first (fast local validation)
-                self.logger.info("Validating metadata (local)...")
+                self.logger.info(f"Validating {config_name} metadata (local, test mode)...")
                 validate_local = generator.validate_nmdc_database(
                     json=metadata, use_api=False
                 )
                 if validate_local.get("result") != "All Okay!":
-                    self.logger.warning(f"Local validation issues: {validate_local}")
-                    failed_files.append((csv_file.name, "Local validation failed"))
+                    self.logger.warning(f"Test mode validation issues for {config_name}: {validate_local}")
+                    failed_files.append((csv_file.name, "Test mode validation failed"))
                     continue
+
+                # If test mode succeeded and test=False, run again in production mode
+                if not test:
+                    self.logger.info(f"Test mode succeeded, running {config_name} metadata generation in production mode...")
+                    generator = metadata_generator_class(test=False, **generator_kwargs)
+                    
+                    # Run metadata generation
+                    metadata = generator.run()
+
+                    # Validate without API first (fast local validation)
+                    self.logger.info(f"Validating {config_name} metadata (local, production mode)...")
+                    validate_local = generator.validate_nmdc_database(
+                        json=metadata, use_api=False
+                    )
+                    if validate_local.get("result") != "All Okay!":
+                        self.logger.warning(f"Production mode validation issues for {config_name}: {validate_local}")
+                        failed_files.append((csv_file.name, "Production mode validation failed"))
+                        continue
 
                 success_count += 1
 
@@ -4172,6 +4336,7 @@ class WorkflowMetadataManager:
         """
         raise NotImplementedError("submit_metadata_packages() is not yet implemented.")
 
+    @skip_if_complete("material_processing_metadata_generated", return_value=True)
     def generate_material_processing_metadata(self, test=False) -> bool:
         """
         Generate material processing metadata using MaterialProcessingMetadataGenerator.
@@ -4310,24 +4475,20 @@ class WorkflowMetadataManager:
             >>> success = manager.generate_nmdc_metadata_for_workflow()
         """
 
+        # Step 1: Generate material processing metadata
+        if not self.generate_material_processing_metadata(test=test):
+            self.logger.error("Failed to generate material processing metadata")
+            return False
+
         # Step 2: Generate workflow metadata mapping CSV files
         self.logger.info("Step 2: Generating workflow metadata input CSVs...")
         if not self.generate_workflow_metadata_generation_inputs():
             self.logger.error("Failed to generate metadata mapping files")
             return False
 
-        # Step 2: Generate material processing metadata
-        self.logger.info("Step 2: Generating material processing metadata...")
-
-        # Generate material processing metadata
-        if not self.generate_material_processing_metadata(test=test):
-            self.logger.error("Failed to generate material processing metadata")
-            return False
-
-
-        # Step 3: Generate NMDC workflow submission packages
+        # Step 3: Generate NMDC workflow submission packages for processing related data
         self.logger.info("Step 3: Generating workflow metadata packages...")
-        if not self._generate_nmdc_metadata_packages(test=test):
+        if not self._generate_processing_metadata(test=test):
             self.logger.error("Failed to generate NMDC metadata packages")
             return False
 
