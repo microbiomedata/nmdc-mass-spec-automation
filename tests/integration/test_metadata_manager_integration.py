@@ -34,8 +34,10 @@ class TestWorkflowMetadataManagerIntegration:
         workflow_dir = tmp_path / "studies" / integration_lcms_config["workflow"]["name"]
         metadata_dir = workflow_dir / "metadata"
         raw_info_dir = workflow_dir / "raw_file_info"
+        nmdc_packages_dir = metadata_dir / "nmdc_submission_packages"
         metadata_dir.mkdir(parents=True, exist_ok=True)
         raw_info_dir.mkdir(parents=True, exist_ok=True)
+        nmdc_packages_dir.mkdir(parents=True, exist_ok=True)
         
         # Copy test data files
         test_data_dir = Path(__file__).parent / "test_data"
@@ -48,6 +50,23 @@ class TestWorkflowMetadataManagerIntegration:
             raw_info_dir / "raw_file_inspection_results.csv"
         )
         
+        # Create mock material processing workflowreference CSV
+        # This simulates the output from generate_material_processing_metadata()
+        biosample_mapping = pd.read_csv(metadata_dir / "mapped_raw_file_biosample_mapping.csv")
+        workflowref_data = []
+        for _, row in biosample_mapping.iterrows():
+            if row["match_confidence"] == "high":
+                workflowref_data.append({
+                    "biosample_id": row["biosample_id"],
+                    "raw_data_identifier": row["raw_file_name"],
+                    "last_processed_sample": f"nmdc:procsm-99-test{len(workflowref_data):03d}"
+                })
+        workflowref_df = pd.DataFrame(workflowref_data)
+        workflowref_df.to_csv(
+            nmdc_packages_dir / "material_processing_metadata_workflowreference.csv",
+            index=False
+        )
+        
         # Save config
         config_file = workflow_dir / "test_config.json"
         with open(config_file, "w") as f:
@@ -56,7 +75,7 @@ class TestWorkflowMetadataManagerIntegration:
         # Create manager
         manager = NMDCWorkflowManager(str(config_file))
         
-        # Generate CSV metadata mappings only (skip JSON package generation)
+        # Generate CSV metadata mappings (now includes processed_sample_id mapping)
         result = manager.generate_workflow_metadata_generation_inputs()
         
         # Verify generation succeeded
@@ -104,7 +123,7 @@ class TestWorkflowMetadataManagerIntegration:
         
         # Verify data integrity
         assert len(df) > 0, "No rows in metadata file"
-        assert all(df["sample_id"].str.startswith("nmdc:bsm-")), "Invalid biosample IDs"
+        assert all(df["sample_id"].str.startswith("nmdc:procsm-")), "Invalid processed sample IDs (should start with nmdc:procsm-)"
         
         # Verify processed_data_directory ends with .corems
         assert all(df["processed_data_directory"].str.endswith(".corems")), \
@@ -131,8 +150,10 @@ class TestWorkflowMetadataManagerIntegration:
         workflow_dir = tmp_path / "studies" / integration_gcms_config["workflow"]["name"]
         metadata_dir = workflow_dir / "metadata"
         raw_info_dir = workflow_dir / "raw_file_info"
+        nmdc_packages_dir = metadata_dir / "nmdc_submission_packages"
         metadata_dir.mkdir(parents=True, exist_ok=True)
         raw_info_dir.mkdir(parents=True, exist_ok=True)
+        nmdc_packages_dir.mkdir(parents=True, exist_ok=True)
         
         # Copy test data files
         test_data_dir = Path(__file__).parent / "test_data"
@@ -145,6 +166,23 @@ class TestWorkflowMetadataManagerIntegration:
             raw_info_dir / "raw_file_inspection_results.csv"
         )
         
+        # Create mock material processing workflowreference CSV
+        # This simulates the output from generate_material_processing_metadata()
+        biosample_mapping = pd.read_csv(metadata_dir / "mapped_raw_file_biosample_mapping.csv")
+        workflowref_data = []
+        for _, row in biosample_mapping.iterrows():
+            if row["match_confidence"] == "high":
+                workflowref_data.append({
+                    "biosample_id": row["biosample_id"],
+                    "raw_data_identifier": row["raw_file_name"],
+                    "last_processed_sample": f"nmdc:procsm-99-test{len(workflowref_data):03d}"
+                })
+        workflowref_df = pd.DataFrame(workflowref_data)
+        workflowref_df.to_csv(
+            nmdc_packages_dir / "material_processing_metadata_workflowreference.csv",
+            index=False
+        )
+        
         # Save config
         config_file = workflow_dir / "test_config.json"
         with open(config_file, "w") as f:
@@ -154,15 +192,15 @@ class TestWorkflowMetadataManagerIntegration:
         manager = NMDCWorkflowManager(str(config_file))
         
         # Verify prerequisites exist
-        biosample_mapping = manager.workflow_path / "metadata" / "mapped_raw_file_biosample_mapping.csv"
-        assert biosample_mapping.exists(), f"Biosample mapping not found at {biosample_mapping}"
+        biosample_mapping_path = manager.workflow_path / "metadata" / "mapped_raw_file_biosample_mapping.csv"
+        assert biosample_mapping_path.exists(), f"Biosample mapping not found at {biosample_mapping_path}"
         
         # Verify calibration file exists in mapping
-        mapping_df = pd.read_csv(biosample_mapping)
+        mapping_df = pd.read_csv(biosample_mapping_path)
         calibration_files = mapping_df[mapping_df["raw_file_type"] == "calibration"]
         assert len(calibration_files) > 0, "No calibration files found in biosample mapping"
         
-        # Generate CSV metadata mappings only (skip JSON package generation)
+        # Generate CSV metadata mappings (now includes processed_sample_id mapping)
         result = manager.generate_workflow_metadata_generation_inputs()
         
         # Verify generation succeeded
@@ -205,7 +243,7 @@ class TestWorkflowMetadataManagerIntegration:
         
         # Verify data integrity
         assert len(df) > 0, "No rows in metadata file"
-        assert all(df["sample_id"].str.startswith("nmdc:bsm-")), "Invalid biosample IDs"
+        assert all(df["sample_id"].str.startswith("nmdc:procsm-")), "Invalid processed sample IDs (should start with nmdc:procsm-)"
         
         # Verify calibration files were assigned
         assert all(df["calibration_file"].notna()), "Some samples missing calibration file"
@@ -344,8 +382,10 @@ class TestWorkflowMetadataManagerIntegration:
         workflow_dir = tmp_path / "studies" / config["workflow"]["name"]
         metadata_dir = workflow_dir / "metadata"
         raw_info_dir = workflow_dir / "raw_file_info"
+        nmdc_packages_dir = metadata_dir / "nmdc_submission_packages"
         metadata_dir.mkdir(parents=True, exist_ok=True)
         raw_info_dir.mkdir(parents=True, exist_ok=True)
+        nmdc_packages_dir.mkdir(parents=True, exist_ok=True)
         
         # Copy test data files
         test_data_dir = Path(__file__).parent / "test_data"
@@ -360,6 +400,23 @@ class TestWorkflowMetadataManagerIntegration:
         shutil.copy(
             test_data_dir / "raw_file_info" / "massive_ftp_test_locs.csv",
             raw_info_dir / "massive_ftp_locs.csv"
+        )
+        
+        # Create mock material processing workflowreference CSV
+        # This simulates the output from generate_material_processing_metadata()
+        biosample_mapping = pd.read_csv(metadata_dir / "mapped_raw_file_biosample_mapping.csv")
+        workflowref_data = []
+        for _, row in biosample_mapping.iterrows():
+            if row["match_confidence"] == "high":
+                workflowref_data.append({
+                    "biosample_id": row["biosample_id"],
+                    "raw_data_identifier": row["raw_file_name"],
+                    "last_processed_sample": f"nmdc:procsm-99-test{len(workflowref_data):03d}"
+                })
+        workflowref_df = pd.DataFrame(workflowref_data)
+        workflowref_df.to_csv(
+            nmdc_packages_dir / "material_processing_metadata_workflowreference.csv",
+            index=False
         )
         
         # Save config
@@ -383,7 +440,7 @@ class TestWorkflowMetadataManagerIntegration:
         # Create manager
         manager = NMDCWorkflowManager(str(config_file))
         
-        # Generate CSV metadata mappings only (skip JSON package generation)
+        # Generate CSV metadata mappings (now includes processed_sample_id mapping)
         result = manager.generate_workflow_metadata_generation_inputs()
         
         # Verify generation succeeded
