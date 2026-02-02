@@ -29,6 +29,9 @@ from nmdc_ms_metadata_gen.lcms_lipid_metadata_generator import (
 from nmdc_ms_metadata_gen.gcms_metab_metadata_generator import (
     GCMSMetabolomicsMetadataGenerator,
 )
+from nmdc_ms_metadata_gen.material_processing_generator import (
+    MaterialProcessingMetadataGenerator,
+)
 
 
 
@@ -3771,6 +3774,10 @@ class WorkflowMetadataManager:
             # Call workflow-specific processing function
             success = wf_input_gen()
 
+            # Replace biosample_id (sample_id) with processed_sample_id from material processing metadata
+            if success:
+                success = self._update_sample_ids_to_processed_sample_ids()
+            
             if success:
                 self.set_skip_trigger("metadata_mapping_generated", True)
                 return True
@@ -3781,6 +3788,151 @@ class WorkflowMetadataManager:
             self.logger.error(f"Error generating metadata mapping files: {e}")
             import traceback
 
+            traceback.print_exc()
+            return False
+
+    def _update_sample_ids_to_processed_sample_ids(self) -> bool:
+        """
+        Update sample_id in metadata CSV files to use processed_sample_id from material processing metadata.
+
+        Reads the material processing metadata workflowreference CSV to get the mapping from
+        raw_data_identifier to processed_sample_id, then updates all the metadata CSV files in
+        metadata_gen_input_csvs directory to use processed_sample_id instead of biosample_id.
+        
+        The merge is done on raw_data_identifier (from workflow reference) matching the filename
+        extracted from raw_data_file (from input CSVs), since a single biosample can have multiple
+        processed samples corresponding to different raw data files.
+
+        Returns:
+            True if successful, False otherwise
+        """
+        self.logger.info("Updating sample_id to processed_sample_id in metadata CSV files...")
+
+        try:
+            # Load the material processing workflowreference CSV
+            workflowref_file = (
+                self.workflow_path / "metadata" / "nmdc_submission_packages" / 
+                "material_processing_metadata_workflowreference.csv"
+            )
+            
+            if not workflowref_file.exists():
+                self.logger.error(
+                    f"Material processing workflowreference file not found: {workflowref_file}"
+                )
+                self.logger.error(
+                    "Run generate_material_processing_metadata() first"
+                )
+                return False
+
+            # Read the mapping from raw_data_identifier to last_processed_sample
+            workflowref_df = pd.read_csv(workflowref_file)
+            
+            # Verify required columns exist
+            if "raw_data_identifier" not in workflowref_df.columns or "last_processed_sample" not in workflowref_df.columns:
+                self.logger.error(
+                    f"Material processing workflowreference file missing required columns. "
+                    f"Expected: 'raw_data_identifier', 'last_processed_sample'. "
+                    f"Found columns: {list(workflowref_df.columns)}"
+                )
+                return False
+
+            # Select only the columns we need for the merge and rename for clarity
+            mapping_df = workflowref_df[["raw_data_identifier", "last_processed_sample"]].copy()
+            mapping_df = mapping_df.rename(columns={"last_processed_sample": "processed_sample_id"})
+
+            self.logger.info(
+                f"Found {len(mapping_df)} raw_data_identifier to processed_sample_id mappings"
+            )
+
+            # Update all metadata CSV files in metadata_gen_input_csvs directory
+            input_dir = self.workflow_path / "metadata" / "metadata_gen_input_csvs"
+            if not input_dir.exists():
+                self.logger.error(f"Metadata input directory not found: {input_dir}")
+                return False
+
+            csv_files = list(input_dir.glob("*.csv"))
+            if not csv_files:
+                self.logger.error(f"No CSV files found in {input_dir}")
+                return False
+
+            updated_count = 0
+            total_rows_updated = 0
+
+            for csv_file in csv_files:
+                # Read the CSV
+                df = pd.read_csv(csv_file)
+                
+                # Check if required columns exist
+                if "sample_id" not in df.columns:
+                    self.logger.warning(f"Skipping {csv_file.name}: no sample_id column found")
+                    continue
+                    
+                if "raw_data_file" not in df.columns:
+                    self.logger.warning(f"Skipping {csv_file.name}: no raw_data_file column found")
+                    continue
+
+                # Extract raw data filename from the full path
+                df["raw_data_file_short"] = df["raw_data_file"].apply(lambda x: Path(x).name)
+                
+                # Store original row count for reporting
+                original_row_count = len(df)
+                
+                # Merge with mapping to get processed_sample_id based on raw data filename
+                # Left merge to keep all rows from df, adding processed_sample_id column
+                df_merged = df.merge(
+                    mapping_df,
+                    left_on="raw_data_file_short",
+                    right_on="raw_data_identifier",
+                    how="left"
+                )
+                
+                # Check for any unmapped raw data files (would have NaN in processed_sample_id)
+                unmapped_mask = df_merged["processed_sample_id"].isna()
+                if unmapped_mask.any():
+                    self.logger.warning(
+                        f"In {csv_file.name}: {unmapped_mask.sum()} rows have raw data files that could not be mapped to processed_sample_id"
+                    )
+                    continue # Skip this file
+
+                # Check that the shape was preserved
+                if len(df_merged) != original_row_count:
+                    self.logger.error(
+                        f"Mismatch in row count after merging to processed_sample_id for {csv_file.name}: "
+                    )
+                    continue # Skip this file
+
+                # Replace sample_id with processed_sample_id
+                df_merged["sample_id"] = df_merged["processed_sample_id"]
+                
+                # Drop the temporary columns from the merge
+                df_merged = df_merged.drop(columns=["raw_data_file_short", "raw_data_identifier", "processed_sample_id"])
+
+                # Write updated CSV back to file
+                df_merged.to_csv(csv_file, index=False)
+                updated_count += 1
+                total_rows_updated += len(df_merged)
+                self.logger.info(
+                    f"Updated {csv_file.name}: {len(df_merged)} rows with processed_sample_id"
+                )
+
+            if updated_count == 0:
+                self.logger.error("No CSV files were successfully updated")
+                return False
+            
+            if updated_count < len(csv_files):
+                self.logger.warning(
+                    f"Only {updated_count} out of {len(csv_files)} CSV files were updated successfully"
+                )
+                return False
+
+            self.logger.info(
+                f"Successfully updated {updated_count} CSV files with {total_rows_updated} total rows"
+            )
+            return True
+
+        except Exception as e:
+            self.logger.error(f"Error updating sample_ids to processed_sample_ids: {e}")
+            import traceback
             traceback.print_exc()
             return False
 
@@ -3985,9 +4137,9 @@ class WorkflowMetadataManager:
         return True
 
     @skip_if_complete("metadata_packages_generated", return_value=True)
-    def _generate_nmdc_metadata_packages(self, test=False) -> bool:
+    def _generate_processing_metadata(self, test=False) -> bool:
         """
-        Generate NMDC metadata packages for workflow submission (internal method).
+        Generate NMDC metadata packages for workflow execution and related records
 
         Creates workflow metadata JSON files for NMDC submission using the
         nmdc-ms-metadata-gen package. Generates one metadata package per
@@ -4094,13 +4246,7 @@ class WorkflowMetadataManager:
             config_name = csv_file.stem.replace("_metadata", "")
             output_file = output_dir / f"workflow_metadata_{config_name}.json"
 
-            # Skip if output already exists
-            if output_file.exists():
-                success_count += 1
-                continue
-
             try:
-                # Initialize workflow-specific metadata generator
                 # Build kwargs based on workflow type
                 generator_kwargs = {
                     "metadata_file": str(csv_file),
@@ -4124,20 +4270,41 @@ class WorkflowMetadataManager:
                     # LCMS generators accept existing_data_objects
                     generator_kwargs["existing_data_objects"] = existing_data_objects
 
-                generator = metadata_generator_class(test=test, **generator_kwargs)
+                # First attempt to generate and validate metadata in test mode
+                # Initialize workflow-specific metadata generator in test mode
+                self.logger.info(f"Running {config_name} metadata generation in test mode...")
+                generator = metadata_generator_class(test=True, **generator_kwargs)
 
                 # Run metadata generation
                 metadata = generator.run()
 
                 # Validate without API first (fast local validation)
-                self.logger.info("Validating metadata (local)...")
+                self.logger.info(f"Validating {config_name} metadata (local, test mode)...")
                 validate_local = generator.validate_nmdc_database(
                     json=metadata, use_api=False
                 )
                 if validate_local.get("result") != "All Okay!":
-                    self.logger.warning(f"Local validation issues: {validate_local}")
-                    failed_files.append((csv_file.name, "Local validation failed"))
+                    self.logger.warning(f"Test mode validation issues for {config_name}: {validate_local}")
+                    failed_files.append((csv_file.name, "Test mode validation failed"))
                     continue
+
+                # If test mode succeeded and test=False, run again in production mode
+                if not test:
+                    self.logger.info(f"Test mode succeeded, running {config_name} metadata generation in production mode...")
+                    generator = metadata_generator_class(test=False, **generator_kwargs)
+                    
+                    # Run metadata generation
+                    metadata = generator.run()
+
+                    # Validate without API first (fast local validation)
+                    self.logger.info(f"Validating {config_name} metadata (local, production mode)...")
+                    validate_local = generator.validate_nmdc_database(
+                        json=metadata, use_api=False
+                    )
+                    if validate_local.get("result") != "All Okay!":
+                        self.logger.warning(f"Production mode validation issues for {config_name}: {validate_local}")
+                        failed_files.append((csv_file.name, "Production mode validation failed"))
+                        continue
 
                 success_count += 1
 
@@ -4169,39 +4336,209 @@ class WorkflowMetadataManager:
         """
         raise NotImplementedError("submit_metadata_packages() is not yet implemented.")
 
-    def generate_nmdc_metadata_for_workflow(self, test=False) -> bool:
+    @skip_if_complete("material_processing_metadata_generated", return_value=True)
+    def generate_material_processing_metadata(self, test=False) -> bool:
         """
-        Generate NMDC metadata for workflow submission.
+        Generate material processing metadata using MaterialProcessingMetadataGenerator.
 
-        This consolidated method handles the complete metadata generation workflow:
-        1. Generates metadata mapping CSV files with URL validation
-        2. Generates NMDC submission packages from the mapping files
+        This method creates NMDC-compliant material processing metadata from a YAML protocol
+        outline and biosample-to-raw-file mapping. It always runs in test mode first for 
+        validation, then optionally runs in production mode to mint real IDs.
+
+        Requires:
+        - protocol_info/llm_generated_protocol_outline.yaml: YAML outline of processing steps
+        - metadata/mapped_raw_files_wprocessed_MANUAL.csv: CSV mapping biosamples to raw files
+          with columns: raw_data_identifier, biosample_id, biosample_name, match_confidence,
+          processedsample_placeholder, material_processing_protocol_id
+        - config['study']['id']: Study ID in NMDC format (nmdc:sty-XX-XXXXXXXX)
+        - Environment variables CLIENT_ID and CLIENT_SECRET for NMDC API authentication
 
         Args:
-            test: If True, runs in test mode (if applicable)
+            test: If False, runs test mode validation then production mode with real ID minting.
+                  If True, only runs test mode (uses test IDs with -13- shoulder).
+                  Default: False
 
         Returns:
-            True if all steps completed successfully, False otherwise
+            True if successful, False otherwise
 
-        Note:
-            This method combines generate_workflow_metadata_generation_inputs() and
-            _generate_nmdc_metadata_packages() into a single workflow step.
+        Outputs:
+            - metadata/nmdc_submission_packages/material_processing_metadata.json
+            - metadata/nmdc_submission_packages/material_processing_metadata_workflowreference.csv
+            - metadata/nmdc_submission_packages/material_processing_metadata_validation.txt
 
         Example:
             >>> manager = NMDCWorkflowManager('config.json')
-            >>> success = manager.generate_nmdc_metadata_for_workflow()
+            >>> # First run in test mode only
+            >>> success = manager.generate_material_processing_metadata(test=True)
+            >>> # Later run with real ID minting
+            >>> success = manager.generate_material_processing_metadata(test=False)
+        """
+        self.logger.info("Generating material processing metadata...")
+
+        try:
+            # Check for required files
+            prot_dir = self.workflow_path / "protocol_info"
+            yaml_path = prot_dir / "llm_generated_protocol_outline.yaml"
+
+
+            if not yaml_path.exists():
+                self.logger.error(f"Material processing YAML not found: {yaml_path}")
+                return False
+
+            # Check for mapped biosample raw data file processed sample
+            #TODO: Update this input_csv_path once LLM-helper works.
+            input_csv_path = self.workflow_path / "metadata" / "mapped_raw_files_wprocessed_MANUAL.csv"
+            if not input_csv_path.exists():
+                self.logger.error(f"Input CSV for material processing metadata generation not found: {input_csv_path}")
+                self.logger.error("Run generate_material_processing_input_csv() first")
+                return False
+
+            # Get study ID from config
+            study_id = self.config.get("study", {}).get("id")
+            if not study_id:
+                self.logger.error("study_id not found in config['study']['id']")
+                return False
+
+            # Outputs will be written into self.workflow_path / "metadata" / "nmdc_submission_packages"
+            output_dir = self.workflow_path / "metadata" / "nmdc_submission_packages"
+            output_dir.mkdir(parents=True, exist_ok=True)
+            db_path = output_dir / "material_processing_metadata.json"
+
+            # Get minting config credentials path from config or use default
+            minting_config = self.config.get("material_processing", {}).get(
+                "minting_config_creds",
+                str(Path.home() / ".nmdc" / "config.toml")
+            )
+
+            # First attempt to generate and validate metadata in test mode 
+            # Initialize MaterialProcessingMetadataGenerator in test mode
+            generator = MaterialProcessingMetadataGenerator(
+                database_dump_json_path=str(db_path),
+                study_id=study_id,
+                yaml_outline_path=str(yaml_path),
+                sample_to_dg_mapping_path=str(input_csv_path),
+                minting_config_creds=minting_config,
+                test=True,
+            )
+
+            # Run metadata generation
+            self.logger.info("Running MaterialProcessingMetadataGenerator in test mode...")
+            metadata = generator.run()
+
+            # Validate generated metadata
+            self.logger.info("Validating generated metadata...")
+            validate = generator.validate_nmdc_database(str(db_path), use_api=False)
+
+            if validate["result"] != "All Okay!":
+                self.logger.error(f"Validation of test mode MaterialProcessingMetadataGenerator failed: {validate}")
+                return False
+            
+            # If test mode succeeded and test=False, run again in normal mode
+            if not test:
+                self.logger.info("Test mode succeeded, running MaterialProcessingMetadataGenerator in production mode...")
+                generator = MaterialProcessingMetadataGenerator(
+                    database_dump_json_path=str(db_path),
+                    study_id=study_id,
+                    yaml_outline_path=str(yaml_path),
+                    sample_to_dg_mapping_path=str(input_csv_path),
+                    minting_config_creds=minting_config,
+                    test=False,
+                )
+                # Run metadata generation
+                self.logger.info("Running MaterialProcessingMetadataGenerator in production mode...")
+                metadata = generator.run()
+
+                # Validate generated metadata
+                self.logger.info("Validating generated metadata...")
+                validate = generator.validate_nmdc_database(str(db_path), use_api=False)
+
+                if validate["result"] != "All Okay!":
+                    self.logger.error(f"Validation of production mode MaterialProcessingMetadataGenerator failed in: {validate}")
+                    return False
+
+            self.logger.info(f"Material processing metadata generated successfully")
+            self.logger.info(f"Output directory: {output_dir}")
+            self.set_skip_trigger("material_processing_metadata_generated", True)
+
+            return True
+
+        except Exception as e:
+            self.logger.error(f"Error generating material processing metadata: {e}")
+            import traceback
+            traceback.print_exc()
+            return False
+
+    def generate_nmdc_metadata_for_workflow(self, test=False) -> bool:
+        """
+        Generate complete NMDC metadata for workflow submission.
+
+        This consolidated method orchestrates the full metadata generation pipeline in three steps:
+        1. Generates material processing metadata from protocol YAML outline and biosample mapping
+        2. Generates workflow metadata input CSV files with instrument metadata and URL validation
+        3. Generates NMDC workflow submission packages (JSON) from the input CSV files
+
+        Each step depends on successful completion of the previous step. All steps always run
+        in test mode first for validation. If test=False, production mode runs after validation.
+
+        Required Files:
+            - protocol_info/llm_generated_protocol_outline.yaml: Protocol steps outline
+            - metadata/mapped_raw_files_wprocessed_MANUAL.csv: Biosample to raw file mapping
+              with columns: raw_data_identifier, biosample_id, biosample_name, match_confidence,
+              processedsample_placeholder, material_processing_protocol_id
+            - metadata/mapped_raw_file_biosample_mapping.csv: Generated by biosample mapping
+            - raw_file_info/raw_file_inspection_results.csv: Generated by raw data inspection
+            - config['study']['id']: Study ID in NMDC format (nmdc:sty-XX-XXXXXXXX)
+
+        Environment Variables:
+            - CLIENT_ID: NMDC API client ID for ID minting
+            - CLIENT_SECRET: NMDC API client secret for ID minting
+
+        Args:
+            test: If False, runs test mode validation then production mode with real ID minting.
+                  If True, only runs test mode (uses test IDs with -13- shoulder).
+                  Default: False
+
+        Returns:
+            True if all three steps completed successfully, False otherwise
+
+        Outputs:
+            Step 1: Material Processing Metadata
+                - metadata/nmdc_submission_packages/material_processing_metadata.json
+                - metadata/nmdc_submission_packages/material_processing_metadata_workflowreference.csv
+                - metadata/nmdc_submission_packages/material_processing_metadata_validation.txt
+            
+            Step 2: Workflow Metadata Input CSVs
+                - metadata/metadata_gen_input_csvs/<config_name>_metadata.csv (one per configuration)
+            
+            Step 3: Workflow Submission Packages
+                - metadata/nmdc_submission_packages/workflow_metadata_<config_name>.json (one per configuration)
+
+        Example:
+            >>> manager = NMDCWorkflowManager('config.json')
+            >>> # First run in test mode only to validate
+            >>> success = manager.generate_nmdc_metadata_for_workflow(test=True)
+            >>> # After validation, run with real ID minting
+            >>> success = manager.generate_nmdc_metadata_for_workflow(test=False)
         """
 
-        # Step 1: Generate metadata mapping CSV files
+        # Step 1: Generate material processing metadata
+        if not self.generate_material_processing_metadata(test=test):
+            self.logger.error("Failed to generate material processing metadata")
+            return False
+
+        # Step 2: Generate workflow metadata mapping CSV files
+        self.logger.info("Step 2: Generating workflow metadata input CSVs...")
         if not self.generate_workflow_metadata_generation_inputs():
             self.logger.error("Failed to generate metadata mapping files")
             return False
 
-        # Step 2: Generate NMDC submission packages
-        if not self._generate_nmdc_metadata_packages(test=test):
+        # Step 3: Generate NMDC workflow submission packages for processing related data
+        self.logger.info("Step 3: Generating workflow metadata packages...")
+        if not self._generate_processing_metadata(test=test):
             self.logger.error("Failed to generate NMDC metadata packages")
             return False
 
+        self.logger.info("All metadata generation steps completed successfully")
         return True
 
 

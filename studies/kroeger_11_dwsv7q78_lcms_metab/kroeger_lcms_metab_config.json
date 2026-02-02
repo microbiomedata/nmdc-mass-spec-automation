@@ -123,11 +123,12 @@
     "skip_triggers": {
         "study_structure_created": true,
         "raw_data_downloaded": true,
-        "protocol_outline_created": false,
+        "protocol_outline_created": true,
         "biosample_attributes_fetched": true,
         "biosample_mapping_script_generated": true,
         "biosample_mapping_completed": true,
         "raw_data_inspected": true,
+        "material_processing_metadata_generated": true,
         "metadata_mapping_generated": true,
         "data_processed": true,
         "processed_data_uploaded_to_minio": true,

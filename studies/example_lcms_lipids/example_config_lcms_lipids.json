@@ -67,7 +67,13 @@
             }
         }
     ],
+    "material_processing": {
+        "processedsample_placeholder": "ProcessedSample2_metabolomics_extraction",
+        "protocol_id": "metabolomics_extraction",
+        "minting_config_creds": ""
+    },
     "metadata": {
+        "study_id": "nmdc:sty-11-dwsv7q78",
         "instrument_used": "Thermo Orbitrap Q-Exactive",
         "processing_institution_workflow": "NMDC",
         "processing_institution_generation": "JGI",
@@ -89,6 +95,7 @@
         "biosample_mapping_script_generated": true,
         "biosample_mapping_completed": true,
         "raw_data_inspected": true,
+        "material_processing_metadata_generated": false,
         "metadata_mapping_generated": false,
         "data_processed": false,
         "processed_data_uploaded_to_minio": false,

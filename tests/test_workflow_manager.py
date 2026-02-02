@@ -163,3 +163,115 @@ class TestNMDCWorkflowManager:
         
         with pytest.raises(json.JSONDecodeError):
             NMDCWorkflowManager(str(bad_config))
+
+    def test_generate_material_processing_metadata(self, lcms_config_file, tmp_path):
+        """Test material processing metadata generation method."""
+        from nmdc_dp_utils.workflow_manager import NMDCWorkflowManager
+        from unittest.mock import MagicMock, patch
+        
+        # Create manager
+        manager = NMDCWorkflowManager(str(lcms_config_file))
+        
+        # Create required directory structure
+        protocol_dir = manager.workflow_path / "protocol_info"
+        protocol_dir.mkdir(parents=True, exist_ok=True)
+        metadata_dir = manager.workflow_path / "metadata"
+        metadata_dir.mkdir(parents=True, exist_ok=True)
+        
+        # Create mock YAML outline file
+        yaml_path = protocol_dir / "llm_generated_protocol_outline.yaml"
+        yaml_content = """
+processing_steps:
+  - step_name: Sample Collection
+    has_input: biosample
+    has_output: processed_sample
+"""
+        with open(yaml_path, "w") as f:
+            f.write(yaml_content)
+        
+        # Create mock input CSV
+        input_csv_path = metadata_dir / "mapped_raw_files_wprocessed_MANUAL.csv"
+        input_csv_content = "biosample_id,raw_file_name,processed_sample_id\nnmdc:bsm-11-test,test_file.raw,nmdc:procsm-11-test\n"
+        with open(input_csv_path, "w") as f:
+            f.write(input_csv_content)
+        
+        # Add study_id to config
+        manager.config["study"] = {"id": "nmdc:sty-11-test"}
+        
+        # Mock MaterialProcessingMetadataGenerator
+        mock_generator_instance = MagicMock()
+        mock_generator_instance.run.return_value = {"test": "metadata"}
+        mock_generator_instance.validate_nmdc_database.return_value = {"result": "All Okay!"}
+        
+        mock_generator_class = MagicMock(return_value=mock_generator_instance)
+        
+        # Patch the MaterialProcessingMetadataGenerator import
+        with patch("nmdc_dp_utils.workflow_manager_mixins.MaterialProcessingMetadataGenerator", mock_generator_class):
+            # Test with test=True (should only run once in test mode)
+            result = manager.generate_material_processing_metadata(test=True)
+            
+            assert result is True, "Material processing metadata generation should succeed"
+            
+            # Verify generator was called with test=True
+            assert mock_generator_class.call_count == 1
+            call_args = mock_generator_class.call_args
+            assert call_args.kwargs["test"] is True
+            assert call_args.kwargs["study_id"] == "nmdc:sty-11-test"
+            assert "llm_generated_protocol_outline.yaml" in call_args.kwargs["yaml_outline_path"]
+            assert "mapped_raw_files_wprocessed_MANUAL.csv" in call_args.kwargs["sample_to_dg_mapping_path"]
+            
+            # Verify skip trigger was set
+            assert manager.should_skip("material_processing_metadata_generated") is True
+            
+            # Reset for test=False scenario
+            manager.reset_all_triggers(save=False)
+            mock_generator_class.reset_mock()
+            
+            # Test with test=False (should run twice: test mode then production mode)
+            result = manager.generate_material_processing_metadata(test=False)
+            
+            assert result is True, "Material processing metadata generation should succeed"
+            
+            # Verify generator was called twice (test mode + production mode)
+            assert mock_generator_class.call_count == 2
+            
+            # First call should be test=True
+            first_call_args = mock_generator_class.call_args_list[0]
+            assert first_call_args.kwargs["test"] is True
+            
+            # Second call should be test=False
+            second_call_args = mock_generator_class.call_args_list[1]
+            assert second_call_args.kwargs["test"] is False
+            
+            # Verify skip trigger was set
+            assert manager.should_skip("material_processing_metadata_generated") is True
+
+    def test_generate_material_processing_metadata_missing_yaml(self, lcms_config_file):
+        """Test that missing YAML outline returns False."""
+        from nmdc_dp_utils.workflow_manager import NMDCWorkflowManager
+        
+        manager = NMDCWorkflowManager(str(lcms_config_file))
+        
+        # Don't create the YAML file
+        result = manager.generate_material_processing_metadata(test=True)
+        
+        assert result is False, "Should return False when YAML outline is missing"
+        assert manager.should_skip("material_processing_metadata_generated") is False
+
+    def test_generate_material_processing_metadata_missing_input_csv(self, lcms_config_file, tmp_path):
+        """Test that missing input CSV returns False."""
+        from nmdc_dp_utils.workflow_manager import NMDCWorkflowManager
+        
+        manager = NMDCWorkflowManager(str(lcms_config_file))
+        
+        # Create YAML but not input CSV
+        protocol_dir = manager.workflow_path / "protocol_info"
+        protocol_dir.mkdir(parents=True, exist_ok=True)
+        yaml_path = protocol_dir / "llm_generated_protocol_outline.yaml"
+        with open(yaml_path, "w") as f:
+            f.write("test: yaml")
+        
+        result = manager.generate_material_processing_metadata(test=True)
+        
+        assert result is False, "Should return False when input CSV is missing"
+        assert manager.should_skip("material_processing_metadata_generated") is False

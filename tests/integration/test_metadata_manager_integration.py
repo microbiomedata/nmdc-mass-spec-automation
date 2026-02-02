@@ -9,6 +9,7 @@ from pathlib import Path
 import pandas as pd
 import shutil
 import json
+import os
 
 
 class TestWorkflowMetadataManagerIntegration:
@@ -34,8 +35,10 @@ class TestWorkflowMetadataManagerIntegration:
         workflow_dir = tmp_path / "studies" / integration_lcms_config["workflow"]["name"]
         metadata_dir = workflow_dir / "metadata"
         raw_info_dir = workflow_dir / "raw_file_info"
+        nmdc_packages_dir = metadata_dir / "nmdc_submission_packages"
         metadata_dir.mkdir(parents=True, exist_ok=True)
         raw_info_dir.mkdir(parents=True, exist_ok=True)
+        nmdc_packages_dir.mkdir(parents=True, exist_ok=True)
         
         # Copy test data files
         test_data_dir = Path(__file__).parent / "test_data"
@@ -48,6 +51,23 @@ class TestWorkflowMetadataManagerIntegration:
             raw_info_dir / "raw_file_inspection_results.csv"
         )
         
+        # Create mock material processing workflowreference CSV
+        # This simulates the output from generate_material_processing_metadata()
+        biosample_mapping = pd.read_csv(metadata_dir / "mapped_raw_file_biosample_mapping.csv")
+        workflowref_data = []
+        for _, row in biosample_mapping.iterrows():
+            if row["match_confidence"] == "high":
+                workflowref_data.append({
+                    "biosample_id": row["biosample_id"],
+                    "raw_data_identifier": row["raw_file_name"],
+                    "last_processed_sample": f"nmdc:procsm-99-test{len(workflowref_data):03d}"
+                })
+        workflowref_df = pd.DataFrame(workflowref_data)
+        workflowref_df.to_csv(
+            nmdc_packages_dir / "material_processing_metadata_workflowreference.csv",
+            index=False
+        )
+        
         # Save config
         config_file = workflow_dir / "test_config.json"
         with open(config_file, "w") as f:
@@ -56,7 +76,7 @@ class TestWorkflowMetadataManagerIntegration:
         # Create manager
         manager = NMDCWorkflowManager(str(config_file))
         
-        # Generate CSV metadata mappings only (skip JSON package generation)
+        # Generate CSV metadata mappings (now includes processed_sample_id mapping)
         result = manager.generate_workflow_metadata_generation_inputs()
         
         # Verify generation succeeded
@@ -104,7 +124,7 @@ class TestWorkflowMetadataManagerIntegration:
         
         # Verify data integrity
         assert len(df) > 0, "No rows in metadata file"
-        assert all(df["sample_id"].str.startswith("nmdc:bsm-")), "Invalid biosample IDs"
+        assert all(df["sample_id"].str.startswith("nmdc:procsm-")), "Invalid processed sample IDs (should start with nmdc:procsm-)"
         
         # Verify processed_data_directory ends with .corems
         assert all(df["processed_data_directory"].str.endswith(".corems")), \
@@ -131,8 +151,10 @@ class TestWorkflowMetadataManagerIntegration:
         workflow_dir = tmp_path / "studies" / integration_gcms_config["workflow"]["name"]
         metadata_dir = workflow_dir / "metadata"
         raw_info_dir = workflow_dir / "raw_file_info"
+        nmdc_packages_dir = metadata_dir / "nmdc_submission_packages"
         metadata_dir.mkdir(parents=True, exist_ok=True)
         raw_info_dir.mkdir(parents=True, exist_ok=True)
+        nmdc_packages_dir.mkdir(parents=True, exist_ok=True)
         
         # Copy test data files
         test_data_dir = Path(__file__).parent / "test_data"
@@ -145,6 +167,23 @@ class TestWorkflowMetadataManagerIntegration:
             raw_info_dir / "raw_file_inspection_results.csv"
         )
         
+        # Create mock material processing workflowreference CSV
+        # This simulates the output from generate_material_processing_metadata()
+        biosample_mapping = pd.read_csv(metadata_dir / "mapped_raw_file_biosample_mapping.csv")
+        workflowref_data = []
+        for _, row in biosample_mapping.iterrows():
+            if row["match_confidence"] == "high":
+                workflowref_data.append({
+                    "biosample_id": row["biosample_id"],
+                    "raw_data_identifier": row["raw_file_name"],
+                    "last_processed_sample": f"nmdc:procsm-99-test{len(workflowref_data):03d}"
+                })
+        workflowref_df = pd.DataFrame(workflowref_data)
+        workflowref_df.to_csv(
+            nmdc_packages_dir / "material_processing_metadata_workflowreference.csv",
+            index=False
+        )
+        
         # Save config
         config_file = workflow_dir / "test_config.json"
         with open(config_file, "w") as f:
@@ -154,15 +193,15 @@ class TestWorkflowMetadataManagerIntegration:
         manager = NMDCWorkflowManager(str(config_file))
         
         # Verify prerequisites exist
-        biosample_mapping = manager.workflow_path / "metadata" / "mapped_raw_file_biosample_mapping.csv"
-        assert biosample_mapping.exists(), f"Biosample mapping not found at {biosample_mapping}"
+        biosample_mapping_path = manager.workflow_path / "metadata" / "mapped_raw_file_biosample_mapping.csv"
+        assert biosample_mapping_path.exists(), f"Biosample mapping not found at {biosample_mapping_path}"
         
         # Verify calibration file exists in mapping
-        mapping_df = pd.read_csv(biosample_mapping)
+        mapping_df = pd.read_csv(biosample_mapping_path)
         calibration_files = mapping_df[mapping_df["raw_file_type"] == "calibration"]
         assert len(calibration_files) > 0, "No calibration files found in biosample mapping"
         
-        # Generate CSV metadata mappings only (skip JSON package generation)
+        # Generate CSV metadata mappings (now includes processed_sample_id mapping)
         result = manager.generate_workflow_metadata_generation_inputs()
         
         # Verify generation succeeded
@@ -205,7 +244,7 @@ class TestWorkflowMetadataManagerIntegration:
         
         # Verify data integrity
         assert len(df) > 0, "No rows in metadata file"
-        assert all(df["sample_id"].str.startswith("nmdc:bsm-")), "Invalid biosample IDs"
+        assert all(df["sample_id"].str.startswith("nmdc:procsm-")), "Invalid processed sample IDs (should start with nmdc:procsm-)"
         
         # Verify calibration files were assigned
         assert all(df["calibration_file"].notna()), "Some samples missing calibration file"
@@ -344,8 +383,10 @@ class TestWorkflowMetadataManagerIntegration:
         workflow_dir = tmp_path / "studies" / config["workflow"]["name"]
         metadata_dir = workflow_dir / "metadata"
         raw_info_dir = workflow_dir / "raw_file_info"
+        nmdc_packages_dir = metadata_dir / "nmdc_submission_packages"
         metadata_dir.mkdir(parents=True, exist_ok=True)
         raw_info_dir.mkdir(parents=True, exist_ok=True)
+        nmdc_packages_dir.mkdir(parents=True, exist_ok=True)
         
         # Copy test data files
         test_data_dir = Path(__file__).parent / "test_data"
@@ -360,6 +401,23 @@ class TestWorkflowMetadataManagerIntegration:
         shutil.copy(
             test_data_dir / "raw_file_info" / "massive_ftp_test_locs.csv",
             raw_info_dir / "massive_ftp_locs.csv"
+        )
+        
+        # Create mock material processing workflowreference CSV
+        # This simulates the output from generate_material_processing_metadata()
+        biosample_mapping = pd.read_csv(metadata_dir / "mapped_raw_file_biosample_mapping.csv")
+        workflowref_data = []
+        for _, row in biosample_mapping.iterrows():
+            if row["match_confidence"] == "high":
+                workflowref_data.append({
+                    "biosample_id": row["biosample_id"],
+                    "raw_data_identifier": row["raw_file_name"],
+                    "last_processed_sample": f"nmdc:procsm-99-test{len(workflowref_data):03d}"
+                })
+        workflowref_df = pd.DataFrame(workflowref_data)
+        workflowref_df.to_csv(
+            nmdc_packages_dir / "material_processing_metadata_workflowreference.csv",
+            index=False
         )
         
         # Save config
@@ -383,7 +441,7 @@ class TestWorkflowMetadataManagerIntegration:
         # Create manager
         manager = NMDCWorkflowManager(str(config_file))
         
-        # Generate CSV metadata mappings only (skip JSON package generation)
+        # Generate CSV metadata mappings (now includes processed_sample_id mapping)
         result = manager.generate_workflow_metadata_generation_inputs()
         
         # Verify generation succeeded
@@ -428,4 +486,183 @@ class TestWorkflowMetadataManagerIntegration:
         for ms in mass_specs:
             assert ms in expected_overrides, f"Unexpected mass spec config: {ms}"
 
+    @pytest.mark.integration
+    def test_material_processing_metadata_generation(self, tmp_path, integration_lcms_config):
+        """
+        Integration test: Test material processing metadata generation.
+        
+        This test verifies:
+        - Material processing metadata generation with real-like inputs
+        - YAML outline parsing and processing
+        - Test/production mode behavior
+        - Validation workflow
+        """
+        from nmdc_dp_utils.workflow_manager import NMDCWorkflowManager
+        
+        # Create workflow directory structure
+        workflow_dir = tmp_path / "studies" / integration_lcms_config["workflow"]["name"]
+        protocol_dir = workflow_dir / "protocol_info"
+        metadata_dir = workflow_dir / "metadata"
+        nmdc_packages_dir = metadata_dir / "nmdc_submission_packages"
+        protocol_dir.mkdir(parents=True, exist_ok=True)
+        metadata_dir.mkdir(parents=True, exist_ok=True)
+        nmdc_packages_dir.mkdir(parents=True, exist_ok=True)
+        
+        # Create valid YAML outline (based on Kroeger study structure but simplified for testing)
+        yaml_path = protocol_dir / "llm_generated_protocol_outline.yaml"
+        yaml_content = """test_metabolites:
+  steps:
+    - Step 1_test_metabolites:
+        SubSamplingProcess:
+          id: # nmdc:subspr-{shoulder}-{blade}
+          type: nmdc:SubSamplingProcess
+          name: Subsample for metabolite extraction
+          description: A 2 g portion taken from <Biosample> for metabolite extraction.
+          has_input:
+            - Biosample
+          has_output:
+            - ProcessedSample1_test_metabolites
+          processing_institution: EMSL
+          mass:
+            type: nmdc:QuantityValue
+            has_raw_value: 2 g
+            has_unit: g
+            has_numeric_value: 2
+          protocol_link:
+            name: Test Protocol
+            url: https://doi.org/10.1093/test
+            type: nmdc:Protocol
 
+    - Step 2_test_metabolites:
+        Extraction:
+          id: # nmdc:extrp-{shoulder}-{blade}
+          type: nmdc:Extraction
+          name: Water extraction of metabolites
+          description: Metabolites extracted from <ProcessedSample1_test_metabolites> using LC-MS water.
+          has_input:
+            - ProcessedSample1_test_metabolites
+          has_output:
+            - ProcessedSample2_test_metabolites
+          processing_institution: EMSL
+          extraction_targets:
+            - metabolite
+          substances_used:
+            - type: nmdc:PortionOfSubstance
+              known_as: water
+              substance_role: solvent
+              volume:
+                type: nmdc:QuantityValue
+                has_raw_value: 1.2 mL
+                has_unit: mL
+                has_numeric_value: 1.2
+          protocol_link:
+            name: Test Protocol
+            url: https://doi.org/10.1093/test
+            type: nmdc:Protocol
+
+  processedsamples:
+    - ProcessedSample1_test_metabolites:
+        ProcessedSample:
+          id: #nmdc:
+          type: nmdc:ProcessedSample
+          name: <Biosample>_subsample
+          description: A 2 g subsample of <Biosample> prepared for metabolite extraction.
+
+    - ProcessedSample2_test_metabolites:
+        ProcessedSample:
+          id: #nmdc:
+          type: nmdc:ProcessedSample
+          name: <Biosample>_extract
+          description: Metabolite extract obtained from <ProcessedSample1_test_metabolites> after water extraction.
+          sampled_portion: aqueous_layer
+"""
+        with open(yaml_path, "w") as f:
+            f.write(yaml_content)
+        
+        # Create input CSV with biosample to raw file mapping and protocol ID
+        input_csv_path = metadata_dir / "mapped_raw_files_wprocessed_MANUAL.csv"
+        test_data_dir = Path(__file__).parent / "test_data"
+        biosample_mapping = pd.read_csv(test_data_dir / "metadata" / "lcms_biosample_mapping.csv")
+        
+        # Create mapping with processed sample placeholder and protocol ID
+        mapping_rows = []
+        for idx, row in biosample_mapping.iterrows():
+            if row["match_confidence"] == "high":
+                mapping_rows.append({
+                    "raw_data_identifier": row["raw_file_name"],
+                    "biosample_id": row["biosample_id"],
+                    "biosample_name": f"Test Sample {idx}",
+                    "match_confidence": "high",
+                    "processedsample_placeholder": "ProcessedSample2_test_metabolites",
+                    "material_processing_protocol_id": "test_metabolites"
+                })
+        
+        mapping_df = pd.DataFrame(mapping_rows)
+        mapping_df.to_csv(input_csv_path, index=False)
+        
+        # Add study info to config
+        integration_lcms_config["study"] = {
+            "id": "nmdc:sty-11-integrationtest",
+            "name": "test_material_processing_study"
+        }
+        
+        # Set environment variables for minting API credentials (required for test mode)
+        os.environ["CLIENT_ID"] = "test_client_id"
+        os.environ["CLIENT_SECRET"] = "test_client_secret"
+        
+        # Save config
+        config_file = workflow_dir / "test_config.json"
+        with open(config_file, "w") as f:
+            json.dump(integration_lcms_config, f, indent=4)
+        
+        # Create manager
+        manager = NMDCWorkflowManager(str(config_file))
+        
+        # Test generation in test mode (actually runs the generator, no mocking)
+        result = manager.generate_material_processing_metadata(test=True)
+        
+        assert result is True, "Material processing metadata generation should succeed"
+        
+        # Verify output files were created
+        output_file = nmdc_packages_dir / "material_processing_metadata.json"
+        assert output_file.exists(), "Material processing metadata JSON should be created"
+        
+        # Load and verify the generated metadata
+        with open(output_file, "r") as f:
+            metadata = json.load(f)
+        
+        # Verify expected structure
+        assert "processed_sample_set" in metadata, "Metadata should contain processed_sample_set"
+        assert "material_processing_set" in metadata, "Metadata should contain material_processing_set"
+        
+        # Verify processed samples were created
+        assert len(metadata["processed_sample_set"]) > 0, "Should have generated processed samples"
+        
+        # Verify material processing records were created
+        assert len(metadata["material_processing_set"]) > 0, "Should have generated material processing records"
+        
+        # Verify workflowreference CSV was created
+        workflowref_file = nmdc_packages_dir / "material_processing_metadata_workflowreference.csv"
+        assert workflowref_file.exists(), "Workflowreference CSV should be created"
+        
+        # Load and verify workflowreference CSV
+        workflowref_df = pd.read_csv(workflowref_file)
+        assert "biosample_id" in workflowref_df.columns, "Should have biosample_id column"
+        assert "raw_data_identifier" in workflowref_df.columns, "Should have raw_data_identifier column"
+        assert "last_processed_sample" in workflowref_df.columns, "Should have last_processed_sample column"
+        
+        # Verify processed sample IDs are in correct format
+        processed_sample_ids = workflowref_df["last_processed_sample"].tolist()
+        assert all("nmdc:procsm-" in pid for pid in processed_sample_ids), "All processed sample IDs should be valid NMDC IDs"
+        assert all("-13-" in pid for pid in processed_sample_ids), "Test mode IDs should contain '-13-'"
+        assert len(processed_sample_ids) > 0, "Should have generated processed sample IDs"
+        
+        # Verify skip trigger was set
+        assert manager.should_skip("material_processing_metadata_generated") is True
+
+
+
+        
+        # Clean up environment variables
+        del os.environ["CLIENT_ID"]
+        del os.environ["CLIENT_SECRET"]
