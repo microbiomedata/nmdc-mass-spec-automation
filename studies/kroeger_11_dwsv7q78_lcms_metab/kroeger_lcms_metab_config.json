@@ -11,7 +11,7 @@
         "file_filters": [
             "msms"
         ],
-        "processed_data_date_tag": "20251027",
+        "processed_data_date_tag": "20260202",
         "workflow_type": "LCMS Metabolomics",
         "batch_size": 25
     },
@@ -128,11 +128,11 @@
         "biosample_mapping_script_generated": true,
         "biosample_mapping_completed": true,
         "raw_data_inspected": true,
-        "material_processing_metadata_generated": true,
-        "metadata_mapping_generated": true,
         "data_processed": true,
-        "processed_data_uploaded_to_minio": true,
-        "metadata_packages_generated": true,
+        "metadata_mapping_generated": false,
+        "processed_data_uploaded_to_minio": false,
+        "material_processing_metadata_generated": false,
+        "metadata_packages_generated": false,
         "metadata_submitted_dev": false,
         "metadata_submitted_prod": false
     }

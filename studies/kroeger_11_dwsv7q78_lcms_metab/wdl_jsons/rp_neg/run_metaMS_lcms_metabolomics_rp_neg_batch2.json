@@ -1,0 +1,13 @@
+{
+    "lcmsMetabolomics.runMetaMSLCMSMetabolomics.file_paths": [
+        "/Volumes/LaCie/nmdc_data/kroeger_11_dwsv7q78/raw/20210915_JGI-AK_MK_506588_SoilWaterRep_final_QE-HF_C18_USDAY63680_NEG_MSMS_32_S40-D30_B_Rg80to1200-CE205060-soil-S1_Run89.raw",
+        "/Volumes/LaCie/nmdc_data/kroeger_11_dwsv7q78/raw/20210915_JGI-AK_MK_506588_SoilWaterRep_final_QE-HF_C18_USDAY63680_NEG_MSMS_28_S29-D30_A_Rg80to1200-CE102040-soil-S1_Run42.raw",
+        "/Volumes/LaCie/nmdc_data/kroeger_11_dwsv7q78/raw/20210915_JGI-AK_MK_506588_SoilWaterRep_final_QE-HF_C18_USDAY63680_NEG_MSMS_31_S40-D30_A_Rg80to1200-CE102040-soil-S1_Run18.raw",
+        "/Volumes/LaCie/nmdc_data/kroeger_11_dwsv7q78/raw/20210915_JGI-AK_MK_506588_SoilWaterRep_final_QE-HF_C18_USDAY63680_NEG_MSMS_1_S16-D30_A_Rg80to1200-CE102040-soil-S1_Run80.raw"
+    ],
+    "lcmsMetabolomics.runMetaMSLCMSMetabolomics.output_directory": "output",
+    "lcmsMetabolomics.runMetaMSLCMSMetabolomics.corems_toml_path": "workflow_inputs/metams_rp_corems.toml",
+    "lcmsMetabolomics.runMetaMSLCMSMetabolomics.msp_file_path": "workflow_inputs/20250407_database.msp",
+    "lcmsMetabolomics.runMetaMSLCMSMetabolomics.scan_translator_path": "workflow_inputs/metams_jgi_scan_translator.toml",
+    "lcmsMetabolomics.runMetaMSLCMSMetabolomics.cores": 5
+}
