@@ -70,5 +70,21 @@ async def main():
     manager.generate_nmdc_metadata_for_workflow(test=True) # Set test to FALSE for actual run.
     assert manager.should_skip('metadata_packages_generated'), "NMDC metadata package generation must complete successfully to proceed"
 
+    # Step 9: Submit metadata packages to dev environment
+    logger.info("9. Submitting metadata packages to dev environment...")
+    dev_success = manager.submit_metadata_packages(environment="dev")
+    if not dev_success:
+        logger.error("Failed to submit metadata packages to dev environment")
+    else:
+        logger.info("Successfully submitted metadata packages to dev environment")
+
+    # Step 10: Submit metadata packages to prod environment
+    logger.info("10. Submitting metadata packages to prod environment...")
+    prod_success = manager.submit_metadata_packages(environment="prod")
+    if not prod_success:
+        logger.error("Failed to submit metadata packages to prod environment")
+    else:
+        logger.info("Successfully submitted metadata packages to prod environment")
+
 if __name__ == "__main__":
     asyncio.run(main())

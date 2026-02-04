@@ -4332,9 +4332,169 @@ class WorkflowMetadataManager:
 
     def submit_metadata_packages(self, environment: str = "dev") -> bool:
         """
-        Needs to be implemented.
+        Submit metadata packages to NMDC API (dev or prod environment).
+
+        This method:
+        1. Loads .json metadata packages from nmdc_submission_packages directory
+        2. Verifies all id fields have "-11-" tag (production minted IDs)
+        3. Validates JSON using validate_json from nmdc_api_utilities
+        4. Submits JSON using submit_json from nmdc_api_utilities
+        5. Submits material processing metadata first, waits 1 minute, then submits workflow metadata
+
+        Args:
+            environment: Target environment - "dev" or "prod" (default: "dev")
+
+        Returns:
+            True if submission successful, False otherwise
+
+        Raises:
+            Exception: If validation or submission fails
+
+        Notes:
+            - Requires CLIENT_ID and CLIENT_SECRET environment variables
+            - Material processing metadata is submitted first
+            - 1 minute wait time after material processing before workflow metadata
+            - Fails immediately on any error (does not try other files)
         """
-        raise NotImplementedError("submit_metadata_packages() is not yet implemented.")
+        from nmdc_api_utilities.metadata import Metadata
+        from nmdc_api_utilities.auth import NMDCAuth
+        import time
+
+        self.logger.info(f"Submitting metadata packages to {environment} environment...")
+
+        # Load credentials from environment
+        client_id = os.getenv("CLIENT_ID")
+        client_secret = os.getenv("CLIENT_SECRET")
+
+        if not client_id or not client_secret:
+            self.logger.error("CLIENT_ID and CLIENT_SECRET must be set in .env file")
+            return False
+
+        # Initialize NMDC API client
+        auth = NMDCAuth(client_id=client_id, client_secret=client_secret, env=environment)
+        metadata_client = Metadata(env=environment, auth=auth)
+
+        # Get metadata packages directory
+        packages_dir = self.workflow_path / "metadata" / "nmdc_submission_packages"
+        if not packages_dir.exists():
+            self.logger.error(f"Metadata packages directory not found: {packages_dir}")
+            return False
+
+        # Get all JSON files
+        json_files = list(packages_dir.glob("*.json"))
+        if not json_files:
+            self.logger.error(f"No JSON files found in {packages_dir}")
+            return False
+
+        # Separate material processing from workflow metadata files
+        material_processing_file = None
+        workflow_files = []
+
+        for json_file in json_files:
+            if "material_processing" in json_file.name:
+                material_processing_file = json_file
+            elif "workflow_metadata" in json_file.name:
+                workflow_files.append(json_file)
+
+        # Process material processing metadata first
+        if material_processing_file:
+            self.logger.info(f"Processing material processing metadata: {material_processing_file.name}")
+
+            # Load and verify IDs
+            with open(material_processing_file, "r") as f:
+                data = json.load(f)
+
+            # Verify all IDs have "-11-" tag (production minted)
+            if not self._verify_production_ids(data):
+                self.logger.error(f"Not all IDs in {material_processing_file.name} have '-11-' tag (production minted IDs)")
+                return False
+
+            # Validate JSON
+            try:
+                self.logger.info(f"Validating {material_processing_file.name}...")
+                metadata_client.validate_json(data)
+                self.logger.info(f"Validation passed for {material_processing_file.name}")
+            except Exception as e:
+                self.logger.error(f"Validation failed for {material_processing_file.name}: {e}")
+                return False
+
+            # Submit JSON
+            try:
+                self.logger.info(f"Submitting {material_processing_file.name}...")
+                metadata_client.submit_json(data)
+                self.logger.info(f"Successfully submitted {material_processing_file.name}")
+            except Exception as e:
+                self.logger.error(f"Submission failed for {material_processing_file.name}: {e}")
+                return False
+
+            # Wait 1 minute before submitting workflow metadata
+            if workflow_files:
+                self.logger.info("Waiting 1 minute before submitting workflow metadata...")
+                time.sleep(60)
+
+        # Process workflow metadata files
+        for workflow_file in workflow_files:
+            self.logger.info(f"Processing workflow metadata: {workflow_file.name}")
+
+            # Load and verify IDs
+            with open(workflow_file, "r") as f:
+                data = json.load(f)
+
+            # Verify all IDs have "-11-" tag (production minted)
+            if not self._verify_production_ids(data):
+                self.logger.error(f"Not all IDs in {workflow_file.name} have '-11-' tag (production minted IDs)")
+                return False
+
+            # Validate JSON
+            try:
+                self.logger.info(f"Validating {workflow_file.name}...")
+                metadata_client.validate_json(data)
+                self.logger.info(f"Validation passed for {workflow_file.name}")
+            except Exception as e:
+                self.logger.error(f"Validation failed for {workflow_file.name}: {e}")
+                return False
+
+            # Submit JSON
+            try:
+                self.logger.info(f"Submitting {workflow_file.name}...")
+                metadata_client.submit_json(data)
+                self.logger.info(f"Successfully submitted {workflow_file.name}")
+            except Exception as e:
+                self.logger.error(f"Submission failed for {workflow_file.name}: {e}")
+                return False
+
+        self.logger.info(f"All metadata packages submitted successfully to {environment}")
+        return True
+
+    def _verify_production_ids(self, data: dict) -> bool:
+        """
+        Verify that all ID fields in the data have the "-11-" tag indicating production minted IDs.
+
+        Args:
+            data: JSON data dictionary to check
+
+        Returns:
+            True if all IDs have "-11-" tag, False otherwise
+        """
+        def check_ids(obj):
+            """Recursively check all id fields in nested structures."""
+            if isinstance(obj, dict):
+                for key, value in obj.items():
+                    if key == "id" and isinstance(value, str):
+                        # Check if the ID has "-11-" tag
+                        if "-11-" not in value:
+                            self.logger.error(f"ID without production tag '-11-' found: {value}")
+                            return False
+                    elif isinstance(value, (dict, list)):
+                        if not check_ids(value):
+                            return False
+            elif isinstance(obj, list):
+                for item in obj:
+                    if not check_ids(item):
+                        return False
+            return True
+
+        return check_ids(data)
 
     @skip_if_complete("material_processing_metadata_generated", return_value=True)
     def generate_material_processing_metadata(self, test=False) -> bool:
