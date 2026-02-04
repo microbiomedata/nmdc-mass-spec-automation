@@ -75,6 +75,8 @@ async def main():
     dev_success = manager.submit_metadata_packages(environment="dev")
     if not dev_success:
         logger.error("Failed to submit metadata packages to dev environment")
+        logger.error("Please fix the issues and re-run. Skipping production submission.")
+        return  # Exit without proceeding to prod
     else:
         logger.info("Successfully submitted metadata packages to dev environment")
 

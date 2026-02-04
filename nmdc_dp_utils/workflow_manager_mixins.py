@@ -4466,12 +4466,13 @@ class WorkflowMetadataManager:
         self.logger.info(f"All metadata packages submitted successfully to {environment}")
         return True
 
-    def _verify_production_ids(self, data: dict) -> bool:
+    def _verify_production_ids(self, data: dict, id_prefix: str = "nmdc:") -> bool:
         """
         Verify that all ID fields in the data have the "-11-" tag indicating production minted IDs.
 
         Args:
             data: JSON data dictionary to check
+            id_prefix: The ID prefix to check (default: "nmdc:")
 
         Returns:
             True if all IDs have "-11-" tag, False otherwise
@@ -4491,7 +4492,7 @@ class WorkflowMetadataManager:
             elif isinstance(obj, list):
                 for item in obj:
                     # Check if item is a string ID (e.g., in has_input/has_output arrays)
-                    if isinstance(item, str) and item.startswith("nmdc:"):
+                    if isinstance(item, str) and item.startswith(id_prefix):
                         if "-11-" not in item:
                             self.logger.error(f"ID without production tag '-11-' found in list: {item}")
                             return False
