@@ -4668,6 +4668,11 @@ class WorkflowMetadataManager:
             >>> # After validation, run with real ID minting
             >>> success = manager.generate_nmdc_metadata_for_workflow(test=False)
         """
+        # Always use prod environment for ID minting to ensure consistency
+        # across material processing and workflow metadata generation
+        os.environ["NMDC_ENV"] = "prod"
+        self.logger.info("Set NMDC_ENV=prod for ID minting across all metadata generation")
+        
         # Clean up macOS metadata files before processing
         self._cleanup_macos_metadata_files()
         
