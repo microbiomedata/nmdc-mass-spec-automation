@@ -11,36 +11,36 @@ PLACEHOLDER COMBINATIONS BY PROTOCOL:
 nonpolar_metabolites:
   Target placeholders: ['ProcessedSample3_nonpolar_metabolites']
   Resulting samples: ['ProcessedSample1_nonpolar_metabolites', 'ProcessedSample2_nonpolar_metabolites', 'ProcessedSample3_nonpolar_metabolites']
-  Biosamples with this combination: 36
+  Biosamples with this combination: 54
   Steps required per biosample: 3
   Processed samples required per biosample: 3
-  Total steps for this combination: 108
-  Total samples for this combination: 108
+  Total steps for this combination: 162
+  Total samples for this combination: 162
 
 polar_metabolites:
   Target placeholders: ['ProcessedSample3_polar_metabolites']
   Resulting samples: ['ProcessedSample1_polar_metabolites', 'ProcessedSample2_polar_metabolites', 'ProcessedSample3_polar_metabolites']
-  Biosamples with this combination: 36
+  Biosamples with this combination: 54
   Steps required per biosample: 3
   Processed samples required per biosample: 3
-  Total steps for this combination: 108
-  Total samples for this combination: 108
+  Total steps for this combination: 162
+  Total samples for this combination: 162
 
 ================================================================================
 VALIDATION SUMMARY:
 ================================================================================
 
 Biosamples:
-  Unique in mapping: 36
+  Unique in mapping: 54
 
 Material Processing Steps:
-  Expected: 216
-  Actual:   216
+  Expected: 324
+  Actual:   324
   ✓ MATCH
 
 Processed Samples:
-  Expected: 216
-  Actual:   216
+  Expected: 324
+  Actual:   324
   ✓ MATCH
 
 Unique placeholder combinations: 2

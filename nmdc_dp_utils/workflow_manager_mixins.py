@@ -3182,6 +3182,9 @@ class WorkflowRawDataInspectionManager:
             Uses config paths for source directory and MinIO settings.
             Creates folder structure: bucket/study_name/processed_data/
         """
+        # Clean up macOS metadata files before uploading
+        self._cleanup_macos_metadata_files()
+        
         if not self.minio_client:
             self.logger.error(
                 "MinIO client not available. Please set MINIO_ACCESS_KEY and MINIO_SECRET_KEY environment variables."
@@ -4571,11 +4574,16 @@ class WorkflowMetadataManager:
 
     def _cleanup_macos_metadata_files(self) -> None:
         """
-        Remove macOS metadata files (._*) from processed data directories.
+        Remove macOS system files from processed data directories.
         
-        These hidden metadata files are automatically created by macOS when files
-        are copied to non-macOS filesystems. They can interfere with file counting
-        and processing in the metadata generation pipeline.
+        Removes:
+        - ._* files: Apple Double metadata files created on non-macOS filesystems
+        - .DS_Store: Finder metadata files
+        - .Spotlight-V100: Spotlight index files
+        - .Trashes: Trash folder metadata
+        
+        These files can interfere with file counting and processing in the metadata
+        generation pipeline and shouldn't be uploaded to storage.
         """
         processed_base = Path(self.processed_data_directory) if self.processed_data_directory else None
         
@@ -4584,20 +4592,29 @@ class WorkflowMetadataManager:
             return
             
         deleted_count = 0
-        self.logger.info(f"Scanning for macOS metadata files in: {processed_base}")
+        self.logger.info(f"Scanning for macOS system files in: {processed_base}")
         
-        for metadata_file in processed_base.rglob("._*"):
-            try:
-                self.logger.debug(f"Deleting macOS metadata file: {metadata_file}")
-                metadata_file.unlink()
-                deleted_count += 1
-            except Exception as e:
-                self.logger.warning(f"Failed to delete {metadata_file}: {e}")
+        # Patterns to match macOS system files
+        patterns = ["._*", ".DS_Store", ".Spotlight-V100", ".Trashes"]
+        
+        for pattern in patterns:
+            for system_file in processed_base.rglob(pattern):
+                try:
+                    self.logger.debug(f"Deleting macOS system file: {system_file}")
+                    if system_file.is_file():
+                        system_file.unlink()
+                        deleted_count += 1
+                    elif system_file.is_dir():
+                        import shutil
+                        shutil.rmtree(system_file)
+                        deleted_count += 1
+                except Exception as e:
+                    self.logger.warning(f"Failed to delete {system_file}: {e}")
         
         if deleted_count > 0:
-            self.logger.info(f"Cleaned up {deleted_count} macOS metadata file(s) from processed data directory")
+            self.logger.info(f"Cleaned up {deleted_count} macOS system file(s) from processed data directory")
         else:
-            self.logger.debug("No macOS metadata files found to clean up")
+            self.logger.debug("No macOS system files found to clean up")
 
     def generate_nmdc_metadata_for_workflow(self, test=False) -> bool:
         """
