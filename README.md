@@ -85,6 +85,12 @@ manager.upload_processed_data_to_minio()
 
 # Step 7: Generate NMDC metadata packages
 manager.generate_nmdc_metadata_for_workflow()
+
+# Step 8: Submit metadata packages to dev environment (for validation)
+manager.submit_metadata_packages(environment="dev")
+
+# Step 9: Submit metadata packages to prod environment (after dev validation)
+manager.submit_metadata_packages(environment="prod")
 ```
 
 ### Configuration-Based Operation
