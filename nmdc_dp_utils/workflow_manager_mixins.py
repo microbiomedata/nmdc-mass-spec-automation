@@ -4330,6 +4330,38 @@ class WorkflowMetadataManager:
             self.logger.warning("Some metadata packages failed - review errors above")
             return False
 
+    @skip_if_complete("metadata_submitted_dev", return_value=True)
+    def submit_metadata_packages_to_dev(self) -> bool:
+        """
+        Submit metadata packages to NMDC dev environment.
+
+        Wrapper function that calls submit_metadata_packages with environment="dev"
+        and manages the skip trigger for dev submissions.
+
+        Returns:
+            True if submission successful, False otherwise
+        """
+        success = self.submit_metadata_packages(environment="dev")
+        if success:
+            self.set_skip_trigger("metadata_submitted_dev", True)
+        return success
+
+    @skip_if_complete("metadata_submitted_prod", return_value=True)
+    def submit_metadata_packages_to_prod(self) -> bool:
+        """
+        Submit metadata packages to NMDC prod environment.
+
+        Wrapper function that calls submit_metadata_packages with environment="prod"
+        and manages the skip trigger for prod submissions.
+
+        Returns:
+            True if submission successful, False otherwise
+        """
+        success = self.submit_metadata_packages(environment="prod")
+        if success:
+            self.set_skip_trigger("metadata_submitted_prod", True)
+        return success
+
     def submit_metadata_packages(self, environment: str = "dev") -> bool:
         """
         Submit metadata packages to NMDC API (dev or prod environment).

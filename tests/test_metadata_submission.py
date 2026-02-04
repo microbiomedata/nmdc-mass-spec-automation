@@ -363,3 +363,101 @@ class TestMetadataSubmission:
         
         # Verify sleep was called with 60 seconds
         mock_sleep.assert_called_once_with(60)
+
+    @patch.dict(os.environ, {"CLIENT_ID": "test_client", "CLIENT_SECRET": "test_secret"})
+    @patch('nmdc_api_utilities.metadata.Metadata')
+    @patch('nmdc_api_utilities.auth.NMDCAuth')
+    def test_submit_metadata_packages_to_dev_wrapper(
+        self, mock_auth_class, mock_metadata_class, lcms_config_file, 
+        metadata_packages_dir, sample_metadata_with_production_ids
+    ):
+        """Test the submit_metadata_packages_to_dev wrapper function."""
+        from nmdc_dp_utils.workflow_manager import NMDCWorkflowManager
+        
+        manager = NMDCWorkflowManager(str(lcms_config_file))
+        manager.workflow_path = metadata_packages_dir.parent.parent
+        
+        # Create sample metadata file
+        material_file = metadata_packages_dir / "material_processing_metadata.json"
+        with open(material_file, "w") as f:
+            json.dump(sample_metadata_with_production_ids, f)
+        
+        mock_auth_instance = MagicMock()
+        mock_auth_class.return_value = mock_auth_instance
+        
+        mock_metadata_instance = MagicMock()
+        mock_metadata_class.return_value = mock_metadata_instance
+        mock_metadata_instance.validate_json.return_value = 200
+        mock_metadata_instance.submit_json.return_value = 200
+        
+        with patch('time.sleep'):
+            result = manager.submit_metadata_packages_to_dev()
+        
+        assert result is True
+        
+        # Verify skip trigger was set
+        assert manager.should_skip("metadata_submitted_dev") is True
+
+    @patch.dict(os.environ, {"CLIENT_ID": "test_client", "CLIENT_SECRET": "test_secret"})
+    @patch('nmdc_api_utilities.metadata.Metadata')
+    @patch('nmdc_api_utilities.auth.NMDCAuth')
+    def test_submit_metadata_packages_to_prod_wrapper(
+        self, mock_auth_class, mock_metadata_class, lcms_config_file, 
+        metadata_packages_dir, sample_metadata_with_production_ids
+    ):
+        """Test the submit_metadata_packages_to_prod wrapper function."""
+        from nmdc_dp_utils.workflow_manager import NMDCWorkflowManager
+        
+        manager = NMDCWorkflowManager(str(lcms_config_file))
+        manager.workflow_path = metadata_packages_dir.parent.parent
+        
+        # Create sample metadata file
+        material_file = metadata_packages_dir / "material_processing_metadata.json"
+        with open(material_file, "w") as f:
+            json.dump(sample_metadata_with_production_ids, f)
+        
+        mock_auth_instance = MagicMock()
+        mock_auth_class.return_value = mock_auth_instance
+        
+        mock_metadata_instance = MagicMock()
+        mock_metadata_class.return_value = mock_metadata_instance
+        mock_metadata_instance.validate_json.return_value = 200
+        mock_metadata_instance.submit_json.return_value = 200
+        
+        with patch('time.sleep'):
+            result = manager.submit_metadata_packages_to_prod()
+        
+        assert result is True
+        
+        # Verify skip trigger was set
+        assert manager.should_skip("metadata_submitted_prod") is True
+
+    def test_submit_metadata_packages_to_dev_skip_if_complete(self, lcms_config_file):
+        """Test that submit_metadata_packages_to_dev respects skip trigger."""
+        from nmdc_dp_utils.workflow_manager import NMDCWorkflowManager
+        
+        manager = NMDCWorkflowManager(str(lcms_config_file))
+        
+        # Set skip trigger
+        manager.set_skip_trigger("metadata_submitted_dev", True)
+        
+        # Should skip and return True immediately
+        result = manager.submit_metadata_packages_to_dev()
+        
+        assert result is True
+        assert manager.should_skip("metadata_submitted_dev") is True
+
+    def test_submit_metadata_packages_to_prod_skip_if_complete(self, lcms_config_file):
+        """Test that submit_metadata_packages_to_prod respects skip trigger."""
+        from nmdc_dp_utils.workflow_manager import NMDCWorkflowManager
+        
+        manager = NMDCWorkflowManager(str(lcms_config_file))
+        
+        # Set skip trigger
+        manager.set_skip_trigger("metadata_submitted_prod", True)
+        
+        # Should skip and return True immediately
+        result = manager.submit_metadata_packages_to_prod()
+        
+        assert result is True
+        assert manager.should_skip("metadata_submitted_prod") is True

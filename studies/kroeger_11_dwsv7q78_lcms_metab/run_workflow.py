@@ -72,7 +72,7 @@ async def main():
 
     # Step 9: Submit metadata packages to dev environment
     logger.info("9. Submitting metadata packages to dev environment...")
-    dev_success = manager.submit_metadata_packages(environment="dev")
+    dev_success = manager.submit_metadata_packages_to_dev()
     if not dev_success:
         logger.error("Failed to submit metadata packages to dev environment")
         logger.error("Please fix the issues and re-run. Skipping production submission.")
@@ -82,7 +82,7 @@ async def main():
 
     # Step 10: Submit metadata packages to prod environment
     logger.info("10. Submitting metadata packages to prod environment...")
-    prod_success = manager.submit_metadata_packages(environment="prod")
+    prod_success = manager.submit_metadata_packages_to_prod()
     if not prod_success:
         logger.error("Failed to submit metadata packages to prod environment")
     else:
