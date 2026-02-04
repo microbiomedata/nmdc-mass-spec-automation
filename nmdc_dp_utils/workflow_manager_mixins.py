@@ -4490,8 +4490,14 @@ class WorkflowMetadataManager:
                             return False
             elif isinstance(obj, list):
                 for item in obj:
-                    if not check_ids(item):
-                        return False
+                    # Check if item is a string ID (e.g., in has_input/has_output arrays)
+                    if isinstance(item, str) and item.startswith("nmdc:"):
+                        if "-11-" not in item:
+                            self.logger.error(f"ID without production tag '-11-' found in list: {item}")
+                            return False
+                    elif isinstance(item, (dict, list)):
+                        if not check_ids(item):
+                            return False
             return True
 
         return check_ids(data)
