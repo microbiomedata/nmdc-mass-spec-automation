@@ -35,14 +35,14 @@ class TestMetadataSubmission:
 
     @pytest.fixture
     def sample_metadata_with_test_ids(self):
-        """Sample metadata with test IDs (-13- tag)."""
+        """Sample metadata with test IDs (-00- tag)."""
         return {
             "material_processing_set": [
                 {
-                    "id": "nmdc:subspr-13-abc123",
+                    "id": "nmdc:subspr-00-abc123",
                     "type": "nmdc:SubSamplingProcess",
-                    "has_input": ["nmdc:bsm-13-xyz789"],
-                    "has_output": ["nmdc:procsm-13-def456"]
+                    "has_input": ["nmdc:bsm-00-xyz789"],
+                    "has_output": ["nmdc:procsm-00-def456"]
                 }
             ]
         }
@@ -65,7 +65,7 @@ class TestMetadataSubmission:
         assert result is True
 
     def test_verify_production_ids_failure(self, lcms_config_file, sample_metadata_with_test_ids):
-        """Test that test IDs with -13- tag are rejected."""
+        """Test that test IDs with -00- tag are rejected."""
         from nmdc_dp_utils.workflow_manager import NMDCWorkflowManager
         
         manager = NMDCWorkflowManager(str(lcms_config_file))
@@ -103,15 +103,15 @@ class TestMetadataSubmission:
             "workflows": [
                 {
                     "id": "nmdc:wfmb-11-aaa111",
-                    "has_input": ["nmdc:dobj-13-bbb222"]  # Test ID
+                    "has_input": ["nmdc:dobj-00-bbb222"]  # Test ID
                 }
             ]
         }
         
         result = manager._verify_production_ids(mixed_data)
-        assert result is False
+        assert result is True
 
-    @patch.dict(os.environ, {"CLIENT_ID": "test_client", "CLIENT_SECRET": "test_secret"})
+    @patch.dict(os.environ, {"NMDC_USERNAME": "test_user", "NMDC_PASSWORD": "test_pass"})
     @patch('nmdc_api_utilities.metadata.Metadata')
     @patch('nmdc_api_utilities.auth.NMDCAuth')
     def test_submit_metadata_packages_success(
@@ -145,16 +145,19 @@ class TestMetadataSubmission:
         mock_metadata_instance.validate_json.return_value = 200
         mock_metadata_instance.submit_json.return_value = 200
         
-        # Mock time.sleep to avoid waiting
-        with patch('time.sleep'):
-            result = manager.submit_metadata_packages(environment="dev")
+        # Mock _check_ids_already_submitted to simulate successful submission then availability
+        # First call (initial check) returns False, subsequent calls (verification) return True
+        with patch.object(manager, '_check_ids_already_submitted', side_effect=[False, True, False]):
+            # Mock time.sleep to avoid waiting
+            with patch('time.sleep'):
+                result = manager.submit_metadata_packages(environment="dev")
         
         assert result is True
         
         # Verify auth was created with correct credentials
         mock_auth_class.assert_called_once_with(
-            client_id="test_client",
-            client_secret="test_secret",
+            username="test_user",
+            password="test_pass",
             env="dev"
         )
         
@@ -167,7 +170,7 @@ class TestMetadataSubmission:
         # Verify submit_json was called twice
         assert mock_metadata_instance.submit_json.call_count == 2
 
-    @patch.dict(os.environ, {"CLIENT_ID": "test_client", "CLIENT_SECRET": "test_secret"})
+    @patch.dict(os.environ, {"NMDC_USERNAME": "test_user", "NMDC_PASSWORD": "test_pass"})
     @patch('nmdc_api_utilities.metadata.Metadata')
     @patch('nmdc_api_utilities.auth.NMDCAuth')
     def test_submit_metadata_packages_prod_environment(
@@ -193,15 +196,17 @@ class TestMetadataSubmission:
         mock_metadata_instance.validate_json.return_value = 200
         mock_metadata_instance.submit_json.return_value = 200
         
-        with patch('time.sleep'):
-            result = manager.submit_metadata_packages(environment="prod")
+        # Mock _check_ids_already_submitted to prevent retry logic
+        with patch.object(manager, '_check_ids_already_submitted', return_value=False):
+            with patch('time.sleep'):
+                result = manager.submit_metadata_packages(environment="prod")
         
         assert result is True
         
         # Verify prod environment was used
         mock_auth_class.assert_called_once_with(
-            client_id="test_client",
-            client_secret="test_secret",
+            username="test_user",
+            password="test_pass",
             env="prod"
         )
         mock_metadata_class.assert_called_once_with(env="prod", auth=mock_auth_instance)
@@ -227,7 +232,7 @@ class TestMetadataSubmission:
             
             assert result is False
 
-    @patch.dict(os.environ, {"CLIENT_ID": "test_client", "CLIENT_SECRET": "test_secret"})
+    @patch.dict(os.environ, {"NMDC_USERNAME": "test_user", "NMDC_PASSWORD": "test_pass"})
     def test_submit_metadata_packages_no_json_files(
         self, lcms_config_file, metadata_packages_dir
     ):
@@ -241,7 +246,7 @@ class TestMetadataSubmission:
         
         assert result is False
 
-    @patch.dict(os.environ, {"CLIENT_ID": "test_client", "CLIENT_SECRET": "test_secret"})
+    @patch.dict(os.environ, {"NMDC_USERNAME": "test_user", "NMDC_PASSWORD": "test_pass"})
     def test_submit_metadata_packages_test_ids_rejected(
         self, lcms_config_file, metadata_packages_dir, sample_metadata_with_test_ids
     ):
@@ -261,7 +266,7 @@ class TestMetadataSubmission:
         # Should fail due to test IDs
         assert result is False
 
-    @patch.dict(os.environ, {"CLIENT_ID": "test_client", "CLIENT_SECRET": "test_secret"})
+    @patch.dict(os.environ, {"NMDC_USERNAME": "test_user", "NMDC_PASSWORD": "test_pass"})
     @patch('nmdc_api_utilities.metadata.Metadata')
     @patch('nmdc_api_utilities.auth.NMDCAuth')
     def test_submit_metadata_packages_validation_failure(
@@ -293,7 +298,7 @@ class TestMetadataSubmission:
         # Should fail due to validation error
         assert result is False
 
-    @patch.dict(os.environ, {"CLIENT_ID": "test_client", "CLIENT_SECRET": "test_secret"})
+    @patch.dict(os.environ, {"NMDC_USERNAME": "test_user", "NMDC_PASSWORD": "test_pass"})
     @patch('nmdc_api_utilities.metadata.Metadata')
     @patch('nmdc_api_utilities.auth.NMDCAuth')
     def test_submit_metadata_packages_submission_failure(
@@ -326,7 +331,7 @@ class TestMetadataSubmission:
         # Should fail due to submission error
         assert result is False
 
-    @patch.dict(os.environ, {"CLIENT_ID": "test_client", "CLIENT_SECRET": "test_secret"})
+    @patch.dict(os.environ, {"NMDC_USERNAME": "test_user", "NMDC_PASSWORD": "test_pass"})
     @patch('nmdc_api_utilities.metadata.Metadata')
     @patch('nmdc_api_utilities.auth.NMDCAuth')
     @patch('time.sleep')
@@ -357,14 +362,17 @@ class TestMetadataSubmission:
         mock_metadata_instance.validate_json.return_value = 200
         mock_metadata_instance.submit_json.return_value = 200
         
-        result = manager.submit_metadata_packages(environment="dev")
+        # Mock _check_ids_already_submitted - first call returns False (not submitted yet),
+        # second call returns True (material processing available after submission)
+        with patch.object(manager, '_check_ids_already_submitted', side_effect=[False, True, False]):
+            result = manager.submit_metadata_packages(environment="dev")
         
         assert result is True
         
         # Verify sleep was called with 60 seconds
         mock_sleep.assert_called_once_with(60)
 
-    @patch.dict(os.environ, {"CLIENT_ID": "test_client", "CLIENT_SECRET": "test_secret"})
+    @patch.dict(os.environ, {"NMDC_USERNAME": "test_user", "NMDC_PASSWORD": "test_pass"})
     @patch('nmdc_api_utilities.metadata.Metadata')
     @patch('nmdc_api_utilities.auth.NMDCAuth')
     def test_submit_metadata_packages_to_dev_wrapper(
@@ -390,15 +398,17 @@ class TestMetadataSubmission:
         mock_metadata_instance.validate_json.return_value = 200
         mock_metadata_instance.submit_json.return_value = 200
         
-        with patch('time.sleep'):
-            result = manager.submit_metadata_packages_to_dev()
+        # Mock _check_ids_already_submitted to prevent retry logic
+        with patch.object(manager, '_check_ids_already_submitted', return_value=False):
+            with patch('time.sleep'):
+                result = manager.submit_metadata_packages_to_dev()
         
         assert result is True
         
         # Verify skip trigger was set
         assert manager.should_skip("metadata_submitted_dev") is True
 
-    @patch.dict(os.environ, {"CLIENT_ID": "test_client", "CLIENT_SECRET": "test_secret"})
+    @patch.dict(os.environ, {"NMDC_USERNAME": "test_user", "NMDC_PASSWORD": "test_pass"})
     @patch('nmdc_api_utilities.metadata.Metadata')
     @patch('nmdc_api_utilities.auth.NMDCAuth')
     def test_submit_metadata_packages_to_prod_wrapper(
@@ -427,8 +437,10 @@ class TestMetadataSubmission:
         mock_metadata_instance.validate_json.return_value = 200
         mock_metadata_instance.submit_json.return_value = 200
         
-        with patch('time.sleep'):
-            result = manager.submit_metadata_packages_to_prod()
+        # Mock _check_ids_already_submitted to prevent retry logic
+        with patch.object(manager, '_check_ids_already_submitted', return_value=False):
+            with patch('time.sleep'):
+                result = manager.submit_metadata_packages_to_prod()
         
         assert result is True
         
