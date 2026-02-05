@@ -654,7 +654,7 @@ class TestWorkflowMetadataManagerIntegration:
         # Verify processed sample IDs are in correct format
         processed_sample_ids = workflowref_df["last_processed_sample"].tolist()
         assert all("nmdc:procsm-" in pid for pid in processed_sample_ids), "All processed sample IDs should be valid NMDC IDs"
-        assert all("-13-" in pid for pid in processed_sample_ids), "Test mode IDs should contain '-13-'"
+        assert all("-00-" in pid for pid in processed_sample_ids), "Test mode IDs should contain '-00-'"
         assert len(processed_sample_ids) > 0, "Should have generated processed sample IDs"
         
         # Verify skip trigger was set
