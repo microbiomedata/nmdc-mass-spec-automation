@@ -411,6 +411,9 @@ class TestMetadataSubmission:
         manager = NMDCWorkflowManager(str(lcms_config_file))
         manager.workflow_path = metadata_packages_dir.parent.parent
         
+        # Set dev skip trigger to indicate dev submission was successful
+        manager.set_skip_trigger("metadata_submitted_dev", True)
+        
         # Create sample metadata file
         material_file = metadata_packages_dir / "material_processing_metadata.json"
         with open(material_file, "w") as f:
@@ -431,6 +434,19 @@ class TestMetadataSubmission:
         
         # Verify skip trigger was set
         assert manager.should_skip("metadata_submitted_prod") is True
+
+    def test_submit_metadata_packages_to_prod_requires_dev_success(self, lcms_config_file):
+        """Test that submit_metadata_packages_to_prod requires dev submission to be successful first."""
+        from nmdc_dp_utils.workflow_manager import NMDCWorkflowManager
+        
+        manager = NMDCWorkflowManager(str(lcms_config_file))
+        
+        # Do NOT set dev skip trigger - simulating dev submission not completed
+        
+        # Should fail because dev was not successful
+        result = manager.submit_metadata_packages_to_prod()
+        
+        assert result is False
 
     def test_submit_metadata_packages_to_dev_skip_if_complete(self, lcms_config_file):
         """Test that submit_metadata_packages_to_dev respects skip trigger."""
@@ -453,10 +469,11 @@ class TestMetadataSubmission:
         
         manager = NMDCWorkflowManager(str(lcms_config_file))
         
-        # Set skip trigger
+        # Set both dev and prod skip triggers
+        manager.set_skip_trigger("metadata_submitted_dev", True)
         manager.set_skip_trigger("metadata_submitted_prod", True)
         
-        # Should skip and return True immediately
+        # Should skip and return True immediately (without checking dev)
         result = manager.submit_metadata_packages_to_prod()
         
         assert result is True

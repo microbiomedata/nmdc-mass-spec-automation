@@ -4354,9 +4354,18 @@ class WorkflowMetadataManager:
         Wrapper function that calls submit_metadata_packages with environment="prod"
         and manages the skip trigger for prod submissions.
 
+        Note:
+            Only attempts prod submission if dev submission was successful.
+
         Returns:
             True if submission successful, False otherwise
         """
+        # Check if dev submission was successful before attempting prod
+        if not self.should_skip("metadata_submitted_dev"):
+            self.logger.error("Cannot submit to prod: dev submission not completed successfully")
+            self.logger.error("Run submit_metadata_packages_to_dev() first")
+            return False
+        
         success = self.submit_metadata_packages(environment="prod")
         if success:
             self.set_skip_trigger("metadata_submitted_prod", True)
