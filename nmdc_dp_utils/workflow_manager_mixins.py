@@ -4811,7 +4811,7 @@ class WorkflowMetadataManager:
 
         Args:
             test: If False, runs test mode validation then production mode with real ID minting.
-                  If True, only runs test mode (uses test IDs with -13- shoulder).
+                  If True, only runs test mode (uses test IDs with -00- shoulder).
                   Default: False
 
         Returns:
@@ -4989,7 +4989,7 @@ class WorkflowMetadataManager:
 
         Args:
             test: If False, runs test mode validation then production mode with real ID minting.
-                  If True, only runs test mode (uses test IDs with -13- shoulder).
+                  If True, only runs test mode (uses test IDs with -00- shoulder).
                   Default: False
 
         Returns:
