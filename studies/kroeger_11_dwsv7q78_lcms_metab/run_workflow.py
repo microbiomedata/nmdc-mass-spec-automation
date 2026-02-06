@@ -80,13 +80,13 @@ async def main():
     else:
         logger.info("Successfully submitted metadata packages to dev environment")
 
-    # Step 10: Submit metadata packages to prod environment
-    #logger.info("10. Submitting metadata packages to prod environment...")
-    #prod_success = manager.submit_metadata_packages_to_prod()
-    #if not prod_success:
-    #    logger.error("Failed to submit metadata packages to prod environment")
-    #else:
-    #    logger.info("Successfully submitted metadata packages to prod environment")
+    # Step 10: Submit metadata packages to prod environment (will only run if dev submission was successful)
+    logger.info("10. Submitting metadata packages to prod environment...")
+    prod_success = manager.submit_metadata_packages_to_prod()
+    if not prod_success:
+        logger.error("Failed to submit metadata packages to prod environment")
+    else:
+        logger.info("Successfully submitted metadata packages to prod environment")
 
 if __name__ == "__main__":
     asyncio.run(main())

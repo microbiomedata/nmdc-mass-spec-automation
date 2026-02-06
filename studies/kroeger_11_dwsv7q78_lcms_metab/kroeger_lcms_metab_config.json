@@ -134,6 +134,6 @@
         "material_processing_metadata_generated": true,
         "metadata_packages_generated": true,
         "metadata_submitted_dev": true,
-        "metadata_submitted_prod": false
+        "metadata_submitted_prod": true
     }
 }
