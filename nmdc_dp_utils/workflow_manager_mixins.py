@@ -3182,6 +3182,9 @@ class WorkflowRawDataInspectionManager:
             Uses config paths for source directory and MinIO settings.
             Creates folder structure: bucket/study_name/processed_data/
         """
+        # Clean up macOS metadata files before uploading
+        self._cleanup_macos_metadata_files()
+        
         if not self.minio_client:
             self.logger.error(
                 "MinIO client not available. Please set MINIO_ACCESS_KEY and MINIO_SECRET_KEY environment variables."
@@ -3774,6 +3777,10 @@ class WorkflowMetadataManager:
             # Call workflow-specific processing function
             success = wf_input_gen()
 
+            # Add associated_studies to input csv (need to do this from the biosamples as the processed samples won't be in mongo yet)
+            if success:
+                success = self._add_associated_studies_to_metadata_csvs()
+
             # Replace biosample_id (sample_id) with processed_sample_id from material processing metadata
             if success:
                 success = self._update_sample_ids_to_processed_sample_ids()
@@ -3788,6 +3795,109 @@ class WorkflowMetadataManager:
             self.logger.error(f"Error generating metadata mapping files: {e}")
             import traceback
 
+            traceback.print_exc()
+            return False
+
+    def _add_associated_studies_to_metadata_csvs(self) -> bool:
+        """
+        Add associated_studies column to metadata CSV files.
+
+        Reads the existing CSV files from metadata_gen_input_csvs directory,
+        queries the NMDC API to find associated study IDs for each biosample_id,
+        and writes the CSVs back with the new associated_studies column.
+        
+        The associated_studies value is formatted as a string representation of a list,
+        e.g., "['nmdc:sty-11-abc123', 'nmdc:sty-11-xyz789']" to match the format
+        expected by the load_metadata method in metadata_generator.py.
+
+        Returns:
+            True if successful, False otherwise
+        """
+        self.logger.info("Adding associated_studies to metadata CSV files...")
+
+        try:
+            from nmdc_api_utilities.nmdc_search import NMDCSearch
+
+            # Get the input directory
+            input_dir = self.workflow_path / "metadata" / "metadata_gen_input_csvs"
+            if not input_dir.exists():
+                self.logger.error(f"Metadata input directory not found: {input_dir}")
+                return False
+
+            csv_files = list(input_dir.glob("*.csv"))
+            if not csv_files:
+                self.logger.error(f"No CSV files found in {input_dir}")
+                return False
+
+            updated_count = 0
+            total_rows_updated = 0
+
+            # Initialize NMDC search client in the production database
+            search_obj = NMDCSearch()
+
+            for csv_file in csv_files:
+                # Read the CSV
+                df = pd.read_csv(csv_file)
+                
+                # Check if sample_id column exists
+                if "sample_id" not in df.columns:
+                    self.logger.warning(f"Skipping {csv_file.name}: no sample_id column found")
+                    continue
+
+                # Check if associated_studies already exists
+                if "associated_studies" in df.columns:
+                    self.logger.info(f"Skipping {csv_file.name}: associated_studies column already exists")
+                    continue
+
+                # Get unique sample IDs (these should be biosample IDs at this stage)
+                sample_ids = df["sample_id"].dropna().unique().tolist()
+                
+                if not sample_ids:
+                    self.logger.warning(f"Skipping {csv_file.name}: no valid sample_ids found")
+                    continue
+
+                self.logger.info(f"Processing {csv_file.name}: finding associated studies for {len(sample_ids)} unique sample IDs...")
+
+                # Call find_associated_ids to get the associated studies
+                # This returns a dict mapping sample_id -> list of study IDs
+                try:
+                    associations = search_obj.get_linked_instances_and_associate_ids(
+                        ids=sample_ids, types="nmdc:Study"
+                    )
+                except Exception as e:
+                    self.logger.error(f"Error finding associated studies: {e}")
+                    return False
+
+                # Map the IDs back to the dataframe
+                # Format as string representation of list to match load_metadata expectations
+                def get_associated_studies_str(sample_id):
+                    if pd.isna(sample_id):
+                        return "[]"
+                    studies = associations.get(sample_id, [])
+                    return str(studies)
+
+                df["associated_studies"] = df["sample_id"].apply(get_associated_studies_str)
+
+                # Write updated CSV back to file
+                df.to_csv(csv_file, index=False)
+                updated_count += 1
+                total_rows_updated += len(df)
+                self.logger.info(
+                    f"Updated {csv_file.name}: {len(df)} rows with associated_studies"
+                )
+
+            if updated_count == 0:
+                self.logger.error("No CSV files were successfully updated with associated_studies")
+                return False
+
+            self.logger.info(
+                f"Successfully updated {updated_count} CSV files with associated_studies ({total_rows_updated} total rows)"
+            )
+            return True
+
+        except Exception as e:
+            self.logger.error(f"Error adding associated_studies to metadata CSV files: {e}")
+            import traceback
             traceback.print_exc()
             return False
 
@@ -4404,20 +4514,14 @@ class WorkflowMetadataManager:
             output_dir.mkdir(parents=True, exist_ok=True)
             db_path = output_dir / "material_processing_metadata.json"
 
-            # Get minting config credentials path from config or use default
-            minting_config = self.config.get("material_processing", {}).get(
-                "minting_config_creds",
-                str(Path.home() / ".nmdc" / "config.toml")
-            )
-
             # First attempt to generate and validate metadata in test mode 
             # Initialize MaterialProcessingMetadataGenerator in test mode
+            # Note: Minting credentials are read from environment variables (CLIENT_ID, CLIENT_SECRET)
             generator = MaterialProcessingMetadataGenerator(
                 database_dump_json_path=str(db_path),
                 study_id=study_id,
                 yaml_outline_path=str(yaml_path),
                 sample_to_dg_mapping_path=str(input_csv_path),
-                minting_config_creds=minting_config,
                 test=True,
             )
 
@@ -4436,12 +4540,12 @@ class WorkflowMetadataManager:
             # If test mode succeeded and test=False, run again in normal mode
             if not test:
                 self.logger.info("Test mode succeeded, running MaterialProcessingMetadataGenerator in production mode...")
+                # Note: Minting credentials are read from environment variables (CLIENT_ID, CLIENT_SECRET)
                 generator = MaterialProcessingMetadataGenerator(
                     database_dump_json_path=str(db_path),
                     study_id=study_id,
                     yaml_outline_path=str(yaml_path),
                     sample_to_dg_mapping_path=str(input_csv_path),
-                    minting_config_creds=minting_config,
                     test=False,
                 )
                 # Run metadata generation
@@ -4467,6 +4571,50 @@ class WorkflowMetadataManager:
             import traceback
             traceback.print_exc()
             return False
+
+    def _cleanup_macos_metadata_files(self) -> None:
+        """
+        Remove macOS system files from processed data directories.
+        
+        Removes:
+        - ._* files: Apple Double metadata files created on non-macOS filesystems
+        - .DS_Store: Finder metadata files
+        - .Spotlight-V100: Spotlight index files
+        - .Trashes: Trash folder metadata
+        
+        These files can interfere with file counting and processing in the metadata
+        generation pipeline and shouldn't be uploaded to storage.
+        """
+        processed_base = Path(self.processed_data_directory) if self.processed_data_directory else None
+        
+        if not processed_base or not processed_base.exists():
+            self.logger.debug(f"Processed data directory not found or not configured: {processed_base}, skipping cleanup")
+            return
+            
+        deleted_count = 0
+        self.logger.info(f"Scanning for macOS system files in: {processed_base}")
+        
+        # Patterns to match macOS system files
+        patterns = ["._*", ".DS_Store", ".Spotlight-V100", ".Trashes"]
+        
+        for pattern in patterns:
+            for system_file in processed_base.rglob(pattern):
+                try:
+                    self.logger.debug(f"Deleting macOS system file: {system_file}")
+                    if system_file.is_file():
+                        system_file.unlink()
+                        deleted_count += 1
+                    elif system_file.is_dir():
+                        import shutil
+                        shutil.rmtree(system_file)
+                        deleted_count += 1
+                except Exception as e:
+                    self.logger.warning(f"Failed to delete {system_file}: {e}")
+        
+        if deleted_count > 0:
+            self.logger.info(f"Cleaned up {deleted_count} macOS system file(s) from processed data directory")
+        else:
+            self.logger.debug("No macOS system files found to clean up")
 
     def generate_nmdc_metadata_for_workflow(self, test=False) -> bool:
         """
@@ -4520,7 +4668,14 @@ class WorkflowMetadataManager:
             >>> # After validation, run with real ID minting
             >>> success = manager.generate_nmdc_metadata_for_workflow(test=False)
         """
-
+        # Always use prod environment for ID minting to ensure consistency
+        # across material processing and workflow metadata generation
+        os.environ["NMDC_ENV"] = "prod"
+        self.logger.info("Set NMDC_ENV=prod for ID minting across all metadata generation")
+        
+        # Clean up macOS metadata files before processing
+        self._cleanup_macos_metadata_files()
+        
         # Step 1: Generate material processing metadata
         if not self.generate_material_processing_metadata(test=test):
             self.logger.error("Failed to generate material processing metadata")

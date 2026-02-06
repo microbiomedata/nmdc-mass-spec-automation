@@ -1,6 +1,6 @@
 raw_file_name,raw_file_type,biosample_id,biosample_name,match_confidence
-sample01_C18_POS_CE102040.raw,sample,nmdc:bsm-11-test001,Sample01,high
-sample02_C18_POS_CE205060.raw,sample,nmdc:bsm-11-test002,Sample02,high
-sample03_C18_NEG_CE102040.raw,sample,nmdc:bsm-11-test003,Sample03,high
-sample04_C18_NEG_CE205060.raw,sample,nmdc:bsm-11-test004,Sample04,high
-sample05_C18_POS_CE102040.raw,sample,nmdc:bsm-11-test005,Sample05,high
+sample01_C18_POS_CE102040.raw,sample,nmdc:bsm-11-bspxw403,Sample01,high
+sample02_C18_POS_CE205060.raw,sample,nmdc:bsm-11-bspxw403,Sample02,high
+sample03_C18_NEG_CE102040.raw,sample,nmdc:bsm-11-bspxw403,Sample03,high
+sample04_C18_NEG_CE205060.raw,sample,nmdc:bsm-11-bspxw403,Sample04,high
+sample05_C18_POS_CE102040.raw,sample,nmdc:bsm-11-bspxw403,Sample05,high
