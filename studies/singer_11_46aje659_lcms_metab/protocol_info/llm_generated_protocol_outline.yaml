@@ -1,0 +1,97 @@
+root_metabolomics:
+  steps:
+    - Step 1_root_metabolomics:
+        SubSamplingProcess:
+          id: # nmdc:subspr-{shoulder}-{blade}
+          type: nmdc:SubSamplingProcess
+          name: Prepare root sample
+          description: Root <Biosample> was frozen, lyophilized dry, and then subsampled for metabolomics analysis.
+          has_input:
+            - Biosample
+          has_output:
+            - ProcessedSample1_root_metabolomics
+          processing_institution: JGI
+    - Step 2_root_metabolomics:
+        MixingProcess:
+          id: # nmdc:mixpro-{shoulder}-{blade}
+          type: nmdc:MixingProcess
+          name: Powderize root sample
+          description: Lyophilized root <ProcessedSample1_root_metabolomics> was bead-beaten with a stainless steel bead to powderize it.
+          has_input:
+            - ProcessedSample1_root_metabolomics
+          has_output:
+            - ProcessedSample2_root_metabolomics
+          processing_institution: JGI
+    - Step 3_root_metabolomics:
+        Extraction:
+          id: # nmdc:extrp-{shoulder}-{blade}
+          type: nmdc:Extraction
+          name: Methanol extraction of metabolites
+          description: Metabolites extracted from powderized <ProcessedSample2_root_metabolomics> using 100% methanol, followed by vortexing, sonication for 10 minutes in an iced water bath, centrifugation, and SpeedVac drying.
+          has_input:
+            - ProcessedSample2_root_metabolomics
+          has_output:
+            - ProcessedSample3_root_metabolomics
+          processing_institution: JGI
+          extraction_targets:
+            - metabolite
+          substances_used:
+            - type: nmdc:PortionOfSubstance
+              known_as: methanol
+              substance_role: solvent
+              volume:
+                type: nmdc:QuantityValue
+                has_raw_value: 1 mL
+                has_unit: mL
+                has_numeric_value: 1
+          temperature:
+            type: nmdc:QuantityValue
+            has_raw_value: 0 Cel
+            has_unit: Cel
+            has_numeric_value: 0
+          duration:
+            type: nmdc:QuantityValue
+            has_raw_value: 10 min
+            has_unit: min
+            has_numeric_value: 10
+    - Step 4_root_metabolomics:
+        DissolvingProcess:
+          id: # nmdc:dispro-{shoulder}-{blade}
+          type: nmdc:DissolvingProcess
+          name: Resuspend extracted metabolites
+          description: Dried extracted metabolites from <ProcessedSample3_root_metabolomics> resuspended in 100% methanol with isotopically labeled internal standards, with resuspension volume adjusted to normalize by extract TOC, for LC-MS preparation.
+          has_input:
+            - ProcessedSample3_root_metabolomics
+          has_output:
+            - ProcessedSample4_root_metabolomics
+          processing_institution: JGI
+          substances_used:
+            - type: nmdc:PortionOfSubstance
+              known_as: methanol
+              substance_role: solvent
+            # Isotopically labeled internal standards are not a ChemicalEntityEnum and volume is variable
+  processedsamples:
+    - ProcessedSample1_root_metabolomics:
+        ProcessedSample:
+          id: #nmdc:
+          type: nmdc:ProcessedSample
+          name: <Biosample>_lyophilized_subsample
+          description: Subsample of <Biosample> root after freezing and lyophilization.
+    - ProcessedSample2_root_metabolomics:
+        ProcessedSample:
+          id: #nmdc:
+          type: nmdc:ProcessedSample
+          name: <Biosample>_powderized_root
+          description: Powderized root from bead-beating of <ProcessedSample1_root_metabolomics>.
+    - ProcessedSample3_root_metabolomics:
+        ProcessedSample:
+          id: #nmdc:
+          type: nmdc:ProcessedSample
+          name: <Biosample>_methanol_extract_dried
+          description: Dried methanol extract containing metabolites from <ProcessedSample2_root_metabolomics>.
+    - ProcessedSample4_root_metabolomics:
+        ProcessedSample:
+          id: #nmdc:
+          type: nmdc:ProcessedSample
+          name: <Biosample>_resuspended_for_LCMS
+          description: Resuspended metabolites from <ProcessedSample3_root_metabolomics> for LC-MS analysis.

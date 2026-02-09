@@ -1,0 +1,9 @@
+2026-02-09 22:55:26,183 - INFO - Found 408 files to inspect
+2026-02-09 22:55:26,183 - INFO - Results will be written to: /mnt/Users/heal742/LOCAL/05_NMDC/07_automation/nmdc_mass_spec_automation/studies/singer_11_46aje659_lcms_metab/raw_file_info/raw_file_inspection_results.csv
+2026-02-09 22:55:26,183 - INFO - Errors will be logged to: /mnt/Users/heal742/LOCAL/05_NMDC/07_automation/nmdc_mass_spec_automation/studies/singer_11_46aje659_lcms_metab/raw_file_info/raw_file_inspection_errors.csv
+2026-02-09 22:55:26,183 - INFO - CoreMS available: True
+2026-02-09 23:10:05,492 - INFO - Inspection complete!
+2026-02-09 23:10:05,492 - INFO - Successfully processed: 408 files
+2026-02-09 23:10:05,492 - INFO - Failed to process: 0 files
+2026-02-09 23:10:05,493 - INFO - Results saved to: /mnt/Users/heal742/LOCAL/05_NMDC/07_automation/nmdc_mass_spec_automation/studies/singer_11_46aje659_lcms_metab/raw_file_info/raw_file_inspection_results.csv
+2026-02-09 23:10:05,493 - INFO - Processing log saved to: /mnt/Users/heal742/LOCAL/05_NMDC/07_automation/nmdc_mass_spec_automation/studies/singer_11_46aje659_lcms_metab/raw_file_info/raw_inspection_log.log

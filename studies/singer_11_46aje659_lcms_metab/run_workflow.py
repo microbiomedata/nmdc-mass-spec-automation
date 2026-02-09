@@ -3,6 +3,9 @@
 Singer study, lcms_metabolomics workflow runner.
 Study: Panicgrass rhizosphere soil microbial communities from growth chamber in LBNL, Berkeley, California, USA
 MASSIVE ID: MSV000094782
+
+C18 samples run on IDX, but only hcd scans were acquired so no special scan translation is needed
+HILICZ samples run on QExactive
 """
 
 import sys
@@ -42,14 +45,14 @@ async def main():
     # TO BE REPLACED BY AN LLM-DRIVEN APPROACH
     logger.info("4. Mapping raw data files to biosamples...")
     manager.get_biosample_attributes()
-    manager.generate_biosample_mapping_script()
+    #manager.generate_biosample_mapping_script()
 
-    mapping_success = manager.run_biosample_mapping_script()
-    if not mapping_success:
-        logger.warning("Biosample mapping needs manual review - check the mapping file and customize the script")
-        logger.warning("Re-run after making changes to improve matching")
-    else:
-        logger.info("Biosample mapping completed successfully")
+    #mapping_success = manager.run_biosample_mapping_script()
+    #if not mapping_success:
+    #    logger.warning("Biosample mapping needs manual review - check the mapping file and customize the script")
+    #    logger.warning("Re-run after making changes to improve matching")
+    #else:
+    #    logger.info("Biosample mapping completed successfully")
 
     # Step 5: Inspect raw data files for metadata and QC
     logger.info("5. Inspecting raw data files...")
