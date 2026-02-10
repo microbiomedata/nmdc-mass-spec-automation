@@ -1,0 +1,41 @@
+
+================================================================================
+VALIDATING GENERATED OUTPUT
+================================================================================
+Calculating expected counts...
+
+================================================================================
+PLACEHOLDER COMBINATIONS BY PROTOCOL:
+================================================================================
+
+root_metabolomics:
+  Target placeholders: ['ProcessedSample3_root_metabolomics']
+  Resulting samples: ['ProcessedSample1_root_metabolomics', 'ProcessedSample2_root_metabolomics', 'ProcessedSample3_root_metabolomics']
+  Biosamples with this combination: 62
+  Steps required per biosample: 3
+  Processed samples required per biosample: 3
+  Total steps for this combination: 186
+  Total samples for this combination: 186
+
+================================================================================
+VALIDATION SUMMARY:
+================================================================================
+
+Biosamples:
+  Unique in mapping: 62
+
+Material Processing Steps:
+  Expected: 186
+  Actual:   186
+  ✓ MATCH
+
+Processed Samples:
+  Expected: 186
+  Actual:   186
+  ✓ MATCH
+
+Unique placeholder combinations: 1
+
+================================================================================
+✓ VALIDATION PASSED: All counts match!
+================================================================================

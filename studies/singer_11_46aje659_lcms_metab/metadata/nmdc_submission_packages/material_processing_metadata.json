@@ -1,0 +1,5339 @@
+{
+  "material_processing_set": [
+    {
+      "id": "nmdc:subspr-11-xsfmxm77",
+      "type": "nmdc:SubSamplingProcess",
+      "name": "Prepare root sample",
+      "description": "Root nmdc:bsm-11-10kjq953 was frozen, lyophilized dry, and then subsampled for metabolomics analysis. Samples were bead-beaten with a stainless steel bead to powderize after subsampling.",
+      "has_input": [
+        "nmdc:bsm-11-10kjq953"
+      ],
+      "has_output": [
+        "nmdc:procsm-11-894aj150"
+      ],
+      "processing_institution": "JGI"
+    },
+    {
+      "id": "nmdc:extrp-11-reyfc550",
+      "type": "nmdc:Extraction",
+      "name": "Methanol extraction of metabolites",
+      "description": "Metabolites extracted from powderized nmdc:procsm-11-894aj150 using 100% methanol, followed by vortexing, sonication for 10 minutes in an iced water bath, centrifugation, and SpeedVac drying.",
+      "has_input": [
+        "nmdc:procsm-11-894aj150"
+      ],
+      "has_output": [
+        "nmdc:procsm-11-61mkj755"
+      ],
+      "processing_institution": "JGI",
+      "substances_used": [
+        {
+          "type": "nmdc:PortionOfSubstance",
+          "known_as": "methanol",
+          "substance_role": "solvent",
+          "volume": {
+            "type": "nmdc:QuantityValue",
+            "has_raw_value": "1 mL",
+            "has_unit": "mL",
+            "has_numeric_value": 1
+          }
+        }
+      ],
+      "extraction_targets": [
+        "metabolite"
+      ],
+      "temperature": {
+        "type": "nmdc:QuantityValue",
+        "has_raw_value": "0 Cel",
+        "has_unit": "Cel",
+        "has_numeric_value": 0
+      }
+    },
+    {
+      "id": "nmdc:dispro-11-3xrbjy06",
+      "type": "nmdc:DissolvingProcess",
+      "name": "Resuspend extracted metabolites",
+      "description": "Dried extracted metabolites from nmdc:procsm-11-61mkj755 resuspended in 100% methanol with isotopically labeled internal standards, with resuspension volume adjusted to normalize by extract TOC, for LC-MS preparation.",
+      "has_input": [
+        "nmdc:procsm-11-61mkj755"
+      ],
+      "has_output": [
+        "nmdc:procsm-11-0dkt6k22"
+      ],
+      "processing_institution": "JGI",
+      "substances_used": [
+        {
+          "type": "nmdc:PortionOfSubstance",
+          "known_as": "methanol",
+          "substance_role": "solvent"
+        }
+      ]
+    },
+    {
+      "id": "nmdc:subspr-11-gyq1d941",
+      "type": "nmdc:SubSamplingProcess",
+      "name": "Prepare root sample",
+      "description": "Root nmdc:bsm-11-1sdkpz20 was frozen, lyophilized dry, and then subsampled for metabolomics analysis. Samples were bead-beaten with a stainless steel bead to powderize after subsampling.",
+      "has_input": [
+        "nmdc:bsm-11-1sdkpz20"
+      ],
+      "has_output": [
+        "nmdc:procsm-11-x6y2d309"
+      ],
+      "processing_institution": "JGI"
+    },
+    {
+      "id": "nmdc:extrp-11-z1ycfe12",
+      "type": "nmdc:Extraction",
+      "name": "Methanol extraction of metabolites",
+      "description": "Metabolites extracted from powderized nmdc:procsm-11-x6y2d309 using 100% methanol, followed by vortexing, sonication for 10 minutes in an iced water bath, centrifugation, and SpeedVac drying.",
+      "has_input": [
+        "nmdc:procsm-11-x6y2d309"
+      ],
+      "has_output": [
+        "nmdc:procsm-11-q3x5r186"
+      ],
+      "processing_institution": "JGI",
+      "substances_used": [
+        {
+          "type": "nmdc:PortionOfSubstance",
+          "known_as": "methanol",
+          "substance_role": "solvent",
+          "volume": {
+            "type": "nmdc:QuantityValue",
+            "has_raw_value": "1 mL",
+            "has_unit": "mL",
+            "has_numeric_value": 1
+          }
+        }
+      ],
+      "extraction_targets": [
+        "metabolite"
+      ],
+      "temperature": {
+        "type": "nmdc:QuantityValue",
+        "has_raw_value": "0 Cel",
+        "has_unit": "Cel",
+        "has_numeric_value": 0
+      }
+    },
+    {
+      "id": "nmdc:dispro-11-7tm76j55",
+      "type": "nmdc:DissolvingProcess",
+      "name": "Resuspend extracted metabolites",
+      "description": "Dried extracted metabolites from nmdc:procsm-11-q3x5r186 resuspended in 100% methanol with isotopically labeled internal standards, with resuspension volume adjusted to normalize by extract TOC, for LC-MS preparation.",
+      "has_input": [
+        "nmdc:procsm-11-q3x5r186"
+      ],
+      "has_output": [
+        "nmdc:procsm-11-bxjgq664"
+      ],
+      "processing_institution": "JGI",
+      "substances_used": [
+        {
+          "type": "nmdc:PortionOfSubstance",
+          "known_as": "methanol",
+          "substance_role": "solvent"
+        }
+      ]
+    },
+    {
+      "id": "nmdc:subspr-11-sg9m7w39",
+      "type": "nmdc:SubSamplingProcess",
+      "name": "Prepare root sample",
+      "description": "Root nmdc:bsm-11-21kzd377 was frozen, lyophilized dry, and then subsampled for metabolomics analysis. Samples were bead-beaten with a stainless steel bead to powderize after subsampling.",
+      "has_input": [
+        "nmdc:bsm-11-21kzd377"
+      ],
+      "has_output": [
+        "nmdc:procsm-11-8kqq6915"
+      ],
+      "processing_institution": "JGI"
+    },
+    {
+      "id": "nmdc:extrp-11-b9qv5076",
+      "type": "nmdc:Extraction",
+      "name": "Methanol extraction of metabolites",
+      "description": "Metabolites extracted from powderized nmdc:procsm-11-8kqq6915 using 100% methanol, followed by vortexing, sonication for 10 minutes in an iced water bath, centrifugation, and SpeedVac drying.",
+      "has_input": [
+        "nmdc:procsm-11-8kqq6915"
+      ],
+      "has_output": [
+        "nmdc:procsm-11-w67gdy98"
+      ],
+      "processing_institution": "JGI",
+      "substances_used": [
+        {
+          "type": "nmdc:PortionOfSubstance",
+          "known_as": "methanol",
+          "substance_role": "solvent",
+          "volume": {
+            "type": "nmdc:QuantityValue",
+            "has_raw_value": "1 mL",
+            "has_unit": "mL",
+            "has_numeric_value": 1
+          }
+        }
+      ],
+      "extraction_targets": [
+        "metabolite"
+      ],
+      "temperature": {
+        "type": "nmdc:QuantityValue",
+        "has_raw_value": "0 Cel",
+        "has_unit": "Cel",
+        "has_numeric_value": 0
+      }
+    },
+    {
+      "id": "nmdc:dispro-11-ejcnxn77",
+      "type": "nmdc:DissolvingProcess",
+      "name": "Resuspend extracted metabolites",
+      "description": "Dried extracted metabolites from nmdc:procsm-11-w67gdy98 resuspended in 100% methanol with isotopically labeled internal standards, with resuspension volume adjusted to normalize by extract TOC, for LC-MS preparation.",
+      "has_input": [
+        "nmdc:procsm-11-w67gdy98"
+      ],
+      "has_output": [
+        "nmdc:procsm-11-5mnkj364"
+      ],
+      "processing_institution": "JGI",
+      "substances_used": [
+        {
+          "type": "nmdc:PortionOfSubstance",
+          "known_as": "methanol",
+          "substance_role": "solvent"
+        }
+      ]
+    },
+    {
+      "id": "nmdc:subspr-11-5abvge22",
+      "type": "nmdc:SubSamplingProcess",
+      "name": "Prepare root sample",
+      "description": "Root nmdc:bsm-11-2bnqye24 was frozen, lyophilized dry, and then subsampled for metabolomics analysis. Samples were bead-beaten with a stainless steel bead to powderize after subsampling.",
+      "has_input": [
+        "nmdc:bsm-11-2bnqye24"
+      ],
+      "has_output": [
+        "nmdc:procsm-11-2w3rxr08"
+      ],
+      "processing_institution": "JGI"
+    },
+    {
+      "id": "nmdc:extrp-11-rx9x6c37",
+      "type": "nmdc:Extraction",
+      "name": "Methanol extraction of metabolites",
+      "description": "Metabolites extracted from powderized nmdc:procsm-11-2w3rxr08 using 100% methanol, followed by vortexing, sonication for 10 minutes in an iced water bath, centrifugation, and SpeedVac drying.",
+      "has_input": [
+        "nmdc:procsm-11-2w3rxr08"
+      ],
+      "has_output": [
+        "nmdc:procsm-11-kqcdkh54"
+      ],
+      "processing_institution": "JGI",
+      "substances_used": [
+        {
+          "type": "nmdc:PortionOfSubstance",
+          "known_as": "methanol",
+          "substance_role": "solvent",
+          "volume": {
+            "type": "nmdc:QuantityValue",
+            "has_raw_value": "1 mL",
+            "has_unit": "mL",
+            "has_numeric_value": 1
+          }
+        }
+      ],
+      "extraction_targets": [
+        "metabolite"
+      ],
+      "temperature": {
+        "type": "nmdc:QuantityValue",
+        "has_raw_value": "0 Cel",
+        "has_unit": "Cel",
+        "has_numeric_value": 0
+      }
+    },
+    {
+      "id": "nmdc:dispro-11-vx1w4r38",
+      "type": "nmdc:DissolvingProcess",
+      "name": "Resuspend extracted metabolites",
+      "description": "Dried extracted metabolites from nmdc:procsm-11-kqcdkh54 resuspended in 100% methanol with isotopically labeled internal standards, with resuspension volume adjusted to normalize by extract TOC, for LC-MS preparation.",
+      "has_input": [
+        "nmdc:procsm-11-kqcdkh54"
+      ],
+      "has_output": [
+        "nmdc:procsm-11-a4wv8r70"
+      ],
+      "processing_institution": "JGI",
+      "substances_used": [
+        {
+          "type": "nmdc:PortionOfSubstance",
+          "known_as": "methanol",
+          "substance_role": "solvent"
+        }
+      ]
+    },
+    {
+      "id": "nmdc:subspr-11-ckjnr817",
+      "type": "nmdc:SubSamplingProcess",
+      "name": "Prepare root sample",
+      "description": "Root nmdc:bsm-11-2d0mzn96 was frozen, lyophilized dry, and then subsampled for metabolomics analysis. Samples were bead-beaten with a stainless steel bead to powderize after subsampling.",
+      "has_input": [
+        "nmdc:bsm-11-2d0mzn96"
+      ],
+      "has_output": [
+        "nmdc:procsm-11-wk0ehk41"
+      ],
+      "processing_institution": "JGI"
+    },
+    {
+      "id": "nmdc:extrp-11-a1919f40",
+      "type": "nmdc:Extraction",
+      "name": "Methanol extraction of metabolites",
+      "description": "Metabolites extracted from powderized nmdc:procsm-11-wk0ehk41 using 100% methanol, followed by vortexing, sonication for 10 minutes in an iced water bath, centrifugation, and SpeedVac drying.",
+      "has_input": [
+        "nmdc:procsm-11-wk0ehk41"
+      ],
+      "has_output": [
+        "nmdc:procsm-11-b63rm424"
+      ],
+      "processing_institution": "JGI",
+      "substances_used": [
+        {
+          "type": "nmdc:PortionOfSubstance",
+          "known_as": "methanol",
+          "substance_role": "solvent",
+          "volume": {
+            "type": "nmdc:QuantityValue",
+            "has_raw_value": "1 mL",
+            "has_unit": "mL",
+            "has_numeric_value": 1
+          }
+        }
+      ],
+      "extraction_targets": [
+        "metabolite"
+      ],
+      "temperature": {
+        "type": "nmdc:QuantityValue",
+        "has_raw_value": "0 Cel",
+        "has_unit": "Cel",
+        "has_numeric_value": 0
+      }
+    },
+    {
+      "id": "nmdc:dispro-11-s6m5cv50",
+      "type": "nmdc:DissolvingProcess",
+      "name": "Resuspend extracted metabolites",
+      "description": "Dried extracted metabolites from nmdc:procsm-11-b63rm424 resuspended in 100% methanol with isotopically labeled internal standards, with resuspension volume adjusted to normalize by extract TOC, for LC-MS preparation.",
+      "has_input": [
+        "nmdc:procsm-11-b63rm424"
+      ],
+      "has_output": [
+        "nmdc:procsm-11-5mgztq29"
+      ],
+      "processing_institution": "JGI",
+      "substances_used": [
+        {
+          "type": "nmdc:PortionOfSubstance",
+          "known_as": "methanol",
+          "substance_role": "solvent"
+        }
+      ]
+    },
+    {
+      "id": "nmdc:subspr-11-bydefa80",
+      "type": "nmdc:SubSamplingProcess",
+      "name": "Prepare root sample",
+      "description": "Root nmdc:bsm-11-2px7mg21 was frozen, lyophilized dry, and then subsampled for metabolomics analysis. Samples were bead-beaten with a stainless steel bead to powderize after subsampling.",
+      "has_input": [
+        "nmdc:bsm-11-2px7mg21"
+      ],
+      "has_output": [
+        "nmdc:procsm-11-sm2mcw79"
+      ],
+      "processing_institution": "JGI"
+    },
+    {
+      "id": "nmdc:extrp-11-yrtbpj18",
+      "type": "nmdc:Extraction",
+      "name": "Methanol extraction of metabolites",
+      "description": "Metabolites extracted from powderized nmdc:procsm-11-sm2mcw79 using 100% methanol, followed by vortexing, sonication for 10 minutes in an iced water bath, centrifugation, and SpeedVac drying.",
+      "has_input": [
+        "nmdc:procsm-11-sm2mcw79"
+      ],
+      "has_output": [
+        "nmdc:procsm-11-24d8jt63"
+      ],
+      "processing_institution": "JGI",
+      "substances_used": [
+        {
+          "type": "nmdc:PortionOfSubstance",
+          "known_as": "methanol",
+          "substance_role": "solvent",
+          "volume": {
+            "type": "nmdc:QuantityValue",
+            "has_raw_value": "1 mL",
+            "has_unit": "mL",
+            "has_numeric_value": 1
+          }
+        }
+      ],
+      "extraction_targets": [
+        "metabolite"
+      ],
+      "temperature": {
+        "type": "nmdc:QuantityValue",
+        "has_raw_value": "0 Cel",
+        "has_unit": "Cel",
+        "has_numeric_value": 0
+      }
+    },
+    {
+      "id": "nmdc:dispro-11-ca83gj92",
+      "type": "nmdc:DissolvingProcess",
+      "name": "Resuspend extracted metabolites",
+      "description": "Dried extracted metabolites from nmdc:procsm-11-24d8jt63 resuspended in 100% methanol with isotopically labeled internal standards, with resuspension volume adjusted to normalize by extract TOC, for LC-MS preparation.",
+      "has_input": [
+        "nmdc:procsm-11-24d8jt63"
+      ],
+      "has_output": [
+        "nmdc:procsm-11-r8jkbh86"
+      ],
+      "processing_institution": "JGI",
+      "substances_used": [
+        {
+          "type": "nmdc:PortionOfSubstance",
+          "known_as": "methanol",
+          "substance_role": "solvent"
+        }
+      ]
+    },
+    {
+      "id": "nmdc:subspr-11-hq4txy94",
+      "type": "nmdc:SubSamplingProcess",
+      "name": "Prepare root sample",
+      "description": "Root nmdc:bsm-11-2v2sz563 was frozen, lyophilized dry, and then subsampled for metabolomics analysis. Samples were bead-beaten with a stainless steel bead to powderize after subsampling.",
+      "has_input": [
+        "nmdc:bsm-11-2v2sz563"
+      ],
+      "has_output": [
+        "nmdc:procsm-11-78f8rt38"
+      ],
+      "processing_institution": "JGI"
+    },
+    {
+      "id": "nmdc:extrp-11-85dwjc84",
+      "type": "nmdc:Extraction",
+      "name": "Methanol extraction of metabolites",
+      "description": "Metabolites extracted from powderized nmdc:procsm-11-78f8rt38 using 100% methanol, followed by vortexing, sonication for 10 minutes in an iced water bath, centrifugation, and SpeedVac drying.",
+      "has_input": [
+        "nmdc:procsm-11-78f8rt38"
+      ],
+      "has_output": [
+        "nmdc:procsm-11-jjheme62"
+      ],
+      "processing_institution": "JGI",
+      "substances_used": [
+        {
+          "type": "nmdc:PortionOfSubstance",
+          "known_as": "methanol",
+          "substance_role": "solvent",
+          "volume": {
+            "type": "nmdc:QuantityValue",
+            "has_raw_value": "1 mL",
+            "has_unit": "mL",
+            "has_numeric_value": 1
+          }
+        }
+      ],
+      "extraction_targets": [
+        "metabolite"
+      ],
+      "temperature": {
+        "type": "nmdc:QuantityValue",
+        "has_raw_value": "0 Cel",
+        "has_unit": "Cel",
+        "has_numeric_value": 0
+      }
+    },
+    {
+      "id": "nmdc:dispro-11-8tr93z08",
+      "type": "nmdc:DissolvingProcess",
+      "name": "Resuspend extracted metabolites",
+      "description": "Dried extracted metabolites from nmdc:procsm-11-jjheme62 resuspended in 100% methanol with isotopically labeled internal standards, with resuspension volume adjusted to normalize by extract TOC, for LC-MS preparation.",
+      "has_input": [
+        "nmdc:procsm-11-jjheme62"
+      ],
+      "has_output": [
+        "nmdc:procsm-11-15gf1f53"
+      ],
+      "processing_institution": "JGI",
+      "substances_used": [
+        {
+          "type": "nmdc:PortionOfSubstance",
+          "known_as": "methanol",
+          "substance_role": "solvent"
+        }
+      ]
+    },
+    {
+      "id": "nmdc:subspr-11-f7afgx41",
+      "type": "nmdc:SubSamplingProcess",
+      "name": "Prepare root sample",
+      "description": "Root nmdc:bsm-11-337xtd94 was frozen, lyophilized dry, and then subsampled for metabolomics analysis. Samples were bead-beaten with a stainless steel bead to powderize after subsampling.",
+      "has_input": [
+        "nmdc:bsm-11-337xtd94"
+      ],
+      "has_output": [
+        "nmdc:procsm-11-rw389x78"
+      ],
+      "processing_institution": "JGI"
+    },
+    {
+      "id": "nmdc:extrp-11-xzgq7b27",
+      "type": "nmdc:Extraction",
+      "name": "Methanol extraction of metabolites",
+      "description": "Metabolites extracted from powderized nmdc:procsm-11-rw389x78 using 100% methanol, followed by vortexing, sonication for 10 minutes in an iced water bath, centrifugation, and SpeedVac drying.",
+      "has_input": [
+        "nmdc:procsm-11-rw389x78"
+      ],
+      "has_output": [
+        "nmdc:procsm-11-ksstcr41"
+      ],
+      "processing_institution": "JGI",
+      "substances_used": [
+        {
+          "type": "nmdc:PortionOfSubstance",
+          "known_as": "methanol",
+          "substance_role": "solvent",
+          "volume": {
+            "type": "nmdc:QuantityValue",
+            "has_raw_value": "1 mL",
+            "has_unit": "mL",
+            "has_numeric_value": 1
+          }
+        }
+      ],
+      "extraction_targets": [
+        "metabolite"
+      ],
+      "temperature": {
+        "type": "nmdc:QuantityValue",
+        "has_raw_value": "0 Cel",
+        "has_unit": "Cel",
+        "has_numeric_value": 0
+      }
+    },
+    {
+      "id": "nmdc:dispro-11-w3v4xr09",
+      "type": "nmdc:DissolvingProcess",
+      "name": "Resuspend extracted metabolites",
+      "description": "Dried extracted metabolites from nmdc:procsm-11-ksstcr41 resuspended in 100% methanol with isotopically labeled internal standards, with resuspension volume adjusted to normalize by extract TOC, for LC-MS preparation.",
+      "has_input": [
+        "nmdc:procsm-11-ksstcr41"
+      ],
+      "has_output": [
+        "nmdc:procsm-11-an2rv683"
+      ],
+      "processing_institution": "JGI",
+      "substances_used": [
+        {
+          "type": "nmdc:PortionOfSubstance",
+          "known_as": "methanol",
+          "substance_role": "solvent"
+        }
+      ]
+    },
+    {
+      "id": "nmdc:subspr-11-gq2dnc95",
+      "type": "nmdc:SubSamplingProcess",
+      "name": "Prepare root sample",
+      "description": "Root nmdc:bsm-11-3qv14w45 was frozen, lyophilized dry, and then subsampled for metabolomics analysis. Samples were bead-beaten with a stainless steel bead to powderize after subsampling.",
+      "has_input": [
+        "nmdc:bsm-11-3qv14w45"
+      ],
+      "has_output": [
+        "nmdc:procsm-11-6xzfy632"
+      ],
+      "processing_institution": "JGI"
+    },
+    {
+      "id": "nmdc:extrp-11-ev569555",
+      "type": "nmdc:Extraction",
+      "name": "Methanol extraction of metabolites",
+      "description": "Metabolites extracted from powderized nmdc:procsm-11-6xzfy632 using 100% methanol, followed by vortexing, sonication for 10 minutes in an iced water bath, centrifugation, and SpeedVac drying.",
+      "has_input": [
+        "nmdc:procsm-11-6xzfy632"
+      ],
+      "has_output": [
+        "nmdc:procsm-11-kaze6x36"
+      ],
+      "processing_institution": "JGI",
+      "substances_used": [
+        {
+          "type": "nmdc:PortionOfSubstance",
+          "known_as": "methanol",
+          "substance_role": "solvent",
+          "volume": {
+            "type": "nmdc:QuantityValue",
+            "has_raw_value": "1 mL",
+            "has_unit": "mL",
+            "has_numeric_value": 1
+          }
+        }
+      ],
+      "extraction_targets": [
+        "metabolite"
+      ],
+      "temperature": {
+        "type": "nmdc:QuantityValue",
+        "has_raw_value": "0 Cel",
+        "has_unit": "Cel",
+        "has_numeric_value": 0
+      }
+    },
+    {
+      "id": "nmdc:dispro-11-zpssmm58",
+      "type": "nmdc:DissolvingProcess",
+      "name": "Resuspend extracted metabolites",
+      "description": "Dried extracted metabolites from nmdc:procsm-11-kaze6x36 resuspended in 100% methanol with isotopically labeled internal standards, with resuspension volume adjusted to normalize by extract TOC, for LC-MS preparation.",
+      "has_input": [
+        "nmdc:procsm-11-kaze6x36"
+      ],
+      "has_output": [
+        "nmdc:procsm-11-nyczat92"
+      ],
+      "processing_institution": "JGI",
+      "substances_used": [
+        {
+          "type": "nmdc:PortionOfSubstance",
+          "known_as": "methanol",
+          "substance_role": "solvent"
+        }
+      ]
+    },
+    {
+      "id": "nmdc:subspr-11-r7pxp605",
+      "type": "nmdc:SubSamplingProcess",
+      "name": "Prepare root sample",
+      "description": "Root nmdc:bsm-11-57vncq38 was frozen, lyophilized dry, and then subsampled for metabolomics analysis. Samples were bead-beaten with a stainless steel bead to powderize after subsampling.",
+      "has_input": [
+        "nmdc:bsm-11-57vncq38"
+      ],
+      "has_output": [
+        "nmdc:procsm-11-qq7ayq93"
+      ],
+      "processing_institution": "JGI"
+    },
+    {
+      "id": "nmdc:extrp-11-s3n49592",
+      "type": "nmdc:Extraction",
+      "name": "Methanol extraction of metabolites",
+      "description": "Metabolites extracted from powderized nmdc:procsm-11-qq7ayq93 using 100% methanol, followed by vortexing, sonication for 10 minutes in an iced water bath, centrifugation, and SpeedVac drying.",
+      "has_input": [
+        "nmdc:procsm-11-qq7ayq93"
+      ],
+      "has_output": [
+        "nmdc:procsm-11-ycwssm11"
+      ],
+      "processing_institution": "JGI",
+      "substances_used": [
+        {
+          "type": "nmdc:PortionOfSubstance",
+          "known_as": "methanol",
+          "substance_role": "solvent",
+          "volume": {
+            "type": "nmdc:QuantityValue",
+            "has_raw_value": "1 mL",
+            "has_unit": "mL",
+            "has_numeric_value": 1
+          }
+        }
+      ],
+      "extraction_targets": [
+        "metabolite"
+      ],
+      "temperature": {
+        "type": "nmdc:QuantityValue",
+        "has_raw_value": "0 Cel",
+        "has_unit": "Cel",
+        "has_numeric_value": 0
+      }
+    },
+    {
+      "id": "nmdc:dispro-11-f4j84m27",
+      "type": "nmdc:DissolvingProcess",
+      "name": "Resuspend extracted metabolites",
+      "description": "Dried extracted metabolites from nmdc:procsm-11-ycwssm11 resuspended in 100% methanol with isotopically labeled internal standards, with resuspension volume adjusted to normalize by extract TOC, for LC-MS preparation.",
+      "has_input": [
+        "nmdc:procsm-11-ycwssm11"
+      ],
+      "has_output": [
+        "nmdc:procsm-11-b7fgrg75"
+      ],
+      "processing_institution": "JGI",
+      "substances_used": [
+        {
+          "type": "nmdc:PortionOfSubstance",
+          "known_as": "methanol",
+          "substance_role": "solvent"
+        }
+      ]
+    },
+    {
+      "id": "nmdc:subspr-11-7j5ehz70",
+      "type": "nmdc:SubSamplingProcess",
+      "name": "Prepare root sample",
+      "description": "Root nmdc:bsm-11-5te06z38 was frozen, lyophilized dry, and then subsampled for metabolomics analysis. Samples were bead-beaten with a stainless steel bead to powderize after subsampling.",
+      "has_input": [
+        "nmdc:bsm-11-5te06z38"
+      ],
+      "has_output": [
+        "nmdc:procsm-11-m6r15958"
+      ],
+      "processing_institution": "JGI"
+    },
+    {
+      "id": "nmdc:extrp-11-1jyewp64",
+      "type": "nmdc:Extraction",
+      "name": "Methanol extraction of metabolites",
+      "description": "Metabolites extracted from powderized nmdc:procsm-11-m6r15958 using 100% methanol, followed by vortexing, sonication for 10 minutes in an iced water bath, centrifugation, and SpeedVac drying.",
+      "has_input": [
+        "nmdc:procsm-11-m6r15958"
+      ],
+      "has_output": [
+        "nmdc:procsm-11-5cfzff35"
+      ],
+      "processing_institution": "JGI",
+      "substances_used": [
+        {
+          "type": "nmdc:PortionOfSubstance",
+          "known_as": "methanol",
+          "substance_role": "solvent",
+          "volume": {
+            "type": "nmdc:QuantityValue",
+            "has_raw_value": "1 mL",
+            "has_unit": "mL",
+            "has_numeric_value": 1
+          }
+        }
+      ],
+      "extraction_targets": [
+        "metabolite"
+      ],
+      "temperature": {
+        "type": "nmdc:QuantityValue",
+        "has_raw_value": "0 Cel",
+        "has_unit": "Cel",
+        "has_numeric_value": 0
+      }
+    },
+    {
+      "id": "nmdc:dispro-11-h56by525",
+      "type": "nmdc:DissolvingProcess",
+      "name": "Resuspend extracted metabolites",
+      "description": "Dried extracted metabolites from nmdc:procsm-11-5cfzff35 resuspended in 100% methanol with isotopically labeled internal standards, with resuspension volume adjusted to normalize by extract TOC, for LC-MS preparation.",
+      "has_input": [
+        "nmdc:procsm-11-5cfzff35"
+      ],
+      "has_output": [
+        "nmdc:procsm-11-nwgdhr72"
+      ],
+      "processing_institution": "JGI",
+      "substances_used": [
+        {
+          "type": "nmdc:PortionOfSubstance",
+          "known_as": "methanol",
+          "substance_role": "solvent"
+        }
+      ]
+    },
+    {
+      "id": "nmdc:subspr-11-n95bmm62",
+      "type": "nmdc:SubSamplingProcess",
+      "name": "Prepare root sample",
+      "description": "Root nmdc:bsm-11-5vz50b85 was frozen, lyophilized dry, and then subsampled for metabolomics analysis. Samples were bead-beaten with a stainless steel bead to powderize after subsampling.",
+      "has_input": [
+        "nmdc:bsm-11-5vz50b85"
+      ],
+      "has_output": [
+        "nmdc:procsm-11-6h78kz97"
+      ],
+      "processing_institution": "JGI"
+    },
+    {
+      "id": "nmdc:extrp-11-tr4brx36",
+      "type": "nmdc:Extraction",
+      "name": "Methanol extraction of metabolites",
+      "description": "Metabolites extracted from powderized nmdc:procsm-11-6h78kz97 using 100% methanol, followed by vortexing, sonication for 10 minutes in an iced water bath, centrifugation, and SpeedVac drying.",
+      "has_input": [
+        "nmdc:procsm-11-6h78kz97"
+      ],
+      "has_output": [
+        "nmdc:procsm-11-b5rdb633"
+      ],
+      "processing_institution": "JGI",
+      "substances_used": [
+        {
+          "type": "nmdc:PortionOfSubstance",
+          "known_as": "methanol",
+          "substance_role": "solvent",
+          "volume": {
+            "type": "nmdc:QuantityValue",
+            "has_raw_value": "1 mL",
+            "has_unit": "mL",
+            "has_numeric_value": 1
+          }
+        }
+      ],
+      "extraction_targets": [
+        "metabolite"
+      ],
+      "temperature": {
+        "type": "nmdc:QuantityValue",
+        "has_raw_value": "0 Cel",
+        "has_unit": "Cel",
+        "has_numeric_value": 0
+      }
+    },
+    {
+      "id": "nmdc:dispro-11-82cjzw20",
+      "type": "nmdc:DissolvingProcess",
+      "name": "Resuspend extracted metabolites",
+      "description": "Dried extracted metabolites from nmdc:procsm-11-b5rdb633 resuspended in 100% methanol with isotopically labeled internal standards, with resuspension volume adjusted to normalize by extract TOC, for LC-MS preparation.",
+      "has_input": [
+        "nmdc:procsm-11-b5rdb633"
+      ],
+      "has_output": [
+        "nmdc:procsm-11-3e9d4479"
+      ],
+      "processing_institution": "JGI",
+      "substances_used": [
+        {
+          "type": "nmdc:PortionOfSubstance",
+          "known_as": "methanol",
+          "substance_role": "solvent"
+        }
+      ]
+    },
+    {
+      "id": "nmdc:subspr-11-g58efx39",
+      "type": "nmdc:SubSamplingProcess",
+      "name": "Prepare root sample",
+      "description": "Root nmdc:bsm-11-5yg12p32 was frozen, lyophilized dry, and then subsampled for metabolomics analysis. Samples were bead-beaten with a stainless steel bead to powderize after subsampling.",
+      "has_input": [
+        "nmdc:bsm-11-5yg12p32"
+      ],
+      "has_output": [
+        "nmdc:procsm-11-8gx6ts15"
+      ],
+      "processing_institution": "JGI"
+    },
+    {
+      "id": "nmdc:extrp-11-q9f6t326",
+      "type": "nmdc:Extraction",
+      "name": "Methanol extraction of metabolites",
+      "description": "Metabolites extracted from powderized nmdc:procsm-11-8gx6ts15 using 100% methanol, followed by vortexing, sonication for 10 minutes in an iced water bath, centrifugation, and SpeedVac drying.",
+      "has_input": [
+        "nmdc:procsm-11-8gx6ts15"
+      ],
+      "has_output": [
+        "nmdc:procsm-11-17527j71"
+      ],
+      "processing_institution": "JGI",
+      "substances_used": [
+        {
+          "type": "nmdc:PortionOfSubstance",
+          "known_as": "methanol",
+          "substance_role": "solvent",
+          "volume": {
+            "type": "nmdc:QuantityValue",
+            "has_raw_value": "1 mL",
+            "has_unit": "mL",
+            "has_numeric_value": 1
+          }
+        }
+      ],
+      "extraction_targets": [
+        "metabolite"
+      ],
+      "temperature": {
+        "type": "nmdc:QuantityValue",
+        "has_raw_value": "0 Cel",
+        "has_unit": "Cel",
+        "has_numeric_value": 0
+      }
+    },
+    {
+      "id": "nmdc:dispro-11-7yrd1s74",
+      "type": "nmdc:DissolvingProcess",
+      "name": "Resuspend extracted metabolites",
+      "description": "Dried extracted metabolites from nmdc:procsm-11-17527j71 resuspended in 100% methanol with isotopically labeled internal standards, with resuspension volume adjusted to normalize by extract TOC, for LC-MS preparation.",
+      "has_input": [
+        "nmdc:procsm-11-17527j71"
+      ],
+      "has_output": [
+        "nmdc:procsm-11-zvj5wy92"
+      ],
+      "processing_institution": "JGI",
+      "substances_used": [
+        {
+          "type": "nmdc:PortionOfSubstance",
+          "known_as": "methanol",
+          "substance_role": "solvent"
+        }
+      ]
+    },
+    {
+      "id": "nmdc:subspr-11-ret2v030",
+      "type": "nmdc:SubSamplingProcess",
+      "name": "Prepare root sample",
+      "description": "Root nmdc:bsm-11-6g8d5g69 was frozen, lyophilized dry, and then subsampled for metabolomics analysis. Samples were bead-beaten with a stainless steel bead to powderize after subsampling.",
+      "has_input": [
+        "nmdc:bsm-11-6g8d5g69"
+      ],
+      "has_output": [
+        "nmdc:procsm-11-tpr2kp07"
+      ],
+      "processing_institution": "JGI"
+    },
+    {
+      "id": "nmdc:extrp-11-5zg80b75",
+      "type": "nmdc:Extraction",
+      "name": "Methanol extraction of metabolites",
+      "description": "Metabolites extracted from powderized nmdc:procsm-11-tpr2kp07 using 100% methanol, followed by vortexing, sonication for 10 minutes in an iced water bath, centrifugation, and SpeedVac drying.",
+      "has_input": [
+        "nmdc:procsm-11-tpr2kp07"
+      ],
+      "has_output": [
+        "nmdc:procsm-11-7eptxh43"
+      ],
+      "processing_institution": "JGI",
+      "substances_used": [
+        {
+          "type": "nmdc:PortionOfSubstance",
+          "known_as": "methanol",
+          "substance_role": "solvent",
+          "volume": {
+            "type": "nmdc:QuantityValue",
+            "has_raw_value": "1 mL",
+            "has_unit": "mL",
+            "has_numeric_value": 1
+          }
+        }
+      ],
+      "extraction_targets": [
+        "metabolite"
+      ],
+      "temperature": {
+        "type": "nmdc:QuantityValue",
+        "has_raw_value": "0 Cel",
+        "has_unit": "Cel",
+        "has_numeric_value": 0
+      }
+    },
+    {
+      "id": "nmdc:dispro-11-easzpj81",
+      "type": "nmdc:DissolvingProcess",
+      "name": "Resuspend extracted metabolites",
+      "description": "Dried extracted metabolites from nmdc:procsm-11-7eptxh43 resuspended in 100% methanol with isotopically labeled internal standards, with resuspension volume adjusted to normalize by extract TOC, for LC-MS preparation.",
+      "has_input": [
+        "nmdc:procsm-11-7eptxh43"
+      ],
+      "has_output": [
+        "nmdc:procsm-11-28c8st41"
+      ],
+      "processing_institution": "JGI",
+      "substances_used": [
+        {
+          "type": "nmdc:PortionOfSubstance",
+          "known_as": "methanol",
+          "substance_role": "solvent"
+        }
+      ]
+    },
+    {
+      "id": "nmdc:subspr-11-htpqte88",
+      "type": "nmdc:SubSamplingProcess",
+      "name": "Prepare root sample",
+      "description": "Root nmdc:bsm-11-6mp6qm50 was frozen, lyophilized dry, and then subsampled for metabolomics analysis. Samples were bead-beaten with a stainless steel bead to powderize after subsampling.",
+      "has_input": [
+        "nmdc:bsm-11-6mp6qm50"
+      ],
+      "has_output": [
+        "nmdc:procsm-11-658cm880"
+      ],
+      "processing_institution": "JGI"
+    },
+    {
+      "id": "nmdc:extrp-11-rq5rve75",
+      "type": "nmdc:Extraction",
+      "name": "Methanol extraction of metabolites",
+      "description": "Metabolites extracted from powderized nmdc:procsm-11-658cm880 using 100% methanol, followed by vortexing, sonication for 10 minutes in an iced water bath, centrifugation, and SpeedVac drying.",
+      "has_input": [
+        "nmdc:procsm-11-658cm880"
+      ],
+      "has_output": [
+        "nmdc:procsm-11-ky2ejf07"
+      ],
+      "processing_institution": "JGI",
+      "substances_used": [
+        {
+          "type": "nmdc:PortionOfSubstance",
+          "known_as": "methanol",
+          "substance_role": "solvent",
+          "volume": {
+            "type": "nmdc:QuantityValue",
+            "has_raw_value": "1 mL",
+            "has_unit": "mL",
+            "has_numeric_value": 1
+          }
+        }
+      ],
+      "extraction_targets": [
+        "metabolite"
+      ],
+      "temperature": {
+        "type": "nmdc:QuantityValue",
+        "has_raw_value": "0 Cel",
+        "has_unit": "Cel",
+        "has_numeric_value": 0
+      }
+    },
+    {
+      "id": "nmdc:dispro-11-m4ng1f02",
+      "type": "nmdc:DissolvingProcess",
+      "name": "Resuspend extracted metabolites",
+      "description": "Dried extracted metabolites from nmdc:procsm-11-ky2ejf07 resuspended in 100% methanol with isotopically labeled internal standards, with resuspension volume adjusted to normalize by extract TOC, for LC-MS preparation.",
+      "has_input": [
+        "nmdc:procsm-11-ky2ejf07"
+      ],
+      "has_output": [
+        "nmdc:procsm-11-9armxr22"
+      ],
+      "processing_institution": "JGI",
+      "substances_used": [
+        {
+          "type": "nmdc:PortionOfSubstance",
+          "known_as": "methanol",
+          "substance_role": "solvent"
+        }
+      ]
+    },
+    {
+      "id": "nmdc:subspr-11-1ws6x298",
+      "type": "nmdc:SubSamplingProcess",
+      "name": "Prepare root sample",
+      "description": "Root nmdc:bsm-11-6s6nr025 was frozen, lyophilized dry, and then subsampled for metabolomics analysis. Samples were bead-beaten with a stainless steel bead to powderize after subsampling.",
+      "has_input": [
+        "nmdc:bsm-11-6s6nr025"
+      ],
+      "has_output": [
+        "nmdc:procsm-11-gernv967"
+      ],
+      "processing_institution": "JGI"
+    },
+    {
+      "id": "nmdc:extrp-11-4yrkp635",
+      "type": "nmdc:Extraction",
+      "name": "Methanol extraction of metabolites",
+      "description": "Metabolites extracted from powderized nmdc:procsm-11-gernv967 using 100% methanol, followed by vortexing, sonication for 10 minutes in an iced water bath, centrifugation, and SpeedVac drying.",
+      "has_input": [
+        "nmdc:procsm-11-gernv967"
+      ],
+      "has_output": [
+        "nmdc:procsm-11-kmrjjb60"
+      ],
+      "processing_institution": "JGI",
+      "substances_used": [
+        {
+          "type": "nmdc:PortionOfSubstance",
+          "known_as": "methanol",
+          "substance_role": "solvent",
+          "volume": {
+            "type": "nmdc:QuantityValue",
+            "has_raw_value": "1 mL",
+            "has_unit": "mL",
+            "has_numeric_value": 1
+          }
+        }
+      ],
+      "extraction_targets": [
+        "metabolite"
+      ],
+      "temperature": {
+        "type": "nmdc:QuantityValue",
+        "has_raw_value": "0 Cel",
+        "has_unit": "Cel",
+        "has_numeric_value": 0
+      }
+    },
+    {
+      "id": "nmdc:dispro-11-kc5bcd09",
+      "type": "nmdc:DissolvingProcess",
+      "name": "Resuspend extracted metabolites",
+      "description": "Dried extracted metabolites from nmdc:procsm-11-kmrjjb60 resuspended in 100% methanol with isotopically labeled internal standards, with resuspension volume adjusted to normalize by extract TOC, for LC-MS preparation.",
+      "has_input": [
+        "nmdc:procsm-11-kmrjjb60"
+      ],
+      "has_output": [
+        "nmdc:procsm-11-mfah9n08"
+      ],
+      "processing_institution": "JGI",
+      "substances_used": [
+        {
+          "type": "nmdc:PortionOfSubstance",
+          "known_as": "methanol",
+          "substance_role": "solvent"
+        }
+      ]
+    },
+    {
+      "id": "nmdc:subspr-11-qcke7434",
+      "type": "nmdc:SubSamplingProcess",
+      "name": "Prepare root sample",
+      "description": "Root nmdc:bsm-11-7ac2z315 was frozen, lyophilized dry, and then subsampled for metabolomics analysis. Samples were bead-beaten with a stainless steel bead to powderize after subsampling.",
+      "has_input": [
+        "nmdc:bsm-11-7ac2z315"
+      ],
+      "has_output": [
+        "nmdc:procsm-11-e4qbs662"
+      ],
+      "processing_institution": "JGI"
+    },
+    {
+      "id": "nmdc:extrp-11-hmh03r10",
+      "type": "nmdc:Extraction",
+      "name": "Methanol extraction of metabolites",
+      "description": "Metabolites extracted from powderized nmdc:procsm-11-e4qbs662 using 100% methanol, followed by vortexing, sonication for 10 minutes in an iced water bath, centrifugation, and SpeedVac drying.",
+      "has_input": [
+        "nmdc:procsm-11-e4qbs662"
+      ],
+      "has_output": [
+        "nmdc:procsm-11-b4z5a481"
+      ],
+      "processing_institution": "JGI",
+      "substances_used": [
+        {
+          "type": "nmdc:PortionOfSubstance",
+          "known_as": "methanol",
+          "substance_role": "solvent",
+          "volume": {
+            "type": "nmdc:QuantityValue",
+            "has_raw_value": "1 mL",
+            "has_unit": "mL",
+            "has_numeric_value": 1
+          }
+        }
+      ],
+      "extraction_targets": [
+        "metabolite"
+      ],
+      "temperature": {
+        "type": "nmdc:QuantityValue",
+        "has_raw_value": "0 Cel",
+        "has_unit": "Cel",
+        "has_numeric_value": 0
+      }
+    },
+    {
+      "id": "nmdc:dispro-11-gjqn4w55",
+      "type": "nmdc:DissolvingProcess",
+      "name": "Resuspend extracted metabolites",
+      "description": "Dried extracted metabolites from nmdc:procsm-11-b4z5a481 resuspended in 100% methanol with isotopically labeled internal standards, with resuspension volume adjusted to normalize by extract TOC, for LC-MS preparation.",
+      "has_input": [
+        "nmdc:procsm-11-b4z5a481"
+      ],
+      "has_output": [
+        "nmdc:procsm-11-35pmpv49"
+      ],
+      "processing_institution": "JGI",
+      "substances_used": [
+        {
+          "type": "nmdc:PortionOfSubstance",
+          "known_as": "methanol",
+          "substance_role": "solvent"
+        }
+      ]
+    },
+    {
+      "id": "nmdc:subspr-11-7e4xmn19",
+      "type": "nmdc:SubSamplingProcess",
+      "name": "Prepare root sample",
+      "description": "Root nmdc:bsm-11-7b05ca84 was frozen, lyophilized dry, and then subsampled for metabolomics analysis. Samples were bead-beaten with a stainless steel bead to powderize after subsampling.",
+      "has_input": [
+        "nmdc:bsm-11-7b05ca84"
+      ],
+      "has_output": [
+        "nmdc:procsm-11-8j8x0k58"
+      ],
+      "processing_institution": "JGI"
+    },
+    {
+      "id": "nmdc:extrp-11-rw0mes26",
+      "type": "nmdc:Extraction",
+      "name": "Methanol extraction of metabolites",
+      "description": "Metabolites extracted from powderized nmdc:procsm-11-8j8x0k58 using 100% methanol, followed by vortexing, sonication for 10 minutes in an iced water bath, centrifugation, and SpeedVac drying.",
+      "has_input": [
+        "nmdc:procsm-11-8j8x0k58"
+      ],
+      "has_output": [
+        "nmdc:procsm-11-ta04m028"
+      ],
+      "processing_institution": "JGI",
+      "substances_used": [
+        {
+          "type": "nmdc:PortionOfSubstance",
+          "known_as": "methanol",
+          "substance_role": "solvent",
+          "volume": {
+            "type": "nmdc:QuantityValue",
+            "has_raw_value": "1 mL",
+            "has_unit": "mL",
+            "has_numeric_value": 1
+          }
+        }
+      ],
+      "extraction_targets": [
+        "metabolite"
+      ],
+      "temperature": {
+        "type": "nmdc:QuantityValue",
+        "has_raw_value": "0 Cel",
+        "has_unit": "Cel",
+        "has_numeric_value": 0
+      }
+    },
+    {
+      "id": "nmdc:dispro-11-zzchk258",
+      "type": "nmdc:DissolvingProcess",
+      "name": "Resuspend extracted metabolites",
+      "description": "Dried extracted metabolites from nmdc:procsm-11-ta04m028 resuspended in 100% methanol with isotopically labeled internal standards, with resuspension volume adjusted to normalize by extract TOC, for LC-MS preparation.",
+      "has_input": [
+        "nmdc:procsm-11-ta04m028"
+      ],
+      "has_output": [
+        "nmdc:procsm-11-ycp8es87"
+      ],
+      "processing_institution": "JGI",
+      "substances_used": [
+        {
+          "type": "nmdc:PortionOfSubstance",
+          "known_as": "methanol",
+          "substance_role": "solvent"
+        }
+      ]
+    },
+    {
+      "id": "nmdc:subspr-11-wzmf2397",
+      "type": "nmdc:SubSamplingProcess",
+      "name": "Prepare root sample",
+      "description": "Root nmdc:bsm-11-7pxptb67 was frozen, lyophilized dry, and then subsampled for metabolomics analysis. Samples were bead-beaten with a stainless steel bead to powderize after subsampling.",
+      "has_input": [
+        "nmdc:bsm-11-7pxptb67"
+      ],
+      "has_output": [
+        "nmdc:procsm-11-b47mt069"
+      ],
+      "processing_institution": "JGI"
+    },
+    {
+      "id": "nmdc:extrp-11-7c14e993",
+      "type": "nmdc:Extraction",
+      "name": "Methanol extraction of metabolites",
+      "description": "Metabolites extracted from powderized nmdc:procsm-11-b47mt069 using 100% methanol, followed by vortexing, sonication for 10 minutes in an iced water bath, centrifugation, and SpeedVac drying.",
+      "has_input": [
+        "nmdc:procsm-11-b47mt069"
+      ],
+      "has_output": [
+        "nmdc:procsm-11-9pg09d08"
+      ],
+      "processing_institution": "JGI",
+      "substances_used": [
+        {
+          "type": "nmdc:PortionOfSubstance",
+          "known_as": "methanol",
+          "substance_role": "solvent",
+          "volume": {
+            "type": "nmdc:QuantityValue",
+            "has_raw_value": "1 mL",
+            "has_unit": "mL",
+            "has_numeric_value": 1
+          }
+        }
+      ],
+      "extraction_targets": [
+        "metabolite"
+      ],
+      "temperature": {
+        "type": "nmdc:QuantityValue",
+        "has_raw_value": "0 Cel",
+        "has_unit": "Cel",
+        "has_numeric_value": 0
+      }
+    },
+    {
+      "id": "nmdc:dispro-11-0066cv60",
+      "type": "nmdc:DissolvingProcess",
+      "name": "Resuspend extracted metabolites",
+      "description": "Dried extracted metabolites from nmdc:procsm-11-9pg09d08 resuspended in 100% methanol with isotopically labeled internal standards, with resuspension volume adjusted to normalize by extract TOC, for LC-MS preparation.",
+      "has_input": [
+        "nmdc:procsm-11-9pg09d08"
+      ],
+      "has_output": [
+        "nmdc:procsm-11-ncbdr751"
+      ],
+      "processing_institution": "JGI",
+      "substances_used": [
+        {
+          "type": "nmdc:PortionOfSubstance",
+          "known_as": "methanol",
+          "substance_role": "solvent"
+        }
+      ]
+    },
+    {
+      "id": "nmdc:subspr-11-7qayp084",
+      "type": "nmdc:SubSamplingProcess",
+      "name": "Prepare root sample",
+      "description": "Root nmdc:bsm-11-7w0ggn04 was frozen, lyophilized dry, and then subsampled for metabolomics analysis. Samples were bead-beaten with a stainless steel bead to powderize after subsampling.",
+      "has_input": [
+        "nmdc:bsm-11-7w0ggn04"
+      ],
+      "has_output": [
+        "nmdc:procsm-11-pdpt1174"
+      ],
+      "processing_institution": "JGI"
+    },
+    {
+      "id": "nmdc:extrp-11-t78j4946",
+      "type": "nmdc:Extraction",
+      "name": "Methanol extraction of metabolites",
+      "description": "Metabolites extracted from powderized nmdc:procsm-11-pdpt1174 using 100% methanol, followed by vortexing, sonication for 10 minutes in an iced water bath, centrifugation, and SpeedVac drying.",
+      "has_input": [
+        "nmdc:procsm-11-pdpt1174"
+      ],
+      "has_output": [
+        "nmdc:procsm-11-41nvp281"
+      ],
+      "processing_institution": "JGI",
+      "substances_used": [
+        {
+          "type": "nmdc:PortionOfSubstance",
+          "known_as": "methanol",
+          "substance_role": "solvent",
+          "volume": {
+            "type": "nmdc:QuantityValue",
+            "has_raw_value": "1 mL",
+            "has_unit": "mL",
+            "has_numeric_value": 1
+          }
+        }
+      ],
+      "extraction_targets": [
+        "metabolite"
+      ],
+      "temperature": {
+        "type": "nmdc:QuantityValue",
+        "has_raw_value": "0 Cel",
+        "has_unit": "Cel",
+        "has_numeric_value": 0
+      }
+    },
+    {
+      "id": "nmdc:dispro-11-m8w6xv77",
+      "type": "nmdc:DissolvingProcess",
+      "name": "Resuspend extracted metabolites",
+      "description": "Dried extracted metabolites from nmdc:procsm-11-41nvp281 resuspended in 100% methanol with isotopically labeled internal standards, with resuspension volume adjusted to normalize by extract TOC, for LC-MS preparation.",
+      "has_input": [
+        "nmdc:procsm-11-41nvp281"
+      ],
+      "has_output": [
+        "nmdc:procsm-11-qqeajf95"
+      ],
+      "processing_institution": "JGI",
+      "substances_used": [
+        {
+          "type": "nmdc:PortionOfSubstance",
+          "known_as": "methanol",
+          "substance_role": "solvent"
+        }
+      ]
+    },
+    {
+      "id": "nmdc:subspr-11-ts0szx63",
+      "type": "nmdc:SubSamplingProcess",
+      "name": "Prepare root sample",
+      "description": "Root nmdc:bsm-11-8t538t71 was frozen, lyophilized dry, and then subsampled for metabolomics analysis. Samples were bead-beaten with a stainless steel bead to powderize after subsampling.",
+      "has_input": [
+        "nmdc:bsm-11-8t538t71"
+      ],
+      "has_output": [
+        "nmdc:procsm-11-d1589j57"
+      ],
+      "processing_institution": "JGI"
+    },
+    {
+      "id": "nmdc:extrp-11-qjyewq96",
+      "type": "nmdc:Extraction",
+      "name": "Methanol extraction of metabolites",
+      "description": "Metabolites extracted from powderized nmdc:procsm-11-d1589j57 using 100% methanol, followed by vortexing, sonication for 10 minutes in an iced water bath, centrifugation, and SpeedVac drying.",
+      "has_input": [
+        "nmdc:procsm-11-d1589j57"
+      ],
+      "has_output": [
+        "nmdc:procsm-11-yh499194"
+      ],
+      "processing_institution": "JGI",
+      "substances_used": [
+        {
+          "type": "nmdc:PortionOfSubstance",
+          "known_as": "methanol",
+          "substance_role": "solvent",
+          "volume": {
+            "type": "nmdc:QuantityValue",
+            "has_raw_value": "1 mL",
+            "has_unit": "mL",
+            "has_numeric_value": 1
+          }
+        }
+      ],
+      "extraction_targets": [
+        "metabolite"
+      ],
+      "temperature": {
+        "type": "nmdc:QuantityValue",
+        "has_raw_value": "0 Cel",
+        "has_unit": "Cel",
+        "has_numeric_value": 0
+      }
+    },
+    {
+      "id": "nmdc:dispro-11-2shyym53",
+      "type": "nmdc:DissolvingProcess",
+      "name": "Resuspend extracted metabolites",
+      "description": "Dried extracted metabolites from nmdc:procsm-11-yh499194 resuspended in 100% methanol with isotopically labeled internal standards, with resuspension volume adjusted to normalize by extract TOC, for LC-MS preparation.",
+      "has_input": [
+        "nmdc:procsm-11-yh499194"
+      ],
+      "has_output": [
+        "nmdc:procsm-11-prgh2x54"
+      ],
+      "processing_institution": "JGI",
+      "substances_used": [
+        {
+          "type": "nmdc:PortionOfSubstance",
+          "known_as": "methanol",
+          "substance_role": "solvent"
+        }
+      ]
+    },
+    {
+      "id": "nmdc:subspr-11-f29c1a23",
+      "type": "nmdc:SubSamplingProcess",
+      "name": "Prepare root sample",
+      "description": "Root nmdc:bsm-11-93y9wj40 was frozen, lyophilized dry, and then subsampled for metabolomics analysis. Samples were bead-beaten with a stainless steel bead to powderize after subsampling.",
+      "has_input": [
+        "nmdc:bsm-11-93y9wj40"
+      ],
+      "has_output": [
+        "nmdc:procsm-11-m725xb65"
+      ],
+      "processing_institution": "JGI"
+    },
+    {
+      "id": "nmdc:extrp-11-8bx4eb71",
+      "type": "nmdc:Extraction",
+      "name": "Methanol extraction of metabolites",
+      "description": "Metabolites extracted from powderized nmdc:procsm-11-m725xb65 using 100% methanol, followed by vortexing, sonication for 10 minutes in an iced water bath, centrifugation, and SpeedVac drying.",
+      "has_input": [
+        "nmdc:procsm-11-m725xb65"
+      ],
+      "has_output": [
+        "nmdc:procsm-11-7bvn0m72"
+      ],
+      "processing_institution": "JGI",
+      "substances_used": [
+        {
+          "type": "nmdc:PortionOfSubstance",
+          "known_as": "methanol",
+          "substance_role": "solvent",
+          "volume": {
+            "type": "nmdc:QuantityValue",
+            "has_raw_value": "1 mL",
+            "has_unit": "mL",
+            "has_numeric_value": 1
+          }
+        }
+      ],
+      "extraction_targets": [
+        "metabolite"
+      ],
+      "temperature": {
+        "type": "nmdc:QuantityValue",
+        "has_raw_value": "0 Cel",
+        "has_unit": "Cel",
+        "has_numeric_value": 0
+      }
+    },
+    {
+      "id": "nmdc:dispro-11-bm8ybn77",
+      "type": "nmdc:DissolvingProcess",
+      "name": "Resuspend extracted metabolites",
+      "description": "Dried extracted metabolites from nmdc:procsm-11-7bvn0m72 resuspended in 100% methanol with isotopically labeled internal standards, with resuspension volume adjusted to normalize by extract TOC, for LC-MS preparation.",
+      "has_input": [
+        "nmdc:procsm-11-7bvn0m72"
+      ],
+      "has_output": [
+        "nmdc:procsm-11-7rgx2y54"
+      ],
+      "processing_institution": "JGI",
+      "substances_used": [
+        {
+          "type": "nmdc:PortionOfSubstance",
+          "known_as": "methanol",
+          "substance_role": "solvent"
+        }
+      ]
+    },
+    {
+      "id": "nmdc:subspr-11-v8mfe720",
+      "type": "nmdc:SubSamplingProcess",
+      "name": "Prepare root sample",
+      "description": "Root nmdc:bsm-11-9fgqs731 was frozen, lyophilized dry, and then subsampled for metabolomics analysis. Samples were bead-beaten with a stainless steel bead to powderize after subsampling.",
+      "has_input": [
+        "nmdc:bsm-11-9fgqs731"
+      ],
+      "has_output": [
+        "nmdc:procsm-11-3sd4dq52"
+      ],
+      "processing_institution": "JGI"
+    },
+    {
+      "id": "nmdc:extrp-11-1078wy94",
+      "type": "nmdc:Extraction",
+      "name": "Methanol extraction of metabolites",
+      "description": "Metabolites extracted from powderized nmdc:procsm-11-3sd4dq52 using 100% methanol, followed by vortexing, sonication for 10 minutes in an iced water bath, centrifugation, and SpeedVac drying.",
+      "has_input": [
+        "nmdc:procsm-11-3sd4dq52"
+      ],
+      "has_output": [
+        "nmdc:procsm-11-1ryt8t17"
+      ],
+      "processing_institution": "JGI",
+      "substances_used": [
+        {
+          "type": "nmdc:PortionOfSubstance",
+          "known_as": "methanol",
+          "substance_role": "solvent",
+          "volume": {
+            "type": "nmdc:QuantityValue",
+            "has_raw_value": "1 mL",
+            "has_unit": "mL",
+            "has_numeric_value": 1
+          }
+        }
+      ],
+      "extraction_targets": [
+        "metabolite"
+      ],
+      "temperature": {
+        "type": "nmdc:QuantityValue",
+        "has_raw_value": "0 Cel",
+        "has_unit": "Cel",
+        "has_numeric_value": 0
+      }
+    },
+    {
+      "id": "nmdc:dispro-11-9mmprv64",
+      "type": "nmdc:DissolvingProcess",
+      "name": "Resuspend extracted metabolites",
+      "description": "Dried extracted metabolites from nmdc:procsm-11-1ryt8t17 resuspended in 100% methanol with isotopically labeled internal standards, with resuspension volume adjusted to normalize by extract TOC, for LC-MS preparation.",
+      "has_input": [
+        "nmdc:procsm-11-1ryt8t17"
+      ],
+      "has_output": [
+        "nmdc:procsm-11-46044f04"
+      ],
+      "processing_institution": "JGI",
+      "substances_used": [
+        {
+          "type": "nmdc:PortionOfSubstance",
+          "known_as": "methanol",
+          "substance_role": "solvent"
+        }
+      ]
+    },
+    {
+      "id": "nmdc:subspr-11-wt87xs20",
+      "type": "nmdc:SubSamplingProcess",
+      "name": "Prepare root sample",
+      "description": "Root nmdc:bsm-11-a51gg456 was frozen, lyophilized dry, and then subsampled for metabolomics analysis. Samples were bead-beaten with a stainless steel bead to powderize after subsampling.",
+      "has_input": [
+        "nmdc:bsm-11-a51gg456"
+      ],
+      "has_output": [
+        "nmdc:procsm-11-q3n2n625"
+      ],
+      "processing_institution": "JGI"
+    },
+    {
+      "id": "nmdc:extrp-11-5yd02c62",
+      "type": "nmdc:Extraction",
+      "name": "Methanol extraction of metabolites",
+      "description": "Metabolites extracted from powderized nmdc:procsm-11-q3n2n625 using 100% methanol, followed by vortexing, sonication for 10 minutes in an iced water bath, centrifugation, and SpeedVac drying.",
+      "has_input": [
+        "nmdc:procsm-11-q3n2n625"
+      ],
+      "has_output": [
+        "nmdc:procsm-11-ds5hn367"
+      ],
+      "processing_institution": "JGI",
+      "substances_used": [
+        {
+          "type": "nmdc:PortionOfSubstance",
+          "known_as": "methanol",
+          "substance_role": "solvent",
+          "volume": {
+            "type": "nmdc:QuantityValue",
+            "has_raw_value": "1 mL",
+            "has_unit": "mL",
+            "has_numeric_value": 1
+          }
+        }
+      ],
+      "extraction_targets": [
+        "metabolite"
+      ],
+      "temperature": {
+        "type": "nmdc:QuantityValue",
+        "has_raw_value": "0 Cel",
+        "has_unit": "Cel",
+        "has_numeric_value": 0
+      }
+    },
+    {
+      "id": "nmdc:dispro-11-c2z15196",
+      "type": "nmdc:DissolvingProcess",
+      "name": "Resuspend extracted metabolites",
+      "description": "Dried extracted metabolites from nmdc:procsm-11-ds5hn367 resuspended in 100% methanol with isotopically labeled internal standards, with resuspension volume adjusted to normalize by extract TOC, for LC-MS preparation.",
+      "has_input": [
+        "nmdc:procsm-11-ds5hn367"
+      ],
+      "has_output": [
+        "nmdc:procsm-11-vpkary77"
+      ],
+      "processing_institution": "JGI",
+      "substances_used": [
+        {
+          "type": "nmdc:PortionOfSubstance",
+          "known_as": "methanol",
+          "substance_role": "solvent"
+        }
+      ]
+    },
+    {
+      "id": "nmdc:subspr-11-t4s9bs10",
+      "type": "nmdc:SubSamplingProcess",
+      "name": "Prepare root sample",
+      "description": "Root nmdc:bsm-11-ag2qyq93 was frozen, lyophilized dry, and then subsampled for metabolomics analysis. Samples were bead-beaten with a stainless steel bead to powderize after subsampling.",
+      "has_input": [
+        "nmdc:bsm-11-ag2qyq93"
+      ],
+      "has_output": [
+        "nmdc:procsm-11-8hrkqb85"
+      ],
+      "processing_institution": "JGI"
+    },
+    {
+      "id": "nmdc:extrp-11-5168b216",
+      "type": "nmdc:Extraction",
+      "name": "Methanol extraction of metabolites",
+      "description": "Metabolites extracted from powderized nmdc:procsm-11-8hrkqb85 using 100% methanol, followed by vortexing, sonication for 10 minutes in an iced water bath, centrifugation, and SpeedVac drying.",
+      "has_input": [
+        "nmdc:procsm-11-8hrkqb85"
+      ],
+      "has_output": [
+        "nmdc:procsm-11-34773164"
+      ],
+      "processing_institution": "JGI",
+      "substances_used": [
+        {
+          "type": "nmdc:PortionOfSubstance",
+          "known_as": "methanol",
+          "substance_role": "solvent",
+          "volume": {
+            "type": "nmdc:QuantityValue",
+            "has_raw_value": "1 mL",
+            "has_unit": "mL",
+            "has_numeric_value": 1
+          }
+        }
+      ],
+      "extraction_targets": [
+        "metabolite"
+      ],
+      "temperature": {
+        "type": "nmdc:QuantityValue",
+        "has_raw_value": "0 Cel",
+        "has_unit": "Cel",
+        "has_numeric_value": 0
+      }
+    },
+    {
+      "id": "nmdc:dispro-11-j0h4af53",
+      "type": "nmdc:DissolvingProcess",
+      "name": "Resuspend extracted metabolites",
+      "description": "Dried extracted metabolites from nmdc:procsm-11-34773164 resuspended in 100% methanol with isotopically labeled internal standards, with resuspension volume adjusted to normalize by extract TOC, for LC-MS preparation.",
+      "has_input": [
+        "nmdc:procsm-11-34773164"
+      ],
+      "has_output": [
+        "nmdc:procsm-11-48t7pf31"
+      ],
+      "processing_institution": "JGI",
+      "substances_used": [
+        {
+          "type": "nmdc:PortionOfSubstance",
+          "known_as": "methanol",
+          "substance_role": "solvent"
+        }
+      ]
+    },
+    {
+      "id": "nmdc:subspr-11-fqct5f50",
+      "type": "nmdc:SubSamplingProcess",
+      "name": "Prepare root sample",
+      "description": "Root nmdc:bsm-11-ax8tca09 was frozen, lyophilized dry, and then subsampled for metabolomics analysis. Samples were bead-beaten with a stainless steel bead to powderize after subsampling.",
+      "has_input": [
+        "nmdc:bsm-11-ax8tca09"
+      ],
+      "has_output": [
+        "nmdc:procsm-11-tmqy7648"
+      ],
+      "processing_institution": "JGI"
+    },
+    {
+      "id": "nmdc:extrp-11-3evt4n58",
+      "type": "nmdc:Extraction",
+      "name": "Methanol extraction of metabolites",
+      "description": "Metabolites extracted from powderized nmdc:procsm-11-tmqy7648 using 100% methanol, followed by vortexing, sonication for 10 minutes in an iced water bath, centrifugation, and SpeedVac drying.",
+      "has_input": [
+        "nmdc:procsm-11-tmqy7648"
+      ],
+      "has_output": [
+        "nmdc:procsm-11-k2nnq453"
+      ],
+      "processing_institution": "JGI",
+      "substances_used": [
+        {
+          "type": "nmdc:PortionOfSubstance",
+          "known_as": "methanol",
+          "substance_role": "solvent",
+          "volume": {
+            "type": "nmdc:QuantityValue",
+            "has_raw_value": "1 mL",
+            "has_unit": "mL",
+            "has_numeric_value": 1
+          }
+        }
+      ],
+      "extraction_targets": [
+        "metabolite"
+      ],
+      "temperature": {
+        "type": "nmdc:QuantityValue",
+        "has_raw_value": "0 Cel",
+        "has_unit": "Cel",
+        "has_numeric_value": 0
+      }
+    },
+    {
+      "id": "nmdc:dispro-11-dnr37x43",
+      "type": "nmdc:DissolvingProcess",
+      "name": "Resuspend extracted metabolites",
+      "description": "Dried extracted metabolites from nmdc:procsm-11-k2nnq453 resuspended in 100% methanol with isotopically labeled internal standards, with resuspension volume adjusted to normalize by extract TOC, for LC-MS preparation.",
+      "has_input": [
+        "nmdc:procsm-11-k2nnq453"
+      ],
+      "has_output": [
+        "nmdc:procsm-11-xx563506"
+      ],
+      "processing_institution": "JGI",
+      "substances_used": [
+        {
+          "type": "nmdc:PortionOfSubstance",
+          "known_as": "methanol",
+          "substance_role": "solvent"
+        }
+      ]
+    },
+    {
+      "id": "nmdc:subspr-11-0xth9m18",
+      "type": "nmdc:SubSamplingProcess",
+      "name": "Prepare root sample",
+      "description": "Root nmdc:bsm-11-bmbcp998 was frozen, lyophilized dry, and then subsampled for metabolomics analysis. Samples were bead-beaten with a stainless steel bead to powderize after subsampling.",
+      "has_input": [
+        "nmdc:bsm-11-bmbcp998"
+      ],
+      "has_output": [
+        "nmdc:procsm-11-veatws72"
+      ],
+      "processing_institution": "JGI"
+    },
+    {
+      "id": "nmdc:extrp-11-hzk9j586",
+      "type": "nmdc:Extraction",
+      "name": "Methanol extraction of metabolites",
+      "description": "Metabolites extracted from powderized nmdc:procsm-11-veatws72 using 100% methanol, followed by vortexing, sonication for 10 minutes in an iced water bath, centrifugation, and SpeedVac drying.",
+      "has_input": [
+        "nmdc:procsm-11-veatws72"
+      ],
+      "has_output": [
+        "nmdc:procsm-11-prb8dn16"
+      ],
+      "processing_institution": "JGI",
+      "substances_used": [
+        {
+          "type": "nmdc:PortionOfSubstance",
+          "known_as": "methanol",
+          "substance_role": "solvent",
+          "volume": {
+            "type": "nmdc:QuantityValue",
+            "has_raw_value": "1 mL",
+            "has_unit": "mL",
+            "has_numeric_value": 1
+          }
+        }
+      ],
+      "extraction_targets": [
+        "metabolite"
+      ],
+      "temperature": {
+        "type": "nmdc:QuantityValue",
+        "has_raw_value": "0 Cel",
+        "has_unit": "Cel",
+        "has_numeric_value": 0
+      }
+    },
+    {
+      "id": "nmdc:dispro-11-fr49rq21",
+      "type": "nmdc:DissolvingProcess",
+      "name": "Resuspend extracted metabolites",
+      "description": "Dried extracted metabolites from nmdc:procsm-11-prb8dn16 resuspended in 100% methanol with isotopically labeled internal standards, with resuspension volume adjusted to normalize by extract TOC, for LC-MS preparation.",
+      "has_input": [
+        "nmdc:procsm-11-prb8dn16"
+      ],
+      "has_output": [
+        "nmdc:procsm-11-ggdx0m21"
+      ],
+      "processing_institution": "JGI",
+      "substances_used": [
+        {
+          "type": "nmdc:PortionOfSubstance",
+          "known_as": "methanol",
+          "substance_role": "solvent"
+        }
+      ]
+    },
+    {
+      "id": "nmdc:subspr-11-5kt5e103",
+      "type": "nmdc:SubSamplingProcess",
+      "name": "Prepare root sample",
+      "description": "Root nmdc:bsm-11-bny18d49 was frozen, lyophilized dry, and then subsampled for metabolomics analysis. Samples were bead-beaten with a stainless steel bead to powderize after subsampling.",
+      "has_input": [
+        "nmdc:bsm-11-bny18d49"
+      ],
+      "has_output": [
+        "nmdc:procsm-11-83gyb957"
+      ],
+      "processing_institution": "JGI"
+    },
+    {
+      "id": "nmdc:extrp-11-3gb3mf08",
+      "type": "nmdc:Extraction",
+      "name": "Methanol extraction of metabolites",
+      "description": "Metabolites extracted from powderized nmdc:procsm-11-83gyb957 using 100% methanol, followed by vortexing, sonication for 10 minutes in an iced water bath, centrifugation, and SpeedVac drying.",
+      "has_input": [
+        "nmdc:procsm-11-83gyb957"
+      ],
+      "has_output": [
+        "nmdc:procsm-11-da1a8960"
+      ],
+      "processing_institution": "JGI",
+      "substances_used": [
+        {
+          "type": "nmdc:PortionOfSubstance",
+          "known_as": "methanol",
+          "substance_role": "solvent",
+          "volume": {
+            "type": "nmdc:QuantityValue",
+            "has_raw_value": "1 mL",
+            "has_unit": "mL",
+            "has_numeric_value": 1
+          }
+        }
+      ],
+      "extraction_targets": [
+        "metabolite"
+      ],
+      "temperature": {
+        "type": "nmdc:QuantityValue",
+        "has_raw_value": "0 Cel",
+        "has_unit": "Cel",
+        "has_numeric_value": 0
+      }
+    },
+    {
+      "id": "nmdc:dispro-11-krv1wn71",
+      "type": "nmdc:DissolvingProcess",
+      "name": "Resuspend extracted metabolites",
+      "description": "Dried extracted metabolites from nmdc:procsm-11-da1a8960 resuspended in 100% methanol with isotopically labeled internal standards, with resuspension volume adjusted to normalize by extract TOC, for LC-MS preparation.",
+      "has_input": [
+        "nmdc:procsm-11-da1a8960"
+      ],
+      "has_output": [
+        "nmdc:procsm-11-njdpag07"
+      ],
+      "processing_institution": "JGI",
+      "substances_used": [
+        {
+          "type": "nmdc:PortionOfSubstance",
+          "known_as": "methanol",
+          "substance_role": "solvent"
+        }
+      ]
+    },
+    {
+      "id": "nmdc:subspr-11-td4btt51",
+      "type": "nmdc:SubSamplingProcess",
+      "name": "Prepare root sample",
+      "description": "Root nmdc:bsm-11-bq4d8j45 was frozen, lyophilized dry, and then subsampled for metabolomics analysis. Samples were bead-beaten with a stainless steel bead to powderize after subsampling.",
+      "has_input": [
+        "nmdc:bsm-11-bq4d8j45"
+      ],
+      "has_output": [
+        "nmdc:procsm-11-qjdcvg07"
+      ],
+      "processing_institution": "JGI"
+    },
+    {
+      "id": "nmdc:extrp-11-7pd4s308",
+      "type": "nmdc:Extraction",
+      "name": "Methanol extraction of metabolites",
+      "description": "Metabolites extracted from powderized nmdc:procsm-11-qjdcvg07 using 100% methanol, followed by vortexing, sonication for 10 minutes in an iced water bath, centrifugation, and SpeedVac drying.",
+      "has_input": [
+        "nmdc:procsm-11-qjdcvg07"
+      ],
+      "has_output": [
+        "nmdc:procsm-11-qr3p4r20"
+      ],
+      "processing_institution": "JGI",
+      "substances_used": [
+        {
+          "type": "nmdc:PortionOfSubstance",
+          "known_as": "methanol",
+          "substance_role": "solvent",
+          "volume": {
+            "type": "nmdc:QuantityValue",
+            "has_raw_value": "1 mL",
+            "has_unit": "mL",
+            "has_numeric_value": 1
+          }
+        }
+      ],
+      "extraction_targets": [
+        "metabolite"
+      ],
+      "temperature": {
+        "type": "nmdc:QuantityValue",
+        "has_raw_value": "0 Cel",
+        "has_unit": "Cel",
+        "has_numeric_value": 0
+      }
+    },
+    {
+      "id": "nmdc:dispro-11-dcqb8s32",
+      "type": "nmdc:DissolvingProcess",
+      "name": "Resuspend extracted metabolites",
+      "description": "Dried extracted metabolites from nmdc:procsm-11-qr3p4r20 resuspended in 100% methanol with isotopically labeled internal standards, with resuspension volume adjusted to normalize by extract TOC, for LC-MS preparation.",
+      "has_input": [
+        "nmdc:procsm-11-qr3p4r20"
+      ],
+      "has_output": [
+        "nmdc:procsm-11-8rwfm853"
+      ],
+      "processing_institution": "JGI",
+      "substances_used": [
+        {
+          "type": "nmdc:PortionOfSubstance",
+          "known_as": "methanol",
+          "substance_role": "solvent"
+        }
+      ]
+    },
+    {
+      "id": "nmdc:subspr-11-98xmgm36",
+      "type": "nmdc:SubSamplingProcess",
+      "name": "Prepare root sample",
+      "description": "Root nmdc:bsm-11-de1h1038 was frozen, lyophilized dry, and then subsampled for metabolomics analysis. Samples were bead-beaten with a stainless steel bead to powderize after subsampling.",
+      "has_input": [
+        "nmdc:bsm-11-de1h1038"
+      ],
+      "has_output": [
+        "nmdc:procsm-11-kh7ykt21"
+      ],
+      "processing_institution": "JGI"
+    },
+    {
+      "id": "nmdc:extrp-11-6eyy5j85",
+      "type": "nmdc:Extraction",
+      "name": "Methanol extraction of metabolites",
+      "description": "Metabolites extracted from powderized nmdc:procsm-11-kh7ykt21 using 100% methanol, followed by vortexing, sonication for 10 minutes in an iced water bath, centrifugation, and SpeedVac drying.",
+      "has_input": [
+        "nmdc:procsm-11-kh7ykt21"
+      ],
+      "has_output": [
+        "nmdc:procsm-11-qh4mgb90"
+      ],
+      "processing_institution": "JGI",
+      "substances_used": [
+        {
+          "type": "nmdc:PortionOfSubstance",
+          "known_as": "methanol",
+          "substance_role": "solvent",
+          "volume": {
+            "type": "nmdc:QuantityValue",
+            "has_raw_value": "1 mL",
+            "has_unit": "mL",
+            "has_numeric_value": 1
+          }
+        }
+      ],
+      "extraction_targets": [
+        "metabolite"
+      ],
+      "temperature": {
+        "type": "nmdc:QuantityValue",
+        "has_raw_value": "0 Cel",
+        "has_unit": "Cel",
+        "has_numeric_value": 0
+      }
+    },
+    {
+      "id": "nmdc:dispro-11-8rksnd67",
+      "type": "nmdc:DissolvingProcess",
+      "name": "Resuspend extracted metabolites",
+      "description": "Dried extracted metabolites from nmdc:procsm-11-qh4mgb90 resuspended in 100% methanol with isotopically labeled internal standards, with resuspension volume adjusted to normalize by extract TOC, for LC-MS preparation.",
+      "has_input": [
+        "nmdc:procsm-11-qh4mgb90"
+      ],
+      "has_output": [
+        "nmdc:procsm-11-syea3302"
+      ],
+      "processing_institution": "JGI",
+      "substances_used": [
+        {
+          "type": "nmdc:PortionOfSubstance",
+          "known_as": "methanol",
+          "substance_role": "solvent"
+        }
+      ]
+    },
+    {
+      "id": "nmdc:subspr-11-bzr2dt28",
+      "type": "nmdc:SubSamplingProcess",
+      "name": "Prepare root sample",
+      "description": "Root nmdc:bsm-11-df1mqz45 was frozen, lyophilized dry, and then subsampled for metabolomics analysis. Samples were bead-beaten with a stainless steel bead to powderize after subsampling.",
+      "has_input": [
+        "nmdc:bsm-11-df1mqz45"
+      ],
+      "has_output": [
+        "nmdc:procsm-11-j5w4p711"
+      ],
+      "processing_institution": "JGI"
+    },
+    {
+      "id": "nmdc:extrp-11-bh5p6a32",
+      "type": "nmdc:Extraction",
+      "name": "Methanol extraction of metabolites",
+      "description": "Metabolites extracted from powderized nmdc:procsm-11-j5w4p711 using 100% methanol, followed by vortexing, sonication for 10 minutes in an iced water bath, centrifugation, and SpeedVac drying.",
+      "has_input": [
+        "nmdc:procsm-11-j5w4p711"
+      ],
+      "has_output": [
+        "nmdc:procsm-11-h6w0jb37"
+      ],
+      "processing_institution": "JGI",
+      "substances_used": [
+        {
+          "type": "nmdc:PortionOfSubstance",
+          "known_as": "methanol",
+          "substance_role": "solvent",
+          "volume": {
+            "type": "nmdc:QuantityValue",
+            "has_raw_value": "1 mL",
+            "has_unit": "mL",
+            "has_numeric_value": 1
+          }
+        }
+      ],
+      "extraction_targets": [
+        "metabolite"
+      ],
+      "temperature": {
+        "type": "nmdc:QuantityValue",
+        "has_raw_value": "0 Cel",
+        "has_unit": "Cel",
+        "has_numeric_value": 0
+      }
+    },
+    {
+      "id": "nmdc:dispro-11-6xtb7n51",
+      "type": "nmdc:DissolvingProcess",
+      "name": "Resuspend extracted metabolites",
+      "description": "Dried extracted metabolites from nmdc:procsm-11-h6w0jb37 resuspended in 100% methanol with isotopically labeled internal standards, with resuspension volume adjusted to normalize by extract TOC, for LC-MS preparation.",
+      "has_input": [
+        "nmdc:procsm-11-h6w0jb37"
+      ],
+      "has_output": [
+        "nmdc:procsm-11-4cp9d231"
+      ],
+      "processing_institution": "JGI",
+      "substances_used": [
+        {
+          "type": "nmdc:PortionOfSubstance",
+          "known_as": "methanol",
+          "substance_role": "solvent"
+        }
+      ]
+    },
+    {
+      "id": "nmdc:subspr-11-kc8mnc83",
+      "type": "nmdc:SubSamplingProcess",
+      "name": "Prepare root sample",
+      "description": "Root nmdc:bsm-11-f9yzba97 was frozen, lyophilized dry, and then subsampled for metabolomics analysis. Samples were bead-beaten with a stainless steel bead to powderize after subsampling.",
+      "has_input": [
+        "nmdc:bsm-11-f9yzba97"
+      ],
+      "has_output": [
+        "nmdc:procsm-11-906ryp44"
+      ],
+      "processing_institution": "JGI"
+    },
+    {
+      "id": "nmdc:extrp-11-v72swv19",
+      "type": "nmdc:Extraction",
+      "name": "Methanol extraction of metabolites",
+      "description": "Metabolites extracted from powderized nmdc:procsm-11-906ryp44 using 100% methanol, followed by vortexing, sonication for 10 minutes in an iced water bath, centrifugation, and SpeedVac drying.",
+      "has_input": [
+        "nmdc:procsm-11-906ryp44"
+      ],
+      "has_output": [
+        "nmdc:procsm-11-t4yy4147"
+      ],
+      "processing_institution": "JGI",
+      "substances_used": [
+        {
+          "type": "nmdc:PortionOfSubstance",
+          "known_as": "methanol",
+          "substance_role": "solvent",
+          "volume": {
+            "type": "nmdc:QuantityValue",
+            "has_raw_value": "1 mL",
+            "has_unit": "mL",
+            "has_numeric_value": 1
+          }
+        }
+      ],
+      "extraction_targets": [
+        "metabolite"
+      ],
+      "temperature": {
+        "type": "nmdc:QuantityValue",
+        "has_raw_value": "0 Cel",
+        "has_unit": "Cel",
+        "has_numeric_value": 0
+      }
+    },
+    {
+      "id": "nmdc:dispro-11-0hzpf730",
+      "type": "nmdc:DissolvingProcess",
+      "name": "Resuspend extracted metabolites",
+      "description": "Dried extracted metabolites from nmdc:procsm-11-t4yy4147 resuspended in 100% methanol with isotopically labeled internal standards, with resuspension volume adjusted to normalize by extract TOC, for LC-MS preparation.",
+      "has_input": [
+        "nmdc:procsm-11-t4yy4147"
+      ],
+      "has_output": [
+        "nmdc:procsm-11-nmawez57"
+      ],
+      "processing_institution": "JGI",
+      "substances_used": [
+        {
+          "type": "nmdc:PortionOfSubstance",
+          "known_as": "methanol",
+          "substance_role": "solvent"
+        }
+      ]
+    },
+    {
+      "id": "nmdc:subspr-11-w0jfes08",
+      "type": "nmdc:SubSamplingProcess",
+      "name": "Prepare root sample",
+      "description": "Root nmdc:bsm-11-fng5eh21 was frozen, lyophilized dry, and then subsampled for metabolomics analysis. Samples were bead-beaten with a stainless steel bead to powderize after subsampling.",
+      "has_input": [
+        "nmdc:bsm-11-fng5eh21"
+      ],
+      "has_output": [
+        "nmdc:procsm-11-dm49qh98"
+      ],
+      "processing_institution": "JGI"
+    },
+    {
+      "id": "nmdc:extrp-11-f9x35e02",
+      "type": "nmdc:Extraction",
+      "name": "Methanol extraction of metabolites",
+      "description": "Metabolites extracted from powderized nmdc:procsm-11-dm49qh98 using 100% methanol, followed by vortexing, sonication for 10 minutes in an iced water bath, centrifugation, and SpeedVac drying.",
+      "has_input": [
+        "nmdc:procsm-11-dm49qh98"
+      ],
+      "has_output": [
+        "nmdc:procsm-11-hr5ppe43"
+      ],
+      "processing_institution": "JGI",
+      "substances_used": [
+        {
+          "type": "nmdc:PortionOfSubstance",
+          "known_as": "methanol",
+          "substance_role": "solvent",
+          "volume": {
+            "type": "nmdc:QuantityValue",
+            "has_raw_value": "1 mL",
+            "has_unit": "mL",
+            "has_numeric_value": 1
+          }
+        }
+      ],
+      "extraction_targets": [
+        "metabolite"
+      ],
+      "temperature": {
+        "type": "nmdc:QuantityValue",
+        "has_raw_value": "0 Cel",
+        "has_unit": "Cel",
+        "has_numeric_value": 0
+      }
+    },
+    {
+      "id": "nmdc:dispro-11-kr44ej84",
+      "type": "nmdc:DissolvingProcess",
+      "name": "Resuspend extracted metabolites",
+      "description": "Dried extracted metabolites from nmdc:procsm-11-hr5ppe43 resuspended in 100% methanol with isotopically labeled internal standards, with resuspension volume adjusted to normalize by extract TOC, for LC-MS preparation.",
+      "has_input": [
+        "nmdc:procsm-11-hr5ppe43"
+      ],
+      "has_output": [
+        "nmdc:procsm-11-qqv6r623"
+      ],
+      "processing_institution": "JGI",
+      "substances_used": [
+        {
+          "type": "nmdc:PortionOfSubstance",
+          "known_as": "methanol",
+          "substance_role": "solvent"
+        }
+      ]
+    },
+    {
+      "id": "nmdc:subspr-11-44nrjq58",
+      "type": "nmdc:SubSamplingProcess",
+      "name": "Prepare root sample",
+      "description": "Root nmdc:bsm-11-gf5nys45 was frozen, lyophilized dry, and then subsampled for metabolomics analysis. Samples were bead-beaten with a stainless steel bead to powderize after subsampling.",
+      "has_input": [
+        "nmdc:bsm-11-gf5nys45"
+      ],
+      "has_output": [
+        "nmdc:procsm-11-dn6tsq37"
+      ],
+      "processing_institution": "JGI"
+    },
+    {
+      "id": "nmdc:extrp-11-bt6nc025",
+      "type": "nmdc:Extraction",
+      "name": "Methanol extraction of metabolites",
+      "description": "Metabolites extracted from powderized nmdc:procsm-11-dn6tsq37 using 100% methanol, followed by vortexing, sonication for 10 minutes in an iced water bath, centrifugation, and SpeedVac drying.",
+      "has_input": [
+        "nmdc:procsm-11-dn6tsq37"
+      ],
+      "has_output": [
+        "nmdc:procsm-11-2b5f3q14"
+      ],
+      "processing_institution": "JGI",
+      "substances_used": [
+        {
+          "type": "nmdc:PortionOfSubstance",
+          "known_as": "methanol",
+          "substance_role": "solvent",
+          "volume": {
+            "type": "nmdc:QuantityValue",
+            "has_raw_value": "1 mL",
+            "has_unit": "mL",
+            "has_numeric_value": 1
+          }
+        }
+      ],
+      "extraction_targets": [
+        "metabolite"
+      ],
+      "temperature": {
+        "type": "nmdc:QuantityValue",
+        "has_raw_value": "0 Cel",
+        "has_unit": "Cel",
+        "has_numeric_value": 0
+      }
+    },
+    {
+      "id": "nmdc:dispro-11-jetdw735",
+      "type": "nmdc:DissolvingProcess",
+      "name": "Resuspend extracted metabolites",
+      "description": "Dried extracted metabolites from nmdc:procsm-11-2b5f3q14 resuspended in 100% methanol with isotopically labeled internal standards, with resuspension volume adjusted to normalize by extract TOC, for LC-MS preparation.",
+      "has_input": [
+        "nmdc:procsm-11-2b5f3q14"
+      ],
+      "has_output": [
+        "nmdc:procsm-11-k8mw5t31"
+      ],
+      "processing_institution": "JGI",
+      "substances_used": [
+        {
+          "type": "nmdc:PortionOfSubstance",
+          "known_as": "methanol",
+          "substance_role": "solvent"
+        }
+      ]
+    },
+    {
+      "id": "nmdc:subspr-11-cpeazq36",
+      "type": "nmdc:SubSamplingProcess",
+      "name": "Prepare root sample",
+      "description": "Root nmdc:bsm-11-h5b3c036 was frozen, lyophilized dry, and then subsampled for metabolomics analysis. Samples were bead-beaten with a stainless steel bead to powderize after subsampling.",
+      "has_input": [
+        "nmdc:bsm-11-h5b3c036"
+      ],
+      "has_output": [
+        "nmdc:procsm-11-jdfg6r64"
+      ],
+      "processing_institution": "JGI"
+    },
+    {
+      "id": "nmdc:extrp-11-w0msx623",
+      "type": "nmdc:Extraction",
+      "name": "Methanol extraction of metabolites",
+      "description": "Metabolites extracted from powderized nmdc:procsm-11-jdfg6r64 using 100% methanol, followed by vortexing, sonication for 10 minutes in an iced water bath, centrifugation, and SpeedVac drying.",
+      "has_input": [
+        "nmdc:procsm-11-jdfg6r64"
+      ],
+      "has_output": [
+        "nmdc:procsm-11-fvyyww92"
+      ],
+      "processing_institution": "JGI",
+      "substances_used": [
+        {
+          "type": "nmdc:PortionOfSubstance",
+          "known_as": "methanol",
+          "substance_role": "solvent",
+          "volume": {
+            "type": "nmdc:QuantityValue",
+            "has_raw_value": "1 mL",
+            "has_unit": "mL",
+            "has_numeric_value": 1
+          }
+        }
+      ],
+      "extraction_targets": [
+        "metabolite"
+      ],
+      "temperature": {
+        "type": "nmdc:QuantityValue",
+        "has_raw_value": "0 Cel",
+        "has_unit": "Cel",
+        "has_numeric_value": 0
+      }
+    },
+    {
+      "id": "nmdc:dispro-11-77zkhz86",
+      "type": "nmdc:DissolvingProcess",
+      "name": "Resuspend extracted metabolites",
+      "description": "Dried extracted metabolites from nmdc:procsm-11-fvyyww92 resuspended in 100% methanol with isotopically labeled internal standards, with resuspension volume adjusted to normalize by extract TOC, for LC-MS preparation.",
+      "has_input": [
+        "nmdc:procsm-11-fvyyww92"
+      ],
+      "has_output": [
+        "nmdc:procsm-11-gwvq9535"
+      ],
+      "processing_institution": "JGI",
+      "substances_used": [
+        {
+          "type": "nmdc:PortionOfSubstance",
+          "known_as": "methanol",
+          "substance_role": "solvent"
+        }
+      ]
+    },
+    {
+      "id": "nmdc:subspr-11-zk23xn15",
+      "type": "nmdc:SubSamplingProcess",
+      "name": "Prepare root sample",
+      "description": "Root nmdc:bsm-11-he69ja63 was frozen, lyophilized dry, and then subsampled for metabolomics analysis. Samples were bead-beaten with a stainless steel bead to powderize after subsampling.",
+      "has_input": [
+        "nmdc:bsm-11-he69ja63"
+      ],
+      "has_output": [
+        "nmdc:procsm-11-5yfw4q65"
+      ],
+      "processing_institution": "JGI"
+    },
+    {
+      "id": "nmdc:extrp-11-7pa38291",
+      "type": "nmdc:Extraction",
+      "name": "Methanol extraction of metabolites",
+      "description": "Metabolites extracted from powderized nmdc:procsm-11-5yfw4q65 using 100% methanol, followed by vortexing, sonication for 10 minutes in an iced water bath, centrifugation, and SpeedVac drying.",
+      "has_input": [
+        "nmdc:procsm-11-5yfw4q65"
+      ],
+      "has_output": [
+        "nmdc:procsm-11-0mt2q744"
+      ],
+      "processing_institution": "JGI",
+      "substances_used": [
+        {
+          "type": "nmdc:PortionOfSubstance",
+          "known_as": "methanol",
+          "substance_role": "solvent",
+          "volume": {
+            "type": "nmdc:QuantityValue",
+            "has_raw_value": "1 mL",
+            "has_unit": "mL",
+            "has_numeric_value": 1
+          }
+        }
+      ],
+      "extraction_targets": [
+        "metabolite"
+      ],
+      "temperature": {
+        "type": "nmdc:QuantityValue",
+        "has_raw_value": "0 Cel",
+        "has_unit": "Cel",
+        "has_numeric_value": 0
+      }
+    },
+    {
+      "id": "nmdc:dispro-11-y6sr2253",
+      "type": "nmdc:DissolvingProcess",
+      "name": "Resuspend extracted metabolites",
+      "description": "Dried extracted metabolites from nmdc:procsm-11-0mt2q744 resuspended in 100% methanol with isotopically labeled internal standards, with resuspension volume adjusted to normalize by extract TOC, for LC-MS preparation.",
+      "has_input": [
+        "nmdc:procsm-11-0mt2q744"
+      ],
+      "has_output": [
+        "nmdc:procsm-11-qcvtpq32"
+      ],
+      "processing_institution": "JGI",
+      "substances_used": [
+        {
+          "type": "nmdc:PortionOfSubstance",
+          "known_as": "methanol",
+          "substance_role": "solvent"
+        }
+      ]
+    },
+    {
+      "id": "nmdc:subspr-11-8z8nmp64",
+      "type": "nmdc:SubSamplingProcess",
+      "name": "Prepare root sample",
+      "description": "Root nmdc:bsm-11-hrkfxp73 was frozen, lyophilized dry, and then subsampled for metabolomics analysis. Samples were bead-beaten with a stainless steel bead to powderize after subsampling.",
+      "has_input": [
+        "nmdc:bsm-11-hrkfxp73"
+      ],
+      "has_output": [
+        "nmdc:procsm-11-vcn6ex36"
+      ],
+      "processing_institution": "JGI"
+    },
+    {
+      "id": "nmdc:extrp-11-fzb84p30",
+      "type": "nmdc:Extraction",
+      "name": "Methanol extraction of metabolites",
+      "description": "Metabolites extracted from powderized nmdc:procsm-11-vcn6ex36 using 100% methanol, followed by vortexing, sonication for 10 minutes in an iced water bath, centrifugation, and SpeedVac drying.",
+      "has_input": [
+        "nmdc:procsm-11-vcn6ex36"
+      ],
+      "has_output": [
+        "nmdc:procsm-11-8nx14q40"
+      ],
+      "processing_institution": "JGI",
+      "substances_used": [
+        {
+          "type": "nmdc:PortionOfSubstance",
+          "known_as": "methanol",
+          "substance_role": "solvent",
+          "volume": {
+            "type": "nmdc:QuantityValue",
+            "has_raw_value": "1 mL",
+            "has_unit": "mL",
+            "has_numeric_value": 1
+          }
+        }
+      ],
+      "extraction_targets": [
+        "metabolite"
+      ],
+      "temperature": {
+        "type": "nmdc:QuantityValue",
+        "has_raw_value": "0 Cel",
+        "has_unit": "Cel",
+        "has_numeric_value": 0
+      }
+    },
+    {
+      "id": "nmdc:dispro-11-1stjjk43",
+      "type": "nmdc:DissolvingProcess",
+      "name": "Resuspend extracted metabolites",
+      "description": "Dried extracted metabolites from nmdc:procsm-11-8nx14q40 resuspended in 100% methanol with isotopically labeled internal standards, with resuspension volume adjusted to normalize by extract TOC, for LC-MS preparation.",
+      "has_input": [
+        "nmdc:procsm-11-8nx14q40"
+      ],
+      "has_output": [
+        "nmdc:procsm-11-w2h7sj82"
+      ],
+      "processing_institution": "JGI",
+      "substances_used": [
+        {
+          "type": "nmdc:PortionOfSubstance",
+          "known_as": "methanol",
+          "substance_role": "solvent"
+        }
+      ]
+    },
+    {
+      "id": "nmdc:subspr-11-he1fkh62",
+      "type": "nmdc:SubSamplingProcess",
+      "name": "Prepare root sample",
+      "description": "Root nmdc:bsm-11-j5xa5t86 was frozen, lyophilized dry, and then subsampled for metabolomics analysis. Samples were bead-beaten with a stainless steel bead to powderize after subsampling.",
+      "has_input": [
+        "nmdc:bsm-11-j5xa5t86"
+      ],
+      "has_output": [
+        "nmdc:procsm-11-430e2g82"
+      ],
+      "processing_institution": "JGI"
+    },
+    {
+      "id": "nmdc:extrp-11-403pfz37",
+      "type": "nmdc:Extraction",
+      "name": "Methanol extraction of metabolites",
+      "description": "Metabolites extracted from powderized nmdc:procsm-11-430e2g82 using 100% methanol, followed by vortexing, sonication for 10 minutes in an iced water bath, centrifugation, and SpeedVac drying.",
+      "has_input": [
+        "nmdc:procsm-11-430e2g82"
+      ],
+      "has_output": [
+        "nmdc:procsm-11-bpr8rx93"
+      ],
+      "processing_institution": "JGI",
+      "substances_used": [
+        {
+          "type": "nmdc:PortionOfSubstance",
+          "known_as": "methanol",
+          "substance_role": "solvent",
+          "volume": {
+            "type": "nmdc:QuantityValue",
+            "has_raw_value": "1 mL",
+            "has_unit": "mL",
+            "has_numeric_value": 1
+          }
+        }
+      ],
+      "extraction_targets": [
+        "metabolite"
+      ],
+      "temperature": {
+        "type": "nmdc:QuantityValue",
+        "has_raw_value": "0 Cel",
+        "has_unit": "Cel",
+        "has_numeric_value": 0
+      }
+    },
+    {
+      "id": "nmdc:dispro-11-zvfddx77",
+      "type": "nmdc:DissolvingProcess",
+      "name": "Resuspend extracted metabolites",
+      "description": "Dried extracted metabolites from nmdc:procsm-11-bpr8rx93 resuspended in 100% methanol with isotopically labeled internal standards, with resuspension volume adjusted to normalize by extract TOC, for LC-MS preparation.",
+      "has_input": [
+        "nmdc:procsm-11-bpr8rx93"
+      ],
+      "has_output": [
+        "nmdc:procsm-11-e1rjma86"
+      ],
+      "processing_institution": "JGI",
+      "substances_used": [
+        {
+          "type": "nmdc:PortionOfSubstance",
+          "known_as": "methanol",
+          "substance_role": "solvent"
+        }
+      ]
+    },
+    {
+      "id": "nmdc:subspr-11-chmkzb95",
+      "type": "nmdc:SubSamplingProcess",
+      "name": "Prepare root sample",
+      "description": "Root nmdc:bsm-11-j9rx1b05 was frozen, lyophilized dry, and then subsampled for metabolomics analysis. Samples were bead-beaten with a stainless steel bead to powderize after subsampling.",
+      "has_input": [
+        "nmdc:bsm-11-j9rx1b05"
+      ],
+      "has_output": [
+        "nmdc:procsm-11-dg2bam07"
+      ],
+      "processing_institution": "JGI"
+    },
+    {
+      "id": "nmdc:extrp-11-jvx6xc16",
+      "type": "nmdc:Extraction",
+      "name": "Methanol extraction of metabolites",
+      "description": "Metabolites extracted from powderized nmdc:procsm-11-dg2bam07 using 100% methanol, followed by vortexing, sonication for 10 minutes in an iced water bath, centrifugation, and SpeedVac drying.",
+      "has_input": [
+        "nmdc:procsm-11-dg2bam07"
+      ],
+      "has_output": [
+        "nmdc:procsm-11-81rzng61"
+      ],
+      "processing_institution": "JGI",
+      "substances_used": [
+        {
+          "type": "nmdc:PortionOfSubstance",
+          "known_as": "methanol",
+          "substance_role": "solvent",
+          "volume": {
+            "type": "nmdc:QuantityValue",
+            "has_raw_value": "1 mL",
+            "has_unit": "mL",
+            "has_numeric_value": 1
+          }
+        }
+      ],
+      "extraction_targets": [
+        "metabolite"
+      ],
+      "temperature": {
+        "type": "nmdc:QuantityValue",
+        "has_raw_value": "0 Cel",
+        "has_unit": "Cel",
+        "has_numeric_value": 0
+      }
+    },
+    {
+      "id": "nmdc:dispro-11-xmk7jr41",
+      "type": "nmdc:DissolvingProcess",
+      "name": "Resuspend extracted metabolites",
+      "description": "Dried extracted metabolites from nmdc:procsm-11-81rzng61 resuspended in 100% methanol with isotopically labeled internal standards, with resuspension volume adjusted to normalize by extract TOC, for LC-MS preparation.",
+      "has_input": [
+        "nmdc:procsm-11-81rzng61"
+      ],
+      "has_output": [
+        "nmdc:procsm-11-sj89zn30"
+      ],
+      "processing_institution": "JGI",
+      "substances_used": [
+        {
+          "type": "nmdc:PortionOfSubstance",
+          "known_as": "methanol",
+          "substance_role": "solvent"
+        }
+      ]
+    },
+    {
+      "id": "nmdc:subspr-11-j5d8jb89",
+      "type": "nmdc:SubSamplingProcess",
+      "name": "Prepare root sample",
+      "description": "Root nmdc:bsm-11-jg9bry11 was frozen, lyophilized dry, and then subsampled for metabolomics analysis. Samples were bead-beaten with a stainless steel bead to powderize after subsampling.",
+      "has_input": [
+        "nmdc:bsm-11-jg9bry11"
+      ],
+      "has_output": [
+        "nmdc:procsm-11-mqqnt095"
+      ],
+      "processing_institution": "JGI"
+    },
+    {
+      "id": "nmdc:extrp-11-8d326t66",
+      "type": "nmdc:Extraction",
+      "name": "Methanol extraction of metabolites",
+      "description": "Metabolites extracted from powderized nmdc:procsm-11-mqqnt095 using 100% methanol, followed by vortexing, sonication for 10 minutes in an iced water bath, centrifugation, and SpeedVac drying.",
+      "has_input": [
+        "nmdc:procsm-11-mqqnt095"
+      ],
+      "has_output": [
+        "nmdc:procsm-11-jxbmrp03"
+      ],
+      "processing_institution": "JGI",
+      "substances_used": [
+        {
+          "type": "nmdc:PortionOfSubstance",
+          "known_as": "methanol",
+          "substance_role": "solvent",
+          "volume": {
+            "type": "nmdc:QuantityValue",
+            "has_raw_value": "1 mL",
+            "has_unit": "mL",
+            "has_numeric_value": 1
+          }
+        }
+      ],
+      "extraction_targets": [
+        "metabolite"
+      ],
+      "temperature": {
+        "type": "nmdc:QuantityValue",
+        "has_raw_value": "0 Cel",
+        "has_unit": "Cel",
+        "has_numeric_value": 0
+      }
+    },
+    {
+      "id": "nmdc:dispro-11-d436gm26",
+      "type": "nmdc:DissolvingProcess",
+      "name": "Resuspend extracted metabolites",
+      "description": "Dried extracted metabolites from nmdc:procsm-11-jxbmrp03 resuspended in 100% methanol with isotopically labeled internal standards, with resuspension volume adjusted to normalize by extract TOC, for LC-MS preparation.",
+      "has_input": [
+        "nmdc:procsm-11-jxbmrp03"
+      ],
+      "has_output": [
+        "nmdc:procsm-11-ysfnmr94"
+      ],
+      "processing_institution": "JGI",
+      "substances_used": [
+        {
+          "type": "nmdc:PortionOfSubstance",
+          "known_as": "methanol",
+          "substance_role": "solvent"
+        }
+      ]
+    },
+    {
+      "id": "nmdc:subspr-11-6sj6yv21",
+      "type": "nmdc:SubSamplingProcess",
+      "name": "Prepare root sample",
+      "description": "Root nmdc:bsm-11-jgxvpj85 was frozen, lyophilized dry, and then subsampled for metabolomics analysis. Samples were bead-beaten with a stainless steel bead to powderize after subsampling.",
+      "has_input": [
+        "nmdc:bsm-11-jgxvpj85"
+      ],
+      "has_output": [
+        "nmdc:procsm-11-d684f740"
+      ],
+      "processing_institution": "JGI"
+    },
+    {
+      "id": "nmdc:extrp-11-x8974e24",
+      "type": "nmdc:Extraction",
+      "name": "Methanol extraction of metabolites",
+      "description": "Metabolites extracted from powderized nmdc:procsm-11-d684f740 using 100% methanol, followed by vortexing, sonication for 10 minutes in an iced water bath, centrifugation, and SpeedVac drying.",
+      "has_input": [
+        "nmdc:procsm-11-d684f740"
+      ],
+      "has_output": [
+        "nmdc:procsm-11-w2m6x464"
+      ],
+      "processing_institution": "JGI",
+      "substances_used": [
+        {
+          "type": "nmdc:PortionOfSubstance",
+          "known_as": "methanol",
+          "substance_role": "solvent",
+          "volume": {
+            "type": "nmdc:QuantityValue",
+            "has_raw_value": "1 mL",
+            "has_unit": "mL",
+            "has_numeric_value": 1
+          }
+        }
+      ],
+      "extraction_targets": [
+        "metabolite"
+      ],
+      "temperature": {
+        "type": "nmdc:QuantityValue",
+        "has_raw_value": "0 Cel",
+        "has_unit": "Cel",
+        "has_numeric_value": 0
+      }
+    },
+    {
+      "id": "nmdc:dispro-11-x5mnpr41",
+      "type": "nmdc:DissolvingProcess",
+      "name": "Resuspend extracted metabolites",
+      "description": "Dried extracted metabolites from nmdc:procsm-11-w2m6x464 resuspended in 100% methanol with isotopically labeled internal standards, with resuspension volume adjusted to normalize by extract TOC, for LC-MS preparation.",
+      "has_input": [
+        "nmdc:procsm-11-w2m6x464"
+      ],
+      "has_output": [
+        "nmdc:procsm-11-n7z1w862"
+      ],
+      "processing_institution": "JGI",
+      "substances_used": [
+        {
+          "type": "nmdc:PortionOfSubstance",
+          "known_as": "methanol",
+          "substance_role": "solvent"
+        }
+      ]
+    },
+    {
+      "id": "nmdc:subspr-11-g466y862",
+      "type": "nmdc:SubSamplingProcess",
+      "name": "Prepare root sample",
+      "description": "Root nmdc:bsm-11-jpqg7a86 was frozen, lyophilized dry, and then subsampled for metabolomics analysis. Samples were bead-beaten with a stainless steel bead to powderize after subsampling.",
+      "has_input": [
+        "nmdc:bsm-11-jpqg7a86"
+      ],
+      "has_output": [
+        "nmdc:procsm-11-cqrym480"
+      ],
+      "processing_institution": "JGI"
+    },
+    {
+      "id": "nmdc:extrp-11-e97py065",
+      "type": "nmdc:Extraction",
+      "name": "Methanol extraction of metabolites",
+      "description": "Metabolites extracted from powderized nmdc:procsm-11-cqrym480 using 100% methanol, followed by vortexing, sonication for 10 minutes in an iced water bath, centrifugation, and SpeedVac drying.",
+      "has_input": [
+        "nmdc:procsm-11-cqrym480"
+      ],
+      "has_output": [
+        "nmdc:procsm-11-d0fe5c45"
+      ],
+      "processing_institution": "JGI",
+      "substances_used": [
+        {
+          "type": "nmdc:PortionOfSubstance",
+          "known_as": "methanol",
+          "substance_role": "solvent",
+          "volume": {
+            "type": "nmdc:QuantityValue",
+            "has_raw_value": "1 mL",
+            "has_unit": "mL",
+            "has_numeric_value": 1
+          }
+        }
+      ],
+      "extraction_targets": [
+        "metabolite"
+      ],
+      "temperature": {
+        "type": "nmdc:QuantityValue",
+        "has_raw_value": "0 Cel",
+        "has_unit": "Cel",
+        "has_numeric_value": 0
+      }
+    },
+    {
+      "id": "nmdc:dispro-11-gfvbqt30",
+      "type": "nmdc:DissolvingProcess",
+      "name": "Resuspend extracted metabolites",
+      "description": "Dried extracted metabolites from nmdc:procsm-11-d0fe5c45 resuspended in 100% methanol with isotopically labeled internal standards, with resuspension volume adjusted to normalize by extract TOC, for LC-MS preparation.",
+      "has_input": [
+        "nmdc:procsm-11-d0fe5c45"
+      ],
+      "has_output": [
+        "nmdc:procsm-11-xssg9q72"
+      ],
+      "processing_institution": "JGI",
+      "substances_used": [
+        {
+          "type": "nmdc:PortionOfSubstance",
+          "known_as": "methanol",
+          "substance_role": "solvent"
+        }
+      ]
+    },
+    {
+      "id": "nmdc:subspr-11-8pxgws35",
+      "type": "nmdc:SubSamplingProcess",
+      "name": "Prepare root sample",
+      "description": "Root nmdc:bsm-11-kfkrbm38 was frozen, lyophilized dry, and then subsampled for metabolomics analysis. Samples were bead-beaten with a stainless steel bead to powderize after subsampling.",
+      "has_input": [
+        "nmdc:bsm-11-kfkrbm38"
+      ],
+      "has_output": [
+        "nmdc:procsm-11-s5j6q181"
+      ],
+      "processing_institution": "JGI"
+    },
+    {
+      "id": "nmdc:extrp-11-mq0e8b33",
+      "type": "nmdc:Extraction",
+      "name": "Methanol extraction of metabolites",
+      "description": "Metabolites extracted from powderized nmdc:procsm-11-s5j6q181 using 100% methanol, followed by vortexing, sonication for 10 minutes in an iced water bath, centrifugation, and SpeedVac drying.",
+      "has_input": [
+        "nmdc:procsm-11-s5j6q181"
+      ],
+      "has_output": [
+        "nmdc:procsm-11-49hb0939"
+      ],
+      "processing_institution": "JGI",
+      "substances_used": [
+        {
+          "type": "nmdc:PortionOfSubstance",
+          "known_as": "methanol",
+          "substance_role": "solvent",
+          "volume": {
+            "type": "nmdc:QuantityValue",
+            "has_raw_value": "1 mL",
+            "has_unit": "mL",
+            "has_numeric_value": 1
+          }
+        }
+      ],
+      "extraction_targets": [
+        "metabolite"
+      ],
+      "temperature": {
+        "type": "nmdc:QuantityValue",
+        "has_raw_value": "0 Cel",
+        "has_unit": "Cel",
+        "has_numeric_value": 0
+      }
+    },
+    {
+      "id": "nmdc:dispro-11-x36scc57",
+      "type": "nmdc:DissolvingProcess",
+      "name": "Resuspend extracted metabolites",
+      "description": "Dried extracted metabolites from nmdc:procsm-11-49hb0939 resuspended in 100% methanol with isotopically labeled internal standards, with resuspension volume adjusted to normalize by extract TOC, for LC-MS preparation.",
+      "has_input": [
+        "nmdc:procsm-11-49hb0939"
+      ],
+      "has_output": [
+        "nmdc:procsm-11-rn08kp73"
+      ],
+      "processing_institution": "JGI",
+      "substances_used": [
+        {
+          "type": "nmdc:PortionOfSubstance",
+          "known_as": "methanol",
+          "substance_role": "solvent"
+        }
+      ]
+    },
+    {
+      "id": "nmdc:subspr-11-qfq77e39",
+      "type": "nmdc:SubSamplingProcess",
+      "name": "Prepare root sample",
+      "description": "Root nmdc:bsm-11-km2htj88 was frozen, lyophilized dry, and then subsampled for metabolomics analysis. Samples were bead-beaten with a stainless steel bead to powderize after subsampling.",
+      "has_input": [
+        "nmdc:bsm-11-km2htj88"
+      ],
+      "has_output": [
+        "nmdc:procsm-11-1fys7224"
+      ],
+      "processing_institution": "JGI"
+    },
+    {
+      "id": "nmdc:extrp-11-5tsr5328",
+      "type": "nmdc:Extraction",
+      "name": "Methanol extraction of metabolites",
+      "description": "Metabolites extracted from powderized nmdc:procsm-11-1fys7224 using 100% methanol, followed by vortexing, sonication for 10 minutes in an iced water bath, centrifugation, and SpeedVac drying.",
+      "has_input": [
+        "nmdc:procsm-11-1fys7224"
+      ],
+      "has_output": [
+        "nmdc:procsm-11-w0xgvf95"
+      ],
+      "processing_institution": "JGI",
+      "substances_used": [
+        {
+          "type": "nmdc:PortionOfSubstance",
+          "known_as": "methanol",
+          "substance_role": "solvent",
+          "volume": {
+            "type": "nmdc:QuantityValue",
+            "has_raw_value": "1 mL",
+            "has_unit": "mL",
+            "has_numeric_value": 1
+          }
+        }
+      ],
+      "extraction_targets": [
+        "metabolite"
+      ],
+      "temperature": {
+        "type": "nmdc:QuantityValue",
+        "has_raw_value": "0 Cel",
+        "has_unit": "Cel",
+        "has_numeric_value": 0
+      }
+    },
+    {
+      "id": "nmdc:dispro-11-xz1sfg50",
+      "type": "nmdc:DissolvingProcess",
+      "name": "Resuspend extracted metabolites",
+      "description": "Dried extracted metabolites from nmdc:procsm-11-w0xgvf95 resuspended in 100% methanol with isotopically labeled internal standards, with resuspension volume adjusted to normalize by extract TOC, for LC-MS preparation.",
+      "has_input": [
+        "nmdc:procsm-11-w0xgvf95"
+      ],
+      "has_output": [
+        "nmdc:procsm-11-xy5qem13"
+      ],
+      "processing_institution": "JGI",
+      "substances_used": [
+        {
+          "type": "nmdc:PortionOfSubstance",
+          "known_as": "methanol",
+          "substance_role": "solvent"
+        }
+      ]
+    },
+    {
+      "id": "nmdc:subspr-11-jw5h5t55",
+      "type": "nmdc:SubSamplingProcess",
+      "name": "Prepare root sample",
+      "description": "Root nmdc:bsm-11-mncsfj85 was frozen, lyophilized dry, and then subsampled for metabolomics analysis. Samples were bead-beaten with a stainless steel bead to powderize after subsampling.",
+      "has_input": [
+        "nmdc:bsm-11-mncsfj85"
+      ],
+      "has_output": [
+        "nmdc:procsm-11-k9qpcm08"
+      ],
+      "processing_institution": "JGI"
+    },
+    {
+      "id": "nmdc:extrp-11-645wy579",
+      "type": "nmdc:Extraction",
+      "name": "Methanol extraction of metabolites",
+      "description": "Metabolites extracted from powderized nmdc:procsm-11-k9qpcm08 using 100% methanol, followed by vortexing, sonication for 10 minutes in an iced water bath, centrifugation, and SpeedVac drying.",
+      "has_input": [
+        "nmdc:procsm-11-k9qpcm08"
+      ],
+      "has_output": [
+        "nmdc:procsm-11-cxpnmx83"
+      ],
+      "processing_institution": "JGI",
+      "substances_used": [
+        {
+          "type": "nmdc:PortionOfSubstance",
+          "known_as": "methanol",
+          "substance_role": "solvent",
+          "volume": {
+            "type": "nmdc:QuantityValue",
+            "has_raw_value": "1 mL",
+            "has_unit": "mL",
+            "has_numeric_value": 1
+          }
+        }
+      ],
+      "extraction_targets": [
+        "metabolite"
+      ],
+      "temperature": {
+        "type": "nmdc:QuantityValue",
+        "has_raw_value": "0 Cel",
+        "has_unit": "Cel",
+        "has_numeric_value": 0
+      }
+    },
+    {
+      "id": "nmdc:dispro-11-vh7p5s93",
+      "type": "nmdc:DissolvingProcess",
+      "name": "Resuspend extracted metabolites",
+      "description": "Dried extracted metabolites from nmdc:procsm-11-cxpnmx83 resuspended in 100% methanol with isotopically labeled internal standards, with resuspension volume adjusted to normalize by extract TOC, for LC-MS preparation.",
+      "has_input": [
+        "nmdc:procsm-11-cxpnmx83"
+      ],
+      "has_output": [
+        "nmdc:procsm-11-b49v9675"
+      ],
+      "processing_institution": "JGI",
+      "substances_used": [
+        {
+          "type": "nmdc:PortionOfSubstance",
+          "known_as": "methanol",
+          "substance_role": "solvent"
+        }
+      ]
+    },
+    {
+      "id": "nmdc:subspr-11-prmrw704",
+      "type": "nmdc:SubSamplingProcess",
+      "name": "Prepare root sample",
+      "description": "Root nmdc:bsm-11-mszxhy66 was frozen, lyophilized dry, and then subsampled for metabolomics analysis. Samples were bead-beaten with a stainless steel bead to powderize after subsampling.",
+      "has_input": [
+        "nmdc:bsm-11-mszxhy66"
+      ],
+      "has_output": [
+        "nmdc:procsm-11-93csmj57"
+      ],
+      "processing_institution": "JGI"
+    },
+    {
+      "id": "nmdc:extrp-11-q6nx7m03",
+      "type": "nmdc:Extraction",
+      "name": "Methanol extraction of metabolites",
+      "description": "Metabolites extracted from powderized nmdc:procsm-11-93csmj57 using 100% methanol, followed by vortexing, sonication for 10 minutes in an iced water bath, centrifugation, and SpeedVac drying.",
+      "has_input": [
+        "nmdc:procsm-11-93csmj57"
+      ],
+      "has_output": [
+        "nmdc:procsm-11-620ywf71"
+      ],
+      "processing_institution": "JGI",
+      "substances_used": [
+        {
+          "type": "nmdc:PortionOfSubstance",
+          "known_as": "methanol",
+          "substance_role": "solvent",
+          "volume": {
+            "type": "nmdc:QuantityValue",
+            "has_raw_value": "1 mL",
+            "has_unit": "mL",
+            "has_numeric_value": 1
+          }
+        }
+      ],
+      "extraction_targets": [
+        "metabolite"
+      ],
+      "temperature": {
+        "type": "nmdc:QuantityValue",
+        "has_raw_value": "0 Cel",
+        "has_unit": "Cel",
+        "has_numeric_value": 0
+      }
+    },
+    {
+      "id": "nmdc:dispro-11-rweh8v92",
+      "type": "nmdc:DissolvingProcess",
+      "name": "Resuspend extracted metabolites",
+      "description": "Dried extracted metabolites from nmdc:procsm-11-620ywf71 resuspended in 100% methanol with isotopically labeled internal standards, with resuspension volume adjusted to normalize by extract TOC, for LC-MS preparation.",
+      "has_input": [
+        "nmdc:procsm-11-620ywf71"
+      ],
+      "has_output": [
+        "nmdc:procsm-11-fgwdvd70"
+      ],
+      "processing_institution": "JGI",
+      "substances_used": [
+        {
+          "type": "nmdc:PortionOfSubstance",
+          "known_as": "methanol",
+          "substance_role": "solvent"
+        }
+      ]
+    },
+    {
+      "id": "nmdc:subspr-11-vt001g36",
+      "type": "nmdc:SubSamplingProcess",
+      "name": "Prepare root sample",
+      "description": "Root nmdc:bsm-11-mz8y6g40 was frozen, lyophilized dry, and then subsampled for metabolomics analysis. Samples were bead-beaten with a stainless steel bead to powderize after subsampling.",
+      "has_input": [
+        "nmdc:bsm-11-mz8y6g40"
+      ],
+      "has_output": [
+        "nmdc:procsm-11-jtfrf846"
+      ],
+      "processing_institution": "JGI"
+    },
+    {
+      "id": "nmdc:extrp-11-6zmpqx35",
+      "type": "nmdc:Extraction",
+      "name": "Methanol extraction of metabolites",
+      "description": "Metabolites extracted from powderized nmdc:procsm-11-jtfrf846 using 100% methanol, followed by vortexing, sonication for 10 minutes in an iced water bath, centrifugation, and SpeedVac drying.",
+      "has_input": [
+        "nmdc:procsm-11-jtfrf846"
+      ],
+      "has_output": [
+        "nmdc:procsm-11-5s01xp61"
+      ],
+      "processing_institution": "JGI",
+      "substances_used": [
+        {
+          "type": "nmdc:PortionOfSubstance",
+          "known_as": "methanol",
+          "substance_role": "solvent",
+          "volume": {
+            "type": "nmdc:QuantityValue",
+            "has_raw_value": "1 mL",
+            "has_unit": "mL",
+            "has_numeric_value": 1
+          }
+        }
+      ],
+      "extraction_targets": [
+        "metabolite"
+      ],
+      "temperature": {
+        "type": "nmdc:QuantityValue",
+        "has_raw_value": "0 Cel",
+        "has_unit": "Cel",
+        "has_numeric_value": 0
+      }
+    },
+    {
+      "id": "nmdc:dispro-11-xnm73m74",
+      "type": "nmdc:DissolvingProcess",
+      "name": "Resuspend extracted metabolites",
+      "description": "Dried extracted metabolites from nmdc:procsm-11-5s01xp61 resuspended in 100% methanol with isotopically labeled internal standards, with resuspension volume adjusted to normalize by extract TOC, for LC-MS preparation.",
+      "has_input": [
+        "nmdc:procsm-11-5s01xp61"
+      ],
+      "has_output": [
+        "nmdc:procsm-11-fctgjn97"
+      ],
+      "processing_institution": "JGI",
+      "substances_used": [
+        {
+          "type": "nmdc:PortionOfSubstance",
+          "known_as": "methanol",
+          "substance_role": "solvent"
+        }
+      ]
+    },
+    {
+      "id": "nmdc:subspr-11-v3zss668",
+      "type": "nmdc:SubSamplingProcess",
+      "name": "Prepare root sample",
+      "description": "Root nmdc:bsm-11-p0v3kr82 was frozen, lyophilized dry, and then subsampled for metabolomics analysis. Samples were bead-beaten with a stainless steel bead to powderize after subsampling.",
+      "has_input": [
+        "nmdc:bsm-11-p0v3kr82"
+      ],
+      "has_output": [
+        "nmdc:procsm-11-ncnrvx07"
+      ],
+      "processing_institution": "JGI"
+    },
+    {
+      "id": "nmdc:extrp-11-zvjt5540",
+      "type": "nmdc:Extraction",
+      "name": "Methanol extraction of metabolites",
+      "description": "Metabolites extracted from powderized nmdc:procsm-11-ncnrvx07 using 100% methanol, followed by vortexing, sonication for 10 minutes in an iced water bath, centrifugation, and SpeedVac drying.",
+      "has_input": [
+        "nmdc:procsm-11-ncnrvx07"
+      ],
+      "has_output": [
+        "nmdc:procsm-11-fwtv5793"
+      ],
+      "processing_institution": "JGI",
+      "substances_used": [
+        {
+          "type": "nmdc:PortionOfSubstance",
+          "known_as": "methanol",
+          "substance_role": "solvent",
+          "volume": {
+            "type": "nmdc:QuantityValue",
+            "has_raw_value": "1 mL",
+            "has_unit": "mL",
+            "has_numeric_value": 1
+          }
+        }
+      ],
+      "extraction_targets": [
+        "metabolite"
+      ],
+      "temperature": {
+        "type": "nmdc:QuantityValue",
+        "has_raw_value": "0 Cel",
+        "has_unit": "Cel",
+        "has_numeric_value": 0
+      }
+    },
+    {
+      "id": "nmdc:dispro-11-qa0e7996",
+      "type": "nmdc:DissolvingProcess",
+      "name": "Resuspend extracted metabolites",
+      "description": "Dried extracted metabolites from nmdc:procsm-11-fwtv5793 resuspended in 100% methanol with isotopically labeled internal standards, with resuspension volume adjusted to normalize by extract TOC, for LC-MS preparation.",
+      "has_input": [
+        "nmdc:procsm-11-fwtv5793"
+      ],
+      "has_output": [
+        "nmdc:procsm-11-c2mjaj97"
+      ],
+      "processing_institution": "JGI",
+      "substances_used": [
+        {
+          "type": "nmdc:PortionOfSubstance",
+          "known_as": "methanol",
+          "substance_role": "solvent"
+        }
+      ]
+    },
+    {
+      "id": "nmdc:subspr-11-hzgf8r49",
+      "type": "nmdc:SubSamplingProcess",
+      "name": "Prepare root sample",
+      "description": "Root nmdc:bsm-11-p2nw7v16 was frozen, lyophilized dry, and then subsampled for metabolomics analysis. Samples were bead-beaten with a stainless steel bead to powderize after subsampling.",
+      "has_input": [
+        "nmdc:bsm-11-p2nw7v16"
+      ],
+      "has_output": [
+        "nmdc:procsm-11-4b1src87"
+      ],
+      "processing_institution": "JGI"
+    },
+    {
+      "id": "nmdc:extrp-11-vpxv4d28",
+      "type": "nmdc:Extraction",
+      "name": "Methanol extraction of metabolites",
+      "description": "Metabolites extracted from powderized nmdc:procsm-11-4b1src87 using 100% methanol, followed by vortexing, sonication for 10 minutes in an iced water bath, centrifugation, and SpeedVac drying.",
+      "has_input": [
+        "nmdc:procsm-11-4b1src87"
+      ],
+      "has_output": [
+        "nmdc:procsm-11-jssaqf46"
+      ],
+      "processing_institution": "JGI",
+      "substances_used": [
+        {
+          "type": "nmdc:PortionOfSubstance",
+          "known_as": "methanol",
+          "substance_role": "solvent",
+          "volume": {
+            "type": "nmdc:QuantityValue",
+            "has_raw_value": "1 mL",
+            "has_unit": "mL",
+            "has_numeric_value": 1
+          }
+        }
+      ],
+      "extraction_targets": [
+        "metabolite"
+      ],
+      "temperature": {
+        "type": "nmdc:QuantityValue",
+        "has_raw_value": "0 Cel",
+        "has_unit": "Cel",
+        "has_numeric_value": 0
+      }
+    },
+    {
+      "id": "nmdc:dispro-11-w918v635",
+      "type": "nmdc:DissolvingProcess",
+      "name": "Resuspend extracted metabolites",
+      "description": "Dried extracted metabolites from nmdc:procsm-11-jssaqf46 resuspended in 100% methanol with isotopically labeled internal standards, with resuspension volume adjusted to normalize by extract TOC, for LC-MS preparation.",
+      "has_input": [
+        "nmdc:procsm-11-jssaqf46"
+      ],
+      "has_output": [
+        "nmdc:procsm-11-hk0xsv51"
+      ],
+      "processing_institution": "JGI",
+      "substances_used": [
+        {
+          "type": "nmdc:PortionOfSubstance",
+          "known_as": "methanol",
+          "substance_role": "solvent"
+        }
+      ]
+    },
+    {
+      "id": "nmdc:subspr-11-tn1c6r54",
+      "type": "nmdc:SubSamplingProcess",
+      "name": "Prepare root sample",
+      "description": "Root nmdc:bsm-11-p9qcnb33 was frozen, lyophilized dry, and then subsampled for metabolomics analysis. Samples were bead-beaten with a stainless steel bead to powderize after subsampling.",
+      "has_input": [
+        "nmdc:bsm-11-p9qcnb33"
+      ],
+      "has_output": [
+        "nmdc:procsm-11-1dg1r984"
+      ],
+      "processing_institution": "JGI"
+    },
+    {
+      "id": "nmdc:extrp-11-dknbz575",
+      "type": "nmdc:Extraction",
+      "name": "Methanol extraction of metabolites",
+      "description": "Metabolites extracted from powderized nmdc:procsm-11-1dg1r984 using 100% methanol, followed by vortexing, sonication for 10 minutes in an iced water bath, centrifugation, and SpeedVac drying.",
+      "has_input": [
+        "nmdc:procsm-11-1dg1r984"
+      ],
+      "has_output": [
+        "nmdc:procsm-11-eesrs230"
+      ],
+      "processing_institution": "JGI",
+      "substances_used": [
+        {
+          "type": "nmdc:PortionOfSubstance",
+          "known_as": "methanol",
+          "substance_role": "solvent",
+          "volume": {
+            "type": "nmdc:QuantityValue",
+            "has_raw_value": "1 mL",
+            "has_unit": "mL",
+            "has_numeric_value": 1
+          }
+        }
+      ],
+      "extraction_targets": [
+        "metabolite"
+      ],
+      "temperature": {
+        "type": "nmdc:QuantityValue",
+        "has_raw_value": "0 Cel",
+        "has_unit": "Cel",
+        "has_numeric_value": 0
+      }
+    },
+    {
+      "id": "nmdc:dispro-11-vba0qp74",
+      "type": "nmdc:DissolvingProcess",
+      "name": "Resuspend extracted metabolites",
+      "description": "Dried extracted metabolites from nmdc:procsm-11-eesrs230 resuspended in 100% methanol with isotopically labeled internal standards, with resuspension volume adjusted to normalize by extract TOC, for LC-MS preparation.",
+      "has_input": [
+        "nmdc:procsm-11-eesrs230"
+      ],
+      "has_output": [
+        "nmdc:procsm-11-xcm7pp55"
+      ],
+      "processing_institution": "JGI",
+      "substances_used": [
+        {
+          "type": "nmdc:PortionOfSubstance",
+          "known_as": "methanol",
+          "substance_role": "solvent"
+        }
+      ]
+    },
+    {
+      "id": "nmdc:subspr-11-0fxmpa86",
+      "type": "nmdc:SubSamplingProcess",
+      "name": "Prepare root sample",
+      "description": "Root nmdc:bsm-11-qvc0wd96 was frozen, lyophilized dry, and then subsampled for metabolomics analysis. Samples were bead-beaten with a stainless steel bead to powderize after subsampling.",
+      "has_input": [
+        "nmdc:bsm-11-qvc0wd96"
+      ],
+      "has_output": [
+        "nmdc:procsm-11-cat8wk69"
+      ],
+      "processing_institution": "JGI"
+    },
+    {
+      "id": "nmdc:extrp-11-wwfx2c11",
+      "type": "nmdc:Extraction",
+      "name": "Methanol extraction of metabolites",
+      "description": "Metabolites extracted from powderized nmdc:procsm-11-cat8wk69 using 100% methanol, followed by vortexing, sonication for 10 minutes in an iced water bath, centrifugation, and SpeedVac drying.",
+      "has_input": [
+        "nmdc:procsm-11-cat8wk69"
+      ],
+      "has_output": [
+        "nmdc:procsm-11-v3kmwx67"
+      ],
+      "processing_institution": "JGI",
+      "substances_used": [
+        {
+          "type": "nmdc:PortionOfSubstance",
+          "known_as": "methanol",
+          "substance_role": "solvent",
+          "volume": {
+            "type": "nmdc:QuantityValue",
+            "has_raw_value": "1 mL",
+            "has_unit": "mL",
+            "has_numeric_value": 1
+          }
+        }
+      ],
+      "extraction_targets": [
+        "metabolite"
+      ],
+      "temperature": {
+        "type": "nmdc:QuantityValue",
+        "has_raw_value": "0 Cel",
+        "has_unit": "Cel",
+        "has_numeric_value": 0
+      }
+    },
+    {
+      "id": "nmdc:dispro-11-qtzj0466",
+      "type": "nmdc:DissolvingProcess",
+      "name": "Resuspend extracted metabolites",
+      "description": "Dried extracted metabolites from nmdc:procsm-11-v3kmwx67 resuspended in 100% methanol with isotopically labeled internal standards, with resuspension volume adjusted to normalize by extract TOC, for LC-MS preparation.",
+      "has_input": [
+        "nmdc:procsm-11-v3kmwx67"
+      ],
+      "has_output": [
+        "nmdc:procsm-11-gkrzt032"
+      ],
+      "processing_institution": "JGI",
+      "substances_used": [
+        {
+          "type": "nmdc:PortionOfSubstance",
+          "known_as": "methanol",
+          "substance_role": "solvent"
+        }
+      ]
+    },
+    {
+      "id": "nmdc:subspr-11-7dcar510",
+      "type": "nmdc:SubSamplingProcess",
+      "name": "Prepare root sample",
+      "description": "Root nmdc:bsm-11-rhh5sz73 was frozen, lyophilized dry, and then subsampled for metabolomics analysis. Samples were bead-beaten with a stainless steel bead to powderize after subsampling.",
+      "has_input": [
+        "nmdc:bsm-11-rhh5sz73"
+      ],
+      "has_output": [
+        "nmdc:procsm-11-6bw19d92"
+      ],
+      "processing_institution": "JGI"
+    },
+    {
+      "id": "nmdc:extrp-11-qvcjfk59",
+      "type": "nmdc:Extraction",
+      "name": "Methanol extraction of metabolites",
+      "description": "Metabolites extracted from powderized nmdc:procsm-11-6bw19d92 using 100% methanol, followed by vortexing, sonication for 10 minutes in an iced water bath, centrifugation, and SpeedVac drying.",
+      "has_input": [
+        "nmdc:procsm-11-6bw19d92"
+      ],
+      "has_output": [
+        "nmdc:procsm-11-44wd5e98"
+      ],
+      "processing_institution": "JGI",
+      "substances_used": [
+        {
+          "type": "nmdc:PortionOfSubstance",
+          "known_as": "methanol",
+          "substance_role": "solvent",
+          "volume": {
+            "type": "nmdc:QuantityValue",
+            "has_raw_value": "1 mL",
+            "has_unit": "mL",
+            "has_numeric_value": 1
+          }
+        }
+      ],
+      "extraction_targets": [
+        "metabolite"
+      ],
+      "temperature": {
+        "type": "nmdc:QuantityValue",
+        "has_raw_value": "0 Cel",
+        "has_unit": "Cel",
+        "has_numeric_value": 0
+      }
+    },
+    {
+      "id": "nmdc:dispro-11-hjabx894",
+      "type": "nmdc:DissolvingProcess",
+      "name": "Resuspend extracted metabolites",
+      "description": "Dried extracted metabolites from nmdc:procsm-11-44wd5e98 resuspended in 100% methanol with isotopically labeled internal standards, with resuspension volume adjusted to normalize by extract TOC, for LC-MS preparation.",
+      "has_input": [
+        "nmdc:procsm-11-44wd5e98"
+      ],
+      "has_output": [
+        "nmdc:procsm-11-gv3qv439"
+      ],
+      "processing_institution": "JGI",
+      "substances_used": [
+        {
+          "type": "nmdc:PortionOfSubstance",
+          "known_as": "methanol",
+          "substance_role": "solvent"
+        }
+      ]
+    },
+    {
+      "id": "nmdc:subspr-11-yfbgnk11",
+      "type": "nmdc:SubSamplingProcess",
+      "name": "Prepare root sample",
+      "description": "Root nmdc:bsm-11-rpmr0530 was frozen, lyophilized dry, and then subsampled for metabolomics analysis. Samples were bead-beaten with a stainless steel bead to powderize after subsampling.",
+      "has_input": [
+        "nmdc:bsm-11-rpmr0530"
+      ],
+      "has_output": [
+        "nmdc:procsm-11-02vxp239"
+      ],
+      "processing_institution": "JGI"
+    },
+    {
+      "id": "nmdc:extrp-11-2j52d036",
+      "type": "nmdc:Extraction",
+      "name": "Methanol extraction of metabolites",
+      "description": "Metabolites extracted from powderized nmdc:procsm-11-02vxp239 using 100% methanol, followed by vortexing, sonication for 10 minutes in an iced water bath, centrifugation, and SpeedVac drying.",
+      "has_input": [
+        "nmdc:procsm-11-02vxp239"
+      ],
+      "has_output": [
+        "nmdc:procsm-11-4p7z4e88"
+      ],
+      "processing_institution": "JGI",
+      "substances_used": [
+        {
+          "type": "nmdc:PortionOfSubstance",
+          "known_as": "methanol",
+          "substance_role": "solvent",
+          "volume": {
+            "type": "nmdc:QuantityValue",
+            "has_raw_value": "1 mL",
+            "has_unit": "mL",
+            "has_numeric_value": 1
+          }
+        }
+      ],
+      "extraction_targets": [
+        "metabolite"
+      ],
+      "temperature": {
+        "type": "nmdc:QuantityValue",
+        "has_raw_value": "0 Cel",
+        "has_unit": "Cel",
+        "has_numeric_value": 0
+      }
+    },
+    {
+      "id": "nmdc:dispro-11-bre7cv61",
+      "type": "nmdc:DissolvingProcess",
+      "name": "Resuspend extracted metabolites",
+      "description": "Dried extracted metabolites from nmdc:procsm-11-4p7z4e88 resuspended in 100% methanol with isotopically labeled internal standards, with resuspension volume adjusted to normalize by extract TOC, for LC-MS preparation.",
+      "has_input": [
+        "nmdc:procsm-11-4p7z4e88"
+      ],
+      "has_output": [
+        "nmdc:procsm-11-wga70q91"
+      ],
+      "processing_institution": "JGI",
+      "substances_used": [
+        {
+          "type": "nmdc:PortionOfSubstance",
+          "known_as": "methanol",
+          "substance_role": "solvent"
+        }
+      ]
+    },
+    {
+      "id": "nmdc:subspr-11-173m6h56",
+      "type": "nmdc:SubSamplingProcess",
+      "name": "Prepare root sample",
+      "description": "Root nmdc:bsm-11-rqktre19 was frozen, lyophilized dry, and then subsampled for metabolomics analysis. Samples were bead-beaten with a stainless steel bead to powderize after subsampling.",
+      "has_input": [
+        "nmdc:bsm-11-rqktre19"
+      ],
+      "has_output": [
+        "nmdc:procsm-11-dw2xag88"
+      ],
+      "processing_institution": "JGI"
+    },
+    {
+      "id": "nmdc:extrp-11-je1v6975",
+      "type": "nmdc:Extraction",
+      "name": "Methanol extraction of metabolites",
+      "description": "Metabolites extracted from powderized nmdc:procsm-11-dw2xag88 using 100% methanol, followed by vortexing, sonication for 10 minutes in an iced water bath, centrifugation, and SpeedVac drying.",
+      "has_input": [
+        "nmdc:procsm-11-dw2xag88"
+      ],
+      "has_output": [
+        "nmdc:procsm-11-cfzqy109"
+      ],
+      "processing_institution": "JGI",
+      "substances_used": [
+        {
+          "type": "nmdc:PortionOfSubstance",
+          "known_as": "methanol",
+          "substance_role": "solvent",
+          "volume": {
+            "type": "nmdc:QuantityValue",
+            "has_raw_value": "1 mL",
+            "has_unit": "mL",
+            "has_numeric_value": 1
+          }
+        }
+      ],
+      "extraction_targets": [
+        "metabolite"
+      ],
+      "temperature": {
+        "type": "nmdc:QuantityValue",
+        "has_raw_value": "0 Cel",
+        "has_unit": "Cel",
+        "has_numeric_value": 0
+      }
+    },
+    {
+      "id": "nmdc:dispro-11-fksxd585",
+      "type": "nmdc:DissolvingProcess",
+      "name": "Resuspend extracted metabolites",
+      "description": "Dried extracted metabolites from nmdc:procsm-11-cfzqy109 resuspended in 100% methanol with isotopically labeled internal standards, with resuspension volume adjusted to normalize by extract TOC, for LC-MS preparation.",
+      "has_input": [
+        "nmdc:procsm-11-cfzqy109"
+      ],
+      "has_output": [
+        "nmdc:procsm-11-5vxmxe89"
+      ],
+      "processing_institution": "JGI",
+      "substances_used": [
+        {
+          "type": "nmdc:PortionOfSubstance",
+          "known_as": "methanol",
+          "substance_role": "solvent"
+        }
+      ]
+    },
+    {
+      "id": "nmdc:subspr-11-3yx6mm33",
+      "type": "nmdc:SubSamplingProcess",
+      "name": "Prepare root sample",
+      "description": "Root nmdc:bsm-11-snf9zn63 was frozen, lyophilized dry, and then subsampled for metabolomics analysis. Samples were bead-beaten with a stainless steel bead to powderize after subsampling.",
+      "has_input": [
+        "nmdc:bsm-11-snf9zn63"
+      ],
+      "has_output": [
+        "nmdc:procsm-11-0pqjgy88"
+      ],
+      "processing_institution": "JGI"
+    },
+    {
+      "id": "nmdc:extrp-11-9zmd0896",
+      "type": "nmdc:Extraction",
+      "name": "Methanol extraction of metabolites",
+      "description": "Metabolites extracted from powderized nmdc:procsm-11-0pqjgy88 using 100% methanol, followed by vortexing, sonication for 10 minutes in an iced water bath, centrifugation, and SpeedVac drying.",
+      "has_input": [
+        "nmdc:procsm-11-0pqjgy88"
+      ],
+      "has_output": [
+        "nmdc:procsm-11-30a1fa91"
+      ],
+      "processing_institution": "JGI",
+      "substances_used": [
+        {
+          "type": "nmdc:PortionOfSubstance",
+          "known_as": "methanol",
+          "substance_role": "solvent",
+          "volume": {
+            "type": "nmdc:QuantityValue",
+            "has_raw_value": "1 mL",
+            "has_unit": "mL",
+            "has_numeric_value": 1
+          }
+        }
+      ],
+      "extraction_targets": [
+        "metabolite"
+      ],
+      "temperature": {
+        "type": "nmdc:QuantityValue",
+        "has_raw_value": "0 Cel",
+        "has_unit": "Cel",
+        "has_numeric_value": 0
+      }
+    },
+    {
+      "id": "nmdc:dispro-11-htgm7f34",
+      "type": "nmdc:DissolvingProcess",
+      "name": "Resuspend extracted metabolites",
+      "description": "Dried extracted metabolites from nmdc:procsm-11-30a1fa91 resuspended in 100% methanol with isotopically labeled internal standards, with resuspension volume adjusted to normalize by extract TOC, for LC-MS preparation.",
+      "has_input": [
+        "nmdc:procsm-11-30a1fa91"
+      ],
+      "has_output": [
+        "nmdc:procsm-11-8hr6e469"
+      ],
+      "processing_institution": "JGI",
+      "substances_used": [
+        {
+          "type": "nmdc:PortionOfSubstance",
+          "known_as": "methanol",
+          "substance_role": "solvent"
+        }
+      ]
+    },
+    {
+      "id": "nmdc:subspr-11-zf62rk78",
+      "type": "nmdc:SubSamplingProcess",
+      "name": "Prepare root sample",
+      "description": "Root nmdc:bsm-11-v7jbqt45 was frozen, lyophilized dry, and then subsampled for metabolomics analysis. Samples were bead-beaten with a stainless steel bead to powderize after subsampling.",
+      "has_input": [
+        "nmdc:bsm-11-v7jbqt45"
+      ],
+      "has_output": [
+        "nmdc:procsm-11-t6ebvs42"
+      ],
+      "processing_institution": "JGI"
+    },
+    {
+      "id": "nmdc:extrp-11-erhdwm82",
+      "type": "nmdc:Extraction",
+      "name": "Methanol extraction of metabolites",
+      "description": "Metabolites extracted from powderized nmdc:procsm-11-t6ebvs42 using 100% methanol, followed by vortexing, sonication for 10 minutes in an iced water bath, centrifugation, and SpeedVac drying.",
+      "has_input": [
+        "nmdc:procsm-11-t6ebvs42"
+      ],
+      "has_output": [
+        "nmdc:procsm-11-zkpjrf36"
+      ],
+      "processing_institution": "JGI",
+      "substances_used": [
+        {
+          "type": "nmdc:PortionOfSubstance",
+          "known_as": "methanol",
+          "substance_role": "solvent",
+          "volume": {
+            "type": "nmdc:QuantityValue",
+            "has_raw_value": "1 mL",
+            "has_unit": "mL",
+            "has_numeric_value": 1
+          }
+        }
+      ],
+      "extraction_targets": [
+        "metabolite"
+      ],
+      "temperature": {
+        "type": "nmdc:QuantityValue",
+        "has_raw_value": "0 Cel",
+        "has_unit": "Cel",
+        "has_numeric_value": 0
+      }
+    },
+    {
+      "id": "nmdc:dispro-11-4n72zs45",
+      "type": "nmdc:DissolvingProcess",
+      "name": "Resuspend extracted metabolites",
+      "description": "Dried extracted metabolites from nmdc:procsm-11-zkpjrf36 resuspended in 100% methanol with isotopically labeled internal standards, with resuspension volume adjusted to normalize by extract TOC, for LC-MS preparation.",
+      "has_input": [
+        "nmdc:procsm-11-zkpjrf36"
+      ],
+      "has_output": [
+        "nmdc:procsm-11-pfgza856"
+      ],
+      "processing_institution": "JGI",
+      "substances_used": [
+        {
+          "type": "nmdc:PortionOfSubstance",
+          "known_as": "methanol",
+          "substance_role": "solvent"
+        }
+      ]
+    },
+    {
+      "id": "nmdc:subspr-11-9qxea113",
+      "type": "nmdc:SubSamplingProcess",
+      "name": "Prepare root sample",
+      "description": "Root nmdc:bsm-11-w4tyzd28 was frozen, lyophilized dry, and then subsampled for metabolomics analysis. Samples were bead-beaten with a stainless steel bead to powderize after subsampling.",
+      "has_input": [
+        "nmdc:bsm-11-w4tyzd28"
+      ],
+      "has_output": [
+        "nmdc:procsm-11-4f50g914"
+      ],
+      "processing_institution": "JGI"
+    },
+    {
+      "id": "nmdc:extrp-11-te2xh570",
+      "type": "nmdc:Extraction",
+      "name": "Methanol extraction of metabolites",
+      "description": "Metabolites extracted from powderized nmdc:procsm-11-4f50g914 using 100% methanol, followed by vortexing, sonication for 10 minutes in an iced water bath, centrifugation, and SpeedVac drying.",
+      "has_input": [
+        "nmdc:procsm-11-4f50g914"
+      ],
+      "has_output": [
+        "nmdc:procsm-11-8k3khj52"
+      ],
+      "processing_institution": "JGI",
+      "substances_used": [
+        {
+          "type": "nmdc:PortionOfSubstance",
+          "known_as": "methanol",
+          "substance_role": "solvent",
+          "volume": {
+            "type": "nmdc:QuantityValue",
+            "has_raw_value": "1 mL",
+            "has_unit": "mL",
+            "has_numeric_value": 1
+          }
+        }
+      ],
+      "extraction_targets": [
+        "metabolite"
+      ],
+      "temperature": {
+        "type": "nmdc:QuantityValue",
+        "has_raw_value": "0 Cel",
+        "has_unit": "Cel",
+        "has_numeric_value": 0
+      }
+    },
+    {
+      "id": "nmdc:dispro-11-cs1xvz54",
+      "type": "nmdc:DissolvingProcess",
+      "name": "Resuspend extracted metabolites",
+      "description": "Dried extracted metabolites from nmdc:procsm-11-8k3khj52 resuspended in 100% methanol with isotopically labeled internal standards, with resuspension volume adjusted to normalize by extract TOC, for LC-MS preparation.",
+      "has_input": [
+        "nmdc:procsm-11-8k3khj52"
+      ],
+      "has_output": [
+        "nmdc:procsm-11-9rsn9v21"
+      ],
+      "processing_institution": "JGI",
+      "substances_used": [
+        {
+          "type": "nmdc:PortionOfSubstance",
+          "known_as": "methanol",
+          "substance_role": "solvent"
+        }
+      ]
+    },
+    {
+      "id": "nmdc:subspr-11-xfanff20",
+      "type": "nmdc:SubSamplingProcess",
+      "name": "Prepare root sample",
+      "description": "Root nmdc:bsm-11-w4w0b844 was frozen, lyophilized dry, and then subsampled for metabolomics analysis. Samples were bead-beaten with a stainless steel bead to powderize after subsampling.",
+      "has_input": [
+        "nmdc:bsm-11-w4w0b844"
+      ],
+      "has_output": [
+        "nmdc:procsm-11-mspxt649"
+      ],
+      "processing_institution": "JGI"
+    },
+    {
+      "id": "nmdc:extrp-11-d4f4ah31",
+      "type": "nmdc:Extraction",
+      "name": "Methanol extraction of metabolites",
+      "description": "Metabolites extracted from powderized nmdc:procsm-11-mspxt649 using 100% methanol, followed by vortexing, sonication for 10 minutes in an iced water bath, centrifugation, and SpeedVac drying.",
+      "has_input": [
+        "nmdc:procsm-11-mspxt649"
+      ],
+      "has_output": [
+        "nmdc:procsm-11-gkwfbk52"
+      ],
+      "processing_institution": "JGI",
+      "substances_used": [
+        {
+          "type": "nmdc:PortionOfSubstance",
+          "known_as": "methanol",
+          "substance_role": "solvent",
+          "volume": {
+            "type": "nmdc:QuantityValue",
+            "has_raw_value": "1 mL",
+            "has_unit": "mL",
+            "has_numeric_value": 1
+          }
+        }
+      ],
+      "extraction_targets": [
+        "metabolite"
+      ],
+      "temperature": {
+        "type": "nmdc:QuantityValue",
+        "has_raw_value": "0 Cel",
+        "has_unit": "Cel",
+        "has_numeric_value": 0
+      }
+    },
+    {
+      "id": "nmdc:dispro-11-9726d824",
+      "type": "nmdc:DissolvingProcess",
+      "name": "Resuspend extracted metabolites",
+      "description": "Dried extracted metabolites from nmdc:procsm-11-gkwfbk52 resuspended in 100% methanol with isotopically labeled internal standards, with resuspension volume adjusted to normalize by extract TOC, for LC-MS preparation.",
+      "has_input": [
+        "nmdc:procsm-11-gkwfbk52"
+      ],
+      "has_output": [
+        "nmdc:procsm-11-wbw26r26"
+      ],
+      "processing_institution": "JGI",
+      "substances_used": [
+        {
+          "type": "nmdc:PortionOfSubstance",
+          "known_as": "methanol",
+          "substance_role": "solvent"
+        }
+      ]
+    },
+    {
+      "id": "nmdc:subspr-11-ptvptr35",
+      "type": "nmdc:SubSamplingProcess",
+      "name": "Prepare root sample",
+      "description": "Root nmdc:bsm-11-ww5h0770 was frozen, lyophilized dry, and then subsampled for metabolomics analysis. Samples were bead-beaten with a stainless steel bead to powderize after subsampling.",
+      "has_input": [
+        "nmdc:bsm-11-ww5h0770"
+      ],
+      "has_output": [
+        "nmdc:procsm-11-53tww171"
+      ],
+      "processing_institution": "JGI"
+    },
+    {
+      "id": "nmdc:extrp-11-fq112e14",
+      "type": "nmdc:Extraction",
+      "name": "Methanol extraction of metabolites",
+      "description": "Metabolites extracted from powderized nmdc:procsm-11-53tww171 using 100% methanol, followed by vortexing, sonication for 10 minutes in an iced water bath, centrifugation, and SpeedVac drying.",
+      "has_input": [
+        "nmdc:procsm-11-53tww171"
+      ],
+      "has_output": [
+        "nmdc:procsm-11-nyy3ne21"
+      ],
+      "processing_institution": "JGI",
+      "substances_used": [
+        {
+          "type": "nmdc:PortionOfSubstance",
+          "known_as": "methanol",
+          "substance_role": "solvent",
+          "volume": {
+            "type": "nmdc:QuantityValue",
+            "has_raw_value": "1 mL",
+            "has_unit": "mL",
+            "has_numeric_value": 1
+          }
+        }
+      ],
+      "extraction_targets": [
+        "metabolite"
+      ],
+      "temperature": {
+        "type": "nmdc:QuantityValue",
+        "has_raw_value": "0 Cel",
+        "has_unit": "Cel",
+        "has_numeric_value": 0
+      }
+    },
+    {
+      "id": "nmdc:dispro-11-h493wy66",
+      "type": "nmdc:DissolvingProcess",
+      "name": "Resuspend extracted metabolites",
+      "description": "Dried extracted metabolites from nmdc:procsm-11-nyy3ne21 resuspended in 100% methanol with isotopically labeled internal standards, with resuspension volume adjusted to normalize by extract TOC, for LC-MS preparation.",
+      "has_input": [
+        "nmdc:procsm-11-nyy3ne21"
+      ],
+      "has_output": [
+        "nmdc:procsm-11-gbmdr546"
+      ],
+      "processing_institution": "JGI",
+      "substances_used": [
+        {
+          "type": "nmdc:PortionOfSubstance",
+          "known_as": "methanol",
+          "substance_role": "solvent"
+        }
+      ]
+    },
+    {
+      "id": "nmdc:subspr-11-1rrxqz80",
+      "type": "nmdc:SubSamplingProcess",
+      "name": "Prepare root sample",
+      "description": "Root nmdc:bsm-11-xdjvn828 was frozen, lyophilized dry, and then subsampled for metabolomics analysis. Samples were bead-beaten with a stainless steel bead to powderize after subsampling.",
+      "has_input": [
+        "nmdc:bsm-11-xdjvn828"
+      ],
+      "has_output": [
+        "nmdc:procsm-11-c4dcfw48"
+      ],
+      "processing_institution": "JGI"
+    },
+    {
+      "id": "nmdc:extrp-11-cw72dk64",
+      "type": "nmdc:Extraction",
+      "name": "Methanol extraction of metabolites",
+      "description": "Metabolites extracted from powderized nmdc:procsm-11-c4dcfw48 using 100% methanol, followed by vortexing, sonication for 10 minutes in an iced water bath, centrifugation, and SpeedVac drying.",
+      "has_input": [
+        "nmdc:procsm-11-c4dcfw48"
+      ],
+      "has_output": [
+        "nmdc:procsm-11-5c06s032"
+      ],
+      "processing_institution": "JGI",
+      "substances_used": [
+        {
+          "type": "nmdc:PortionOfSubstance",
+          "known_as": "methanol",
+          "substance_role": "solvent",
+          "volume": {
+            "type": "nmdc:QuantityValue",
+            "has_raw_value": "1 mL",
+            "has_unit": "mL",
+            "has_numeric_value": 1
+          }
+        }
+      ],
+      "extraction_targets": [
+        "metabolite"
+      ],
+      "temperature": {
+        "type": "nmdc:QuantityValue",
+        "has_raw_value": "0 Cel",
+        "has_unit": "Cel",
+        "has_numeric_value": 0
+      }
+    },
+    {
+      "id": "nmdc:dispro-11-9ygegm07",
+      "type": "nmdc:DissolvingProcess",
+      "name": "Resuspend extracted metabolites",
+      "description": "Dried extracted metabolites from nmdc:procsm-11-5c06s032 resuspended in 100% methanol with isotopically labeled internal standards, with resuspension volume adjusted to normalize by extract TOC, for LC-MS preparation.",
+      "has_input": [
+        "nmdc:procsm-11-5c06s032"
+      ],
+      "has_output": [
+        "nmdc:procsm-11-5s8yw710"
+      ],
+      "processing_institution": "JGI",
+      "substances_used": [
+        {
+          "type": "nmdc:PortionOfSubstance",
+          "known_as": "methanol",
+          "substance_role": "solvent"
+        }
+      ]
+    },
+    {
+      "id": "nmdc:subspr-11-kg5sgr65",
+      "type": "nmdc:SubSamplingProcess",
+      "name": "Prepare root sample",
+      "description": "Root nmdc:bsm-11-z6kxrf72 was frozen, lyophilized dry, and then subsampled for metabolomics analysis. Samples were bead-beaten with a stainless steel bead to powderize after subsampling.",
+      "has_input": [
+        "nmdc:bsm-11-z6kxrf72"
+      ],
+      "has_output": [
+        "nmdc:procsm-11-yvnaqw21"
+      ],
+      "processing_institution": "JGI"
+    },
+    {
+      "id": "nmdc:extrp-11-fyetyz09",
+      "type": "nmdc:Extraction",
+      "name": "Methanol extraction of metabolites",
+      "description": "Metabolites extracted from powderized nmdc:procsm-11-yvnaqw21 using 100% methanol, followed by vortexing, sonication for 10 minutes in an iced water bath, centrifugation, and SpeedVac drying.",
+      "has_input": [
+        "nmdc:procsm-11-yvnaqw21"
+      ],
+      "has_output": [
+        "nmdc:procsm-11-0wse9h89"
+      ],
+      "processing_institution": "JGI",
+      "substances_used": [
+        {
+          "type": "nmdc:PortionOfSubstance",
+          "known_as": "methanol",
+          "substance_role": "solvent",
+          "volume": {
+            "type": "nmdc:QuantityValue",
+            "has_raw_value": "1 mL",
+            "has_unit": "mL",
+            "has_numeric_value": 1
+          }
+        }
+      ],
+      "extraction_targets": [
+        "metabolite"
+      ],
+      "temperature": {
+        "type": "nmdc:QuantityValue",
+        "has_raw_value": "0 Cel",
+        "has_unit": "Cel",
+        "has_numeric_value": 0
+      }
+    },
+    {
+      "id": "nmdc:dispro-11-4ywxp298",
+      "type": "nmdc:DissolvingProcess",
+      "name": "Resuspend extracted metabolites",
+      "description": "Dried extracted metabolites from nmdc:procsm-11-0wse9h89 resuspended in 100% methanol with isotopically labeled internal standards, with resuspension volume adjusted to normalize by extract TOC, for LC-MS preparation.",
+      "has_input": [
+        "nmdc:procsm-11-0wse9h89"
+      ],
+      "has_output": [
+        "nmdc:procsm-11-xf7c7r20"
+      ],
+      "processing_institution": "JGI",
+      "substances_used": [
+        {
+          "type": "nmdc:PortionOfSubstance",
+          "known_as": "methanol",
+          "substance_role": "solvent"
+        }
+      ]
+    },
+    {
+      "id": "nmdc:subspr-11-4fyy2k49",
+      "type": "nmdc:SubSamplingProcess",
+      "name": "Prepare root sample",
+      "description": "Root nmdc:bsm-11-zmx1nq19 was frozen, lyophilized dry, and then subsampled for metabolomics analysis. Samples were bead-beaten with a stainless steel bead to powderize after subsampling.",
+      "has_input": [
+        "nmdc:bsm-11-zmx1nq19"
+      ],
+      "has_output": [
+        "nmdc:procsm-11-cx4b3g74"
+      ],
+      "processing_institution": "JGI"
+    },
+    {
+      "id": "nmdc:extrp-11-wawgd571",
+      "type": "nmdc:Extraction",
+      "name": "Methanol extraction of metabolites",
+      "description": "Metabolites extracted from powderized nmdc:procsm-11-cx4b3g74 using 100% methanol, followed by vortexing, sonication for 10 minutes in an iced water bath, centrifugation, and SpeedVac drying.",
+      "has_input": [
+        "nmdc:procsm-11-cx4b3g74"
+      ],
+      "has_output": [
+        "nmdc:procsm-11-k0ckrd95"
+      ],
+      "processing_institution": "JGI",
+      "substances_used": [
+        {
+          "type": "nmdc:PortionOfSubstance",
+          "known_as": "methanol",
+          "substance_role": "solvent",
+          "volume": {
+            "type": "nmdc:QuantityValue",
+            "has_raw_value": "1 mL",
+            "has_unit": "mL",
+            "has_numeric_value": 1
+          }
+        }
+      ],
+      "extraction_targets": [
+        "metabolite"
+      ],
+      "temperature": {
+        "type": "nmdc:QuantityValue",
+        "has_raw_value": "0 Cel",
+        "has_unit": "Cel",
+        "has_numeric_value": 0
+      }
+    },
+    {
+      "id": "nmdc:dispro-11-728ht233",
+      "type": "nmdc:DissolvingProcess",
+      "name": "Resuspend extracted metabolites",
+      "description": "Dried extracted metabolites from nmdc:procsm-11-k0ckrd95 resuspended in 100% methanol with isotopically labeled internal standards, with resuspension volume adjusted to normalize by extract TOC, for LC-MS preparation.",
+      "has_input": [
+        "nmdc:procsm-11-k0ckrd95"
+      ],
+      "has_output": [
+        "nmdc:procsm-11-zb39xb47"
+      ],
+      "processing_institution": "JGI",
+      "substances_used": [
+        {
+          "type": "nmdc:PortionOfSubstance",
+          "known_as": "methanol",
+          "substance_role": "solvent"
+        }
+      ]
+    }
+  ],
+  "processed_sample_set": [
+    {
+      "id": "nmdc:procsm-11-894aj150",
+      "type": "nmdc:ProcessedSample",
+      "name": "nmdc:bsm-11-10kjq953_lyophilized_subsample",
+      "description": "Subsample of nmdc:bsm-11-10kjq953 root after freezing, lyophilization, and powderization."
+    },
+    {
+      "id": "nmdc:procsm-11-61mkj755",
+      "type": "nmdc:ProcessedSample",
+      "name": "nmdc:bsm-11-10kjq953_methanol_extract_dried",
+      "description": "Dried methanol extract containing metabolites from nmdc:procsm-11-894aj150."
+    },
+    {
+      "id": "nmdc:procsm-11-0dkt6k22",
+      "type": "nmdc:ProcessedSample",
+      "name": "nmdc:bsm-11-10kjq953_resuspended_for_LCMS",
+      "description": "Resuspended metabolites from nmdc:procsm-11-61mkj755 for LC-MS analysis."
+    },
+    {
+      "id": "nmdc:procsm-11-x6y2d309",
+      "type": "nmdc:ProcessedSample",
+      "name": "nmdc:bsm-11-1sdkpz20_lyophilized_subsample",
+      "description": "Subsample of nmdc:bsm-11-1sdkpz20 root after freezing, lyophilization, and powderization."
+    },
+    {
+      "id": "nmdc:procsm-11-q3x5r186",
+      "type": "nmdc:ProcessedSample",
+      "name": "nmdc:bsm-11-1sdkpz20_methanol_extract_dried",
+      "description": "Dried methanol extract containing metabolites from nmdc:procsm-11-x6y2d309."
+    },
+    {
+      "id": "nmdc:procsm-11-bxjgq664",
+      "type": "nmdc:ProcessedSample",
+      "name": "nmdc:bsm-11-1sdkpz20_resuspended_for_LCMS",
+      "description": "Resuspended metabolites from nmdc:procsm-11-q3x5r186 for LC-MS analysis."
+    },
+    {
+      "id": "nmdc:procsm-11-8kqq6915",
+      "type": "nmdc:ProcessedSample",
+      "name": "nmdc:bsm-11-21kzd377_lyophilized_subsample",
+      "description": "Subsample of nmdc:bsm-11-21kzd377 root after freezing, lyophilization, and powderization."
+    },
+    {
+      "id": "nmdc:procsm-11-w67gdy98",
+      "type": "nmdc:ProcessedSample",
+      "name": "nmdc:bsm-11-21kzd377_methanol_extract_dried",
+      "description": "Dried methanol extract containing metabolites from nmdc:procsm-11-8kqq6915."
+    },
+    {
+      "id": "nmdc:procsm-11-5mnkj364",
+      "type": "nmdc:ProcessedSample",
+      "name": "nmdc:bsm-11-21kzd377_resuspended_for_LCMS",
+      "description": "Resuspended metabolites from nmdc:procsm-11-w67gdy98 for LC-MS analysis."
+    },
+    {
+      "id": "nmdc:procsm-11-2w3rxr08",
+      "type": "nmdc:ProcessedSample",
+      "name": "nmdc:bsm-11-2bnqye24_lyophilized_subsample",
+      "description": "Subsample of nmdc:bsm-11-2bnqye24 root after freezing, lyophilization, and powderization."
+    },
+    {
+      "id": "nmdc:procsm-11-kqcdkh54",
+      "type": "nmdc:ProcessedSample",
+      "name": "nmdc:bsm-11-2bnqye24_methanol_extract_dried",
+      "description": "Dried methanol extract containing metabolites from nmdc:procsm-11-2w3rxr08."
+    },
+    {
+      "id": "nmdc:procsm-11-a4wv8r70",
+      "type": "nmdc:ProcessedSample",
+      "name": "nmdc:bsm-11-2bnqye24_resuspended_for_LCMS",
+      "description": "Resuspended metabolites from nmdc:procsm-11-kqcdkh54 for LC-MS analysis."
+    },
+    {
+      "id": "nmdc:procsm-11-wk0ehk41",
+      "type": "nmdc:ProcessedSample",
+      "name": "nmdc:bsm-11-2d0mzn96_lyophilized_subsample",
+      "description": "Subsample of nmdc:bsm-11-2d0mzn96 root after freezing, lyophilization, and powderization."
+    },
+    {
+      "id": "nmdc:procsm-11-b63rm424",
+      "type": "nmdc:ProcessedSample",
+      "name": "nmdc:bsm-11-2d0mzn96_methanol_extract_dried",
+      "description": "Dried methanol extract containing metabolites from nmdc:procsm-11-wk0ehk41."
+    },
+    {
+      "id": "nmdc:procsm-11-5mgztq29",
+      "type": "nmdc:ProcessedSample",
+      "name": "nmdc:bsm-11-2d0mzn96_resuspended_for_LCMS",
+      "description": "Resuspended metabolites from nmdc:procsm-11-b63rm424 for LC-MS analysis."
+    },
+    {
+      "id": "nmdc:procsm-11-sm2mcw79",
+      "type": "nmdc:ProcessedSample",
+      "name": "nmdc:bsm-11-2px7mg21_lyophilized_subsample",
+      "description": "Subsample of nmdc:bsm-11-2px7mg21 root after freezing, lyophilization, and powderization."
+    },
+    {
+      "id": "nmdc:procsm-11-24d8jt63",
+      "type": "nmdc:ProcessedSample",
+      "name": "nmdc:bsm-11-2px7mg21_methanol_extract_dried",
+      "description": "Dried methanol extract containing metabolites from nmdc:procsm-11-sm2mcw79."
+    },
+    {
+      "id": "nmdc:procsm-11-r8jkbh86",
+      "type": "nmdc:ProcessedSample",
+      "name": "nmdc:bsm-11-2px7mg21_resuspended_for_LCMS",
+      "description": "Resuspended metabolites from nmdc:procsm-11-24d8jt63 for LC-MS analysis."
+    },
+    {
+      "id": "nmdc:procsm-11-78f8rt38",
+      "type": "nmdc:ProcessedSample",
+      "name": "nmdc:bsm-11-2v2sz563_lyophilized_subsample",
+      "description": "Subsample of nmdc:bsm-11-2v2sz563 root after freezing, lyophilization, and powderization."
+    },
+    {
+      "id": "nmdc:procsm-11-jjheme62",
+      "type": "nmdc:ProcessedSample",
+      "name": "nmdc:bsm-11-2v2sz563_methanol_extract_dried",
+      "description": "Dried methanol extract containing metabolites from nmdc:procsm-11-78f8rt38."
+    },
+    {
+      "id": "nmdc:procsm-11-15gf1f53",
+      "type": "nmdc:ProcessedSample",
+      "name": "nmdc:bsm-11-2v2sz563_resuspended_for_LCMS",
+      "description": "Resuspended metabolites from nmdc:procsm-11-jjheme62 for LC-MS analysis."
+    },
+    {
+      "id": "nmdc:procsm-11-rw389x78",
+      "type": "nmdc:ProcessedSample",
+      "name": "nmdc:bsm-11-337xtd94_lyophilized_subsample",
+      "description": "Subsample of nmdc:bsm-11-337xtd94 root after freezing, lyophilization, and powderization."
+    },
+    {
+      "id": "nmdc:procsm-11-ksstcr41",
+      "type": "nmdc:ProcessedSample",
+      "name": "nmdc:bsm-11-337xtd94_methanol_extract_dried",
+      "description": "Dried methanol extract containing metabolites from nmdc:procsm-11-rw389x78."
+    },
+    {
+      "id": "nmdc:procsm-11-an2rv683",
+      "type": "nmdc:ProcessedSample",
+      "name": "nmdc:bsm-11-337xtd94_resuspended_for_LCMS",
+      "description": "Resuspended metabolites from nmdc:procsm-11-ksstcr41 for LC-MS analysis."
+    },
+    {
+      "id": "nmdc:procsm-11-6xzfy632",
+      "type": "nmdc:ProcessedSample",
+      "name": "nmdc:bsm-11-3qv14w45_lyophilized_subsample",
+      "description": "Subsample of nmdc:bsm-11-3qv14w45 root after freezing, lyophilization, and powderization."
+    },
+    {
+      "id": "nmdc:procsm-11-kaze6x36",
+      "type": "nmdc:ProcessedSample",
+      "name": "nmdc:bsm-11-3qv14w45_methanol_extract_dried",
+      "description": "Dried methanol extract containing metabolites from nmdc:procsm-11-6xzfy632."
+    },
+    {
+      "id": "nmdc:procsm-11-nyczat92",
+      "type": "nmdc:ProcessedSample",
+      "name": "nmdc:bsm-11-3qv14w45_resuspended_for_LCMS",
+      "description": "Resuspended metabolites from nmdc:procsm-11-kaze6x36 for LC-MS analysis."
+    },
+    {
+      "id": "nmdc:procsm-11-qq7ayq93",
+      "type": "nmdc:ProcessedSample",
+      "name": "nmdc:bsm-11-57vncq38_lyophilized_subsample",
+      "description": "Subsample of nmdc:bsm-11-57vncq38 root after freezing, lyophilization, and powderization."
+    },
+    {
+      "id": "nmdc:procsm-11-ycwssm11",
+      "type": "nmdc:ProcessedSample",
+      "name": "nmdc:bsm-11-57vncq38_methanol_extract_dried",
+      "description": "Dried methanol extract containing metabolites from nmdc:procsm-11-qq7ayq93."
+    },
+    {
+      "id": "nmdc:procsm-11-b7fgrg75",
+      "type": "nmdc:ProcessedSample",
+      "name": "nmdc:bsm-11-57vncq38_resuspended_for_LCMS",
+      "description": "Resuspended metabolites from nmdc:procsm-11-ycwssm11 for LC-MS analysis."
+    },
+    {
+      "id": "nmdc:procsm-11-m6r15958",
+      "type": "nmdc:ProcessedSample",
+      "name": "nmdc:bsm-11-5te06z38_lyophilized_subsample",
+      "description": "Subsample of nmdc:bsm-11-5te06z38 root after freezing, lyophilization, and powderization."
+    },
+    {
+      "id": "nmdc:procsm-11-5cfzff35",
+      "type": "nmdc:ProcessedSample",
+      "name": "nmdc:bsm-11-5te06z38_methanol_extract_dried",
+      "description": "Dried methanol extract containing metabolites from nmdc:procsm-11-m6r15958."
+    },
+    {
+      "id": "nmdc:procsm-11-nwgdhr72",
+      "type": "nmdc:ProcessedSample",
+      "name": "nmdc:bsm-11-5te06z38_resuspended_for_LCMS",
+      "description": "Resuspended metabolites from nmdc:procsm-11-5cfzff35 for LC-MS analysis."
+    },
+    {
+      "id": "nmdc:procsm-11-6h78kz97",
+      "type": "nmdc:ProcessedSample",
+      "name": "nmdc:bsm-11-5vz50b85_lyophilized_subsample",
+      "description": "Subsample of nmdc:bsm-11-5vz50b85 root after freezing, lyophilization, and powderization."
+    },
+    {
+      "id": "nmdc:procsm-11-b5rdb633",
+      "type": "nmdc:ProcessedSample",
+      "name": "nmdc:bsm-11-5vz50b85_methanol_extract_dried",
+      "description": "Dried methanol extract containing metabolites from nmdc:procsm-11-6h78kz97."
+    },
+    {
+      "id": "nmdc:procsm-11-3e9d4479",
+      "type": "nmdc:ProcessedSample",
+      "name": "nmdc:bsm-11-5vz50b85_resuspended_for_LCMS",
+      "description": "Resuspended metabolites from nmdc:procsm-11-b5rdb633 for LC-MS analysis."
+    },
+    {
+      "id": "nmdc:procsm-11-8gx6ts15",
+      "type": "nmdc:ProcessedSample",
+      "name": "nmdc:bsm-11-5yg12p32_lyophilized_subsample",
+      "description": "Subsample of nmdc:bsm-11-5yg12p32 root after freezing, lyophilization, and powderization."
+    },
+    {
+      "id": "nmdc:procsm-11-17527j71",
+      "type": "nmdc:ProcessedSample",
+      "name": "nmdc:bsm-11-5yg12p32_methanol_extract_dried",
+      "description": "Dried methanol extract containing metabolites from nmdc:procsm-11-8gx6ts15."
+    },
+    {
+      "id": "nmdc:procsm-11-zvj5wy92",
+      "type": "nmdc:ProcessedSample",
+      "name": "nmdc:bsm-11-5yg12p32_resuspended_for_LCMS",
+      "description": "Resuspended metabolites from nmdc:procsm-11-17527j71 for LC-MS analysis."
+    },
+    {
+      "id": "nmdc:procsm-11-tpr2kp07",
+      "type": "nmdc:ProcessedSample",
+      "name": "nmdc:bsm-11-6g8d5g69_lyophilized_subsample",
+      "description": "Subsample of nmdc:bsm-11-6g8d5g69 root after freezing, lyophilization, and powderization."
+    },
+    {
+      "id": "nmdc:procsm-11-7eptxh43",
+      "type": "nmdc:ProcessedSample",
+      "name": "nmdc:bsm-11-6g8d5g69_methanol_extract_dried",
+      "description": "Dried methanol extract containing metabolites from nmdc:procsm-11-tpr2kp07."
+    },
+    {
+      "id": "nmdc:procsm-11-28c8st41",
+      "type": "nmdc:ProcessedSample",
+      "name": "nmdc:bsm-11-6g8d5g69_resuspended_for_LCMS",
+      "description": "Resuspended metabolites from nmdc:procsm-11-7eptxh43 for LC-MS analysis."
+    },
+    {
+      "id": "nmdc:procsm-11-658cm880",
+      "type": "nmdc:ProcessedSample",
+      "name": "nmdc:bsm-11-6mp6qm50_lyophilized_subsample",
+      "description": "Subsample of nmdc:bsm-11-6mp6qm50 root after freezing, lyophilization, and powderization."
+    },
+    {
+      "id": "nmdc:procsm-11-ky2ejf07",
+      "type": "nmdc:ProcessedSample",
+      "name": "nmdc:bsm-11-6mp6qm50_methanol_extract_dried",
+      "description": "Dried methanol extract containing metabolites from nmdc:procsm-11-658cm880."
+    },
+    {
+      "id": "nmdc:procsm-11-9armxr22",
+      "type": "nmdc:ProcessedSample",
+      "name": "nmdc:bsm-11-6mp6qm50_resuspended_for_LCMS",
+      "description": "Resuspended metabolites from nmdc:procsm-11-ky2ejf07 for LC-MS analysis."
+    },
+    {
+      "id": "nmdc:procsm-11-gernv967",
+      "type": "nmdc:ProcessedSample",
+      "name": "nmdc:bsm-11-6s6nr025_lyophilized_subsample",
+      "description": "Subsample of nmdc:bsm-11-6s6nr025 root after freezing, lyophilization, and powderization."
+    },
+    {
+      "id": "nmdc:procsm-11-kmrjjb60",
+      "type": "nmdc:ProcessedSample",
+      "name": "nmdc:bsm-11-6s6nr025_methanol_extract_dried",
+      "description": "Dried methanol extract containing metabolites from nmdc:procsm-11-gernv967."
+    },
+    {
+      "id": "nmdc:procsm-11-mfah9n08",
+      "type": "nmdc:ProcessedSample",
+      "name": "nmdc:bsm-11-6s6nr025_resuspended_for_LCMS",
+      "description": "Resuspended metabolites from nmdc:procsm-11-kmrjjb60 for LC-MS analysis."
+    },
+    {
+      "id": "nmdc:procsm-11-e4qbs662",
+      "type": "nmdc:ProcessedSample",
+      "name": "nmdc:bsm-11-7ac2z315_lyophilized_subsample",
+      "description": "Subsample of nmdc:bsm-11-7ac2z315 root after freezing, lyophilization, and powderization."
+    },
+    {
+      "id": "nmdc:procsm-11-b4z5a481",
+      "type": "nmdc:ProcessedSample",
+      "name": "nmdc:bsm-11-7ac2z315_methanol_extract_dried",
+      "description": "Dried methanol extract containing metabolites from nmdc:procsm-11-e4qbs662."
+    },
+    {
+      "id": "nmdc:procsm-11-35pmpv49",
+      "type": "nmdc:ProcessedSample",
+      "name": "nmdc:bsm-11-7ac2z315_resuspended_for_LCMS",
+      "description": "Resuspended metabolites from nmdc:procsm-11-b4z5a481 for LC-MS analysis."
+    },
+    {
+      "id": "nmdc:procsm-11-8j8x0k58",
+      "type": "nmdc:ProcessedSample",
+      "name": "nmdc:bsm-11-7b05ca84_lyophilized_subsample",
+      "description": "Subsample of nmdc:bsm-11-7b05ca84 root after freezing, lyophilization, and powderization."
+    },
+    {
+      "id": "nmdc:procsm-11-ta04m028",
+      "type": "nmdc:ProcessedSample",
+      "name": "nmdc:bsm-11-7b05ca84_methanol_extract_dried",
+      "description": "Dried methanol extract containing metabolites from nmdc:procsm-11-8j8x0k58."
+    },
+    {
+      "id": "nmdc:procsm-11-ycp8es87",
+      "type": "nmdc:ProcessedSample",
+      "name": "nmdc:bsm-11-7b05ca84_resuspended_for_LCMS",
+      "description": "Resuspended metabolites from nmdc:procsm-11-ta04m028 for LC-MS analysis."
+    },
+    {
+      "id": "nmdc:procsm-11-b47mt069",
+      "type": "nmdc:ProcessedSample",
+      "name": "nmdc:bsm-11-7pxptb67_lyophilized_subsample",
+      "description": "Subsample of nmdc:bsm-11-7pxptb67 root after freezing, lyophilization, and powderization."
+    },
+    {
+      "id": "nmdc:procsm-11-9pg09d08",
+      "type": "nmdc:ProcessedSample",
+      "name": "nmdc:bsm-11-7pxptb67_methanol_extract_dried",
+      "description": "Dried methanol extract containing metabolites from nmdc:procsm-11-b47mt069."
+    },
+    {
+      "id": "nmdc:procsm-11-ncbdr751",
+      "type": "nmdc:ProcessedSample",
+      "name": "nmdc:bsm-11-7pxptb67_resuspended_for_LCMS",
+      "description": "Resuspended metabolites from nmdc:procsm-11-9pg09d08 for LC-MS analysis."
+    },
+    {
+      "id": "nmdc:procsm-11-pdpt1174",
+      "type": "nmdc:ProcessedSample",
+      "name": "nmdc:bsm-11-7w0ggn04_lyophilized_subsample",
+      "description": "Subsample of nmdc:bsm-11-7w0ggn04 root after freezing, lyophilization, and powderization."
+    },
+    {
+      "id": "nmdc:procsm-11-41nvp281",
+      "type": "nmdc:ProcessedSample",
+      "name": "nmdc:bsm-11-7w0ggn04_methanol_extract_dried",
+      "description": "Dried methanol extract containing metabolites from nmdc:procsm-11-pdpt1174."
+    },
+    {
+      "id": "nmdc:procsm-11-qqeajf95",
+      "type": "nmdc:ProcessedSample",
+      "name": "nmdc:bsm-11-7w0ggn04_resuspended_for_LCMS",
+      "description": "Resuspended metabolites from nmdc:procsm-11-41nvp281 for LC-MS analysis."
+    },
+    {
+      "id": "nmdc:procsm-11-d1589j57",
+      "type": "nmdc:ProcessedSample",
+      "name": "nmdc:bsm-11-8t538t71_lyophilized_subsample",
+      "description": "Subsample of nmdc:bsm-11-8t538t71 root after freezing, lyophilization, and powderization."
+    },
+    {
+      "id": "nmdc:procsm-11-yh499194",
+      "type": "nmdc:ProcessedSample",
+      "name": "nmdc:bsm-11-8t538t71_methanol_extract_dried",
+      "description": "Dried methanol extract containing metabolites from nmdc:procsm-11-d1589j57."
+    },
+    {
+      "id": "nmdc:procsm-11-prgh2x54",
+      "type": "nmdc:ProcessedSample",
+      "name": "nmdc:bsm-11-8t538t71_resuspended_for_LCMS",
+      "description": "Resuspended metabolites from nmdc:procsm-11-yh499194 for LC-MS analysis."
+    },
+    {
+      "id": "nmdc:procsm-11-m725xb65",
+      "type": "nmdc:ProcessedSample",
+      "name": "nmdc:bsm-11-93y9wj40_lyophilized_subsample",
+      "description": "Subsample of nmdc:bsm-11-93y9wj40 root after freezing, lyophilization, and powderization."
+    },
+    {
+      "id": "nmdc:procsm-11-7bvn0m72",
+      "type": "nmdc:ProcessedSample",
+      "name": "nmdc:bsm-11-93y9wj40_methanol_extract_dried",
+      "description": "Dried methanol extract containing metabolites from nmdc:procsm-11-m725xb65."
+    },
+    {
+      "id": "nmdc:procsm-11-7rgx2y54",
+      "type": "nmdc:ProcessedSample",
+      "name": "nmdc:bsm-11-93y9wj40_resuspended_for_LCMS",
+      "description": "Resuspended metabolites from nmdc:procsm-11-7bvn0m72 for LC-MS analysis."
+    },
+    {
+      "id": "nmdc:procsm-11-3sd4dq52",
+      "type": "nmdc:ProcessedSample",
+      "name": "nmdc:bsm-11-9fgqs731_lyophilized_subsample",
+      "description": "Subsample of nmdc:bsm-11-9fgqs731 root after freezing, lyophilization, and powderization."
+    },
+    {
+      "id": "nmdc:procsm-11-1ryt8t17",
+      "type": "nmdc:ProcessedSample",
+      "name": "nmdc:bsm-11-9fgqs731_methanol_extract_dried",
+      "description": "Dried methanol extract containing metabolites from nmdc:procsm-11-3sd4dq52."
+    },
+    {
+      "id": "nmdc:procsm-11-46044f04",
+      "type": "nmdc:ProcessedSample",
+      "name": "nmdc:bsm-11-9fgqs731_resuspended_for_LCMS",
+      "description": "Resuspended metabolites from nmdc:procsm-11-1ryt8t17 for LC-MS analysis."
+    },
+    {
+      "id": "nmdc:procsm-11-q3n2n625",
+      "type": "nmdc:ProcessedSample",
+      "name": "nmdc:bsm-11-a51gg456_lyophilized_subsample",
+      "description": "Subsample of nmdc:bsm-11-a51gg456 root after freezing, lyophilization, and powderization."
+    },
+    {
+      "id": "nmdc:procsm-11-ds5hn367",
+      "type": "nmdc:ProcessedSample",
+      "name": "nmdc:bsm-11-a51gg456_methanol_extract_dried",
+      "description": "Dried methanol extract containing metabolites from nmdc:procsm-11-q3n2n625."
+    },
+    {
+      "id": "nmdc:procsm-11-vpkary77",
+      "type": "nmdc:ProcessedSample",
+      "name": "nmdc:bsm-11-a51gg456_resuspended_for_LCMS",
+      "description": "Resuspended metabolites from nmdc:procsm-11-ds5hn367 for LC-MS analysis."
+    },
+    {
+      "id": "nmdc:procsm-11-8hrkqb85",
+      "type": "nmdc:ProcessedSample",
+      "name": "nmdc:bsm-11-ag2qyq93_lyophilized_subsample",
+      "description": "Subsample of nmdc:bsm-11-ag2qyq93 root after freezing, lyophilization, and powderization."
+    },
+    {
+      "id": "nmdc:procsm-11-34773164",
+      "type": "nmdc:ProcessedSample",
+      "name": "nmdc:bsm-11-ag2qyq93_methanol_extract_dried",
+      "description": "Dried methanol extract containing metabolites from nmdc:procsm-11-8hrkqb85."
+    },
+    {
+      "id": "nmdc:procsm-11-48t7pf31",
+      "type": "nmdc:ProcessedSample",
+      "name": "nmdc:bsm-11-ag2qyq93_resuspended_for_LCMS",
+      "description": "Resuspended metabolites from nmdc:procsm-11-34773164 for LC-MS analysis."
+    },
+    {
+      "id": "nmdc:procsm-11-tmqy7648",
+      "type": "nmdc:ProcessedSample",
+      "name": "nmdc:bsm-11-ax8tca09_lyophilized_subsample",
+      "description": "Subsample of nmdc:bsm-11-ax8tca09 root after freezing, lyophilization, and powderization."
+    },
+    {
+      "id": "nmdc:procsm-11-k2nnq453",
+      "type": "nmdc:ProcessedSample",
+      "name": "nmdc:bsm-11-ax8tca09_methanol_extract_dried",
+      "description": "Dried methanol extract containing metabolites from nmdc:procsm-11-tmqy7648."
+    },
+    {
+      "id": "nmdc:procsm-11-xx563506",
+      "type": "nmdc:ProcessedSample",
+      "name": "nmdc:bsm-11-ax8tca09_resuspended_for_LCMS",
+      "description": "Resuspended metabolites from nmdc:procsm-11-k2nnq453 for LC-MS analysis."
+    },
+    {
+      "id": "nmdc:procsm-11-veatws72",
+      "type": "nmdc:ProcessedSample",
+      "name": "nmdc:bsm-11-bmbcp998_lyophilized_subsample",
+      "description": "Subsample of nmdc:bsm-11-bmbcp998 root after freezing, lyophilization, and powderization."
+    },
+    {
+      "id": "nmdc:procsm-11-prb8dn16",
+      "type": "nmdc:ProcessedSample",
+      "name": "nmdc:bsm-11-bmbcp998_methanol_extract_dried",
+      "description": "Dried methanol extract containing metabolites from nmdc:procsm-11-veatws72."
+    },
+    {
+      "id": "nmdc:procsm-11-ggdx0m21",
+      "type": "nmdc:ProcessedSample",
+      "name": "nmdc:bsm-11-bmbcp998_resuspended_for_LCMS",
+      "description": "Resuspended metabolites from nmdc:procsm-11-prb8dn16 for LC-MS analysis."
+    },
+    {
+      "id": "nmdc:procsm-11-83gyb957",
+      "type": "nmdc:ProcessedSample",
+      "name": "nmdc:bsm-11-bny18d49_lyophilized_subsample",
+      "description": "Subsample of nmdc:bsm-11-bny18d49 root after freezing, lyophilization, and powderization."
+    },
+    {
+      "id": "nmdc:procsm-11-da1a8960",
+      "type": "nmdc:ProcessedSample",
+      "name": "nmdc:bsm-11-bny18d49_methanol_extract_dried",
+      "description": "Dried methanol extract containing metabolites from nmdc:procsm-11-83gyb957."
+    },
+    {
+      "id": "nmdc:procsm-11-njdpag07",
+      "type": "nmdc:ProcessedSample",
+      "name": "nmdc:bsm-11-bny18d49_resuspended_for_LCMS",
+      "description": "Resuspended metabolites from nmdc:procsm-11-da1a8960 for LC-MS analysis."
+    },
+    {
+      "id": "nmdc:procsm-11-qjdcvg07",
+      "type": "nmdc:ProcessedSample",
+      "name": "nmdc:bsm-11-bq4d8j45_lyophilized_subsample",
+      "description": "Subsample of nmdc:bsm-11-bq4d8j45 root after freezing, lyophilization, and powderization."
+    },
+    {
+      "id": "nmdc:procsm-11-qr3p4r20",
+      "type": "nmdc:ProcessedSample",
+      "name": "nmdc:bsm-11-bq4d8j45_methanol_extract_dried",
+      "description": "Dried methanol extract containing metabolites from nmdc:procsm-11-qjdcvg07."
+    },
+    {
+      "id": "nmdc:procsm-11-8rwfm853",
+      "type": "nmdc:ProcessedSample",
+      "name": "nmdc:bsm-11-bq4d8j45_resuspended_for_LCMS",
+      "description": "Resuspended metabolites from nmdc:procsm-11-qr3p4r20 for LC-MS analysis."
+    },
+    {
+      "id": "nmdc:procsm-11-kh7ykt21",
+      "type": "nmdc:ProcessedSample",
+      "name": "nmdc:bsm-11-de1h1038_lyophilized_subsample",
+      "description": "Subsample of nmdc:bsm-11-de1h1038 root after freezing, lyophilization, and powderization."
+    },
+    {
+      "id": "nmdc:procsm-11-qh4mgb90",
+      "type": "nmdc:ProcessedSample",
+      "name": "nmdc:bsm-11-de1h1038_methanol_extract_dried",
+      "description": "Dried methanol extract containing metabolites from nmdc:procsm-11-kh7ykt21."
+    },
+    {
+      "id": "nmdc:procsm-11-syea3302",
+      "type": "nmdc:ProcessedSample",
+      "name": "nmdc:bsm-11-de1h1038_resuspended_for_LCMS",
+      "description": "Resuspended metabolites from nmdc:procsm-11-qh4mgb90 for LC-MS analysis."
+    },
+    {
+      "id": "nmdc:procsm-11-j5w4p711",
+      "type": "nmdc:ProcessedSample",
+      "name": "nmdc:bsm-11-df1mqz45_lyophilized_subsample",
+      "description": "Subsample of nmdc:bsm-11-df1mqz45 root after freezing, lyophilization, and powderization."
+    },
+    {
+      "id": "nmdc:procsm-11-h6w0jb37",
+      "type": "nmdc:ProcessedSample",
+      "name": "nmdc:bsm-11-df1mqz45_methanol_extract_dried",
+      "description": "Dried methanol extract containing metabolites from nmdc:procsm-11-j5w4p711."
+    },
+    {
+      "id": "nmdc:procsm-11-4cp9d231",
+      "type": "nmdc:ProcessedSample",
+      "name": "nmdc:bsm-11-df1mqz45_resuspended_for_LCMS",
+      "description": "Resuspended metabolites from nmdc:procsm-11-h6w0jb37 for LC-MS analysis."
+    },
+    {
+      "id": "nmdc:procsm-11-906ryp44",
+      "type": "nmdc:ProcessedSample",
+      "name": "nmdc:bsm-11-f9yzba97_lyophilized_subsample",
+      "description": "Subsample of nmdc:bsm-11-f9yzba97 root after freezing, lyophilization, and powderization."
+    },
+    {
+      "id": "nmdc:procsm-11-t4yy4147",
+      "type": "nmdc:ProcessedSample",
+      "name": "nmdc:bsm-11-f9yzba97_methanol_extract_dried",
+      "description": "Dried methanol extract containing metabolites from nmdc:procsm-11-906ryp44."
+    },
+    {
+      "id": "nmdc:procsm-11-nmawez57",
+      "type": "nmdc:ProcessedSample",
+      "name": "nmdc:bsm-11-f9yzba97_resuspended_for_LCMS",
+      "description": "Resuspended metabolites from nmdc:procsm-11-t4yy4147 for LC-MS analysis."
+    },
+    {
+      "id": "nmdc:procsm-11-dm49qh98",
+      "type": "nmdc:ProcessedSample",
+      "name": "nmdc:bsm-11-fng5eh21_lyophilized_subsample",
+      "description": "Subsample of nmdc:bsm-11-fng5eh21 root after freezing, lyophilization, and powderization."
+    },
+    {
+      "id": "nmdc:procsm-11-hr5ppe43",
+      "type": "nmdc:ProcessedSample",
+      "name": "nmdc:bsm-11-fng5eh21_methanol_extract_dried",
+      "description": "Dried methanol extract containing metabolites from nmdc:procsm-11-dm49qh98."
+    },
+    {
+      "id": "nmdc:procsm-11-qqv6r623",
+      "type": "nmdc:ProcessedSample",
+      "name": "nmdc:bsm-11-fng5eh21_resuspended_for_LCMS",
+      "description": "Resuspended metabolites from nmdc:procsm-11-hr5ppe43 for LC-MS analysis."
+    },
+    {
+      "id": "nmdc:procsm-11-dn6tsq37",
+      "type": "nmdc:ProcessedSample",
+      "name": "nmdc:bsm-11-gf5nys45_lyophilized_subsample",
+      "description": "Subsample of nmdc:bsm-11-gf5nys45 root after freezing, lyophilization, and powderization."
+    },
+    {
+      "id": "nmdc:procsm-11-2b5f3q14",
+      "type": "nmdc:ProcessedSample",
+      "name": "nmdc:bsm-11-gf5nys45_methanol_extract_dried",
+      "description": "Dried methanol extract containing metabolites from nmdc:procsm-11-dn6tsq37."
+    },
+    {
+      "id": "nmdc:procsm-11-k8mw5t31",
+      "type": "nmdc:ProcessedSample",
+      "name": "nmdc:bsm-11-gf5nys45_resuspended_for_LCMS",
+      "description": "Resuspended metabolites from nmdc:procsm-11-2b5f3q14 for LC-MS analysis."
+    },
+    {
+      "id": "nmdc:procsm-11-jdfg6r64",
+      "type": "nmdc:ProcessedSample",
+      "name": "nmdc:bsm-11-h5b3c036_lyophilized_subsample",
+      "description": "Subsample of nmdc:bsm-11-h5b3c036 root after freezing, lyophilization, and powderization."
+    },
+    {
+      "id": "nmdc:procsm-11-fvyyww92",
+      "type": "nmdc:ProcessedSample",
+      "name": "nmdc:bsm-11-h5b3c036_methanol_extract_dried",
+      "description": "Dried methanol extract containing metabolites from nmdc:procsm-11-jdfg6r64."
+    },
+    {
+      "id": "nmdc:procsm-11-gwvq9535",
+      "type": "nmdc:ProcessedSample",
+      "name": "nmdc:bsm-11-h5b3c036_resuspended_for_LCMS",
+      "description": "Resuspended metabolites from nmdc:procsm-11-fvyyww92 for LC-MS analysis."
+    },
+    {
+      "id": "nmdc:procsm-11-5yfw4q65",
+      "type": "nmdc:ProcessedSample",
+      "name": "nmdc:bsm-11-he69ja63_lyophilized_subsample",
+      "description": "Subsample of nmdc:bsm-11-he69ja63 root after freezing, lyophilization, and powderization."
+    },
+    {
+      "id": "nmdc:procsm-11-0mt2q744",
+      "type": "nmdc:ProcessedSample",
+      "name": "nmdc:bsm-11-he69ja63_methanol_extract_dried",
+      "description": "Dried methanol extract containing metabolites from nmdc:procsm-11-5yfw4q65."
+    },
+    {
+      "id": "nmdc:procsm-11-qcvtpq32",
+      "type": "nmdc:ProcessedSample",
+      "name": "nmdc:bsm-11-he69ja63_resuspended_for_LCMS",
+      "description": "Resuspended metabolites from nmdc:procsm-11-0mt2q744 for LC-MS analysis."
+    },
+    {
+      "id": "nmdc:procsm-11-vcn6ex36",
+      "type": "nmdc:ProcessedSample",
+      "name": "nmdc:bsm-11-hrkfxp73_lyophilized_subsample",
+      "description": "Subsample of nmdc:bsm-11-hrkfxp73 root after freezing, lyophilization, and powderization."
+    },
+    {
+      "id": "nmdc:procsm-11-8nx14q40",
+      "type": "nmdc:ProcessedSample",
+      "name": "nmdc:bsm-11-hrkfxp73_methanol_extract_dried",
+      "description": "Dried methanol extract containing metabolites from nmdc:procsm-11-vcn6ex36."
+    },
+    {
+      "id": "nmdc:procsm-11-w2h7sj82",
+      "type": "nmdc:ProcessedSample",
+      "name": "nmdc:bsm-11-hrkfxp73_resuspended_for_LCMS",
+      "description": "Resuspended metabolites from nmdc:procsm-11-8nx14q40 for LC-MS analysis."
+    },
+    {
+      "id": "nmdc:procsm-11-430e2g82",
+      "type": "nmdc:ProcessedSample",
+      "name": "nmdc:bsm-11-j5xa5t86_lyophilized_subsample",
+      "description": "Subsample of nmdc:bsm-11-j5xa5t86 root after freezing, lyophilization, and powderization."
+    },
+    {
+      "id": "nmdc:procsm-11-bpr8rx93",
+      "type": "nmdc:ProcessedSample",
+      "name": "nmdc:bsm-11-j5xa5t86_methanol_extract_dried",
+      "description": "Dried methanol extract containing metabolites from nmdc:procsm-11-430e2g82."
+    },
+    {
+      "id": "nmdc:procsm-11-e1rjma86",
+      "type": "nmdc:ProcessedSample",
+      "name": "nmdc:bsm-11-j5xa5t86_resuspended_for_LCMS",
+      "description": "Resuspended metabolites from nmdc:procsm-11-bpr8rx93 for LC-MS analysis."
+    },
+    {
+      "id": "nmdc:procsm-11-dg2bam07",
+      "type": "nmdc:ProcessedSample",
+      "name": "nmdc:bsm-11-j9rx1b05_lyophilized_subsample",
+      "description": "Subsample of nmdc:bsm-11-j9rx1b05 root after freezing, lyophilization, and powderization."
+    },
+    {
+      "id": "nmdc:procsm-11-81rzng61",
+      "type": "nmdc:ProcessedSample",
+      "name": "nmdc:bsm-11-j9rx1b05_methanol_extract_dried",
+      "description": "Dried methanol extract containing metabolites from nmdc:procsm-11-dg2bam07."
+    },
+    {
+      "id": "nmdc:procsm-11-sj89zn30",
+      "type": "nmdc:ProcessedSample",
+      "name": "nmdc:bsm-11-j9rx1b05_resuspended_for_LCMS",
+      "description": "Resuspended metabolites from nmdc:procsm-11-81rzng61 for LC-MS analysis."
+    },
+    {
+      "id": "nmdc:procsm-11-mqqnt095",
+      "type": "nmdc:ProcessedSample",
+      "name": "nmdc:bsm-11-jg9bry11_lyophilized_subsample",
+      "description": "Subsample of nmdc:bsm-11-jg9bry11 root after freezing, lyophilization, and powderization."
+    },
+    {
+      "id": "nmdc:procsm-11-jxbmrp03",
+      "type": "nmdc:ProcessedSample",
+      "name": "nmdc:bsm-11-jg9bry11_methanol_extract_dried",
+      "description": "Dried methanol extract containing metabolites from nmdc:procsm-11-mqqnt095."
+    },
+    {
+      "id": "nmdc:procsm-11-ysfnmr94",
+      "type": "nmdc:ProcessedSample",
+      "name": "nmdc:bsm-11-jg9bry11_resuspended_for_LCMS",
+      "description": "Resuspended metabolites from nmdc:procsm-11-jxbmrp03 for LC-MS analysis."
+    },
+    {
+      "id": "nmdc:procsm-11-d684f740",
+      "type": "nmdc:ProcessedSample",
+      "name": "nmdc:bsm-11-jgxvpj85_lyophilized_subsample",
+      "description": "Subsample of nmdc:bsm-11-jgxvpj85 root after freezing, lyophilization, and powderization."
+    },
+    {
+      "id": "nmdc:procsm-11-w2m6x464",
+      "type": "nmdc:ProcessedSample",
+      "name": "nmdc:bsm-11-jgxvpj85_methanol_extract_dried",
+      "description": "Dried methanol extract containing metabolites from nmdc:procsm-11-d684f740."
+    },
+    {
+      "id": "nmdc:procsm-11-n7z1w862",
+      "type": "nmdc:ProcessedSample",
+      "name": "nmdc:bsm-11-jgxvpj85_resuspended_for_LCMS",
+      "description": "Resuspended metabolites from nmdc:procsm-11-w2m6x464 for LC-MS analysis."
+    },
+    {
+      "id": "nmdc:procsm-11-cqrym480",
+      "type": "nmdc:ProcessedSample",
+      "name": "nmdc:bsm-11-jpqg7a86_lyophilized_subsample",
+      "description": "Subsample of nmdc:bsm-11-jpqg7a86 root after freezing, lyophilization, and powderization."
+    },
+    {
+      "id": "nmdc:procsm-11-d0fe5c45",
+      "type": "nmdc:ProcessedSample",
+      "name": "nmdc:bsm-11-jpqg7a86_methanol_extract_dried",
+      "description": "Dried methanol extract containing metabolites from nmdc:procsm-11-cqrym480."
+    },
+    {
+      "id": "nmdc:procsm-11-xssg9q72",
+      "type": "nmdc:ProcessedSample",
+      "name": "nmdc:bsm-11-jpqg7a86_resuspended_for_LCMS",
+      "description": "Resuspended metabolites from nmdc:procsm-11-d0fe5c45 for LC-MS analysis."
+    },
+    {
+      "id": "nmdc:procsm-11-s5j6q181",
+      "type": "nmdc:ProcessedSample",
+      "name": "nmdc:bsm-11-kfkrbm38_lyophilized_subsample",
+      "description": "Subsample of nmdc:bsm-11-kfkrbm38 root after freezing, lyophilization, and powderization."
+    },
+    {
+      "id": "nmdc:procsm-11-49hb0939",
+      "type": "nmdc:ProcessedSample",
+      "name": "nmdc:bsm-11-kfkrbm38_methanol_extract_dried",
+      "description": "Dried methanol extract containing metabolites from nmdc:procsm-11-s5j6q181."
+    },
+    {
+      "id": "nmdc:procsm-11-rn08kp73",
+      "type": "nmdc:ProcessedSample",
+      "name": "nmdc:bsm-11-kfkrbm38_resuspended_for_LCMS",
+      "description": "Resuspended metabolites from nmdc:procsm-11-49hb0939 for LC-MS analysis."
+    },
+    {
+      "id": "nmdc:procsm-11-1fys7224",
+      "type": "nmdc:ProcessedSample",
+      "name": "nmdc:bsm-11-km2htj88_lyophilized_subsample",
+      "description": "Subsample of nmdc:bsm-11-km2htj88 root after freezing, lyophilization, and powderization."
+    },
+    {
+      "id": "nmdc:procsm-11-w0xgvf95",
+      "type": "nmdc:ProcessedSample",
+      "name": "nmdc:bsm-11-km2htj88_methanol_extract_dried",
+      "description": "Dried methanol extract containing metabolites from nmdc:procsm-11-1fys7224."
+    },
+    {
+      "id": "nmdc:procsm-11-xy5qem13",
+      "type": "nmdc:ProcessedSample",
+      "name": "nmdc:bsm-11-km2htj88_resuspended_for_LCMS",
+      "description": "Resuspended metabolites from nmdc:procsm-11-w0xgvf95 for LC-MS analysis."
+    },
+    {
+      "id": "nmdc:procsm-11-k9qpcm08",
+      "type": "nmdc:ProcessedSample",
+      "name": "nmdc:bsm-11-mncsfj85_lyophilized_subsample",
+      "description": "Subsample of nmdc:bsm-11-mncsfj85 root after freezing, lyophilization, and powderization."
+    },
+    {
+      "id": "nmdc:procsm-11-cxpnmx83",
+      "type": "nmdc:ProcessedSample",
+      "name": "nmdc:bsm-11-mncsfj85_methanol_extract_dried",
+      "description": "Dried methanol extract containing metabolites from nmdc:procsm-11-k9qpcm08."
+    },
+    {
+      "id": "nmdc:procsm-11-b49v9675",
+      "type": "nmdc:ProcessedSample",
+      "name": "nmdc:bsm-11-mncsfj85_resuspended_for_LCMS",
+      "description": "Resuspended metabolites from nmdc:procsm-11-cxpnmx83 for LC-MS analysis."
+    },
+    {
+      "id": "nmdc:procsm-11-93csmj57",
+      "type": "nmdc:ProcessedSample",
+      "name": "nmdc:bsm-11-mszxhy66_lyophilized_subsample",
+      "description": "Subsample of nmdc:bsm-11-mszxhy66 root after freezing, lyophilization, and powderization."
+    },
+    {
+      "id": "nmdc:procsm-11-620ywf71",
+      "type": "nmdc:ProcessedSample",
+      "name": "nmdc:bsm-11-mszxhy66_methanol_extract_dried",
+      "description": "Dried methanol extract containing metabolites from nmdc:procsm-11-93csmj57."
+    },
+    {
+      "id": "nmdc:procsm-11-fgwdvd70",
+      "type": "nmdc:ProcessedSample",
+      "name": "nmdc:bsm-11-mszxhy66_resuspended_for_LCMS",
+      "description": "Resuspended metabolites from nmdc:procsm-11-620ywf71 for LC-MS analysis."
+    },
+    {
+      "id": "nmdc:procsm-11-jtfrf846",
+      "type": "nmdc:ProcessedSample",
+      "name": "nmdc:bsm-11-mz8y6g40_lyophilized_subsample",
+      "description": "Subsample of nmdc:bsm-11-mz8y6g40 root after freezing, lyophilization, and powderization."
+    },
+    {
+      "id": "nmdc:procsm-11-5s01xp61",
+      "type": "nmdc:ProcessedSample",
+      "name": "nmdc:bsm-11-mz8y6g40_methanol_extract_dried",
+      "description": "Dried methanol extract containing metabolites from nmdc:procsm-11-jtfrf846."
+    },
+    {
+      "id": "nmdc:procsm-11-fctgjn97",
+      "type": "nmdc:ProcessedSample",
+      "name": "nmdc:bsm-11-mz8y6g40_resuspended_for_LCMS",
+      "description": "Resuspended metabolites from nmdc:procsm-11-5s01xp61 for LC-MS analysis."
+    },
+    {
+      "id": "nmdc:procsm-11-ncnrvx07",
+      "type": "nmdc:ProcessedSample",
+      "name": "nmdc:bsm-11-p0v3kr82_lyophilized_subsample",
+      "description": "Subsample of nmdc:bsm-11-p0v3kr82 root after freezing, lyophilization, and powderization."
+    },
+    {
+      "id": "nmdc:procsm-11-fwtv5793",
+      "type": "nmdc:ProcessedSample",
+      "name": "nmdc:bsm-11-p0v3kr82_methanol_extract_dried",
+      "description": "Dried methanol extract containing metabolites from nmdc:procsm-11-ncnrvx07."
+    },
+    {
+      "id": "nmdc:procsm-11-c2mjaj97",
+      "type": "nmdc:ProcessedSample",
+      "name": "nmdc:bsm-11-p0v3kr82_resuspended_for_LCMS",
+      "description": "Resuspended metabolites from nmdc:procsm-11-fwtv5793 for LC-MS analysis."
+    },
+    {
+      "id": "nmdc:procsm-11-4b1src87",
+      "type": "nmdc:ProcessedSample",
+      "name": "nmdc:bsm-11-p2nw7v16_lyophilized_subsample",
+      "description": "Subsample of nmdc:bsm-11-p2nw7v16 root after freezing, lyophilization, and powderization."
+    },
+    {
+      "id": "nmdc:procsm-11-jssaqf46",
+      "type": "nmdc:ProcessedSample",
+      "name": "nmdc:bsm-11-p2nw7v16_methanol_extract_dried",
+      "description": "Dried methanol extract containing metabolites from nmdc:procsm-11-4b1src87."
+    },
+    {
+      "id": "nmdc:procsm-11-hk0xsv51",
+      "type": "nmdc:ProcessedSample",
+      "name": "nmdc:bsm-11-p2nw7v16_resuspended_for_LCMS",
+      "description": "Resuspended metabolites from nmdc:procsm-11-jssaqf46 for LC-MS analysis."
+    },
+    {
+      "id": "nmdc:procsm-11-1dg1r984",
+      "type": "nmdc:ProcessedSample",
+      "name": "nmdc:bsm-11-p9qcnb33_lyophilized_subsample",
+      "description": "Subsample of nmdc:bsm-11-p9qcnb33 root after freezing, lyophilization, and powderization."
+    },
+    {
+      "id": "nmdc:procsm-11-eesrs230",
+      "type": "nmdc:ProcessedSample",
+      "name": "nmdc:bsm-11-p9qcnb33_methanol_extract_dried",
+      "description": "Dried methanol extract containing metabolites from nmdc:procsm-11-1dg1r984."
+    },
+    {
+      "id": "nmdc:procsm-11-xcm7pp55",
+      "type": "nmdc:ProcessedSample",
+      "name": "nmdc:bsm-11-p9qcnb33_resuspended_for_LCMS",
+      "description": "Resuspended metabolites from nmdc:procsm-11-eesrs230 for LC-MS analysis."
+    },
+    {
+      "id": "nmdc:procsm-11-cat8wk69",
+      "type": "nmdc:ProcessedSample",
+      "name": "nmdc:bsm-11-qvc0wd96_lyophilized_subsample",
+      "description": "Subsample of nmdc:bsm-11-qvc0wd96 root after freezing, lyophilization, and powderization."
+    },
+    {
+      "id": "nmdc:procsm-11-v3kmwx67",
+      "type": "nmdc:ProcessedSample",
+      "name": "nmdc:bsm-11-qvc0wd96_methanol_extract_dried",
+      "description": "Dried methanol extract containing metabolites from nmdc:procsm-11-cat8wk69."
+    },
+    {
+      "id": "nmdc:procsm-11-gkrzt032",
+      "type": "nmdc:ProcessedSample",
+      "name": "nmdc:bsm-11-qvc0wd96_resuspended_for_LCMS",
+      "description": "Resuspended metabolites from nmdc:procsm-11-v3kmwx67 for LC-MS analysis."
+    },
+    {
+      "id": "nmdc:procsm-11-6bw19d92",
+      "type": "nmdc:ProcessedSample",
+      "name": "nmdc:bsm-11-rhh5sz73_lyophilized_subsample",
+      "description": "Subsample of nmdc:bsm-11-rhh5sz73 root after freezing, lyophilization, and powderization."
+    },
+    {
+      "id": "nmdc:procsm-11-44wd5e98",
+      "type": "nmdc:ProcessedSample",
+      "name": "nmdc:bsm-11-rhh5sz73_methanol_extract_dried",
+      "description": "Dried methanol extract containing metabolites from nmdc:procsm-11-6bw19d92."
+    },
+    {
+      "id": "nmdc:procsm-11-gv3qv439",
+      "type": "nmdc:ProcessedSample",
+      "name": "nmdc:bsm-11-rhh5sz73_resuspended_for_LCMS",
+      "description": "Resuspended metabolites from nmdc:procsm-11-44wd5e98 for LC-MS analysis."
+    },
+    {
+      "id": "nmdc:procsm-11-02vxp239",
+      "type": "nmdc:ProcessedSample",
+      "name": "nmdc:bsm-11-rpmr0530_lyophilized_subsample",
+      "description": "Subsample of nmdc:bsm-11-rpmr0530 root after freezing, lyophilization, and powderization."
+    },
+    {
+      "id": "nmdc:procsm-11-4p7z4e88",
+      "type": "nmdc:ProcessedSample",
+      "name": "nmdc:bsm-11-rpmr0530_methanol_extract_dried",
+      "description": "Dried methanol extract containing metabolites from nmdc:procsm-11-02vxp239."
+    },
+    {
+      "id": "nmdc:procsm-11-wga70q91",
+      "type": "nmdc:ProcessedSample",
+      "name": "nmdc:bsm-11-rpmr0530_resuspended_for_LCMS",
+      "description": "Resuspended metabolites from nmdc:procsm-11-4p7z4e88 for LC-MS analysis."
+    },
+    {
+      "id": "nmdc:procsm-11-dw2xag88",
+      "type": "nmdc:ProcessedSample",
+      "name": "nmdc:bsm-11-rqktre19_lyophilized_subsample",
+      "description": "Subsample of nmdc:bsm-11-rqktre19 root after freezing, lyophilization, and powderization."
+    },
+    {
+      "id": "nmdc:procsm-11-cfzqy109",
+      "type": "nmdc:ProcessedSample",
+      "name": "nmdc:bsm-11-rqktre19_methanol_extract_dried",
+      "description": "Dried methanol extract containing metabolites from nmdc:procsm-11-dw2xag88."
+    },
+    {
+      "id": "nmdc:procsm-11-5vxmxe89",
+      "type": "nmdc:ProcessedSample",
+      "name": "nmdc:bsm-11-rqktre19_resuspended_for_LCMS",
+      "description": "Resuspended metabolites from nmdc:procsm-11-cfzqy109 for LC-MS analysis."
+    },
+    {
+      "id": "nmdc:procsm-11-0pqjgy88",
+      "type": "nmdc:ProcessedSample",
+      "name": "nmdc:bsm-11-snf9zn63_lyophilized_subsample",
+      "description": "Subsample of nmdc:bsm-11-snf9zn63 root after freezing, lyophilization, and powderization."
+    },
+    {
+      "id": "nmdc:procsm-11-30a1fa91",
+      "type": "nmdc:ProcessedSample",
+      "name": "nmdc:bsm-11-snf9zn63_methanol_extract_dried",
+      "description": "Dried methanol extract containing metabolites from nmdc:procsm-11-0pqjgy88."
+    },
+    {
+      "id": "nmdc:procsm-11-8hr6e469",
+      "type": "nmdc:ProcessedSample",
+      "name": "nmdc:bsm-11-snf9zn63_resuspended_for_LCMS",
+      "description": "Resuspended metabolites from nmdc:procsm-11-30a1fa91 for LC-MS analysis."
+    },
+    {
+      "id": "nmdc:procsm-11-t6ebvs42",
+      "type": "nmdc:ProcessedSample",
+      "name": "nmdc:bsm-11-v7jbqt45_lyophilized_subsample",
+      "description": "Subsample of nmdc:bsm-11-v7jbqt45 root after freezing, lyophilization, and powderization."
+    },
+    {
+      "id": "nmdc:procsm-11-zkpjrf36",
+      "type": "nmdc:ProcessedSample",
+      "name": "nmdc:bsm-11-v7jbqt45_methanol_extract_dried",
+      "description": "Dried methanol extract containing metabolites from nmdc:procsm-11-t6ebvs42."
+    },
+    {
+      "id": "nmdc:procsm-11-pfgza856",
+      "type": "nmdc:ProcessedSample",
+      "name": "nmdc:bsm-11-v7jbqt45_resuspended_for_LCMS",
+      "description": "Resuspended metabolites from nmdc:procsm-11-zkpjrf36 for LC-MS analysis."
+    },
+    {
+      "id": "nmdc:procsm-11-4f50g914",
+      "type": "nmdc:ProcessedSample",
+      "name": "nmdc:bsm-11-w4tyzd28_lyophilized_subsample",
+      "description": "Subsample of nmdc:bsm-11-w4tyzd28 root after freezing, lyophilization, and powderization."
+    },
+    {
+      "id": "nmdc:procsm-11-8k3khj52",
+      "type": "nmdc:ProcessedSample",
+      "name": "nmdc:bsm-11-w4tyzd28_methanol_extract_dried",
+      "description": "Dried methanol extract containing metabolites from nmdc:procsm-11-4f50g914."
+    },
+    {
+      "id": "nmdc:procsm-11-9rsn9v21",
+      "type": "nmdc:ProcessedSample",
+      "name": "nmdc:bsm-11-w4tyzd28_resuspended_for_LCMS",
+      "description": "Resuspended metabolites from nmdc:procsm-11-8k3khj52 for LC-MS analysis."
+    },
+    {
+      "id": "nmdc:procsm-11-mspxt649",
+      "type": "nmdc:ProcessedSample",
+      "name": "nmdc:bsm-11-w4w0b844_lyophilized_subsample",
+      "description": "Subsample of nmdc:bsm-11-w4w0b844 root after freezing, lyophilization, and powderization."
+    },
+    {
+      "id": "nmdc:procsm-11-gkwfbk52",
+      "type": "nmdc:ProcessedSample",
+      "name": "nmdc:bsm-11-w4w0b844_methanol_extract_dried",
+      "description": "Dried methanol extract containing metabolites from nmdc:procsm-11-mspxt649."
+    },
+    {
+      "id": "nmdc:procsm-11-wbw26r26",
+      "type": "nmdc:ProcessedSample",
+      "name": "nmdc:bsm-11-w4w0b844_resuspended_for_LCMS",
+      "description": "Resuspended metabolites from nmdc:procsm-11-gkwfbk52 for LC-MS analysis."
+    },
+    {
+      "id": "nmdc:procsm-11-53tww171",
+      "type": "nmdc:ProcessedSample",
+      "name": "nmdc:bsm-11-ww5h0770_lyophilized_subsample",
+      "description": "Subsample of nmdc:bsm-11-ww5h0770 root after freezing, lyophilization, and powderization."
+    },
+    {
+      "id": "nmdc:procsm-11-nyy3ne21",
+      "type": "nmdc:ProcessedSample",
+      "name": "nmdc:bsm-11-ww5h0770_methanol_extract_dried",
+      "description": "Dried methanol extract containing metabolites from nmdc:procsm-11-53tww171."
+    },
+    {
+      "id": "nmdc:procsm-11-gbmdr546",
+      "type": "nmdc:ProcessedSample",
+      "name": "nmdc:bsm-11-ww5h0770_resuspended_for_LCMS",
+      "description": "Resuspended metabolites from nmdc:procsm-11-nyy3ne21 for LC-MS analysis."
+    },
+    {
+      "id": "nmdc:procsm-11-c4dcfw48",
+      "type": "nmdc:ProcessedSample",
+      "name": "nmdc:bsm-11-xdjvn828_lyophilized_subsample",
+      "description": "Subsample of nmdc:bsm-11-xdjvn828 root after freezing, lyophilization, and powderization."
+    },
+    {
+      "id": "nmdc:procsm-11-5c06s032",
+      "type": "nmdc:ProcessedSample",
+      "name": "nmdc:bsm-11-xdjvn828_methanol_extract_dried",
+      "description": "Dried methanol extract containing metabolites from nmdc:procsm-11-c4dcfw48."
+    },
+    {
+      "id": "nmdc:procsm-11-5s8yw710",
+      "type": "nmdc:ProcessedSample",
+      "name": "nmdc:bsm-11-xdjvn828_resuspended_for_LCMS",
+      "description": "Resuspended metabolites from nmdc:procsm-11-5c06s032 for LC-MS analysis."
+    },
+    {
+      "id": "nmdc:procsm-11-yvnaqw21",
+      "type": "nmdc:ProcessedSample",
+      "name": "nmdc:bsm-11-z6kxrf72_lyophilized_subsample",
+      "description": "Subsample of nmdc:bsm-11-z6kxrf72 root after freezing, lyophilization, and powderization."
+    },
+    {
+      "id": "nmdc:procsm-11-0wse9h89",
+      "type": "nmdc:ProcessedSample",
+      "name": "nmdc:bsm-11-z6kxrf72_methanol_extract_dried",
+      "description": "Dried methanol extract containing metabolites from nmdc:procsm-11-yvnaqw21."
+    },
+    {
+      "id": "nmdc:procsm-11-xf7c7r20",
+      "type": "nmdc:ProcessedSample",
+      "name": "nmdc:bsm-11-z6kxrf72_resuspended_for_LCMS",
+      "description": "Resuspended metabolites from nmdc:procsm-11-0wse9h89 for LC-MS analysis."
+    },
+    {
+      "id": "nmdc:procsm-11-cx4b3g74",
+      "type": "nmdc:ProcessedSample",
+      "name": "nmdc:bsm-11-zmx1nq19_lyophilized_subsample",
+      "description": "Subsample of nmdc:bsm-11-zmx1nq19 root after freezing, lyophilization, and powderization."
+    },
+    {
+      "id": "nmdc:procsm-11-k0ckrd95",
+      "type": "nmdc:ProcessedSample",
+      "name": "nmdc:bsm-11-zmx1nq19_methanol_extract_dried",
+      "description": "Dried methanol extract containing metabolites from nmdc:procsm-11-cx4b3g74."
+    },
+    {
+      "id": "nmdc:procsm-11-zb39xb47",
+      "type": "nmdc:ProcessedSample",
+      "name": "nmdc:bsm-11-zmx1nq19_resuspended_for_LCMS",
+      "description": "Resuspended metabolites from nmdc:procsm-11-k0ckrd95 for LC-MS analysis."
+    }
+  ],
+  "@type": "Database"
+}
