@@ -6,6 +6,8 @@ MASSIVE ID: MSV000094782
 
 C18 samples run on IDX, but only hcd scans were acquired so no special scan translation is needed
 HILICZ samples run on QExactive
+
+NOTEs: Need to make a new instrument record for IDX in the database and update the config file to use that instrument name.
 """
 
 import sys

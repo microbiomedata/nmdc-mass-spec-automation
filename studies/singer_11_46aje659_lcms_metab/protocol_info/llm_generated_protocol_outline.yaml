@@ -38,11 +38,6 @@ root_metabolomics:
             has_raw_value: 0 Cel
             has_unit: Cel
             has_numeric_value: 0
-          duration:
-            type: nmdc:QuantityValue
-            has_raw_value: 10 min
-            has_unit: min
-            has_numeric_value: 10
     - Step 3_root_metabolomics:
         DissolvingProcess:
           id: # nmdc:dispro-{shoulder}-{blade}

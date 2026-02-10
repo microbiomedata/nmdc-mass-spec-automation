@@ -37,15 +37,10 @@
             "corems_toml": "workflow_inputs/metams_hilic_corems.toml",
             "reference_db": "workflow_inputs/20250407_database.msp",
             "scan_translator": "workflow_inputs/metams_jgi_scan_translator.toml",
+            "instrument_used": "Thermo Orbitrap Q-Exactive",
             "cores": 5,
             "chromat_configuration_name": "JGI/LBNL Metabolomics Standard LC Method - Polar HILIC-Z",
-            "mass_spec_configuration_name": "N/A, should be overwritten",
-            "metadata_overrides": {
-                "mass_spec_configuration_name": {
-                    "CE102040": "JGI/LBNL Standard Metabolomics Method, positive @10,20,40CE",
-                    "CE205060": "JGI/LBNL Standard Metabolomics Method, positive @20,50,60CE"
-                }
-            }
+            "mass_spec_configuration_name": "JGI/LBNL Standard Metabolomics Method, positive @10,20,40CE"
         },
         {
             "name": "hilic_neg",
@@ -56,15 +51,10 @@
             "corems_toml": "workflow_inputs/metams_hilic_corems.toml",
             "reference_db": "workflow_inputs/20250407_database.msp",
             "scan_translator": "workflow_inputs/metams_jgi_scan_translator.toml",
+            "instrument_used": "Thermo Orbitrap Q-Exactive",
             "cores": 5,
             "chromat_configuration_name": "JGI/LBNL Metabolomics Standard LC Method - Polar HILIC-Z",
-            "mass_spec_configuration_name": "N/A, should be overwritten",
-            "metadata_overrides": {
-                "mass_spec_configuration_name": {
-                    "CE102040": "JGI/LBNL Standard Metabolomics Method, negative @10,20,40CE",
-                    "CE205060": "JGI/LBNL Standard Metabolomics Method, negative @20,50,60CE"
-                }
-            }
+            "mass_spec_configuration_name": "JGI/LBNL Standard Metabolomics Method, negative @10,20,40CE"
         },
         {
             "name": "rp_pos",
@@ -75,15 +65,10 @@
             "corems_toml": "workflow_inputs/metams_rp_corems.toml",
             "reference_db": "workflow_inputs/20250407_database.msp",
             "scan_translator": "workflow_inputs/metams_jgi_scan_translator.toml",
+            "instrument_used": " Thermo Orbitrap ID-X",
             "cores": 5,
             "chromat_configuration_name": "JGI/LBNL Metabolomics Standard LC Method - Nonpolar C18",
-            "mass_spec_configuration_name": "N/A, should be overwritten",
-            "metadata_overrides": {
-                "mass_spec_configuration_name": {
-                    "CE102040": "JGI/LBNL Standard Metabolomics Method, positive @10,20,40CE",
-                    "CE205060": "JGI/LBNL Standard Metabolomics Method, positive @20,50,60CE"
-                }
-            }
+            "mass_spec_configuration_name": "JGI/LBNL Standard Metabolomics Method, positive @10,20,40CE"
         },
         {
             "name": "rp_neg",
@@ -94,19 +79,14 @@
             "corems_toml": "workflow_inputs/metams_rp_corems.toml",
             "reference_db": "workflow_inputs/20250407_database.msp",
             "scan_translator": "workflow_inputs/metams_jgi_scan_translator.toml",
+            "instrument_used": " Thermo Orbitrap ID-X",
             "cores": 5,
             "chromat_configuration_name": "JGI/LBNL Metabolomics Standard LC Method - Nonpolar C18",
-            "mass_spec_configuration_name": "N/A, should be overwritten",
-            "metadata_overrides": {
-                "mass_spec_configuration_name": {
-                    "CE102040": "JGI/LBNL Standard Metabolomics Method, negative @10,20,40CE",
-                    "CE205060": "JGI/LBNL Standard Metabolomics Method, negative @20,50,60CE"
-                }
-            }
+            "mass_spec_configuration_name": "JGI/LBNL Standard Metabolomics Method, negative @10,20,40CE"
         }
     ],
     "metadata": {
-        "instrument_used": "Thermo Orbitrap Q-Exactive",
+        "instrument_used": "N/A, should be overwritten",
         "processing_institution_workflow": "NMDC",
         "processing_institution_generation": "JGI",
         "chromat_configuration_name": "N/A, should be overwritten",
@@ -126,12 +106,12 @@
         "protocol_outline_created": true,
         "biosample_attributes_fetched": true,
         "biosample_mapping_script_generated": false,
-        "biosample_mapping_completed": false,
+        "biosample_mapping_completed": true,
         "raw_data_inspected": true,
         "data_processed": true,
         "processed_data_uploaded_to_minio": true,
-        "metadata_mapping_generated": false,
-        "material_processing_metadata_generated": false,
+        "material_processing_metadata_generated": true,
+        "metadata_mapping_generated": true,
         "metadata_packages_generated": false,
         "metadata_submitted_dev": false,
         "metadata_submitted_prod": false
