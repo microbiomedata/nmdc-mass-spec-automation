@@ -2,7 +2,7 @@ from types import SimpleNamespace
 from unittest.mock import AsyncMock
 import asyncio
 
-from nmdc_dp_utils.llm.llm_pipeline import get_llm_yaml_outline
+from nmdc_dp_utils.llm.protocol_conversion.pipeline import get_llm_yaml_outline
 
 
 class DummyConversation:
