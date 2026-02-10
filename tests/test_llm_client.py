@@ -27,7 +27,7 @@ def test_llm_client_initialization(monkeypatch):
     responses_model.assert_called_once_with(model="gemini-2.5-flash-project", openai_client="client")
     expected_schema_path = os.path.join(
         os.path.dirname(llm_client_module.__file__),
-        "llm_protocol_context/schema_server.py",
+        "protocol_conversion/mcp_server.py",
     )
     assert client.client == "client"
     assert client.model_object == "model"

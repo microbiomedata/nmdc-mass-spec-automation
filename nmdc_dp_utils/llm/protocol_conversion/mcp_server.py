@@ -123,7 +123,6 @@ def clean_yaml_response(response: str) -> str:
         response = response[:-3]  # Remove trailing ```
     return response.strip()
 
-
 @mcp.tool()
 def validate_generated_yaml(yaml_outline: str) -> dict:
     """

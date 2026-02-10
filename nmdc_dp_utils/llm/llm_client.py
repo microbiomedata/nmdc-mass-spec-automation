@@ -26,7 +26,7 @@ class LLMClient():
         client = AsyncOpenAI(base_url=self.base_url, api_key=API_KEY)
         self.client = client
         self.model_object = OpenAIResponsesModel(model=self.model_name, openai_client=self.client)
-        self.mcp_servers=[os.path.join(os.path.dirname(__file__), "llm_protocol_context/schema_server.py")]
+        self.mcp_servers=[os.path.join(os.path.dirname(__file__), "protocol_conversion/mcp_server.py")]
 
     async def get_response(self, messages: list):
         """

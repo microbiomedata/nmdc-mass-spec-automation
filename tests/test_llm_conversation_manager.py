@@ -56,7 +56,7 @@ def test_add_protocol_examples_reads_pairs(monkeypatch):
 
     file_map = {}
     for idx in range(1, 8):
-        prefix = f"nmdc_dp_utils/llm/llm_protocol_context/example_{idx}"
+        prefix = f"nmdc_dp_utils/llm/examples/example_{idx}"
         file_map[f"{prefix}/extracted_text.txt"] = f"Protocol description {idx}"
         file_map[f"{prefix}/combined_outline.yaml"] = f"outline: example_{idx}"
 

@@ -15,7 +15,7 @@ from tqdm import tqdm
 from dotenv import load_dotenv
 from minio.error import S3Error
 
-from nmdc_dp_utils.llm.llm_pipeline import get_llm_yaml_outline
+from nmdc_dp_utils.llm.protocol_conversion.pipeline import get_llm_yaml_outline
 from nmdc_dp_utils.llm.llm_conversation_manager import ConversationManager
 from nmdc_dp_utils.llm.llm_client import LLMClient
 
