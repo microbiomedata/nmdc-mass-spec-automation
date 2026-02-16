@@ -1,1 +1,1 @@
-nmdc:nmdc:sty-11-r2h77870
+nmdc:sty-11-r2h77870
