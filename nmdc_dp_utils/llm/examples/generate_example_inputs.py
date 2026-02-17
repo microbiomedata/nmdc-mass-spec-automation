@@ -1,30 +1,20 @@
 #!/usr/bin/env python3
 """
-Script to generate biosample_attributes.csv and downloaded_files.csv 
-from combined_input.csv for each example in llm_protocol_context.
+Generate standardized input files for LLM-based material processing extraction.
 
-This prepares the standardized input structure for LLM-based material processing extraction:
-1. biosample_attributes.csv - ALL biosamples for the study from NMDC API (by study ID)
-2. downloaded_files.csv - list of raw data files
-3. nmdc_id_to_filename_mapping.csv - mapping of NMDC IDs to resolved filenames
-4. combined_input.csv - UPDATED to replace NMDC IDs with raw file names
-5. combined_outline.yaml - material processing protocol (already exists)
+For each example_* directory containing combined_input.csv and study_id.txt, generates:
+  - biosample_attributes.csv: Biosamples from NMDC API (by study ID)
+  - downloaded_files.csv: Raw data file list
+  - nmdc_id_to_filename_mapping.csv: NMDC ID to filename mapping (if needed)
+  - combined_inputs_v2.csv: Standardized format with biosample names and metadata
 
-Requirements for each example directory:
-- combined_input.csv: Raw data mapping (biosample_id, raw_data_identifier, etc.)
-- study_id.txt: NMDC study ID (e.g., 'nmdc:sty-11-34xj1150')
-
-Uses nmdc_api_utilities to fetch real data from NMDC database:
-- BiosampleSearch: Fetch ALL biosamples for study (by associated_studies field)
-- DataGenerationSearch: Get data object IDs from NMDC workflow IDs
-- DataObjectSearch: Get filenames from data object IDs
+Uses nmdc_api_utilities to fetch data from NMDC database.
 """
 
 import csv
-import os
 import pandas as pd
 from pathlib import Path
-from typing import Set, List, Dict
+from typing import Set, Dict
 from nmdc_api_utilities.biosample_search import BiosampleSearch
 from nmdc_api_utilities.data_generation_search import DataGenerationSearch
 from nmdc_api_utilities.data_object_search import DataObjectSearch
@@ -49,29 +39,13 @@ def generate_biosample_attributes(
     combined_input_path: Path,
     study_id: str,
     output_path: Path
-) -> None:
+) -> int:
     """
-    Generate biosample_attributes.csv using NMDC API by querying for study ID.
+    Generate biosample_attributes.csv from NMDC API using study ID.
     
-    Queries the NMDC API for all biosamples associated with the study,
-    matching the behavior of NMDCWorkflowBiosampleManager.get_biosample_attributes().
-    This returns ALL biosamples for the study, not just ones with data files.
-    
-    Args:
-        combined_input_path: Path to combined_input.csv (not used, kept for consistency)
-        study_id: NMDC study ID (e.g., 'nmdc:sty-11-34xj1150')
-        output_path: Path to write biosample_attributes.csv
-    
-    Fields returned by NMDC API:
-    - id: NMDC biosample identifier
-    - name: Short name for the biosample
-    - samp_name: Sample name
-    - analysis_type: List of analysis types
-    - gold_biosample_identifiers: External GOLD identifiers
+    Returns:
+        Number of biosamples retrieved, or 0 if failed
     """
-    import json
-    
-    print(f"  Fetching biosample attributes for study: {study_id}")
     
     biosample_search = BiosampleSearch()
     
@@ -88,21 +62,16 @@ def generate_biosample_attributes(
         
         if not biosamples:
             print(f"  ❌ No biosample data retrieved from NMDC API for study {study_id}")
-            return
-            
-        print(f"  Retrieved {len(biosamples)} biosamples from NMDC API")
+            return 0
         
     except Exception as e:
-        print(f"  ❌ Error fetching biosamples from NMDC API: {type(e).__name__}: {e}")
-        import traceback
-        traceback.print_exc()
-        return
+        print(f"  ❌ Error fetching biosamples: {type(e).__name__}: {e}")
+        return 0
     
     # Convert to DataFrame and save
     biosample_df = pd.DataFrame(biosamples)   
     biosample_df.to_csv(output_path, index=False)
-    
-    print(f"  ✓ Generated {output_path.name} with {len(biosample_df)} biosamples from NMDC API")
+    return len(biosample_df)
 
 
 def generate_downloaded_files(
@@ -111,15 +80,10 @@ def generate_downloaded_files(
 ) -> Dict[str, str]:
     """
     Generate downloaded_files.csv from combined_input.csv.
-    
-    Extracts filenames from raw_data_identifier column:
-    - If raw_data_identifier is already a filename, uses it directly
-    - If it's an NMDC ID (e.g., nmdc:omprc-11-...), queries NMDC API:
-      1. Uses DataGenerationSearch to get has_output field (data object IDs)
-      2. Uses DataObjectSearch to get name field (filename) for each data object
+    Resolves NMDC IDs to filenames via API if needed.
     
     Returns:
-        Dictionary mapping NMDC IDs to filenames for updating combined_input.csv
+        Dictionary mapping NMDC IDs to filenames
     """
     import json
     
@@ -145,8 +109,6 @@ def generate_downloaded_files(
     
     # Resolve NMDC IDs to filenames via API
     if nmdc_ids_to_resolve:
-        print(f"  Resolving {len(nmdc_ids_to_resolve)} NMDC IDs to filenames via API...")
-        
         try:
             # Step 1: Query DataGeneration for all NMDC IDs at once using $in operator
             nmdc_ids_list = list(set(nmdc_ids_to_resolve))  # Deduplicate
@@ -161,10 +123,8 @@ def generate_downloaded_files(
             )
             
             if not data_gens:
-                print(f"  ⚠ Warning: No data generation records found for NMDC IDs")
+                print("  ⚠ No data generation records found for NMDC IDs")
             else:
-                print(f"  Retrieved {len(data_gens)} data generation records")
-                
                 # Build mapping of data_obj_id -> nmdc_id (for reverse lookup later)
                 data_obj_to_nmdc: Dict[str, str] = {}
                 data_obj_ids = []
@@ -183,8 +143,6 @@ def generate_downloaded_files(
                             data_obj_to_nmdc[has_output] = nmdc_id
                 
                 if data_obj_ids:
-                    print(f"  Found {len(data_obj_ids)} data object IDs to resolve")
-                    
                     # Step 2: Query DataObject for all object IDs at once
                     data_obj_ids_list = list(set(data_obj_ids))  # Deduplicate
                     obj_id_list_json = json.dumps(data_obj_ids_list)
@@ -198,7 +156,6 @@ def generate_downloaded_files(
                     )
                     
                     if data_objs:
-                        print(f"  Retrieved {len(data_objs)} data objects")
                         for data_obj in data_objs:
                             obj_id = data_obj.get('id')
                             filename = data_obj.get('name')
@@ -208,14 +165,12 @@ def generate_downloaded_files(
                                 nmdc_id = data_obj_to_nmdc[obj_id]
                                 nmdc_id_to_filename[nmdc_id] = filename
                     else:
-                        print(f"  ⚠ Warning: No data objects found")
+                        print("  ⚠ No data objects found")
                 else:
-                    print(f"  ⚠ Warning: No data object IDs in has_output fields")
+                    print("  ⚠ No data object IDs in has_output fields")
                     
         except Exception as e:
             print(f"  ⚠ Error resolving NMDC IDs: {type(e).__name__}: {e}")
-            import traceback
-            traceback.print_exc()
     
     # Write downloaded_files.csv with just raw file names (no path)
     with open(output_path, 'w', newline='') as f:
@@ -227,19 +182,13 @@ def generate_downloaded_files(
                 writer.writerow([filename.split('/')[-1]])
             else:
                 writer.writerow([filename])
-    print(f"  ✓ Generated {output_path.name} with {len(files)} files")
     return nmdc_id_to_filename
 
 
 def process_example_directory(example_dir: Path) -> None:
     """
-    Process a single example directory to generate input files.
-    
-    Requires:
-    - combined_input.csv: Raw data mapping
-    - study_id.txt: NMDC study ID (e.g., 'nmdc:sty-11-34xj1150')
-    
-    Always generates combined_inputs_v2.csv. Skips biosample_attributes.csv if already exists.
+    Process example directory to generate standardized input files.
+    Prints single summary line per example.
     """
     combined_input = example_dir / 'combined_input.csv'
     study_id_file = example_dir / 'study_id.txt'
@@ -262,18 +211,24 @@ def process_example_directory(example_dir: Path) -> None:
         print(f"⚠ Skipping {example_dir.name}: study_id.txt is empty")
         return
     
-    print(f"\n📁 Processing {example_dir.name}...")
-    print(f"  Study ID: {study_id}")
+    # Track what was generated for summary
+    generated = []
     
     # Generate biosample_attributes.csv using study ID (skip if already exists)
+    biosample_count = 0
     if not biosample_output.exists():
-        generate_biosample_attributes(combined_input, study_id, biosample_output)
-    else:
-        print(f"  ⏭  biosample_attributes.csv already exists, skipping fetch")
+        biosample_count = generate_biosample_attributes(combined_input, study_id, biosample_output)
+        if biosample_count > 0:
+            generated.append(f"{biosample_count} biosamples")
     
     # Generate downloaded_files.csv and get NMDC ID to filename mapping
     files_output = example_dir / 'downloaded_files.csv'
     nmdc_id_to_filename = generate_downloaded_files(combined_input, files_output)
+    
+    # Count files for summary
+    with open(files_output, 'r') as f:
+        file_count = sum(1 for _ in f) - 1  # Subtract header
+    generated.append(f"{file_count} files")
     
     # Write out the NMDC ID to filename mapping
     if nmdc_id_to_filename:
@@ -283,10 +238,8 @@ def process_example_directory(example_dir: Path) -> None:
             for nmdc_id, filename in sorted(nmdc_id_to_filename.items())
         ])
         mapping_df.to_csv(mapping_output, index=False)
-        print(f"  ✓ Generated {mapping_output.name} with {len(mapping_df)} mappings")
     
     # Always create combined_inputs_v2.csv with standardized structure
-    print(f"  Creating combined_inputs_v2.csv with raw file names and extra columns...")
     df = pd.read_csv(combined_input)
     
     # Replace NMDC IDs with filenames if we have mappings
@@ -326,39 +279,14 @@ def process_example_directory(example_dir: Path) -> None:
     df = df[columns]
     combined_input_v2 = example_dir / 'combined_inputs_v2.csv'
     df.to_csv(combined_input_v2, index=False)
-    print(f"  ✓ Created {combined_input_v2.name} with raw file names and extra columns")
+    
+    # Print single summary line
+    print(f"✓ {example_dir.name}: {', '.join(generated)}")
 
 
 def main():
-    """
-    Process all example directories to generate standardized input files.
-    
-    For each example_* directory:
-    Requires:
-    - combined_input.csv: Raw data mapping
-    - study_id.txt: NMDC study ID
-    
-    Generates:
-    1. biosample_attributes.csv - ALL biosamples for study from NMDC API
-       (queries by study ID using associated_studies field, same as NMDCWorkflowBiosampleManager)
-    2. downloaded_files.csv - Raw file names
-       (resolves NMDC IDs to filenames via DataGenerationSearch and DataObjectSearch)
-    3. nmdc_id_to_filename_mapping.csv - NMDC ID to filename mapping
-    4. Updates combined_input.csv to replace NMDC IDs with raw file names
-    
-    These examples use real NMDC data from the database, matching the exact
-    structure used by the NMDCWorkflowBiosampleManager class in workflow_manager_mixins.py
-    """
+    """Process all example directories to generate standardized input files."""
     script_dir = Path(__file__).parent
-    
-    print("=" * 70)
-    print("Generating biosample_attributes.csv and downloaded_files.csv")
-    print("from combined_input.csv for all examples")
-    print("=" * 70)
-    print("\nFetching real biosample data from NMDC API...")
-    print("\nNOTE: Each example directory must contain:")
-    print("  - combined_input.csv")
-    print("  - study_id.txt (NMDC study ID, e.g., 'nmdc:sty-11-34xj1150')")
     
     # Find all example directories
     example_dirs = sorted([
@@ -373,16 +301,7 @@ def main():
     for example_dir in example_dirs:
         process_example_directory(example_dir)
     
-    print("\n" + "=" * 70)
-    print(f"✅ Complete! Processed {len(example_dirs)} examples")
-    print("=" * 70)
-    print("\nGenerated files structure for each example:")
-    print("  - biosample_attributes.csv: ALL biosamples for study from NMDC API")
-    print("  - downloaded_files.csv: Raw data file list")
-    print("  - nmdc_id_to_filename_mapping.csv: NMDC ID to filename mapping")
-    print("  - combined_input.csv: UPDATED with raw file names (replaced NMDC IDs)")
-    print("  - combined_outline.yaml: Material processing protocol (already exists)")
-    print("\nThese inputs are used for LLM-based material processing extraction.")
+    print(f"\n✅ Processed {len(example_dirs)} examples")
 
 
 if __name__ == '__main__':
