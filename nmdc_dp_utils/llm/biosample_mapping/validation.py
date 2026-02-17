@@ -18,14 +18,23 @@ def validate_biosample_mapping_csv(
     
     Parameters
     ----------
-    csv_content (str) : The generated CSV mapping content
-    biosample_attributes_csv (str) : The biosample attributes CSV content
-    material_processing_yaml (str) : The material processing YAML content
-    raw_files_csv (str) : The raw files CSV content
+    csv_content : str
+        The generated CSV mapping content
+    biosample_attributes_csv : str
+        The biosample attributes CSV content
+    material_processing_yaml : str
+        The material processing YAML content
+    raw_files_csv : str
+        The raw files CSV content
     
     Returns
     -------
-    dict : Validation result with 'valid' (bool) and 'errors' (list of str)
+    dict
+        Validation result with:
+        - 'valid' (bool): True if no errors found
+        - 'errors' (list of str): Critical issues that must be fixed
+        - 'warnings' (list of str): Non-critical issues for review
+        - 'unmapped_files' (list of str): Raw files not mapped to biosamples
     """
     errors = []
     
@@ -76,7 +85,18 @@ def validate_biosample_mapping_csv(
     try:
         raw_files_reader = csv.DictReader(io.StringIO(raw_files_csv))
         raw_files_rows = list(raw_files_reader)
-        raw_file_names = {row['file_name'] for row in raw_files_rows}
+        # Handle both 'file_name' and 'raw_data_file_name' column names
+        if raw_files_rows:
+            if 'file_name' in raw_files_rows[0]:
+                raw_file_names = {row['file_name'] for row in raw_files_rows}
+            elif 'raw_data_file_name' in raw_files_rows[0]:
+                raw_file_names = {row['raw_data_file_name'] for row in raw_files_rows}
+            else:
+                # Use first column if neither name is found
+                first_col = list(raw_files_rows[0].keys())[0]
+                raw_file_names = {row[first_col] for row in raw_files_rows}
+        else:
+            raw_file_names = set()
     except Exception as e:
         return {
             'valid': False,
@@ -145,12 +165,15 @@ def validate_biosample_mapping_csv(
         if protocol_id and protocol_id not in protocol_names:
             errors.append(f"{row_num}: material_processing_protocol_id '{protocol_id}' not found in material processing YAML (available: {', '.join(protocol_names)})")
     
-    # Check that all raw files are mapped
+    # Check that all raw files are mapped (warning only, not an error)
     unmapped_files = raw_file_names - mapped_raw_files
+    warnings = []
     if unmapped_files:
-        errors.append(f"Unmapped raw files ({len(unmapped_files)}): {', '.join(sorted(list(unmapped_files))[:5])}{'...' if len(unmapped_files) > 5 else ''}")
+        warnings.append(f"Unmapped raw files ({len(unmapped_files)}): These files could not be mapped to biosamples (may be QC, blanks, standards, etc.)")
     
     return {
         'valid': len(errors) == 0,
-        'errors': errors
+        'errors': errors,
+        'warnings': warnings,
+        'unmapped_files': sorted(list(unmapped_files))
     }

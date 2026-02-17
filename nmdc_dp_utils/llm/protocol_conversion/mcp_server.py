@@ -2,6 +2,14 @@
 Extract specific classes from NMDC LinkML schema and convert to LLM-friendly format
 """
 
+import sys
+from pathlib import Path
+
+# Add workspace root to path to allow imports when running as MCP subprocess
+workspace_root = Path(__file__).parent.parent.parent.parent
+if str(workspace_root) not in sys.path:
+    sys.path.insert(0, str(workspace_root))
+
 import os
 from linkml_runtime.utils.schemaview import SchemaView
 import nmdc_schema

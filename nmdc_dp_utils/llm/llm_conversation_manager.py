@@ -63,19 +63,57 @@ class ConversationManager:
     def add_biosample_mapping_examples(self):
         """
         Add curated biosample -> raw file -> processed sample mapping examples to the context.
-        Uses example_8 which contains the vetted biosample mapping format.
+        Uses ONLY combined_inputs_v2.csv which already contains raw files, biosamples, and mapping.
+        Also includes simplified YAML protocol outline.
         """
-        dirs = ["nmdc_dp_utils/llm/examples/example_8"] # TODO KRH: add more examples when ready
-        for dir in dirs: 
-            with open(f"{dir}/biosample_attributes.csv", "r") as f:
-                biosample_attributes = f.read()
-            with open(f"{dir}/combined_yaml.yaml", "r") as f:
-                material_processing_yaml = f.read()
-            with open(f"{dir}/raw_files.csv", "r") as f:
-                raw_files = f.read()
-            with open(f"{dir}/combined_input.csv", "r") as f:
-                mapped_output = f.read()
-            self.add_message(role="system", content="Here is an example of biosample attributes for a study of interest:\n" + biosample_attributes )
-            self.add_message(role="system", content="Here is the YAML outline describing the material processing steps for this study:\n" + material_processing_yaml )
-            self.add_message(role="system", content="Here are the raw files associated with the study for our analysis type:\n" + raw_files )
-            self.add_message(role="system", content="Here is the expected output mapping of raw files to processed samples based on the biosample attributes and material processing YAML:\n" + mapped_output )
+        import pandas as pd
+        import yaml as yaml_lib
+        
+        dirs = ["nmdc_dp_utils/llm/examples/example_3"]
+        
+        for dir in dirs:
+            # Load and simplify YAML (only description, has_input, has_output, processedsamples)
+            with open(f"{dir}/combined_outline.yaml", "r") as f:
+                yaml_full = yaml_lib.safe_load(f)
+            
+            yaml_minimal = {}
+            for protocol_name, protocol_data in yaml_full.items():
+                yaml_minimal[protocol_name] = {}
+                
+                # Simplify steps - keep only description, has_input, has_output
+                if 'steps' in protocol_data:
+                    yaml_minimal[protocol_name]['steps'] = []
+                    for step in protocol_data['steps']:
+                        simplified_step = {}
+                        for step_name, step_data in step.items():
+                            for process_type, process_details in step_data.items():
+                                simplified_process = {}
+                                if 'description' in process_details:
+                                    simplified_process['description'] = process_details['description']
+                                if 'has_input' in process_details:
+                                    simplified_process['has_input'] = process_details['has_input']
+                                if 'has_output' in process_details:
+                                    simplified_process['has_output'] = process_details['has_output']
+                                simplified_step[step_name] = {process_type: simplified_process}
+                        yaml_minimal[protocol_name]['steps'].append(simplified_step)
+                
+                # Keep processedsamples as-is (needed for validation)
+                if 'processedsamples' in protocol_data:
+                    yaml_minimal[protocol_name]['processedsamples'] = protocol_data['processedsamples']
+            
+            yaml_minimal_str = yaml_lib.dump(yaml_minimal, default_flow_style=False, sort_keys=False)
+            
+            # Load combined_inputs_v2.csv which has everything
+            with open(f"{dir}/combined_inputs_v2.csv", "r") as f:
+                combined_inputs = f.read()
+            
+            self.add_message(role="system", content="Here is the YAML outline describing the material processing steps:\n" + yaml_minimal_str)
+            self.add_message(role="system", content="Here is an example of the expected CSV mapping (includes raw files, biosamples, and processed samples):\n" + combined_inputs)
+        
+        # Calculate and print token estimate for examples
+        example_chars = sum(len(msg.get('content', '')) for msg in self.messages if msg.get('role') == 'system')
+        # Subtract system prompt from total (it's in messages[1])
+        system_prompt_chars = len(self.messages[1].get('content', '')) if len(self.messages) > 1 else 0
+        example_only_chars = example_chars - system_prompt_chars
+        example_tokens = example_only_chars // 4
+        print(f"  Examples loaded: ~{example_tokens:,} tokens (~{example_only_chars:,} characters)")

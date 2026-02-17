@@ -2,6 +2,14 @@
 MCP server for biosample mapping validation
 """
 
+import sys
+from pathlib import Path
+
+# Add workspace root to path to allow imports when running as MCP subprocess
+workspace_root = Path(__file__).parent.parent.parent.parent
+if str(workspace_root) not in sys.path:
+    sys.path.insert(0, str(workspace_root))
+
 import logging
 from mcp.server.fastmcp import FastMCP
 from nmdc_dp_utils.llm.biosample_mapping.validation import validate_biosample_mapping_csv
@@ -62,8 +70,10 @@ def validate_biosample_mapping(csv_mapping: str) -> dict:
     - Biosample names match the biosample IDs
     - Processed sample placeholders exist in the material processing YAML
     - Protocol IDs match top-level protocols in the YAML
-    - All raw files are mapped
     - CSV formatting is correct with required columns
+    
+    Note: Unmapped raw files generate warnings (not errors) and are saved to unmapped_files.txt
+    for manual review. This is expected for QC samples, blanks, standards, etc.
 
     Parameters
     ----------
@@ -71,9 +81,12 @@ def validate_biosample_mapping(csv_mapping: str) -> dict:
 
     Returns
     -------
-    dict: Validation results with 'valid' (bool) and 'errors' (list of str).
-          If valid is True, the mapping is correct.
-          If valid is False, errors list contains specific issues to fix.
+    dict: Validation results with:
+          - 'valid' (bool): True if no errors found
+          - 'errors' (list of str): Critical issues that must be fixed
+          - 'warnings' (list of str): Non-critical issues for review
+          - 'unmapped_files_count' (int): Number of unmapped raw files
+          - 'unmapped_files_saved' (str): Path to file with unmapped files list (if any)
     """
     global _biosample_attributes, _raw_files, _material_processing_yaml
     
@@ -99,12 +112,48 @@ def validate_biosample_mapping(csv_mapping: str) -> dict:
         )
         
         logging.info(f"Validation result: {'PASS' if validation_result['valid'] else 'FAIL'}")
+        
+        # Handle errors
         if not validation_result['valid']:
             logging.warning(f"Validation errors: {len(validation_result['errors'])} found")
             for error in validation_result['errors'][:5]:  # Log first 5 errors
                 logging.warning(f"  - {error}")
         
-        return validation_result
+        # Handle warnings
+        if validation_result.get('warnings'):
+            logging.info(f"Validation warnings: {len(validation_result['warnings'])} found")
+            for warning in validation_result['warnings']:
+                logging.info(f"  - {warning}")
+        
+        # Save unmapped files to a file if any exist
+        unmapped_files = validation_result.get('unmapped_files', [])
+        unmapped_files_path = None
+        if unmapped_files:
+            unmapped_files_path = "unmapped_files.txt"
+            with open(unmapped_files_path, 'w') as f:
+                f.write(f"# Unmapped raw data files ({len(unmapped_files)})\n")
+                f.write("# These files could not be mapped to biosamples\n")
+                f.write("# May include QC samples, blanks, standards, extraction controls, etc.\n")
+                f.write("# Please review and determine appropriate handling\n\n")
+                for filename in unmapped_files:
+                    f.write(f"{filename}\n")
+            logging.info(f"Saved {len(unmapped_files)} unmapped files to {unmapped_files_path}")
+        
+        # Build response
+        response = {
+            "valid": validation_result['valid'],
+            "errors": validation_result['errors'],
+            "warnings": validation_result.get('warnings', []),
+            "unmapped_files_count": len(unmapped_files)
+        }
+        
+        if unmapped_files_path:
+            response["unmapped_files_saved"] = unmapped_files_path
+            response["message"] = f"Validation {'passed' if validation_result['valid'] else 'failed'}. {len(unmapped_files)} unmapped files saved to {unmapped_files_path} - please review."
+        else:
+            response["message"] = f"Validation {'passed' if validation_result['valid'] else 'failed'}."
+        
+        return response
         
     except Exception as e:
         logging.error(f"Error during biosample mapping validation: {e}")
