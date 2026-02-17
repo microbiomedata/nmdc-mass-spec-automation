@@ -217,16 +217,17 @@ def generate_downloaded_files(
             import traceback
             traceback.print_exc()
     
-    # Write downloaded_files.csv with just raw file names
+    # Write downloaded_files.csv with just raw file names (no path)
     with open(output_path, 'w', newline='') as f:
         writer = csv.writer(f)
         writer.writerow(['raw_data_file_name'])  # Single column header
-        
         for filename in sorted(files):
-            writer.writerow([filename])
-    
+            # Extract actual file name after last '/' if present
+            if '/' in filename:
+                writer.writerow([filename.split('/')[-1]])
+            else:
+                writer.writerow([filename])
     print(f"  ✓ Generated {output_path.name} with {len(files)} files")
-    
     return nmdc_id_to_filename
 
 
@@ -238,16 +239,11 @@ def process_example_directory(example_dir: Path) -> None:
     - combined_input.csv: Raw data mapping
     - study_id.txt: NMDC study ID (e.g., 'nmdc:sty-11-34xj1150')
     
-    Skips if biosample_attributes.csv already exists.
+    Always generates combined_inputs_v2.csv. Skips biosample_attributes.csv if already exists.
     """
     combined_input = example_dir / 'combined_input.csv'
     study_id_file = example_dir / 'study_id.txt'
     biosample_output = example_dir / 'biosample_attributes.csv'
-    
-    # Skip if biosample_attributes.csv already exists
-    if biosample_output.exists():
-        print(f"⏭  Skipping {example_dir.name}: biosample_attributes.csv already exists")
-        return
     
     if not combined_input.exists():
         print(f"⚠ Skipping {example_dir.name}: combined_input.csv not found")
@@ -269,8 +265,11 @@ def process_example_directory(example_dir: Path) -> None:
     print(f"\n📁 Processing {example_dir.name}...")
     print(f"  Study ID: {study_id}")
     
-    # Generate biosample_attributes.csv using study ID
-    generate_biosample_attributes(combined_input, study_id, biosample_output)
+    # Generate biosample_attributes.csv using study ID (skip if already exists)
+    if not biosample_output.exists():
+        generate_biosample_attributes(combined_input, study_id, biosample_output)
+    else:
+        print(f"  ⏭  biosample_attributes.csv already exists, skipping fetch")
     
     # Generate downloaded_files.csv and get NMDC ID to filename mapping
     files_output = example_dir / 'downloaded_files.csv'
@@ -286,21 +285,48 @@ def process_example_directory(example_dir: Path) -> None:
         mapping_df.to_csv(mapping_output, index=False)
         print(f"  ✓ Generated {mapping_output.name} with {len(mapping_df)} mappings")
     
-    # Update combined_input.csv to replace NMDC IDs with raw file names
+    # Always create combined_inputs_v2.csv with standardized structure
+    print(f"  Creating combined_inputs_v2.csv with raw file names and extra columns...")
+    df = pd.read_csv(combined_input)
+    
+    # Replace NMDC IDs with filenames if we have mappings
     if nmdc_id_to_filename:
-        print(f"  Updating combined_input.csv to use raw file names...")
-        
-        # Read the original combined_input
-        df = pd.read_csv(combined_input)
-        
-        # Replace NMDC IDs with filenames in raw_data_identifier column
         df['raw_data_identifier'] = df['raw_data_identifier'].apply(
-            lambda x: nmdc_id_to_filename.get(x, x)  # Replace if in mapping, else keep original
+            lambda x: nmdc_id_to_filename.get(x, x).split('/')[-1] if '/' in nmdc_id_to_filename.get(x, x) else nmdc_id_to_filename.get(x, x)
         )
-        
-        # Write updated combined_input back
-        df.to_csv(combined_input, index=False)
-        print(f"  ✓ Updated {combined_input.name} with raw file names")
+    else:
+        # Already filenames, just strip paths if present
+        df['raw_data_identifier'] = df['raw_data_identifier'].apply(
+            lambda x: x.split('/')[-1] if '/' in x else x
+        )
+
+    biosample_name_map = {}
+    biosample_attr_path = example_dir / 'biosample_attributes.csv'
+    if biosample_attr_path.exists():
+        try:
+            biosample_df = pd.read_csv(biosample_attr_path)
+            if 'id' in biosample_df.columns and 'name' in biosample_df.columns:
+                biosample_name_map = dict(zip(biosample_df['id'], biosample_df['name']))
+        except Exception as e:
+            print(f"  ⚠ Could not read biosample_attributes.csv for biosample_name mapping: {e}")
+
+    df['biosample_name'] = df['biosample_id'].map(biosample_name_map).fillna('')
+    df['match_confidence'] = 'high'
+    columns = [
+        'raw_data_identifier',
+        'biosample_id',
+        'biosample_name',
+        'match_confidence',
+        'processedsample_placeholder',
+        'material_processing_protocol_id'
+    ]
+    for col in columns:
+        if col not in df.columns:
+            df[col] = ''
+    df = df[columns]
+    combined_input_v2 = example_dir / 'combined_inputs_v2.csv'
+    df.to_csv(combined_input_v2, index=False)
+    print(f"  ✓ Created {combined_input_v2.name} with raw file names and extra columns")
 
 
 def main():
