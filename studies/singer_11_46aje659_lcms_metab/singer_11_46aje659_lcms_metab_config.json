@@ -114,7 +114,7 @@
         "metadata_mapping_generated": true,
         "metadata_packages_generated": true,
         "metadata_submitted_dev": true,
-        "metadata_submitted_prod": false
+        "metadata_submitted_prod": true
     },
     "problem_files": [
         "20220203_JGI-AK-TH_ES_504603_EcoPod_final_IDX_C18_USDAY59443_POS_MSMS_37_B-C-3_1_Rg80to1200-CE102040-root-I12-S1_Run78.raw"
