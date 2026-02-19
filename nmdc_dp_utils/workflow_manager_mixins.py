@@ -136,7 +136,7 @@ class WorkflowDataMovementManager:
         Note:
             This method can take several minutes for large datasets.
             Progress is reported every 100 files discovered.
-            File type is determined by config['study']['file_type'] (e.g., '.raw', '.mzml', '.d')
+            File type is determined by config['workflow']['file_type'] (e.g., '.raw', '.mzml', '.d')
         """
         import ftplib
 
@@ -195,7 +195,7 @@ class WorkflowDataMovementManager:
                             else:
                                 # It's a file, check if it matches the configured file type
                                 file_type = (
-                                    self.config["study"]
+                                    self.config["workflow"]
                                     .get("file_type", ".raw")
                                     .lower()
                                 )
@@ -227,7 +227,7 @@ class WorkflowDataMovementManager:
                 for url in ftp_urls:
                     f.write(f"{url}\n")
 
-            file_type = self.config["study"].get("file_type", ".raw").lower()
+            file_type = self.config["workflow"].get("file_type", ".raw").lower()
             self.logger.info(f"Found {len(ftp_urls)} {file_type} files")
 
             return str(log_file)
@@ -287,7 +287,7 @@ class WorkflowDataMovementManager:
 
         try:
             # Get the configured file type
-            file_type = self.config["study"].get("file_type", ".raw").lower()
+            file_type = self.config["workflow"].get("file_type", ".raw").lower()
 
             with open(log_file, "r") as f:
                 for line in f:
@@ -304,7 +304,7 @@ class WorkflowDataMovementManager:
 
             # Extract filename from URL - use configured file type for pattern
             file_type = (
-                self.config["study"].get("file_type", ".raw").lower().lstrip(".")
+                self.config["workflow"].get("file_type", ".raw").lower().lstrip(".")
             )
             pattern = rf"([^/]+\.{file_type})$"
             ftp_df["raw_data_file_short"] = ftp_df["ftp_location"].str.extract(
@@ -401,8 +401,8 @@ class WorkflowDataMovementManager:
             filtered_df = self.parse_massive_ftp_log(log_file)
 
             # Step 3: Report filtering results with sample files
-            file_type = self.config["study"].get("file_type", ".raw")
-            file_filters = self.config["study"].get("file_filters", [])
+            file_type = self.config["workflow"].get("file_type", ".raw")
+            file_filters = self.config["workflow"].get("file_filters", [])
 
             if len(filtered_df) > 0:
                 self.logger.info(
@@ -906,7 +906,7 @@ class WorkflowDataMovementManager:
         raw_data_dir = self.raw_data_directory
         study_raw_files = set()
         if raw_data_dir and Path(raw_data_dir).exists():
-            file_type = self.config["study"].get("file_type", ".raw")
+            file_type = self.config["workflow"].get("file_type", ".raw")
             raw_files = list(Path(raw_data_dir).rglob(f"*{file_type}"))
             study_raw_files = {
                 f.stem for f in raw_files

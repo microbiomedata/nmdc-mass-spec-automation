@@ -1,0 +1,160 @@
+lcms_metabolomics_soil_extraction:
+  steps:
+    - Step 1_lcms_metabolomics_soil_extraction:
+        SubSamplingProcess:
+          id: # nmdc:subspr-{shoulder}-{blade}
+          type: nmdc:SubSamplingProcess
+          name: Subsample soil for extraction
+          description: A 0.5 g portion of soil being taken from <Biosample> for metabolomics extraction.
+          has_input:
+            - Biosample
+          has_output:
+            - ProcessedSample1_lcms_metabolomics_soil_extraction
+          processing_institution: JGI
+          mass:
+            type: nmdc:QuantityValue
+            has_raw_value: 0.5 g
+            has_unit: g
+            has_numeric_value: 0.5
+
+    - Step 2_lcms_metabolomics_soil_extraction:
+        Extraction:
+          id: # nmdc:extrp-{shoulder}-{blade}
+          type: nmdc:Extraction
+          name: First water extraction of metabolites
+          description: First extraction of metabolites from <ProcessedSample1_lcms_metabolomics_soil_extraction> using water. Supernatant transferred to a 5 mL tube.
+          has_input:
+            - ProcessedSample1_lcms_metabolomics_soil_extraction
+          has_output:
+            - ProcessedSample2_lcms_metabolomics_soil_extraction # first supernatant
+            - ProcessedSample3_lcms_metabolomics_soil_extraction # remaining soil
+          processing_institution: JGI
+          extraction_targets:
+            - metabolite
+          substances_used:
+            - type: nmdc:PortionOfSubstance
+              known_as: water
+              substance_role: solvent
+              volume:
+                type: nmdc:QuantityValue
+                has_raw_value: 2 mL
+                has_unit: mL
+                has_numeric_value: 2
+          temperature:
+            type: nmdc:QuantityValue
+            has_raw_value: 0 Cel
+            has_unit: Cel
+            has_numeric_value: 0
+
+    - Step 3_lcms_metabolomics_soil_extraction:
+        Extraction:
+          id: # nmdc:extrp-{shoulder}-{blade}
+          type: nmdc:Extraction
+          name: Second water extraction of metabolites
+          description: Second extraction of metabolites from <ProcessedSample3_lcms_metabolomics_soil_extraction> using water.
+          has_input:
+            - ProcessedSample3_lcms_metabolomics_soil_extraction
+          has_output:
+            - ProcessedSample4_lcms_metabolomics_soil_extraction # second supernatant
+            - ProcessedSample5_lcms_metabolomics_soil_extraction # final remaining soil
+          processing_institution: JGI
+          extraction_targets:
+            - metabolite
+          substances_used:
+            - type: nmdc:PortionOfSubstance
+              known_as: water
+              substance_role: solvent
+              volume:
+                type: nmdc:QuantityValue
+                has_raw_value: 2 mL
+                has_unit: mL
+                has_numeric_value: 2
+          temperature:
+            type: nmdc:QuantityValue
+            has_raw_value: 0 Cel
+            has_unit: Cel
+            has_numeric_value: 0
+
+    - Step 4_lcms_metabolomics_soil_extraction:
+        Pooling:
+          id: # nmdc:poolp-{shoulder}-{blade}
+          type: nmdc:Pooling
+          name: Combine water extracts
+          description: Supernatants from first and second water extractions are combined. The combined extract was frozen and lyophilized dry.
+          has_input:
+            - ProcessedSample2_lcms_metabolomics_soil_extraction
+            - ProcessedSample4_lcms_metabolomics_soil_extraction
+          has_output:
+            - ProcessedSample6_lcms_metabolomics_soil_extraction
+          processing_institution: JGI
+
+    - Step 5_lcms_metabolomics_soil_extraction:
+        DissolvingProcess:
+          id: # nmdc:dispro-{shoulder}-{blade}
+          type: nmdc:DissolvingProcess
+          name: Resuspension for LC-MS
+          description: Resuspension of dried extract (<ProcessedSample6_lcms_metabolomics_soil_extraction>) in methanol containing internal standards for LC-MS analysis.
+          has_input:
+            - ProcessedSample6_lcms_metabolomics_soil_extraction
+          has_output:
+            - ProcessedSample7_lcms_metabolomics_soil_extraction
+          processing_institution: JGI
+          substances_used:
+            - type: nmdc:PortionOfSubstance
+              known_as: methanol
+              substance_role: solvent
+              volume:
+                type: nmdc:QuantityValue
+                has_raw_value: 200 uL
+                has_unit: uL
+                has_numeric_value: 200
+
+  processedsamples:
+    - ProcessedSample1_lcms_metabolomics_soil_extraction:
+        ProcessedSample:
+          id: #nmdc:
+          type: nmdc:ProcessedSample
+          name: <Biosample>_subsampled_soil
+          description: A 0.5 g subsample of <Biosample> for metabolomics extraction.
+    - ProcessedSample2_lcms_metabolomics_soil_extraction:
+        ProcessedSample:
+          id: #nmdc:
+          type: nmdc:ProcessedSample
+          name: <Biosample>_first_water_supernatant
+          description: Supernatant from the first water extraction of <ProcessedSample1_lcms_metabolomics_soil_extraction>.
+          sampled_portion: aqueous_layer
+    - ProcessedSample3_lcms_metabolomics_soil_extraction:
+        ProcessedSample:
+          id: #nmdc:
+          type: nmdc:ProcessedSample
+          name: <Biosample>_first_extracted_soil
+          description: Soil remaining after the first water extraction of <ProcessedSample1_lcms_metabolomics_soil_extraction>.
+          sampled_portion: pellet
+    - ProcessedSample4_lcms_metabolomics_soil_extraction:
+        ProcessedSample:
+          id: #nmdc:
+          type: nmdc:ProcessedSample
+          name: <Biosample>_second_water_supernatant
+          description: Supernatant from the second water extraction of <ProcessedSample3_lcms_metabolomics_soil_extraction>.
+          sampled_portion: aqueous_layer
+    - ProcessedSample5_lcms_metabolomics_soil_extraction:
+        ProcessedSample:
+          id: #nmdc:
+          type: nmdc:ProcessedSample
+          name: <Biosample>_second_extracted_soil
+          description: Soil remaining after the second water extraction of <ProcessedSample3_lcms_metabolomics_soil_extraction>.
+          sampled_portion: pellet
+    - ProcessedSample6_lcms_metabolomics_soil_extraction:
+        ProcessedSample:
+          id: #nmdc:
+          type: nmdc:ProcessedSample
+          name: <Biosample>_combined_dried_extract
+          description: Combined supernatants from both water extractions of <Biosample>, then frozen and lyophilized dry.
+          sampled_portion: aqueous_layer
+    - ProcessedSample7_lcms_metabolomics_soil_extraction:
+        ProcessedSample:
+          id: #nmdc:
+          type: nmdc:ProcessedSample
+          name: <Biosample>_resuspended_extract_LCMS
+          description: Combined and dried extract from <Biosample> resuspended in methanol with internal standards, ready for LC-MS analysis.
+          sampled_portion: methanol_layer
