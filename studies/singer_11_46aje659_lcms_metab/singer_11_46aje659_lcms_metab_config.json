@@ -65,7 +65,7 @@
             "corems_toml": "workflow_inputs/metams_rp_corems.toml",
             "reference_db": "workflow_inputs/20250407_database.msp",
             "scan_translator": "workflow_inputs/metams_jgi_scan_translator.toml",
-            "instrument_used": " Thermo Orbitrap ID-X",
+            "instrument_used": "Thermo Orbitrap ID-X",
             "cores": 5,
             "chromat_configuration_name": "JGI/LBNL Metabolomics Standard LC Method - Nonpolar C18",
             "mass_spec_configuration_name": "JGI/LBNL Standard Metabolomics Method, positive @10,20,40CE"
@@ -79,7 +79,7 @@
             "corems_toml": "workflow_inputs/metams_rp_corems.toml",
             "reference_db": "workflow_inputs/20250407_database.msp",
             "scan_translator": "workflow_inputs/metams_jgi_scan_translator.toml",
-            "instrument_used": " Thermo Orbitrap ID-X",
+            "instrument_used": "Thermo Orbitrap ID-X",
             "cores": 5,
             "chromat_configuration_name": "JGI/LBNL Metabolomics Standard LC Method - Nonpolar C18",
             "mass_spec_configuration_name": "JGI/LBNL Standard Metabolomics Method, negative @10,20,40CE"
