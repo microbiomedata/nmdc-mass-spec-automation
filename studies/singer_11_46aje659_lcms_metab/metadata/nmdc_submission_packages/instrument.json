@@ -1,0 +1,13 @@
+{
+  "instrument_set": [
+    {
+      "id": "nmdc:inst-11-075j3n79",
+      "type": "nmdc:Instrument",
+      "name": "Thermo Orbitrap ID-X",
+      "description": "Thermo Orbitrap ID-X Tribrid Mass Spectrometer",
+      "vendor": "thermo_fisher",
+      "model": "orbitrap_idx_tribrid"
+    }
+  ],
+  "@type": "Database"
+}
