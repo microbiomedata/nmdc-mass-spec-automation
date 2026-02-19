@@ -112,8 +112,8 @@
         "processed_data_uploaded_to_minio": true,
         "material_processing_metadata_generated": true,
         "metadata_mapping_generated": true,
-        "metadata_packages_generated": false,
-        "metadata_submitted_dev": false,
+        "metadata_packages_generated": true,
+        "metadata_submitted_dev": true,
         "metadata_submitted_prod": false
     },
     "problem_files": [
