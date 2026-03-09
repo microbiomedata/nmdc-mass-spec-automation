@@ -9,9 +9,9 @@
         "massive_id": "v07/MSV000094090",
         "file_type": ".raw",
         "file_filters": [
-            "msms"
+            "S17-D45"
         ],
-        "processed_data_date_tag": "20260106",
+        "processed_data_date_tag": "20260309",
         "workflow_type": "LCMS Lipidomics",
         "batch_size": 25
     },
@@ -92,7 +92,6 @@
         "study_structure_created": true,
         "raw_data_downloaded": true,
         "biosample_attributes_fetched": true,
-        "biosample_mapping_script_generated": true,
         "biosample_mapping_completed": true,
         "raw_data_inspected": true,
         "material_processing_metadata_generated": false,
@@ -101,6 +100,7 @@
         "processed_data_uploaded_to_minio": false,
         "metadata_packages_generated": false,
         "metadata_submitted_dev": false,
-        "metadata_submitted_prod": false
+        "metadata_submitted_prod": false,
+        "protocol_outline_created": true
     }
 }
