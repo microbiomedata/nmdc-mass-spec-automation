@@ -64,10 +64,14 @@ class ConversationManager:
         """
         Add curated biosample -> raw file -> processed sample mapping examples to the context.
         Uses examples 3 and 4 (most robust examples after testing).
-        Uses ONLY combined_inputs_v2.csv which already contains raw files, biosamples, and mapping.
-        Also includes simplified YAML protocol outline.
+        
+        Examples demonstrate:
+        1. How to analyze file naming patterns
+        2. How protocols relate to processed samples
+        3. The expected output CSV format
+        
+        Important: Examples are NOT templates to copy - they show the process for different studies.
         """
-        import pandas as pd
         import yaml as yaml_lib
         
         dirs = ["nmdc_dp_utils/llm/examples/example_3", 
@@ -109,13 +113,7 @@ class ConversationManager:
             with open(f"{dir}/combined_inputs_v2.csv", "r") as f:
                 combined_inputs = f.read()
             
-            self.add_message(role="system", content="Here is the YAML outline describing the material processing steps:\n" + yaml_minimal_str)
-            self.add_message(role="system", content="Here is an example of the expected CSV mapping (includes raw files, biosamples, and processed samples):\n" + combined_inputs)
-        
-        # Calculate and print token estimate for examples
-        example_chars = sum(len(msg.get('content', '')) for msg in self.messages if msg.get('role') == 'system')
-        # Subtract system prompt from total (it's in messages[1])
-        system_prompt_chars = len(self.messages[1].get('content', '')) if len(self.messages) > 1 else 0
-        example_only_chars = example_chars - system_prompt_chars
-        example_tokens = example_only_chars // 4
-        print(f"  Examples loaded: ~{example_tokens:,} tokens (~{example_only_chars:,} characters)")
+            # Present examples with clear context that they're from a DIFFERENT study
+            example_num = dir.split('_')[-1]
+            self.add_message(role="system", content=f"Example {example_num} - YAML protocols (from a different study, showing format only):\n" + yaml_minimal_str)
+            self.add_message(role="system", content=f"Example {example_num} - Expected CSV output format (from a different study):\n{combined_inputs}\n\nNote: This example shows the OUTPUT FORMAT. The actual mapping logic you generate should be based ONLY on the study data provided to you, not on patterns from this example.")

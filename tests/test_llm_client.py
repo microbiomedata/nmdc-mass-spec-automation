@@ -95,6 +95,6 @@ def test_llm_client_get_response_invokes_runner(monkeypatch):
     }
     assert captured_context["params"].command == "python"
     assert captured_context["params"].args == client.mcp_servers
-    assert captured_context["timeout"] == 60
+    assert captured_context["timeout"] == 120
     assert runner_mock.await_count == 1
     assert runner_mock.await_args.kwargs["input"] == messages

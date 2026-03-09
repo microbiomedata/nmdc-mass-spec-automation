@@ -1,8 +1,26 @@
+"""
+Biosample Mapping Pipeline - LLM-assisted code generation for mapping raw files to biosamples
+
+This module provides automated biosample-to-raw-file mapping through LLM-generated Python scripts.
+The pipeline:
+1. Loads study data (biosamples, raw files, material processing YAML)
+2. Asks LLM to generate a mapping script
+3. Executes and validates the generated script
+4. Iteratively fixes errors until validation passes
+
+The validation ensures:
+- Biosample IDs follow NMDC format and exist in biosample attributes
+- Protocol IDs match those defined in the YAML
+- Processed sample placeholders are valid
+- All mappable raw files are included
+"""
+
 import sys
 from pathlib import Path
 import asyncio
 from dotenv import load_dotenv
 import time
+import logging
 
 # Add workspace root to path to allow imports when running as script
 workspace_root = Path(__file__).parent.parent.parent.parent
@@ -17,9 +35,11 @@ from nmdc_dp_utils.llm.llm_client import LLMClient
 from nmdc_dp_utils.llm.llm_conversation_manager import ConversationManager
 import subprocess
 
+logging.basicConfig(level=logging.INFO, format='%(levelname)s: %(message)s')
+
 
 async def get_llm_generated_script(llm_client: LLMClient, conversation_obj: ConversationManager, 
-                                   biosample_path: str, files_path: str, output_path: str):
+                                   biosample_path: str, files_path: str, yaml_path: str, output_path: str):
     """
     Get LLM to generate a Python script that does the mapping.
     
@@ -33,6 +53,8 @@ async def get_llm_generated_script(llm_client: LLMClient, conversation_obj: Conv
         Path to biosample CSV (for script to read)
     files_path : str
         Path to raw files CSV (for script to read)
+    yaml_path : str
+        Path to material processing YAML (for script to read)
     output_path : str
         Path where script should write output CSV
     
@@ -55,18 +77,21 @@ async def get_llm_generated_script(llm_client: LLMClient, conversation_obj: Conv
 The script should:
 - Read biosamples from: {biosample_path}
 - Read raw files from: {files_path} (column: {column_name})
+- Read material processing YAML from: {yaml_path}
 - Write output CSV to: {output_path}
 - Use the mapping logic we discussed (parse filenames, match to biosamples, determine protocols)
+
+IMPORTANT: Use these EXACT file paths in your script. Do not guess or change the paths.
 
 Provide ONLY the Python script code, no markdown blocks or explanations."""
     
     conversation_obj.add_message(role="user", content=prompt)
     
-    print("  Waiting for LLM to generate mapping script...")
+    logging.info("Waiting for LLM to generate mapping script...")
     start_time = time.time()
     response = await llm_client.get_response(conversation_obj.messages, timeout_seconds=300)
     elapsed = time.time() - start_time
-    print(f"  ✓ Script generated ({elapsed:.1f}s)")
+    logging.info(f"Script generated ({elapsed:.1f}s)")
     
     return response
 
@@ -114,10 +139,10 @@ async def validate_and_fix_script(llm_client: LLMClient, conversation_obj: Conve
         yaml_content = f.read()
     
     for iteration in range(max_iterations):
-        print(f"\n  Iteration {iteration + 1}/{max_iterations}")
+        logging.info(f"Iteration {iteration + 1}/{max_iterations}")
         
         # Execute the script
-        print(f"    Executing script: {script_path}")
+        logging.info(f"Executing script: {script_path}")
         try:
             result = subprocess.run(
                 [sys.executable, script_path],
@@ -128,9 +153,9 @@ async def validate_and_fix_script(llm_client: LLMClient, conversation_obj: Conve
             )
             
             if result.returncode != 0:
-                print(f"    ❌ Script execution failed:")
-                print(f"    STDOUT: {result.stdout}")
-                print(f"    STDERR: {result.stderr}")
+                logging.error(f"Script execution failed")
+                logging.debug(f"STDOUT: {result.stdout}")
+                logging.error(f"STDERR: {result.stderr}")
                 
                 # Ask LLM to fix the script
                 conversation_obj.add_message(
@@ -142,7 +167,7 @@ async def validate_and_fix_script(llm_client: LLMClient, conversation_obj: Conve
                     content="Fix the script to resolve this error. Provide the complete corrected script."
                 )
                 
-                print("    Asking LLM to fix the script...")
+                logging.info("Asking LLM to fix the script...")
                 fixed_script = await llm_client.get_response(conversation_obj.messages, timeout_seconds=300)
                 
                 # Clean up markdown if present
@@ -154,16 +179,16 @@ async def validate_and_fix_script(llm_client: LLMClient, conversation_obj: Conve
                 # Save fixed script
                 with open(script_path, 'w') as f:
                     f.write(fixed_script)
-                print("    Script updated")
+                logging.info("Script updated")
                 
                 conversation_obj.add_message(role="assistant", content=fixed_script)
                 continue
             
-            print(f"    ✓ Script executed successfully")
+            logging.info("Script executed successfully")
             
             # Check if output file was created
             if not os.path.exists(output_path):
-                print(f"    ❌ Output file not created: {output_path}")
+                logging.error(f"Output file not created: {output_path}")
                 conversation_obj.add_message(
                     role="user",
                     content=f"Script ran but did not create output file: {output_path}. Fix the script to ensure it creates this file."
@@ -180,14 +205,14 @@ async def validate_and_fix_script(llm_client: LLMClient, conversation_obj: Conve
                 conversation_obj.add_message(role="assistant", content=fixed_script)
                 continue
             
-            print(f"    ✓ Output file created: {output_path}")
+            logging.info(f"Output file created: {output_path}")
             
             # Read the generated CSV
             with open(output_path, 'r') as f:
                 generated_csv = f.read()
             
             # Validate
-            print(f"    Validating CSV...")
+            logging.info("Validating CSV...")
             validation_result = validate_biosample_mapping_csv(
                 csv_content=generated_csv,
                 biosample_attributes_csv=biosample_content,
@@ -197,21 +222,21 @@ async def validate_and_fix_script(llm_client: LLMClient, conversation_obj: Conve
             
             # Check validation result
             if validation_result.get('valid', False):
-                print(f"    ✓ Validation passed!")
+                logging.info("Validation passed!")
                 
                 # Check for warnings
                 warnings = validation_result.get('warnings', [])
                 unmapped_files = validation_result.get('unmapped_files', [])
                 
                 if warnings:
-                    print(f"    ⚠️  Validation warnings: {len(warnings)}")
+                    logging.warning(f"Validation warnings: {len(warnings)}")
                     for warning in warnings[:3]:
-                        print(f"       - {warning}")
+                        logging.warning(f"  {warning}")
                     if len(warnings) > 3:
-                        print(f"       ... and {len(warnings) - 3} more warnings")
+                        logging.warning(f"  ... and {len(warnings) - 3} more warnings")
                 
                 if unmapped_files:
-                    print(f"    ℹ️  Unmapped files: {len(unmapped_files)} (saved separately)")
+                    logging.info(f"Unmapped files: {len(unmapped_files)} (saved separately)")
                     unmapped_path = output_path.replace('.csv', '_unmapped_files.txt')
                     with open(unmapped_path, 'w') as f:
                         f.write('\n'.join(unmapped_files))
@@ -220,11 +245,11 @@ async def validate_and_fix_script(llm_client: LLMClient, conversation_obj: Conve
             else:
                 # Validation failed
                 errors = validation_result.get('errors', [])
-                print(f"    ❌ Validation failed: {len(errors)} errors")
+                logging.error(f"Validation failed: {len(errors)} errors")
                 for error in errors[:5]:
-                    print(f"       - {error}")
+                    logging.error(f"  {error}")
                 if len(errors) > 5:
-                    print(f"       ... and {len(errors) - 5} more errors")
+                    logging.error(f"  ... and {len(errors) - 5} more errors")
                 
                 # Ask LLM to fix the script
                 error_summary = '\n'.join(errors[:10])
@@ -244,7 +269,7 @@ Fix the script to resolve these validation errors. The validation checks:
 Provide the complete corrected script."""
                 )
                 
-                print("    Asking LLM to fix validation errors...")
+                logging.info("Asking LLM to fix validation errors...")
                 fixed_script = await llm_client.get_response(conversation_obj.messages, timeout_seconds=300)
                 
                 if '```python' in fixed_script:
@@ -254,13 +279,13 @@ Provide the complete corrected script."""
                 
                 with open(script_path, 'w') as f:
                     f.write(fixed_script)
-                print("    Script updated")
+                logging.info("Script updated")
                 
                 conversation_obj.add_message(role="assistant", content=fixed_script)
                 continue
                 
         except subprocess.TimeoutExpired:
-            print(f"    ❌ Script execution timed out (>30s)")
+            logging.error("Script execution timed out (>30s)")
             conversation_obj.add_message(
                 role="user",
                 content="Script execution timed out. Make the script more efficient."
@@ -277,9 +302,9 @@ Provide the complete corrected script."""
             conversation_obj.add_message(role="assistant", content=fixed_script)
             continue
         except Exception as e:
-            print(f"    ❌ Validation error: {e}")
+            logging.error(f"Validation error: {e}")
             import traceback
-            traceback.print_exc()
+            logging.debug(traceback.format_exc())
             conversation_obj.add_message(
                 role="user",
                 content=f"Validation encountered an error: {e}. Fix the script to produce valid output."
@@ -296,7 +321,7 @@ Provide the complete corrected script."""
             conversation_obj.add_message(role="assistant", content=fixed_script)
             continue
     
-    print(f"\n  ❌ Failed to generate valid script after {max_iterations} iterations")
+    logging.error(f"Failed to generate valid script after {max_iterations} iterations")
     return False
 
 
@@ -305,7 +330,6 @@ async def add_study_data_to_conversation(
     biosample_attributes_path: str,
     raw_files_path: str,
     material_processing_yaml_path: str,
-    study_id: str = None,
     additional_context_path: str = None
 ):
     """
@@ -318,7 +342,6 @@ async def add_study_data_to_conversation(
     biosample_attributes_path (str) : path to biosample attributes CSV file
     raw_files_path (str) : path to raw files CSV file
     material_processing_yaml_path (str) : path to material processing YAML file
-    study_id (str) : optional study identifier
     additional_context_path (str) : optional path to additional context text file with naming conventions or protocol details
     """
     import pandas as pd
@@ -394,12 +417,6 @@ async def add_study_data_to_conversation(
             role="system",
             content=f"Additional context (experimental methods and sample processing):\n{additional_context}"
         )
-    
-    if study_id:
-        conversation_obj.add_message(
-            role="system",
-            content=f"Study ID: {study_id}"
-        )
 
 
 if __name__ == "__main__":
@@ -416,51 +433,37 @@ if __name__ == "__main__":
     script_output_path = "nmdc_dp_utils/llm/examples/example_1/llm_generated_mapping_script.py"
     csv_output_path = "nmdc_dp_utils/llm/examples/example_1/llm_generated_mapping.csv"
     
-    # Read study ID if available
-    study_id = None
-    try:
-        with open("nmdc_dp_utils/llm/examples/example_1/study_id.txt", "r") as f:
-            study_id = f.read().strip()
-    except FileNotFoundError:
-        pass
-    
     # Check if additional context file exists
     if not os.path.exists(additional_context_path):
         additional_context_path = None
     
     # Create LLM client (no MCP servers needed for code generation)
-    print("Initializing LLM client for code generation...")
+    logging.info("Initializing LLM client for code generation...")
     llm_client = LLMClient(mcp_servers=[])
     
     # Create conversation manager with code generation prompt and examples
-    print("Setting up conversation with code generation prompt and examples...")
+    logging.info("Setting up conversation with code generation prompt and examples...")
     conversation_obj = ConversationManager(interaction_type="biosample_mapping")
     
     # Add study-specific data to the conversation
-    print("Adding study data to conversation...")
+    logging.info("Adding study data to conversation...")
     asyncio.run(add_study_data_to_conversation(
         conversation_obj=conversation_obj,
         biosample_attributes_path=biosample_attributes_path,
         raw_files_path=raw_files_path,
         material_processing_yaml_path=material_processing_yaml_path,
-        study_id=study_id,
         additional_context_path=additional_context_path
     ))
-    
-    # Estimate input size
-    total_chars = sum(len(msg.get('content', '')) for msg in conversation_obj.messages)
-    estimated_tokens = total_chars // 4
-    print(f"Study data added (~{estimated_tokens:,} tokens, ~{total_chars:,} characters)")
-    
+       
     # Get the mapping script from LLM
-    print("\nGenerating mapping script via code generation approach...")
-    print("=" * 70)
+    logging.info("Generating mapping script via code generation approach...")
     
     script_code = asyncio.run(get_llm_generated_script(
         llm_client=llm_client,
         conversation_obj=conversation_obj,
         biosample_path=biosample_attributes_path,
         files_path=raw_files_path,
+        yaml_path=material_processing_yaml_path,
         output_path=csv_output_path
     ))
         
@@ -474,14 +477,13 @@ if __name__ == "__main__":
     with open(script_output_path, 'w') as f:
         f.write(script_code)
         
-    print(f"\n✓ Script saved to: {script_output_path}")
+    logging.info(f"Script saved to: {script_output_path}")
     
     # Add script to conversation for potential fixes
     conversation_obj.add_message(role="assistant", content=script_code)
     
     # Execute and validate
-    print("\n📝 Executing and validating script...")
-    print("=" * 70)
+    logging.info("Executing and validating script...")
     
     success = asyncio.run(validate_and_fix_script(
         llm_client=llm_client,
@@ -495,7 +497,7 @@ if __name__ == "__main__":
     ))
 
     if success:
-        print(f"LLM generated code saved to: {script_output_path} and associated CSV mapping saved to: {csv_output_path}")
+        logging.info(f"LLM generated code saved to: {script_output_path} and associated CSV mapping saved to: {csv_output_path}")
     else:
-        print("Failed to generate a valid mapping script after multiple attempts. Please review the conversation and outputs for debugging.")
+        logging.error("Failed to generate a valid mapping script after multiple attempts. Please review the conversation and outputs for debugging.")
 

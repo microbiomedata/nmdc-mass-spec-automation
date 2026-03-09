@@ -417,10 +417,10 @@ raw_data_identifier,biosample_id,biosample_name,match_confidence,processedsample
 1000s_TALL_FTMS_SPE_TOP_3_01Nov22_Mag_300SA_p025_220_1_7233.zip,nmdc:bsm-11-mm5fdy46,1000 soils - TALL_CoreB_TOP,high,ProcessedSample9_NOM,NOM
 1000s_UKFS_FTMS_SPE_BTM_1_25Oct22_Mag_300SA_p025_59_1_6972.zip,nmdc:bsm-11-fftxqt61,1000 soils - UKFS_CoreB_BTM,high,ProcessedSample5_NOM,NOM
 1000s_UKFS_FTMS_SPE_BTM_2_rr_28Oct22_Mag_300SA_p025_145_1_7058.zip,nmdc:bsm-11-fftxqt61,1000 soils - UKFS_CoreB_BTM,high,ProcessedSample7_NOM,NOM
-1000s_UKFS_FTMS_SPE_BTM_2b_25Oct22_Mag_300SA_p025_40_1_6953.zip,nmdc:bsm-11-fftxqt61,1000 soils - UKFS_CoreB_BTM,high,ProcessedSample7_NOM,NOM
+1000s_UKFS_FTMS_SPE_BTM_2b_25Oct22_Mag_300SA_p025_40_1_6953.zip,,,low,,
 1000s_UKFS_FTMS_SPE_BTM_3_rr_28Oct22_Mag_300SA_p025_129_1_7042.zip,nmdc:bsm-11-fftxqt61,1000 soils - UKFS_CoreB_BTM,high,ProcessedSample9_NOM,NOM
 1000s_UKFS_FTMS_SPE_TOP_1_rr_28Oct22_Mag_300SA_p025_137_1_7050.zip,nmdc:bsm-11-4fnnr421,1000 soils - UKFS_CoreB_TOP,high,ProcessedSample5_NOM,NOM
-1000s_UKFS_FTMS_SPE_TOP_1b_25Oct22_Mag_300SA_p025_73_1_6986.zip,nmdc:bsm-11-4fnnr421,1000 soils - UKFS_CoreB_TOP,high,ProcessedSample5_NOM,NOM
+1000s_UKFS_FTMS_SPE_TOP_1b_25Oct22_Mag_300SA_p025_73_1_6986.zip,,,low,,
 1000s_UKFS_FTMS_SPE_TOP_2_31Oct22_Mag_300SA_p025_170_1_7183.zip,nmdc:bsm-11-4fnnr421,1000 soils - UKFS_CoreB_TOP,high,ProcessedSample7_NOM,NOM
 1000s_UKFS_FTMS_SPE_TOP_3_rr_28Oct22_Mag_300SA_p025_123_1_7036.zip,nmdc:bsm-11-4fnnr421,1000 soils - UKFS_CoreB_TOP,high,ProcessedSample9_NOM,NOM
 1000s_UT12_FTMS_SPE_BTM_1_rr_28Oct22_Mag_300SA_p025_136_1_7049.zip,nmdc:bsm-11-fmxqm307,1000 soils - UT12_CoreB_BTM,high,ProcessedSample5_NOM,NOM
