@@ -38,16 +38,14 @@ async def main():
     logger.info("3. Fetching raw data...")
     manager.fetch_raw_data()
 
-    # Step 4: Map raw data files to biosamples by generating mapping script and running it
-    # TO BE REPLACED BY AN LLM-DRIVEN APPROACH
-    logger.info("4. Mapping raw data files to biosamples...")
+    # Step 4: Map raw data files to biosamples using LLM code generation
+    # Optional: add "additional_mapping_context.txt" in metadata/ folder for extra mapping context
+    logger.info("4. Mapping raw data files to biosamples using LLM...")
     manager.get_biosample_attributes()
-    manager.generate_biosample_mapping_script()
-
-    mapping_success = manager.run_biosample_mapping_script()
+    mapping_success = await manager.generate_llm_biosample_mapping(max_iterations=3)
+    
     if not mapping_success:
-        logger.warning("Biosample mapping needs manual review - check the mapping file and customize the script")
-        logger.warning("Re-run after making changes to improve matching")
+        logger.warning("Biosample mapping failed - review logs and add additional context if needed")
     else:
         logger.info("Biosample mapping completed successfully")
 
