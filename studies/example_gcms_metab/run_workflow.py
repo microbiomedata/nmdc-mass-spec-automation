@@ -5,15 +5,18 @@ Example GCMS metabolomics study, gcms_metabolomics workflow runner.
 
 import sys
 from pathlib import Path
+import asyncio
 
-def main():
+# Ensure project root is on sys.path so package `nmdc_dp_utils` is importable
+PROJECT_ROOT = Path(__file__).resolve().parents[2]
+if str(PROJECT_ROOT) not in sys.path:
+    sys.path.insert(0, str(PROJECT_ROOT))
+
+from nmdc_dp_utils.workflow_manager import NMDCWorkflowManager
+
+async def main():
     """Run the Example GCMS Metabolomics workflow."""
-    # Ensure project root is on sys.path so package `nmdc_dp_utils` is importable
-    project_root = Path(__file__).resolve().parents[2]
-    if str(project_root) not in sys.path:
-        sys.path.insert(0, str(project_root))
-    from nmdc_dp_utils.workflow_manager import NMDCWorkflowManager
-    
+
     # Initialize study manager
     config_path = "studies/example_gcms_metab/example_gcms_metab_config.json"
     manager = NMDCWorkflowManager(str(config_path))
@@ -24,41 +27,54 @@ def main():
     # Step 1: Create workflow structure
     logger.info("1. Creating workflow structure...")
     manager.create_workflow_structure()
+
+    # Step 2: Generate protocol YAML outline using LLM
+    logger.info("2. Generating protocol YAML outline using LLM...")
+    await manager.generate_material_processing_yaml()
     
-    # Step 2: Fetch raw data (MinIO or MASSIVE based on config)
-    logger.info("2. Fetching raw data...")
+    # Step 3: Fetch raw data (MinIO or MASSIVE based on config)
+    logger.info("3. Fetching raw data...")
     manager.fetch_raw_data()
 
-    # Step 3: Map raw data files to biosamples by generating mapping script and running it
-    logger.info("3. Mapping raw data files to biosamples...")
+    # Step 4: Map raw data files to biosamples using LLM code generation
+    # Optional: add "additional_mapping_context.txt" in metadata/ folder for extra mapping context
+    logger.info("4. Mapping raw data files to biosamples using LLM...")
     manager.get_biosample_attributes()
-    manager.generate_biosample_mapping_script()
+    mapping_success = await manager.generate_llm_biosample_mapping(max_iterations=3)
     
-    mapping_success = manager.run_biosample_mapping_script()
     if not mapping_success:
-        logger.warning("Biosample mapping needs manual review - check the mapping file and customize the script")
-        logger.warning("Re-run after making changes to improve matching")
+        logger.warning("Biosample mapping failed - review logs and add additional context if needed")
     else:
         logger.info("Biosample mapping completed successfully")
     
-    # Step 4: Inspect raw data files for metadata and QC
-    logger.info("4. Inspecting raw data files...")
+    # Step 5: Inspect raw data files for metadata and QC
+    logger.info("5. Inspecting raw data files...")
     manager.raw_data_inspector(cores=4)
 
-    # Step 5: Process data (generate WDL configs and execute workflows)
-    logger.info("5. Processing data with WDL workflows...")
+    # Step 6: Process data (generate WDL configs and execute workflows)
+    logger.info("6. Processing data with WDL workflows...")
     manager.process_data(execute=True)
     assert manager.should_skip('data_processed'), "WDL workflows must complete successfully to proceed"
 
-    # Step 6: Upload processed data to MinIO
-    logger.info("6. Uploading processed data to MinIO...")
+    # Step 7: Upload processed data to MinIO
+    logger.info("7. Uploading processed data to MinIO...")
     manager.upload_processed_data_to_minio()
     assert manager.should_skip('processed_data_uploaded_to_minio'), "Processed data upload to MinIO must complete successfully to proceed"
 
-    # Step 7: Generate and submit NMDC metadata packages
-    logger.info("7. Generating NMDC metadata packages...")
-    manager.generate_nmdc_metadata_for_workflow(test=True)
+    # Step 8: Generate and submit NMDC metadata packages
+    logger.info("8. Generating NMDC metadata packages...")
+    manager.generate_nmdc_metadata_for_workflow()
     assert manager.should_skip('metadata_packages_generated'), "NMDC metadata package generation must complete successfully to proceed"
 
+    # Step 9: Submit metadata packages to dev environment
+    logger.info("9. Submitting metadata packages to dev environment...")
+    dev_success = manager.submit_metadata_packages_to_dev()
+    if not dev_success:
+        logger.error("Failed to submit metadata packages to dev environment")
+        logger.error("Please fix the issues and re-run. Skipping production submission.")
+        return  # Exit without proceeding to prod
+    else:
+        logger.info("Successfully submitted metadata packages to dev environment")
+
 if __name__ == "__main__":
-    main()
+    asyncio.run(main())
