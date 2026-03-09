@@ -152,8 +152,8 @@ def validate_biosample_mapping_csv(
         
         # Check match_confidence
         match_confidence = row.get('match_confidence', '').strip()
-        if match_confidence not in ['high', 'medium', 'low', '']:
-            errors.append(f"{row_num}: match_confidence must be 'high', 'medium', 'low', or empty (got '{match_confidence}')")
+        if match_confidence not in ['high', 'medium', 'low', 'calibrant', '']:
+            errors.append(f"{row_num}: match_confidence must be 'high', 'medium', 'low', 'calibrant', or empty (got '{match_confidence}')")
         
         # Check processedsample_placeholder
         ps_placeholder = row.get('processedsample_placeholder', '').strip()
