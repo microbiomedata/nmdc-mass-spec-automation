@@ -580,7 +580,7 @@ class TestWorkflowMetadataManagerIntegration:
             f.write(yaml_content)
         
         # Create input CSV with biosample to raw file mapping and protocol ID
-        input_csv_path = metadata_dir / "mapped_raw_files_wprocessed_MANUAL.csv"
+        input_csv_path = metadata_dir / "llm_biosample_raw_file_mapper.csv"
         test_data_dir = Path(__file__).parent / "test_data"
         biosample_mapping = pd.read_csv(test_data_dir / "metadata" / "lcms_biosample_mapping.csv")
         

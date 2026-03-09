@@ -97,148 +97,6 @@ class TestNMDCWorkflowBiosampleManager:
         
         assert result is False
 
-
-    def test_generate_biosample_mapping_script_default(self, lcms_config_file):
-        """Test generation of biosample mapping script with defaults."""
-        from nmdc_dp_utils.workflow_manager import NMDCWorkflowManager
-        
-        manager = NMDCWorkflowManager(str(lcms_config_file))
-        
-        # Create scripts directory
-        scripts_dir = manager.workflow_path / "scripts"
-        scripts_dir.mkdir(parents=True, exist_ok=True)
-        
-        result = manager.generate_biosample_mapping_script()
-        
-        assert result is True
-        assert manager.should_skip("biosample_mapping_script_generated") is True
-        
-        # Verify script was created with TEMPLATE suffix
-        script_path = manager.workflow_path / "scripts" / "map_raw_files_to_biosamples_TEMPLATE.py"
-        assert script_path.exists()
-        
-        # Verify script is executable
-        assert script_path.stat().st_mode & 0o111  # Check executable bits
-        
-        # Verify script contains study-specific values
-        content = script_path.read_text()
-        assert "test_lcms_study" in content
-        assert "Test LCMS study for unit testing" in content
-
-    def test_generate_biosample_mapping_script_custom_name(self, lcms_config_file):
-        """Test generation with custom script name."""
-        from nmdc_dp_utils.workflow_manager import NMDCWorkflowManager
-        
-        manager = NMDCWorkflowManager(str(lcms_config_file))
-        
-        # Create scripts directory
-        scripts_dir = manager.workflow_path / "scripts"
-        scripts_dir.mkdir(parents=True, exist_ok=True)
-        
-        result = manager.generate_biosample_mapping_script(script_name="custom_mapper.py")
-        
-        assert result is True
-        
-        script_path = manager.workflow_path / "scripts" / "custom_mapper.py"
-        assert script_path.exists()
-
-    def test_generate_biosample_mapping_script_missing_template(self, lcms_config_file, temp_config_dir):
-        """Test handling of missing template file."""
-        from nmdc_dp_utils.workflow_manager import NMDCWorkflowManager
-        
-        manager = NMDCWorkflowManager(str(lcms_config_file))
-        
-        # Try with non-existent template
-        fake_template = temp_config_dir / "nonexistent_template.py"
-        result = manager.generate_biosample_mapping_script(template_path=str(fake_template))
-        
-        assert result is False
-
-    def test_run_biosample_mapping_script_template_error(self, lcms_config_file):
-        """Test that running TEMPLATE script directly is prevented."""
-        from nmdc_dp_utils.workflow_manager import NMDCWorkflowManager
-        
-        manager = NMDCWorkflowManager(str(lcms_config_file))
-        
-        # Generate template
-        manager.generate_biosample_mapping_script()
-        
-        # Try to run template directly (should fail)
-        template_path = manager.workflow_path / "scripts" / "map_raw_files_to_biosamples_TEMPLATE.py"
-        result = manager.run_biosample_mapping_script(script_path=str(template_path))
-        
-        assert result is False
-
-    def test_run_biosample_mapping_script_not_found(self, lcms_config_file):
-        """Test handling of missing mapping script."""
-        from nmdc_dp_utils.workflow_manager import NMDCWorkflowManager
-        
-        manager = NMDCWorkflowManager(str(lcms_config_file))
-        
-        result = manager.run_biosample_mapping_script()
-        
-        assert result is False
-
-    def test_run_biosample_mapping_script_success(self, mock_subprocess_run, lcms_config_file):
-        """Test successful execution of biosample mapping script."""
-        from nmdc_dp_utils.workflow_manager import NMDCWorkflowManager
-        
-        manager = NMDCWorkflowManager(str(lcms_config_file))
-        
-        # Create a non-template script
-        script_path = manager.workflow_path / "scripts" / "map_raw_files_to_biosamples.py"
-        script_path.parent.mkdir(parents=True, exist_ok=True)
-        script_path.write_text("#!/usr/bin/env python3\nprint('Mapping complete')")
-        
-        # Create fake mapping output for _generate_mapped_files_list
-        metadata_dir = manager.workflow_path / "metadata"
-        metadata_dir.mkdir(parents=True, exist_ok=True)
-        mapping_df = pd.DataFrame({
-            "raw_file_name": ["file1.raw", "file2.raw", "file3.raw"],
-            "biosample_id": ["nmdc:bsm-11-001", "nmdc:bsm-11-002", ""],
-            "biosample_name": ["Sample 1", "Sample 2", ""],
-            "match_confidence": ["high", "medium", "no_match"]
-        })
-        mapping_df.to_csv(metadata_dir / "mapped_raw_file_biosample_mapping.csv", index=False)
-        
-        # Mock successful subprocess execution
-        mock_result = MagicMock()
-        mock_result.returncode = 0
-        mock_subprocess_run.return_value = mock_result
-        
-        result = manager.run_biosample_mapping_script()
-        
-        assert result is True
-        assert manager.should_skip("biosample_mapping_completed") is True
-        
-        # Verify subprocess was called
-        mock_subprocess_run.assert_called_once()
-        
-        # Verify mapped_raw_files.csv was generated
-        mapped_files = metadata_dir / "mapped_raw_files.csv"
-        assert mapped_files.exists()
-
-    def test_run_biosample_mapping_script_failure(self, mock_subprocess_run, lcms_config_file):
-        """Test handling of script execution failure."""
-        from nmdc_dp_utils.workflow_manager import NMDCWorkflowManager
-        
-        manager = NMDCWorkflowManager(str(lcms_config_file))
-        
-        # Create a non-template script
-        script_path = manager.workflow_path / "scripts" / "map_raw_files_to_biosamples.py"
-        script_path.parent.mkdir(parents=True, exist_ok=True)
-        script_path.write_text("#!/usr/bin/env python3\nimport sys; sys.exit(1)")
-        
-        # Mock failed subprocess execution
-        mock_result = MagicMock()
-        mock_result.returncode = 1
-        mock_subprocess_run.return_value = mock_result
-        
-        result = manager.run_biosample_mapping_script()
-        
-        assert result is False
-        assert manager.should_skip("biosample_mapping_completed") is False
-
     def test_generate_mapped_files_list_with_file_types(self, lcms_config_file):
         """Test generation of mapped files list with raw_file_type column."""
         from nmdc_dp_utils.workflow_manager import NMDCWorkflowManager
@@ -346,21 +204,17 @@ class TestNMDCWorkflowBiosampleManager:
         
         # Initially all should be False
         assert manager.should_skip("biosample_attributes_fetched") is False
-        assert manager.should_skip("biosample_mapping_script_generated") is False
         assert manager.should_skip("biosample_mapping_completed") is False
         
         # Set triggers
         manager.set_skip_trigger("biosample_attributes_fetched", True, save=False)
-        manager.set_skip_trigger("biosample_mapping_script_generated", True, save=False)
         manager.set_skip_trigger("biosample_mapping_completed", True, save=False)
         
         # Verify they're set
         assert manager.should_skip("biosample_attributes_fetched") is True
-        assert manager.should_skip("biosample_mapping_script_generated") is True
         assert manager.should_skip("biosample_mapping_completed") is True
         
         # Reset and verify
         manager.reset_all_triggers(save=False)
         assert manager.should_skip("biosample_attributes_fetched") is False
-        assert manager.should_skip("biosample_mapping_script_generated") is False
         assert manager.should_skip("biosample_mapping_completed") is False
