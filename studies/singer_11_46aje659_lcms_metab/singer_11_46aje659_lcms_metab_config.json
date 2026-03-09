@@ -1,0 +1,122 @@
+{
+    "study": {
+        "name": "singer_11_46aje659",
+        "id": "nmdc:sty-11-46aje659",
+        "description": "Panicgrass rhizosphere soil microbial communities from growth chamber in LBNL, Berkeley, California, USA"
+    },
+    "workflow": {
+        "name": "singer_11_46aje659_lcms_metab",
+        "massive_id": "v07/MSV000094782/",
+        "file_type": ".raw",
+        "file_filters": [
+            "msms"
+        ],
+        "processed_data_date_tag": "20251031",
+        "workflow_type": "LCMS Metabolomics",
+        "batch_size": 25
+    },
+    "paths": {
+        "base_directory": "/Users/heal742/LOCAL/05_NMDC/07_automation/nmdc_mass_spec_automation",
+        "data_directory": "/Volumes/LaCie/nmdc_data"
+    },
+    "docker": {
+        "raw_data_inspector_image": "microbiomedata/metams:3.3.3"
+    },
+    "minio": {
+        "endpoint": "admin.nmdcdemo.emsl.pnl.gov",
+        "secure": true,
+        "bucket": "metabolomics"
+    },
+    "configurations": [
+        {
+            "name": "hilic_pos",
+            "file_filter": [
+                "HILICZ",
+                "_POS_"
+            ],
+            "corems_toml": "workflow_inputs/metams_hilic_corems.toml",
+            "reference_db": "workflow_inputs/20250407_database.msp",
+            "scan_translator": "workflow_inputs/metams_jgi_scan_translator.toml",
+            "instrument_used": "Thermo Orbitrap Q-Exactive",
+            "cores": 5,
+            "chromat_configuration_name": "JGI/LBNL Metabolomics Standard LC Method - Polar HILIC-Z",
+            "mass_spec_configuration_name": "JGI/LBNL Standard Metabolomics Method, positive @10,20,40CE"
+        },
+        {
+            "name": "hilic_neg",
+            "file_filter": [
+                "HILICZ",
+                "_NEG_"
+            ],
+            "corems_toml": "workflow_inputs/metams_hilic_corems.toml",
+            "reference_db": "workflow_inputs/20250407_database.msp",
+            "scan_translator": "workflow_inputs/metams_jgi_scan_translator.toml",
+            "instrument_used": "Thermo Orbitrap Q-Exactive",
+            "cores": 5,
+            "chromat_configuration_name": "JGI/LBNL Metabolomics Standard LC Method - Polar HILIC-Z",
+            "mass_spec_configuration_name": "JGI/LBNL Standard Metabolomics Method, negative @10,20,40CE"
+        },
+        {
+            "name": "rp_pos",
+            "file_filter": [
+                "C18",
+                "_POS_"
+            ],
+            "corems_toml": "workflow_inputs/metams_rp_corems.toml",
+            "reference_db": "workflow_inputs/20250407_database.msp",
+            "scan_translator": "workflow_inputs/metams_jgi_scan_translator.toml",
+            "instrument_used": "Thermo Orbitrap ID-X",
+            "cores": 5,
+            "chromat_configuration_name": "JGI/LBNL Metabolomics Standard LC Method - Nonpolar C18",
+            "mass_spec_configuration_name": "JGI/LBNL Standard Metabolomics Method, positive @10,20,40CE"
+        },
+        {
+            "name": "rp_neg",
+            "file_filter": [
+                "C18",
+                "_NEG_"
+            ],
+            "corems_toml": "workflow_inputs/metams_rp_corems.toml",
+            "reference_db": "workflow_inputs/20250407_database.msp",
+            "scan_translator": "workflow_inputs/metams_jgi_scan_translator.toml",
+            "instrument_used": "Thermo Orbitrap ID-X",
+            "cores": 5,
+            "chromat_configuration_name": "JGI/LBNL Metabolomics Standard LC Method - Nonpolar C18",
+            "mass_spec_configuration_name": "JGI/LBNL Standard Metabolomics Method, negative @10,20,40CE"
+        }
+    ],
+    "metadata": {
+        "instrument_used": "N/A, should be overwritten",
+        "processing_institution_workflow": "NMDC",
+        "processing_institution_generation": "JGI",
+        "chromat_configuration_name": "N/A, should be overwritten",
+        "mass_spec_configuration_name": "N/A, should be overwritten",
+        "existing_data_objects": [
+            "nmdc:dobj-11-7kab3m51"
+        ],
+        "use_massive_urls": true,
+        "serial_numbers_to_remove": [
+            "Unknown",
+            "Exactive Series slot #1"
+        ]
+    },
+    "skip_triggers": {
+        "study_structure_created": true,
+        "raw_data_downloaded": true,
+        "protocol_outline_created": true,
+        "biosample_attributes_fetched": true,
+        "biosample_mapping_script_generated": false,
+        "biosample_mapping_completed": true,
+        "raw_data_inspected": true,
+        "data_processed": true,
+        "processed_data_uploaded_to_minio": true,
+        "material_processing_metadata_generated": true,
+        "metadata_mapping_generated": true,
+        "metadata_packages_generated": true,
+        "metadata_submitted_dev": true,
+        "metadata_submitted_prod": true
+    },
+    "problem_files": [
+        "20220203_JGI-AK-TH_ES_504603_EcoPod_final_IDX_C18_USDAY59443_POS_MSMS_37_B-C-3_1_Rg80to1200-CE102040-root-I12-S1_Run78.raw"
+    ]
+}

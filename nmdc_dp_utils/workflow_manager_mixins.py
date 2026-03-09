@@ -3111,7 +3111,7 @@ class WorkflowMetadataManager:
             self.logger.error("No high confidence biosample matches found")
             return False
 
-        mapped_df["raw_data_file_short"] = mapped_df["raw_file_name"]
+        mapped_df["raw_data_file_short"] = mapped_df["raw_data_identifier"]
 
         # Add raw data file paths
         raw_data_dir = str(self.raw_data_directory)

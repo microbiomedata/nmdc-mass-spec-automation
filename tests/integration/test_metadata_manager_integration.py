@@ -68,6 +68,22 @@ class TestWorkflowMetadataManagerIntegration:
             index=False
         )
         
+        # Create mapped_raw_files_wprocessed_MANUAL.csv (simulates manual creation in real workflow)
+        # Merge biosample mapping with workflowref data to include processed sample IDs
+        manual_mapping = biosample_mapping[biosample_mapping["match_confidence"] == "high"].copy()
+        manual_mapping = manual_mapping.merge(
+            workflowref_df[["raw_data_identifier", "last_processed_sample"]],
+            left_on="raw_file_name",
+            right_on="raw_data_identifier",
+            how="left"
+        )
+        # Keep raw_data_identifier as the filename (drop the duplicate from merge)
+        manual_mapping["raw_data_identifier"] = manual_mapping["raw_file_name"]
+        manual_mapping.to_csv(
+            metadata_dir / "mapped_raw_files_wprocessed_MANUAL.csv",
+            index=False
+        )
+        
         # Save config
         config_file = workflow_dir / "test_config.json"
         with open(config_file, "w") as f:
@@ -181,6 +197,22 @@ class TestWorkflowMetadataManagerIntegration:
         workflowref_df = pd.DataFrame(workflowref_data)
         workflowref_df.to_csv(
             nmdc_packages_dir / "material_processing_metadata_workflowreference.csv",
+            index=False
+        )
+        
+        # Create mapped_raw_files_wprocessed_MANUAL.csv (simulates manual creation in real workflow)
+        # Merge biosample mapping with workflowref data to include processed sample IDs
+        manual_mapping = biosample_mapping[biosample_mapping["match_confidence"] == "high"].copy()
+        manual_mapping = manual_mapping.merge(
+            workflowref_df[["raw_data_identifier", "last_processed_sample"]],
+            left_on="raw_file_name",
+            right_on="raw_data_identifier",
+            how="left"
+        )
+        # Keep raw_data_identifier as the filename (drop the duplicate from merge)
+        manual_mapping["raw_data_identifier"] = manual_mapping["raw_file_name"]
+        manual_mapping.to_csv(
+            metadata_dir / "mapped_raw_files_wprocessed_MANUAL.csv",
             index=False
         )
         
@@ -417,6 +449,22 @@ class TestWorkflowMetadataManagerIntegration:
         workflowref_df = pd.DataFrame(workflowref_data)
         workflowref_df.to_csv(
             nmdc_packages_dir / "material_processing_metadata_workflowreference.csv",
+            index=False
+        )
+        
+        # Create mapped_raw_files_wprocessed_MANUAL.csv (simulates manual creation in real workflow)
+        # Merge biosample mapping with workflowref data to include processed sample IDs
+        manual_mapping = biosample_mapping[biosample_mapping["match_confidence"] == "high"].copy()
+        manual_mapping = manual_mapping.merge(
+            workflowref_df[["raw_data_identifier", "last_processed_sample"]],
+            left_on="raw_file_name",
+            right_on="raw_data_identifier",
+            how="left"
+        )
+        # Keep raw_data_identifier as the filename (drop the duplicate from merge)
+        manual_mapping["raw_data_identifier"] = manual_mapping["raw_file_name"]
+        manual_mapping.to_csv(
+            metadata_dir / "mapped_raw_files_wprocessed_MANUAL.csv",
             index=False
         )
         

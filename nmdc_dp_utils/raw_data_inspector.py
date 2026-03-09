@@ -172,6 +172,15 @@ def _extract_file_metadata(file_path: Path) -> Dict:
     else:
         # For .raw files, collision energies might not be in scan_text
         collision_energies = ["Unknown"]
+
+    # Extract MS2 type from scan text (if available)
+    # For example, if the scan_text contains @hcd20.35, we can extract "hcd" as the MS2 type
+    ms2_types = []
+    if 'scan_text' in lcms_obj.scan_df.columns:
+        ms2_series = lcms_obj.scan_df['scan_text'].str.extract(r'@([a-zA-Z]+)\d+\.')[0].dropna()
+        ms2_types = list(set(ms2_series.unique().tolist()))
+    else:
+        ms2_types = ["Unknown"]
     
     # Get polarity information
     polarity = list(set(lcms_obj.scan_df['polarity'].tolist()))
@@ -197,6 +206,7 @@ def _extract_file_metadata(file_path: Path) -> Dict:
         "scan_types": str(scan_types),
         "scan_levels": str(scan_levels),
         "collision_energies": str(collision_energies),
+        "ms2_types": str(ms2_types),
         "polarity": str(polarity),
         "mz_min": float(mz_min) if pd.notna(mz_min) else None,
         "mz_max": float(mz_max) if pd.notna(mz_max) else None,
