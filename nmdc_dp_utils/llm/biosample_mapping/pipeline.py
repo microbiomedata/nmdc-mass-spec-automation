@@ -405,16 +405,15 @@ async def add_study_data_to_conversation(
 if __name__ == "__main__":
     import os
     import pandas as pd
-    import yaml
     
     # Example usage for biosample mapping via code generation approach
     biosample_attributes_path = "nmdc_dp_utils/llm/examples/example_1/biosample_attributes.csv"
     raw_files_path = "nmdc_dp_utils/llm/examples/example_1/downloaded_files.csv"
     material_processing_yaml_path = "nmdc_dp_utils/llm/examples/example_1/combined_outline.yaml"
-    additional_context_path = "nmdc_dp_utils/llm/examples/example_1/extracted_text.txt"
+    additional_context_path = "nmdc_dp_utils/llm/examples/example_1/additional_mapping_context.txt"
     
     # Output paths
-    script_output_path = "nmdc_dp_utils/llm/examples/example_1/generated_mapping_script.py"
+    script_output_path = "nmdc_dp_utils/llm/examples/example_1/llm_generated_mapping_script.py"
     csv_output_path = "nmdc_dp_utils/llm/examples/example_1/llm_generated_mapping.csv"
     
     # Read study ID if available
@@ -433,58 +432,9 @@ if __name__ == "__main__":
     print("Initializing LLM client for code generation...")
     llm_client = LLMClient(mcp_servers=[])
     
-    # Create conversation manager with code generation prompt
-    from nmdc_dp_utils.llm.biosample_mapping.instructions import system_prompt as CODEGEN_PROMPT
-    
-    print("Setting up conversation with code generation prompt...")
-    conversation_obj = ConversationManager.__new__(ConversationManager)
-    conversation_obj.messages = []
-    conversation_obj.add_message(role="system", content=CODEGEN_PROMPT)
-    
-    # Add examples (using minimal context approach)
-    dirs = ["nmdc_dp_utils/llm/examples/example_2", 
-            "nmdc_dp_utils/llm/examples/example_4",
-            "nmdc_dp_utils/llm/examples/example_6"]
-    for dir in dirs:
-        # Load and simplify YAML
-        with open(f"{dir}/combined_outline.yaml", "r") as f:
-            yaml_full = yaml.safe_load(f)
-        
-        yaml_minimal = {}
-        for protocol_name, protocol_data in yaml_full.items():
-            yaml_minimal[protocol_name] = {}
-            if 'steps' in protocol_data:
-                yaml_minimal[protocol_name]['steps'] = []
-                for step in protocol_data['steps']:
-                    simplified_step = {}
-                    for step_name, step_data in step.items():
-                        for process_type, process_details in step_data.items():
-                            simplified_process = {}
-                            if 'description' in process_details:
-                                simplified_process['description'] = process_details['description']
-                            if 'has_input' in process_details:
-                                simplified_process['has_input'] = process_details['has_input']
-                            if 'has_output' in process_details:
-                                simplified_process['has_output'] = process_details['has_output']
-                            simplified_step[step_name] = {process_type: simplified_process}
-                    yaml_minimal[protocol_name]['steps'].append(simplified_step)
-            if 'processedsamples' in protocol_data:
-                yaml_minimal[protocol_name]['processedsamples'] = protocol_data['processedsamples']
-        
-        yaml_minimal_str = yaml.dump(yaml_minimal, default_flow_style=False, sort_keys=False)
-        
-        # Load combined_inputs_v2.csv as example
-        with open(f"{dir}/combined_inputs_v2.csv", "r") as f:
-            combined_inputs = f.read()
-        
-        conversation_obj.add_message(role="system", content="Here is the YAML outline describing the material processing steps:\n" + yaml_minimal_str)
-        conversation_obj.add_message(role="system", content="Here is an example of the expected CSV mapping:\n" + combined_inputs)
-    
-    example_chars = sum(len(msg.get('content', '')) for msg in conversation_obj.messages if msg.get('role') == 'system')
-    system_prompt_chars = len(conversation_obj.messages[0].get('content', ''))
-    example_only_chars = example_chars - system_prompt_chars
-    example_tokens = example_only_chars // 4
-    print(f"  Examples loaded: ~{example_tokens:,} tokens")
+    # Create conversation manager with code generation prompt and examples
+    print("Setting up conversation with code generation prompt and examples...")
+    conversation_obj = ConversationManager(interaction_type="biosample_mapping")
     
     # Add study-specific data to the conversation
     print("Adding study data to conversation...")
@@ -503,70 +453,49 @@ if __name__ == "__main__":
     print(f"Study data added (~{estimated_tokens:,} tokens, ~{total_chars:,} characters)")
     
     # Get the mapping script from LLM
-    print("\n🚀 Starting code generation approach...")
+    print("\nGenerating mapping script via code generation approach...")
     print("=" * 70)
     
-    try:
-        script_code = asyncio.run(get_llm_generated_script(
-            llm_client=llm_client,
-            conversation_obj=conversation_obj,
-            biosample_path=biosample_attributes_path,
-            files_path=raw_files_path,
-            output_path=csv_output_path
-        ))
+    script_code = asyncio.run(get_llm_generated_script(
+        llm_client=llm_client,
+        conversation_obj=conversation_obj,
+        biosample_path=biosample_attributes_path,
+        files_path=raw_files_path,
+        output_path=csv_output_path
+    ))
         
-        # Clean up the script (remove markdown blocks if present)
-        if '```python' in script_code:
-            script_code = script_code.split('```python')[1].split('```')[0].strip()
-        elif '```' in script_code:
-            script_code = script_code.split('```')[1].split('```')[0].strip()
+    # Clean up the script (remove markdown blocks if present)
+    if '```python' in script_code:
+        script_code = script_code.split('```python')[1].split('```')[0].strip()
+    elif '```' in script_code:
+        script_code = script_code.split('```')[1].split('```')[0].strip()
+    
+    # Save the script
+    with open(script_output_path, 'w') as f:
+        f.write(script_code)
         
-        # Save the script
-        with open(script_output_path, 'w') as f:
-            f.write(script_code)
-        
-        print(f"\n✓ Script saved to: {script_output_path}")
-        
-        # Add script to conversation for potential fixes
-        conversation_obj.add_message(role="assistant", content=script_code)
-        
-        # Execute and validate
-        print("\n📝 Executing and validating script...")
-        print("=" * 70)
-        
-        success = asyncio.run(validate_and_fix_script(
-            llm_client=llm_client,
-            conversation_obj=conversation_obj,
-            script_path=script_output_path,
-            output_path=csv_output_path,
-            biosample_path=biosample_attributes_path,
-            files_path=raw_files_path,
-            yaml_path=material_processing_yaml_path,
-            max_iterations=3
-        ))
-        
-        if success:
-            print(f"\n✅ SUCCESS! Final mapping saved to: {csv_output_path}")
-            print(f"   Generated script saved to: {script_output_path}")
-            
-            # Show summary
-            df = pd.read_csv(csv_output_path)
-            print(f"\n📊 Summary:")
-            print(f"   Total files mapped: {len(df)}")
-            print(f"   Files with biosamples: {df['biosample_id'].notna().sum()}")
-            print(f"   Files without biosamples (QC/blank): {df['biosample_id'].isna().sum()}")
-            
-            # Check for unmapped files list
-            unmapped_path = csv_output_path.replace('.csv', '_unmapped_files.txt')
-            if os.path.exists(unmapped_path):
-                with open(unmapped_path, 'r') as f:
-                    unmapped_count = len(f.readlines())
-                print(f"   Unmapped files saved to: {unmapped_path} ({unmapped_count} files)")
-        else:
-            print(f"\n❌ Failed to generate valid mapping")
-            
-    except Exception as e:
-        print(f"\n❌ Error during code generation: {e}")
-        import traceback
-        traceback.print_exc()
-        exit(1)
+    print(f"\n✓ Script saved to: {script_output_path}")
+    
+    # Add script to conversation for potential fixes
+    conversation_obj.add_message(role="assistant", content=script_code)
+    
+    # Execute and validate
+    print("\n📝 Executing and validating script...")
+    print("=" * 70)
+    
+    success = asyncio.run(validate_and_fix_script(
+        llm_client=llm_client,
+        conversation_obj=conversation_obj,
+        script_path=script_output_path,
+        output_path=csv_output_path,
+        biosample_path=biosample_attributes_path,
+        files_path=raw_files_path,
+        yaml_path=material_processing_yaml_path,
+        max_iterations=3
+    ))
+
+    if success:
+        print(f"LLM generated code saved to: {script_output_path} and associated CSV mapping saved to: {csv_output_path}")
+    else:
+        print("Failed to generate a valid mapping script after multiple attempts. Please review the conversation and outputs for debugging.")
+

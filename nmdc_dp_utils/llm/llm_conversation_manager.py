@@ -63,13 +63,15 @@ class ConversationManager:
     def add_biosample_mapping_examples(self):
         """
         Add curated biosample -> raw file -> processed sample mapping examples to the context.
+        Uses examples 3 and 4 (most robust examples after testing).
         Uses ONLY combined_inputs_v2.csv which already contains raw files, biosamples, and mapping.
         Also includes simplified YAML protocol outline.
         """
         import pandas as pd
         import yaml as yaml_lib
         
-        dirs = ["nmdc_dp_utils/llm/examples/example_3"]
+        dirs = ["nmdc_dp_utils/llm/examples/example_3", 
+                "nmdc_dp_utils/llm/examples/example_4"]
         
         for dir in dirs:
             # Load and simplify YAML (only description, has_input, has_output, processedsamples)
