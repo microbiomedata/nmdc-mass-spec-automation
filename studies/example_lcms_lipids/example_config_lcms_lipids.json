@@ -34,7 +34,7 @@
                 "C18",
                 "_POS_"
             ],
-            "corems_toml": "workflow_inputs/metams_rp_corems.toml",
+            "corems_toml": "workflow_inputs/metams_rp_corems_jgi.toml",
             "reference_db": "workflow_inputs/20250407_database.msp",
             "scan_translator": "workflow_inputs/metams_jgi_scan_translator.toml",
             "cores": 5,
@@ -53,7 +53,7 @@
                 "C18",
                 "_NEG_"
             ],
-            "corems_toml": "workflow_inputs/metams_rp_corems.toml",
+            "corems_toml": "workflow_inputs/metams_rp_corems_jgi.toml",
             "reference_db": "workflow_inputs/20250407_database.msp",
             "scan_translator": "workflow_inputs/metams_jgi_scan_translator.toml",
             "cores": 5,

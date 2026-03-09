@@ -53,6 +53,7 @@ async def main():
 
     # Step 6: Process data (generate WDL configs and execute workflows)
     logger.info("6. Processing data with WDL workflows...")
+    #TODO KRH: Need to update and add correct database file!
     manager.process_data(execute=True)
     assert manager.should_skip('data_processed'), "WDL workflows must complete successfully to proceed"
 
