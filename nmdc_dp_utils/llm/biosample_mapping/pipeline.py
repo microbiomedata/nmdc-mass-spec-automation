@@ -153,7 +153,7 @@ async def validate_and_fix_script(llm_client: LLMClient, conversation_obj: Conve
             )
             
             if result.returncode != 0:
-                logging.error(f"Script execution failed")
+                logging.error("Script execution failed")
                 logging.debug(f"STDOUT: {result.stdout}")
                 logging.error(f"STDERR: {result.stderr}")
                 
@@ -421,7 +421,6 @@ async def add_study_data_to_conversation(
 
 if __name__ == "__main__":
     import os
-    import pandas as pd
     
     # Example usage for biosample mapping via code generation approach
     biosample_attributes_path = "nmdc_dp_utils/llm/examples/example_1/biosample_attributes.csv"

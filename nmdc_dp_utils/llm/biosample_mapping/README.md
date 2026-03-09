@@ -50,6 +50,7 @@ conversation_obj = ConversationManager(interaction_type="biosample_mapping")
 # Note: ConversationManager automatically loads system prompt and examples
 
 # 2. Add study-specific data to conversation
+# This loads the data, but doesn't save the path references for the script
 asyncio.run(add_study_data_to_conversation(
     conversation_obj=conversation_obj,
     biosample_attributes_path="biosamples.csv",
@@ -59,12 +60,13 @@ asyncio.run(add_study_data_to_conversation(
 ))
 
 # 3. Generate mapping script
+# Need to pass the file paths again here so they can be included in the script generation prompt context for accurate pattern analysis
 script_code = asyncio.run(get_llm_generated_script(
     llm_client=llm_client,
     conversation_obj=conversation_obj,
     biosample_path="biosamples.csv",
     files_path="raw_files.csv",
-    yaml_path="protocol.yaml",  # Required: tells LLM exact YAML file path
+    yaml_path="protocol.yaml",
     output_path="mapping_output.csv"
 ))
 
