@@ -184,7 +184,6 @@ class NMDCWorkflowManager(
             "raw_data_downloaded": False,
             "protocol_outline_created": False,
             "biosample_attributes_fetched": False,
-            "biosample_mapping_script_generated": False,
             "biosample_mapping_completed": False,
             "data_processed": False,
         }

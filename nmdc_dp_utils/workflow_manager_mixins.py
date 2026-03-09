@@ -1134,7 +1134,7 @@ class NMDCWorkflowDataProcessManager:
             mapping_file = (
                 self.workflow_path
                 / "metadata"
-                / "mapped_raw_file_biosample_mapping.csv"
+                / "llm_biosample_raw_file_mapper.csv"
             )
             if mapping_file.exists():
                 mapping_df = pd.read_csv(mapping_file)
@@ -1416,7 +1416,7 @@ class NMDCWorkflowDataProcessManager:
 
         # Load biosample mapping to identify file types
         mapping_file = (
-            self.workflow_path / "metadata" / "mapped_raw_file_biosample_mapping.csv"
+            self.workflow_path / "metadata" / "llm_biosample_raw_file_mapper.csv"
         )
         if not mapping_file.exists():
             raise FileNotFoundError(
@@ -2110,178 +2110,6 @@ class NMDCWorkflowBiosampleManager:
 
             return False
 
-    @skip_if_complete("biosample_mapping_script_generated", return_value=True)
-    def generate_biosample_mapping_script(
-        self, script_name: Optional[str] = None, template_path: Optional[str] = None
-    ) -> bool:
-        """
-        Generate a study-specific TEMPLATE script for mapping raw files to biosamples.
-
-        Creates a customizable Python template script that maps raw data files to NMDC
-        biosamples using a template file. The generated script is clearly labeled as a
-        TEMPLATE and includes parsing logic that MUST be customized for each study's
-        specific file naming conventions.
-
-        Args:
-            script_name: Name for the generated script. Defaults to
-                        'map_raw_files_to_biosamples_TEMPLATE.py'
-            template_path: Path to template file. Defaults to
-                          'nmdc_dp_utils/templates/biosample_mapping_script_template.py'
-
-        Returns:
-            True if script generation completed successfully, False otherwise
-
-        Note:
-            The generated script is labeled as _TEMPLATE to prevent accidental use
-            without customization. Users should copy to a new filename and modify
-            the parsing logic for their study's specific file naming patterns.
-            This method is automatically skipped if biosample_mapping_script_generated trigger is set.
-        """
-        if script_name is None:
-            script_name = "map_raw_files_to_biosamples_TEMPLATE.py"
-
-        if template_path is None:
-            # Use default template relative to this module
-            template_path = (
-                Path(__file__).parent
-                / "templates"
-                / "biosample_mapping_script_template.py"
-            )
-        else:
-            template_path = Path(template_path)
-
-        script_path = self.workflow_path / "scripts" / script_name
-
-        # Check if template exists
-        if not template_path.exists():
-            self.logger.error(f"Template file not found: {template_path}")
-            return False
-
-        try:
-            # Read the template
-            with open(template_path, "r") as f:
-                template_content = f.read()
-
-            # Format the template with study-specific values
-            script_content = template_content.format(
-                study_name=self.study_name,
-                study_description=self.config["study"]["description"],
-                script_name=script_name,
-                config_path=self.config_path,
-            )
-
-            # Write the script file
-            with open(script_path, "w") as f:
-                f.write(script_content)
-
-            # Make the script executable
-            os.chmod(script_path, 0o755)
-
-            self.logger.info(
-                f"Generated biosample mapping TEMPLATE script: {script_path}"
-            )
-
-            self.set_skip_trigger("biosample_mapping_script_generated", True)
-            return True
-
-        except Exception as e:
-            self.logger.error(f"Error generating mapping script: {e}")
-            return False
-
-    @skip_if_complete("biosample_mapping_completed", return_value=True)
-    def run_biosample_mapping_script(self, script_path: Optional[str] = None) -> bool:
-        """
-        Execute the biosample mapping script.
-
-        Runs the study-specific biosample mapping script and reports success/failure.
-        Sets skip trigger on successful completion.
-
-        Args:
-            script_path: Path to the customized mapping script (NOT the template).
-                        Looks for 'scripts/map_raw_files_to_biosamples.py' by default.
-                        Will not run template files (_TEMPLATE) directly.
-
-        Returns:
-            True if mapping completed successfully, False otherwise
-
-        Note:
-            This method automatically sets the 'biosample_mapping_completed'
-            trigger on successful completion.
-        """
-        import subprocess
-
-        if script_path is None:
-            # Check for both template and non-template versions
-            template_script = (
-                self.workflow_path
-                / "scripts"
-                / "map_raw_files_to_biosamples_TEMPLATE.py"
-            )
-            regular_script = (
-                self.workflow_path / "scripts" / "map_raw_files_to_biosamples.py"
-            )
-
-            if regular_script.exists():
-                script_path = regular_script
-            elif template_script.exists():
-                self.logger.error(
-                    "Found only TEMPLATE script - you must customize it first!"
-                )
-                self.logger.error(f"Template script: {template_script}")
-                return False
-            else:
-                self.logger.error(
-                    "No mapping script found. Run generate_biosample_mapping_script() first"
-                )
-                return False
-        else:
-            script_path = Path(script_path)
-
-        # Check if user is trying to run the template directly
-        if "_TEMPLATE" in script_path.name:
-            self.logger.error("Cannot run TEMPLATE script directly!")
-            self.logger.error(f"Template script: {script_path}")
-            return False
-
-        if not script_path.exists():
-            self.logger.error(f"Mapping script not found: {script_path}")
-            return False
-
-        self.logger.info(f"Running biosample mapping script: {script_path}")
-
-        # Store current directory
-        original_dir = os.getcwd()
-
-        try:
-            # Run the mapping script
-            result = subprocess.run(
-                [sys.executable, str(script_path)],
-                capture_output=False,  # Let output go to console
-                text=True,
-                cwd=self.base_path,
-            )  # Run from base directory
-
-            if result.returncode == 0:
-                # Generate filtered file list for WDL processing
-                self._generate_mapped_files_list()
-
-                self.set_skip_trigger("biosample_mapping_completed", True)
-                return True
-            else:
-                self.logger.warning(
-                    f"Biosample mapping script exited with code: {result.returncode}"
-                )
-
-                return False
-
-        except Exception as e:
-            self.logger.error(f"Error running mapping script: {e}")
-            return False
-
-        finally:
-            # Always return to original directory
-            os.chdir(original_dir)
-
     def _generate_mapped_files_list(self) -> None:
         """
         Generate a list of raw data files that successfully mapped to biosamples.
@@ -2297,7 +2125,7 @@ class NMDCWorkflowBiosampleManager:
 
         # Load the biosample mapping file
         mapping_file = (
-            self.workflow_path / "metadata" / "mapped_raw_file_biosample_mapping.csv"
+            self.workflow_path / "metadata" / "llm_biosample_raw_file_mapper.csv"
         )
         if not mapping_file.exists():
             self.logger.warning(f"Mapping file not found: {mapping_file}")
@@ -2344,7 +2172,7 @@ class NMDCWorkflowBiosampleManager:
                     # Old format with full paths
                     mapped_df = mapped_df.merge(
                         downloaded_df[["file_name", "file_path"]],
-                        left_on="raw_file_name",
+                        left_on="raw_data_identifier",
                         right_on="file_name",
                         how="left",
                     )
@@ -2352,13 +2180,13 @@ class NMDCWorkflowBiosampleManager:
                 else:
                     # New format - construct paths
                     raw_data_dir = Path(self.raw_data_directory)
-                    mapped_df["raw_file_path"] = mapped_df["raw_file_name"].apply(
+                    mapped_df["raw_file_path"] = mapped_df["raw_data_identifier"].apply(
                         lambda x: str(raw_data_dir / x)
                     )
             else:
                 # No downloaded_files.csv - construct paths from raw_data_directory
                 raw_data_dir = Path(self.raw_data_directory)
-                mapped_df["raw_file_path"] = mapped_df["raw_file_name"].apply(
+                mapped_df["raw_file_path"] = mapped_df["raw_data_identifier"].apply(
                     lambda x: str(raw_data_dir / x)
                 )
 
@@ -3261,7 +3089,7 @@ class WorkflowMetadataManager:
         """
         # Check prerequisites
         biosample_mapping_file = (
-            self.workflow_path / "metadata" / "mapped_raw_file_biosample_mapping.csv"
+            self.workflow_path / "metadata" / "llm_biosample_raw_file_mapper.csv"
         )
         if not biosample_mapping_file.exists():
             self.logger.error(
@@ -3641,7 +3469,7 @@ class WorkflowMetadataManager:
         """
         # Load full biosample mapping to identify calibration files
         mapping_file = (
-            self.workflow_path / "metadata" / "mapped_raw_file_biosample_mapping.csv"
+            self.workflow_path / "metadata" / "llm_biosample_raw_file_mapper.csv"
         )
         if not mapping_file.exists():
             raise FileNotFoundError(
@@ -4803,7 +4631,7 @@ class WorkflowMetadataManager:
 
         Requires:
         - protocol_info/llm_generated_protocol_outline.yaml: YAML outline of processing steps
-        - metadata/mapped_raw_files_wprocessed_MANUAL.csv: CSV mapping biosamples to raw files
+        - metadata/llm_biosample_raw_file_mapper.csv: CSV mapping biosamples to raw files
           with columns: raw_data_identifier, biosample_id, biosample_name, match_confidence,
           processedsample_placeholder, material_processing_protocol_id
         - config['study']['id']: Study ID in NMDC format (nmdc:sty-XX-XXXXXXXX)
@@ -4842,8 +4670,7 @@ class WorkflowMetadataManager:
                 return False
 
             # Check for mapped biosample raw data file processed sample
-            #TODO: Update this input_csv_path once LLM-helper works.
-            input_csv_path = self.workflow_path / "metadata" / "mapped_raw_files_wprocessed_MANUAL.csv"
+            input_csv_path = self.workflow_path / "metadata" / "llm_biosample_raw_file_mapper.csv"
             if not input_csv_path.exists():
                 self.logger.error(f"Input CSV for material processing metadata generation not found: {input_csv_path}")
                 self.logger.error("Run generate_material_processing_input_csv() first")
@@ -4976,10 +4803,9 @@ class WorkflowMetadataManager:
 
         Required Files:
             - protocol_info/llm_generated_protocol_outline.yaml: Protocol steps outline
-            - metadata/mapped_raw_files_wprocessed_MANUAL.csv: Biosample to raw file mapping
+            - metadata/llm_biosample_raw_file_mapper.csv: Generated by LLM biosample mapping
               with columns: raw_data_identifier, biosample_id, biosample_name, match_confidence,
               processedsample_placeholder, material_processing_protocol_id
-            - metadata/mapped_raw_file_biosample_mapping.csv: Generated by biosample mapping
             - raw_file_info/raw_file_inspection_results.csv: Generated by raw data inspection
             - config['study']['id']: Study ID in NMDC format (nmdc:sty-XX-XXXXXXXX)
 
@@ -5134,5 +4960,169 @@ class LLMWorkflowManagerMixin:
         
         response = await get_llm_yaml_outline(llm_client=self.llm_client, conversation_obj=self.conversation_obj)
         return response
+    
+    @skip_if_complete("biosample_mapping_completed", return_value=True)
+    async def generate_llm_biosample_mapping(
+        self, 
+        max_iterations: int = 3,
+        additional_context_path: str = None
+    ) -> bool:
+        """
+        Generate biosample mapping using LLM code generation approach.
+        
+        This method:
+        1. Creates a new conversation context for biosample mapping
+        2. Loads study data (biosamples, raw files, material processing YAML)
+        3. Optionally loads additional context file if present
+        4. Asks LLM to generate a Python mapping script
+        5. Executes and validates the script
+        6. Iteratively fixes errors until validation passes
+        
+        Parameters
+        ----------
+        max_iterations : int
+            Maximum number of fix iterations (default: 3)
+        additional_context_path : str, optional
+            Path to additional context file with naming conventions.
+            If None, automatically checks for 'metadata/additional_mapping_context.txt'
+        
+        Returns
+        -------
+        bool
+            True if mapping completed successfully, False otherwise
+        """
+        from nmdc_dp_utils.llm.biosample_mapping.pipeline import (
+            add_study_data_to_conversation,
+            get_llm_generated_script,
+            validate_and_fix_script
+        )
+        
+        # Define file paths
+        biosample_path = str(self.workflow_path / "metadata" / "biosample_attributes.csv")
+        
+        # Handle both old format (downloaded_files.csv) and new format (just file names)
+        downloaded_files_path = self.workflow_path / "metadata" / "downloaded_files.csv"
+        if downloaded_files_path.exists():
+            raw_files_path = str(downloaded_files_path)
+        else:
+            self.logger.error("downloaded_files.csv not found - run fetch_raw_data() first")
+            return False
+        
+        yaml_path = str(self.workflow_path / "protocol_info" / "llm_generated_protocol_outline.yaml")
+        output_path = str(self.workflow_path / "metadata" / "llm_biosample_raw_file_mapper.csv")
+        script_path = str(self.workflow_path / "scripts" / "llm_generated_biosample_mapping_script.py")
+        
+        # Check for additional context file if not explicitly provided
+        if additional_context_path is None:
+            default_context_path = self.workflow_path / "metadata" / "additional_mapping_context.txt"
+            if default_context_path.exists():
+                additional_context_path = str(default_context_path)
+                self.logger.info(f"Found additional context file: {additional_context_path}")
+            else:
+                self.logger.info("No additional mapping context file found (optional)")
+        
+        # Verify required files exist
+        if not Path(biosample_path).exists():
+            self.logger.error(f"Biosample attributes not found: {biosample_path}")
+            self.logger.error("Run get_biosample_attributes() first")
+            return False
+        
+        if not Path(yaml_path).exists():
+            self.logger.error(f"Material processing YAML not found: {yaml_path}")
+            self.logger.error("Run generate_material_processing_yaml() first")
+            return False
+        
+        # Create a new conversation manager for biosample mapping
+        self.logger.info("Initializing LLM conversation for biosample mapping...")
+        biosample_conversation = ConversationManager(interaction_type="biosample_mapping")
+        
+        # Add study data to conversation context
+        self.logger.info("Loading study data into conversation context...")
+        await add_study_data_to_conversation(
+            conversation_obj=biosample_conversation,
+            biosample_attributes_path=biosample_path,
+            raw_files_path=raw_files_path,
+            material_processing_yaml_path=yaml_path,
+            additional_context_path=additional_context_path
+        )
+        
+        # Generate mapping script
+        self.logger.info("Generating biosample mapping script using LLM...")
+        try:
+            script_code = await get_llm_generated_script(
+                llm_client=self.llm_client,
+                conversation_obj=biosample_conversation,
+                biosample_path=biosample_path,
+                files_path=raw_files_path,
+                yaml_path=yaml_path,
+                output_path=output_path
+            )
+            
+            # Clean up markdown if present
+            if '```python' in script_code:
+                parts = script_code.split('```python')
+                if len(parts) > 1:
+                    script_code = parts[1].split('```')[0].strip()
+            elif '```' in script_code:
+                parts = script_code.split('```')
+                if len(parts) > 2:
+                    script_code = parts[1].strip()
+            
+            # Verify we have actual code
+            if not script_code or len(script_code.strip()) == 0:
+                self.logger.error("LLM returned empty script after markdown cleanup")
+                self.logger.error("This may indicate an issue with the LLM response format")
+                return False
+            
+            # Ensure scripts directory exists
+            scripts_dir = self.workflow_path / "scripts"
+            scripts_dir.mkdir(parents=True, exist_ok=True)
+            
+            # Save the generated script
+            with open(script_path, 'w') as f:
+                f.write(script_code)
+            self.logger.info(f"Saved generated script to: {script_path}")
+            self.logger.info(f"Script length: {len(script_code)} characters")
+            
+        except Exception as e:
+            self.logger.error(f"Error generating biosample mapping script: {e}")
+            import traceback
+            traceback.print_exc()
+            return False
+        
+        # Execute script with validation and iterative fixing
+        self.logger.info(f"Executing and validating script (max {max_iterations} iterations)...")
+        try:
+            success = await validate_and_fix_script(
+                llm_client=self.llm_client,
+                conversation_obj=biosample_conversation,
+                script_path=script_path,
+                output_path=output_path,
+                biosample_path=biosample_path,
+                files_path=raw_files_path,
+                yaml_path=yaml_path,
+                max_iterations=max_iterations
+            )
+            
+            if success:
+                self.logger.info("Biosample mapping completed successfully!")
+                self.logger.info(f"Output saved to: {output_path}")
+                
+                # Generate filtered file list for WDL processing
+                self._generate_mapped_files_list()
+                
+                # Set skip trigger
+                self.set_skip_trigger("biosample_mapping_completed", True)
+                return True
+            else:
+                self.logger.error(f"Failed to generate valid mapping after {max_iterations} iterations")
+                self.logger.error("You may need to manually review and fix the script")
+                return False
+                
+        except Exception as e:
+            self.logger.error(f"Error during script execution/validation: {e}")
+            import traceback
+            traceback.print_exc()
+            return False
 
 
