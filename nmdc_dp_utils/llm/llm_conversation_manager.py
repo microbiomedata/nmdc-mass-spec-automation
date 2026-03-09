@@ -109,8 +109,8 @@ class ConversationManager:
             
             yaml_minimal_str = yaml_lib.dump(yaml_minimal, default_flow_style=False, sort_keys=False)
             
-            # Load combined_inputs_v2.csv which has everything
-            with open(f"{dir}/combined_inputs_v2.csv", "r") as f:
+            # Load combined_inputs.csv which has everything
+            with open(f"{dir}/combined_inputs.csv", "r") as f:
                 combined_inputs = f.read()
             
             # Present examples with clear context that they're from a DIFFERENT study

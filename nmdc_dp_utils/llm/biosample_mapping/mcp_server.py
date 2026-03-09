@@ -72,8 +72,7 @@ def validate_biosample_mapping(csv_mapping: str) -> dict:
     - Protocol IDs match top-level protocols in the YAML
     - CSV formatting is correct with required columns
     
-    Note: Unmapped raw files generate warnings (not errors) and are saved to unmapped_files.txt
-    for manual review. This is expected for QC samples, blanks, standards, etc.
+    Note: It is not unusual for some raw files to remain unmapped. This is expected for QC samples, blanks, standards, etc.
 
     Parameters
     ----------
@@ -111,47 +110,27 @@ def validate_biosample_mapping(csv_mapping: str) -> dict:
             raw_files_csv=_raw_files
         )
         
-        logging.info(f"Validation result: {'PASS' if validation_result['valid'] else 'FAIL'}")
+        logging.info(f"Biosample mapping validation result: {'PASS' if validation_result['valid'] else 'FAIL'}")
         
         # Handle errors
         if not validation_result['valid']:
-            logging.warning(f"Validation errors: {len(validation_result['errors'])} found")
+            logging.warning(f"Biosample mapping validation errors: {len(validation_result['errors'])} found")
             for error in validation_result['errors'][:5]:  # Log first 5 errors
                 logging.warning(f"  - {error}")
         
         # Handle warnings
         if validation_result.get('warnings'):
-            logging.info(f"Validation warnings: {len(validation_result['warnings'])} found")
+            logging.info(f"Biosample mapping validation warnings: {len(validation_result['warnings'])} found")
             for warning in validation_result['warnings']:
                 logging.info(f"  - {warning}")
-        
-        # Save unmapped files to a file if any exist
-        unmapped_files = validation_result.get('unmapped_files', [])
-        unmapped_files_path = None
-        if unmapped_files:
-            unmapped_files_path = "unmapped_files.txt"
-            with open(unmapped_files_path, 'w') as f:
-                f.write(f"# Unmapped raw data files ({len(unmapped_files)})\n")
-                f.write("# These files could not be mapped to biosamples\n")
-                f.write("# May include QC samples, blanks, standards, extraction controls, etc.\n")
-                f.write("# Please review and determine appropriate handling\n\n")
-                for filename in unmapped_files:
-                    f.write(f"{filename}\n")
-            logging.info(f"Saved {len(unmapped_files)} unmapped files to {unmapped_files_path}")
-        
+
         # Build response
         response = {
             "valid": validation_result['valid'],
             "errors": validation_result['errors'],
-            "warnings": validation_result.get('warnings', []),
-            "unmapped_files_count": len(unmapped_files)
+            "warnings": validation_result.get('warnings', [])
         }
-        
-        if unmapped_files_path:
-            response["unmapped_files_saved"] = unmapped_files_path
-            response["message"] = f"Validation {'passed' if validation_result['valid'] else 'failed'}. {len(unmapped_files)} unmapped files saved to {unmapped_files_path} - please review."
-        else:
-            response["message"] = f"Validation {'passed' if validation_result['valid'] else 'failed'}."
+        response["message"] = f"Biosample mapping validation {'passed' if validation_result['valid'] else 'failed'}."
         
         return response
         
@@ -159,7 +138,7 @@ def validate_biosample_mapping(csv_mapping: str) -> dict:
         logging.error(f"Error during biosample mapping validation: {e}")
         return {
             "valid": False,
-            "errors": [f"Validation system error: {str(e)}"]
+            "errors": [f"Biosample mapping validation system error: {str(e)}"]
         }
 
 
