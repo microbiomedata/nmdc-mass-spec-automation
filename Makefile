@@ -56,6 +56,18 @@ download-test-data:
 		echo "GCMS test data already exists."; \
 	fi
 
+# Download lipid databse file from https://nmdcdemo.emsl.pnnl.gov/minio/lipidomics/parameter_files/202412_lipid_ref.sqlite into workflow_inputs/
+download-lipid-db:
+	@echo "Downloading lipid database file from NMDC..."
+	@mkdir -p workflow_inputs
+	@if [ ! -f workflow_inputs/202412_lipid_ref.sqlite ]; then \
+		curl -L -o workflow_inputs/202412_lipid_ref.sqlite \
+		"https://nmdcdemo.emsl.pnnl.gov/minio/lipidomics/parameter_files/202412_lipid_ref.sqlite"; \
+		echo "Lipid database download complete!"; \
+	else \
+		echo "Lipid database file already exists."; \
+	fi
+
 # Remove downloaded test data
 clean-test-data:
 	@echo "Removing test data..."
