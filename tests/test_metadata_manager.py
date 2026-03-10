@@ -146,7 +146,7 @@ class TestWorkflowMetadataManager:
         metadata_dir.mkdir(parents=True, exist_ok=True)
         
         mapping_df = pd.DataFrame({
-            'raw_file_name': [
+            'raw_data_identifier': [
                 'calibration_01.cdf',
                 'sample_01.cdf',
                 'sample_02.cdf',
@@ -176,7 +176,7 @@ class TestWorkflowMetadataManager:
             ]
         })
         
-        mapping_file = metadata_dir / "mapped_raw_file_biosample_mapping.csv"
+        mapping_file = metadata_dir / "llm_biosample_raw_file_mapper.csv"
         mapping_df.to_csv(mapping_file, index=False)
         
         # Create inspection results with timestamps

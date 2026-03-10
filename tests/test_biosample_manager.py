@@ -109,13 +109,13 @@ class TestNMDCWorkflowBiosampleManager:
         
         # Create mapping with raw_file_type column (new format)
         mapping_df = pd.DataFrame({
-            "raw_file_name": ["sample1.raw", "sample2.raw", "cal1.raw", "sample3.raw"],
+            "raw_data_identifier": ["sample1.raw", "sample2.raw", "cal1.raw", "sample3.raw"],
             "biosample_id": ["nmdc:bsm-11-001", "nmdc:bsm-11-002", "", ""],
             "biosample_name": ["Sample 1", "Sample 2", "", ""],
             "match_confidence": ["high", "medium", "no_match", "low"],
             "raw_file_type": ["sample", "sample", "calibration", "sample"]
         })
-        mapping_df.to_csv(metadata_dir / "mapped_raw_file_biosample_mapping.csv", index=False)
+        mapping_df.to_csv(metadata_dir / "llm_biosample_raw_file_mapper.csv", index=False)
         
         # Create raw data directory
         raw_data_dir = Path(manager.raw_data_directory)
@@ -147,12 +147,12 @@ class TestNMDCWorkflowBiosampleManager:
         
         # Create mapping without raw_file_type column (old format)
         mapping_df = pd.DataFrame({
-            "raw_file_name": ["sample1.raw", "sample2.raw", "sample3.raw"],
+            "raw_data_identifier": ["sample1.raw", "sample2.raw", "sample3.raw"],
             "biosample_id": ["nmdc:bsm-11-001", "nmdc:bsm-11-002", ""],
             "biosample_name": ["Sample 1", "Sample 2", ""],
             "match_confidence": ["high", "medium", "low"]
         })
-        mapping_df.to_csv(metadata_dir / "mapped_raw_file_biosample_mapping.csv", index=False)
+        mapping_df.to_csv(metadata_dir / "llm_biosample_raw_file_mapper.csv", index=False)
         
         # Create raw data directory
         raw_data_dir = Path(manager.raw_data_directory)
@@ -181,12 +181,12 @@ class TestNMDCWorkflowBiosampleManager:
         
         # Create mapping with no matches
         mapping_df = pd.DataFrame({
-            "raw_file_name": ["sample1.raw", "sample2.raw"],
+            "raw_data_identifier": ["sample1.raw", "sample2.raw"],
             "biosample_id": ["", ""],
             "biosample_name": ["", ""],
             "match_confidence": ["no_match", "low"]
         })
-        mapping_df.to_csv(metadata_dir / "mapped_raw_file_biosample_mapping.csv", index=False)
+        mapping_df.to_csv(metadata_dir / "llm_biosample_raw_file_mapper.csv", index=False)
         
         # Call the internal method (should warn and return early)
         manager._generate_mapped_files_list()

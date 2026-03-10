@@ -1140,7 +1140,7 @@ class NMDCWorkflowDataProcessManager:
                 mapping_df = pd.read_csv(mapping_file)
                 calibration_files_set = set(
                     mapping_df[mapping_df["raw_file_type"] == "calibration"][
-                        "raw_file_name"
+                        "raw_data_identifier"
                     ].tolist()
                 )
 
@@ -1433,7 +1433,7 @@ class NMDCWorkflowDataProcessManager:
                     "raw_data_file_short": f.name,
                     "file_path": str(f),
                     "raw_file_type": mapping_df[
-                        mapping_df["raw_file_name"] == f.name
+                        mapping_df["raw_data_identifier"] == f.name
                     ].iloc[0]["raw_file_type"],
                     "write_time": inspection_df[
                         inspection_df["file_name"] == f.name
@@ -3494,7 +3494,7 @@ class WorkflowMetadataManager:
         # Merge calibration files with their write_time from inspection results
         calibration_files_df = calibration_files_df.merge(
             inspection_df[["file_name", "write_time"]],
-            left_on="raw_file_name",
+            left_on="raw_data_identifier",
             right_on="file_name",
             how="left",
         )
@@ -3523,10 +3523,10 @@ class WorkflowMetadataManager:
 
             if len(valid_calibrations) == 0:
                 # No calibration before this sample - use the first calibration (with warning logged once)
-                return calibration_files_df.iloc[0]["raw_file_name"]
+                return calibration_files_df.iloc[0]["raw_data_identifier"]
             else:
                 # Use the most recent calibration before this sample
-                return valid_calibrations.iloc[-1]["raw_file_name"]
+                return valid_calibrations.iloc[-1]["raw_data_identifier"]
 
         # Assign calibration file to each sample
         merged_df["calibration_file_short"] = merged_df["write_time_dt"].apply(
@@ -3552,7 +3552,7 @@ class WorkflowMetadataManager:
             if len(early_samples) > 5:
                 self.logger.warning(f"    ... and {len(early_samples) - 5} more")
             self.logger.warning(
-                f"    These will use the first calibration: {calibration_files_df.iloc[0]['raw_file_name']}"
+                f"    These will use the first calibration: {calibration_files_df.iloc[0]['raw_data_identifier']}"
             )
 
         # Report calibration file assignment summary
