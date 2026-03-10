@@ -1,4 +1,4 @@
-raw_file_name,raw_file_type,biosample_id,biosample_name,match_confidence
+raw_data_identifier,raw_file_type,biosample_id,biosample_name,match_confidence
 sample01_C18_POS_CE102040.raw,sample,nmdc:bsm-11-bspxw403,Sample01,high
 sample02_C18_POS_CE205060.raw,sample,nmdc:bsm-11-bspxw403,Sample02,high
 sample03_C18_NEG_CE102040.raw,sample,nmdc:bsm-11-bspxw403,Sample03,high
