@@ -30,11 +30,6 @@
             "cores": 5
         }
     ],
-    "material_processing": {
-        "processedsample_placeholder": "ProcessedSample2_metabolomics_extraction",
-        "protocol_id": "metabolomics_extraction",
-        "minting_config_creds": ""
-    },
     "metadata": {
         "study_id": "nmdc:sty-11-8ws97026",
         "instrument_used": "Agilent 7980A GC-MS",

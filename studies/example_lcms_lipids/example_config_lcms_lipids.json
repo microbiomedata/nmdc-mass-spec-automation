@@ -9,7 +9,7 @@
         "massive_id": "v07/MSV000094090",
         "file_type": ".raw",
         "file_filters": [
-            "S17-D45"
+            "QE-HF_C18_USDAY63680_.*_MSMS_.*_S17-D45"
         ],
         "processed_data_date_tag": "20260309",
         "workflow_type": "LCMS Lipidomics",
@@ -35,7 +35,7 @@
                 "_POS_"
             ],
             "corems_toml": "workflow_inputs/metams_rp_corems_jgi.toml",
-            "reference_db": "workflow_inputs/20250407_database.msp",
+            "reference_db": "workflow_inputs/202412_lipid_ref.sqlite",
             "scan_translator": "workflow_inputs/metams_jgi_scan_translator.toml",
             "cores": 5,
             "chromat_configuration_name": "JGI/LBNL Metabolomics Standard LC Method - Nonpolar C18",
@@ -54,7 +54,7 @@
                 "_NEG_"
             ],
             "corems_toml": "workflow_inputs/metams_rp_corems_jgi.toml",
-            "reference_db": "workflow_inputs/20250407_database.msp",
+            "reference_db": "workflow_inputs/202412_lipid_ref.sqlite",
             "scan_translator": "workflow_inputs/metams_jgi_scan_translator.toml",
             "cores": 5,
             "chromat_configuration_name": "JGI/LBNL Metabolomics Standard LC Method - Nonpolar C18",
@@ -67,11 +67,6 @@
             }
         }
     ],
-    "material_processing": {
-        "processedsample_placeholder": "ProcessedSample2_metabolomics_extraction",
-        "protocol_id": "metabolomics_extraction",
-        "minting_config_creds": ""
-    },
     "metadata": {
         "study_id": "nmdc:sty-11-dwsv7q78",
         "instrument_used": "Thermo Orbitrap Q-Exactive",
