@@ -68,6 +68,18 @@ download-lipid-db:
 		echo "Lipid database file already exists."; \
 	fi
 
+# Download MSP database file from https://nmdcdemo.emsl.pnnl.gov/metabolomics/databases/20250407_database.msp into workflow_inputs/
+download-msp-db:
+	@echo "Downloading MSP database file from NMDC..."
+	@mkdir -p workflow_inputs
+	@if [ ! -f workflow_inputs/20250407_database.msp ]; then \
+		curl -L -o workflow_inputs/20250407_database.msp \
+		"https://nmdcdemo.emsl.pnnl.gov/metabolomics/databases/20250407_database.msp"; \
+		echo "MSP database download complete!"; \
+	else \
+		echo "MSP database file already exists."; \
+	fi
+
 # Remove downloaded test data
 clean-test-data:
 	@echo "Removing test data..."
