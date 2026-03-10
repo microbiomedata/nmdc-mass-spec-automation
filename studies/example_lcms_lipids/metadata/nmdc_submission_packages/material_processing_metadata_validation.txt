@@ -1,0 +1,41 @@
+
+================================================================================
+VALIDATING GENERATED OUTPUT
+================================================================================
+Calculating expected counts...
+
+================================================================================
+PLACEHOLDER COMBINATIONS BY PROTOCOL:
+================================================================================
+
+nonpolar_metabolites_extraction:
+  Target placeholders: ['ProcessedSample3_nonpolar_metabolites_extraction']
+  Resulting samples: ['ProcessedSample1_nonpolar_metabolites_extraction', 'ProcessedSample2_nonpolar_metabolites_extraction', 'ProcessedSample3_nonpolar_metabolites_extraction']
+  Biosamples with this combination: 1
+  Steps required per biosample: 3
+  Processed samples required per biosample: 3
+  Total steps for this combination: 3
+  Total samples for this combination: 3
+
+================================================================================
+VALIDATION SUMMARY:
+================================================================================
+
+Biosamples:
+  Unique in mapping: 1
+
+Material Processing Steps:
+  Expected: 3
+  Actual:   3
+  ✓ MATCH
+
+Processed Samples:
+  Expected: 3
+  Actual:   3
+  ✓ MATCH
+
+Unique placeholder combinations: 1
+
+================================================================================
+✓ VALIDATION PASSED: All counts match!
+================================================================================

@@ -9,7 +9,7 @@
         "massive_id": "v07/MSV000094090",
         "file_type": ".raw",
         "file_filters": [
-            "QE-HF_C18_USDAY63680_.*_MSMS_.*_S17-D45"
+            "QE-HF_C18_USDAY63680_.*_MSMS_.*_S17-D45_A"
         ],
         "processed_data_date_tag": "20260309",
         "workflow_type": "LCMS Lipidomics",
@@ -34,7 +34,7 @@
                 "C18",
                 "_POS_"
             ],
-            "corems_toml": "workflow_inputs/metams_rp_corems_jgi.toml",
+            "corems_toml": "workflow_inputs/metams_rp_corems_jgi_lipids.toml",
             "reference_db": "workflow_inputs/202412_lipid_ref.sqlite",
             "scan_translator": "workflow_inputs/metams_jgi_scan_translator.toml",
             "cores": 5,
@@ -53,7 +53,7 @@
                 "C18",
                 "_NEG_"
             ],
-            "corems_toml": "workflow_inputs/metams_rp_corems_jgi.toml",
+            "corems_toml": "workflow_inputs/metams_rp_corems_jgi_lipids.toml",
             "reference_db": "workflow_inputs/202412_lipid_ref.sqlite",
             "scan_translator": "workflow_inputs/metams_jgi_scan_translator.toml",
             "cores": 5,
@@ -85,17 +85,17 @@
     },
     "skip_triggers": {
         "study_structure_created": true,
+        "protocol_outline_created": true,
         "raw_data_downloaded": true,
         "biosample_attributes_fetched": true,
         "biosample_mapping_completed": true,
         "raw_data_inspected": true,
-        "material_processing_metadata_generated": false,
-        "metadata_mapping_generated": false,
-        "data_processed": false,
-        "processed_data_uploaded_to_minio": false,
-        "metadata_packages_generated": false,
+        "data_processed": true,
+        "processed_data_uploaded_to_minio": true,
+        "material_processing_metadata_generated": true,
+        "metadata_mapping_generated": true,
+        "metadata_packages_generated": true,
         "metadata_submitted_dev": false,
-        "metadata_submitted_prod": false,
-        "protocol_outline_created": true
+        "metadata_submitted_prod": false
     }
 }

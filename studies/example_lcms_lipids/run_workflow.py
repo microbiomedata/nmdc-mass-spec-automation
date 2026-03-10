@@ -53,13 +53,12 @@ async def main():
 
     # Step 6: Process data (generate WDL configs and execute workflows)
     logger.info("6. Processing data with WDL workflows...")
-    #TODO KRH: Need to update and add correct database file!
     manager.process_data(execute=True)
     assert manager.should_skip('data_processed'), "WDL workflows must complete successfully to proceed"
 
     # Step 7: Upload processed data to MinIO
     logger.info("7. Uploading processed data to MinIO...")
-    manager.upload_processed_data_to_minio()
+    #manager.upload_processed_data_to_minio()
     assert manager.should_skip('processed_data_uploaded_to_minio'), "Processed data upload to MinIO must complete successfully to proceed"
 
     # Step 8: Generate and submit NMDC metadata packages
