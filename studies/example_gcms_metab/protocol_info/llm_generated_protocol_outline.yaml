@@ -1,0 +1,153 @@
+gcms_metabolomics:
+  steps:
+  - Step 1_gcms_metabolomics:
+      Extraction:
+        id: # nmdc:extrp-{shoulder}-{blade}
+        type: nmdc:Extraction
+        name: Metabolite Extraction from Soil
+        description: Soil was bead beat in 60% methanol solution for 15 min at 4Cel. Then, 12 mL of ice-cold chloroform was added. Samples were probe sonicated at 60% amplitude for 30 seconds on ice, cooled, and sonicated again. Samples were incubated for 5 min at -80Cel, vortexed for 1 min, and centrifuged at 4500g for 10 min at 4Cel. The upper aqueous phase was collected into a separate glass vial, dried in a vacuum concentrator.
+        has_input:
+        - Biosample
+        has_output:
+        - ProcessedSample1_gcms_metabolomics
+        extraction_targets:
+        - metabolite
+        substances_used:
+        - type: nmdc:PortionOfSubstance
+          known_as: methanol
+          substance_role: solvent
+          final_concentration:
+            type: nmdc:QuantityValue
+            has_raw_value: 60 %
+            has_unit: '%'
+            has_numeric_value: 60
+        - type: nmdc:PortionOfSubstance
+          known_as: water
+          substance_role: solvent
+          final_concentration:
+            type: nmdc:QuantityValue
+            has_raw_value: 40 %
+            has_unit: '%'
+            has_numeric_value: 40
+        - type: nmdc:PortionOfSubstance
+          known_as: chloroform
+          substance_role: solvent
+          volume:
+            type: nmdc:QuantityValue
+            has_raw_value: 12 mL
+            has_unit: mL
+            has_numeric_value: 12
+        temperature:
+          type: nmdc:QuantityValue
+          has_raw_value: 4 Cel
+          has_unit: Cel
+          has_numeric_value: 4
+        protocol_link:
+          name: "Placeholder Protocol Name"
+          url: "https://example.com/protocol"
+          type: nmdc:Protocol
+
+  - Step 2_gcms_metabolomics:
+      DissolvingProcess:
+        id: # nmdc:dispro-{shoulder}-{blade}
+        type: nmdc:DissolvingProcess
+        name: Resuspension of Dried Aqueous Extract
+        description: The dried aqueous phase from <ProcessedSample1_gcms_metabolomics> was resuspended in 200 uL of methanol.
+        has_input:
+        - ProcessedSample1_gcms_metabolomics
+        has_output:
+        - ProcessedSample2_gcms_metabolomics
+        substances_used:
+        - type: nmdc:PortionOfSubstance
+          known_as: methanol
+          substance_role: solvent
+          volume:
+            type: nmdc:QuantityValue
+            has_raw_value: 200 uL
+            has_unit: uL
+            has_numeric_value: 200
+        protocol_link:
+          name: "Placeholder Protocol Name"
+          url: "https://example.com/protocol"
+          type: nmdc:Protocol
+
+  - Step 3_gcms_metabolomics:
+      FiltrationProcess:
+        id: # nmdc:filtpr-{shoulder}-{blade}
+        type: nmdc:FiltrationProcess
+        name: Supernatant Collection after Resuspension
+        description: After resuspension, the sample was centrifuged at 4500g for 10 min at 4Cel, and the supernatant was transferred to a smaller glass vial and dried in a vacuum concentrator.
+        has_input:
+        - ProcessedSample2_gcms_metabolomics
+        has_output:
+        - ProcessedSample3_gcms_metabolomics
+        protocol_link:
+          name: "Placeholder Protocol Name"
+          url: "https://example.com/protocol"
+          type: nmdc:Protocol
+
+  - Step 4_gcms_metabolomics:
+      ChemicalConversionProcess:
+        id: # nmdc:chcpr-{shoulder}-{blade}
+        type: nmdc:ChemicalConversionProcess
+        name: Methoxyamination for GC-MS
+        description: Dried samples from <ProcessedSample3_gcms_metabolomics> were dissolved in 20 uL methoxyamine solution, incubated at 37Cel for 90min, then centrifuged and vialed for GC-MS analysis.
+        has_input:
+        - ProcessedSample3_gcms_metabolomics
+        has_output:
+        - ProcessedSample4_gcms_metabolomics
+        chemical_conversion_category: substitution
+        substances_used:
+        - type: nmdc:PortionOfSubstance
+          known_as: methoxyamine
+          substance_role: derivatizing_agent
+          volume:
+            type: nmdc:QuantityValue
+            has_raw_value: 20 uL
+            has_unit: uL
+            has_numeric_value: 20
+        temperature:
+          type: nmdc:QuantityValue
+          has_raw_value: 37 Cel
+          has_unit: Cel
+          has_numeric_value: 37
+        duration:
+          type: nmdc:QuantityValue
+          has_raw_value: 90 min
+          has_unit: min
+          has_numeric_value: 90
+        protocol_link:
+          name: "Placeholder Protocol Name"
+          url: "https://example.com/protocol"
+          type: nmdc:Protocol
+
+  processedsamples:
+  - ProcessedSample1_gcms_metabolomics:
+      ProcessedSample:
+        id: #nmdc:
+        type: nmdc:ProcessedSample
+        name: <Biosample>_aqueous_extract
+        description: The collected upper aqueous phase after initial extraction and phase separation, subsequently dried.
+        sampled_portion: aqueous_layer
+
+  - ProcessedSample2_gcms_metabolomics:
+      ProcessedSample:
+        id: #nmdc:
+        type: nmdc:ProcessedSample
+        name: <Biosample>_resuspended_extract
+        description: The dried aqueous extract from <ProcessedSample1_gcms_metabolomics> resuspended in methanol.
+
+  - ProcessedSample3_gcms_metabolomics:
+      ProcessedSample:
+        id: #nmdc:
+        type: nmdc:ProcessedSample
+        name: <Biosample>_methanol_supernatant
+        description: The dried supernatant after methanol resuspension and centrifugation.
+        sampled_portion: supernatant
+
+  - ProcessedSample4_gcms_metabolomics:
+      ProcessedSample:
+        id: #nmdc:
+        type: nmdc:ProcessedSample
+        name: <Biosample>_derivatized_GCMS_sample
+        description: The methoxyamine-derivatized sample, ready for GC-MS analysis.

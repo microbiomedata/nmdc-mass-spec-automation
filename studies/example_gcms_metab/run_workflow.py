@@ -68,13 +68,8 @@ async def main():
 
     # Step 9: Submit metadata packages to dev environment
     logger.info("9. Submitting metadata packages to dev environment...")
-    dev_success = manager.submit_metadata_packages_to_dev()
-    if not dev_success:
-        logger.error("Failed to submit metadata packages to dev environment")
-        logger.error("Please fix the issues and re-run. Skipping production submission.")
-        return  # Exit without proceeding to prod
-    else:
-        logger.info("Successfully submitted metadata packages to dev environment")
+    #dev_success = manager.submit_metadata_packages_to_dev()
+
 
 if __name__ == "__main__":
     asyncio.run(main())

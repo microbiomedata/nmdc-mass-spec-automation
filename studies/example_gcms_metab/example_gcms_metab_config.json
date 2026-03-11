@@ -56,6 +56,7 @@
         "processed_data_uploaded_to_minio": true,
         "metadata_packages_generated": true,
         "metadata_submitted_dev": false,
-        "metadata_submitted_prod": false
+        "metadata_submitted_prod": false,
+        "protocol_outline_created": true
     }
 }
