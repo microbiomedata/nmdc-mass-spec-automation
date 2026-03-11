@@ -1,0 +1,339 @@
+"""
+Combined MCP server for NMDC data processing tools.
+
+This server provides tools for both:
+1. Protocol conversion: NMDC LinkML schema context and YAML validation
+2. Biosample mapping: Biosample-to-raw-file mapping validation
+
+Tool filtering can be applied on the client side when connecting to this server.
+Use create_static_tool_filter or dynamic filtering to expose only relevant tools
+to each agent. Example:
+
+    from agents.mcp import MCPServerStdio, create_static_tool_filter
+    
+    # For protocol conversion agent
+    protocol_server = MCPServerStdio(
+        params={"command": "python", "args": ["-m", "nmdc_dp_utils.llm.mcp_server"]},
+        tool_filter=create_static_tool_filter(
+            allowed_tool_names=["get_protocol_schema_context", "validate_generated_yaml"]
+        ),
+    )
+    
+    # For biosample mapping agent
+    biosample_server = MCPServerStdio(
+        params={"command": "python", "args": ["-m", "nmdc_dp_utils.llm.mcp_server"]},
+        tool_filter=create_static_tool_filter(
+            allowed_tool_names=["validate_biosample_mapping"]
+        ),
+    )
+"""
+
+import sys
+from pathlib import Path
+
+# Add workspace root to path to allow imports when running as MCP subprocess
+workspace_root = Path(__file__).parent.parent.parent.parent
+if str(workspace_root) not in sys.path:
+    sys.path.insert(0, str(workspace_root))
+
+import os
+from linkml_runtime.utils.schemaview import SchemaView
+import nmdc_schema
+from nmdc_ms_metadata_gen.validate_yaml_outline import validate_yaml_outline
+from nmdc_dp_utils.llm.biosample_mapping.validation import validate_biosample_mapping_csv
+import logging
+logging.basicConfig(level=logging.INFO)
+
+from mcp.server.fastmcp import FastMCP
+
+mcp = FastMCP(
+    "NMDC Data Processing Tools",
+    instructions=(
+        "You are an MCP server that provides tools for NMDC data processing. "
+        "Tools for protocol conversion: get_protocol_schema_context, validate_generated_yaml. "
+        "Tools for biosample mapping: validate_biosample_mapping."
+    ),
+)
+
+# Global storage for biosample mapping validation context
+_biosample_attributes = None
+_raw_files = None
+_material_processing_yaml = None
+
+
+def set_biosample_validation_context(
+    biosample_attributes: str, 
+    raw_files: str, 
+    material_processing_yaml: str
+):
+    """
+    Set the context data needed for biosample mapping validation.
+    This should be called before starting the MCP server.
+    
+    Parameters
+    ----------
+    biosample_attributes (str) : Biosample attributes CSV content
+    raw_files (str) : Raw files CSV content
+    material_processing_yaml (str) : Material processing YAML content
+    """
+    global _biosample_attributes, _raw_files, _material_processing_yaml
+    _biosample_attributes = biosample_attributes
+    _raw_files = raw_files
+    _material_processing_yaml = material_processing_yaml
+    logging.info("Biosample validation context set successfully")
+
+# =============================================================================
+# PROTOCOL CONVERSION TOOLS
+# =============================================================================
+
+@mcp.tool()
+def get_protocol_schema_context() -> dict:
+    """
+    Extract classes related to 'MaterialProcessing' from NMDC schema
+    and convert them to a JSON format suitable for LLM context.
+    
+    Use this tool to get the NMDC schema definitions needed for protocol conversion.
+    """
+    logging.info("Within get_protocol_schema_context mcp tool.")
+    # Initialize SchemaView from NMDC schema package
+    nmdc_path = os.path.dirname(nmdc_schema.__file__)
+    schema_path = os.path.join(nmdc_path, "nmdc_materialized_patterns.yaml")
+    schema_view = SchemaView(schema_path)
+
+    # Get all classes that are subclasses of 'MaterialProcessing'
+    all_classes = schema_view.all_classes()
+    relevant_classes = {
+        class_name: class_def
+        for class_name, class_def in all_classes.items()
+        if class_def.is_a and "MaterialProcessing" in schema_view.get_class(class_def.is_a).name or
+              class_name == "ProcessedSample"
+    }
+
+    # Recursively find all related classes and enums
+    # For each slot in each relevant class, if the range is an enum or inline class, add it
+    # Only include classes that are used inline (not just referenced by ID)
+    # Continue until no new classes or enums are found
+    enums = {}
+    new_found = True
+    while new_found:
+        new_found = False
+        for class_name, class_def in list(relevant_classes.items()):
+            # Check only slots defined in this class (not inherited) for inline usage
+            for slot_name in class_def.slots:
+                # Get the induced slot (which includes slot_usage overrides)
+                slot_def = schema_view.induced_slot(slot_name, class_name)
+                slot_range = slot_def.range
+                
+                # Check if range is an enum
+                enum_def = schema_view.get_enum(slot_range)
+                if enum_def and slot_range not in enums:
+                    enums[slot_range] = enum_def
+                    new_found = True
+                
+                # Check if range is a class that's used inline, if so, add it to relevant_classes
+                class_range_def = schema_view.get_class(slot_range)
+                if class_range_def and slot_range not in relevant_classes:
+                    # Only include if the slot is inlined or inlined_as_list
+                    if slot_def.inlined or slot_def.inlined_as_list:
+                        relevant_classes[slot_range] = class_range_def
+                        new_found = True
+
+    # Convert classes and enums to LLM-friendly format
+    schema_output = {
+        "classes": {},
+        "slots": {},
+        "enums": {name: enum_def._as_json_obj() for name, enum_def in enums.items()}
+    }
+    
+    # Collect all unique slot definitions across all classes
+    all_slot_definitions = {}
+    
+    # For each class, include slot names and collect slot definitions
+    for class_name, class_def in relevant_classes.items():
+        class_data = class_def._as_json_obj()
+        
+        # Get all induced slots for this class (includes inherited slots)
+        class_slot_names = []
+        for slot_name in schema_view.class_slots(class_name):
+            class_slot_names.append(slot_name)
+            
+            # Collect slot definition if not already captured
+            if slot_name not in all_slot_definitions:
+                induced_slot = schema_view.induced_slot(slot_name, class_name)
+                slot_info = {
+                    "range": induced_slot.range,
+                }
+                # Only add non-null values for these fields
+                for attr in ["description", "required", "multivalued"]:
+                    value = getattr(induced_slot, attr, None)
+                    if value is not None:
+                        slot_info[attr] = value
+                
+                all_slot_definitions[slot_name] = slot_info
+        
+        # Store just the slot names in the class
+        class_data["class_slots"] = class_slot_names
+        # Remove the class_data["slots"] since we are replacing it with class_slots
+        if "slots" in class_data:
+            del class_data["slots"]
+        schema_output["classes"][class_name] = class_data
+    
+    # Add all collected slot definitions
+    schema_output["slots"] = all_slot_definitions
+    
+    return schema_output
+
+def _clean_yaml_response(response: str) -> str:
+    """Remove markdown code fences from YAML LLM response."""
+    # Remove ```yaml and ``` markers
+    response = response.strip()
+    if response.startswith("```yaml"):
+        response = response[7:]  # Remove ```yaml
+    elif response.startswith("```"):
+        response = response[3:]  # Remove ```
+    if response.endswith("```"):
+        response = response[:-3]  # Remove trailing ```
+    return response.strip()
+
+
+def _clean_csv_response(response: str) -> str:
+    """Remove markdown code fences from CSV LLM response."""
+    response = response.strip()
+    if response.startswith("```csv"):
+        response = response[6:]  # Remove ```csv
+    elif response.startswith("```"):
+        response = response[3:]  # Remove ```
+    if response.endswith("```"):
+        response = response[:-3]  # Remove trailing ```
+    return response.strip()
+
+
+@mcp.tool()
+def validate_generated_yaml(yaml_outline: str) -> dict:
+    """
+    Validate the provided YAML outline against NMDC schema.
+    You must call this function at least once after generating the outline to ensure compliance.
+
+    Parameters
+    ----------
+    yaml_outline (str): The YAML outline as a string (with or without markdown code fences).
+
+    Returns
+    -------
+    dict: Validation results including errors and warnings.
+    """
+    clean_yaml_res = _clean_yaml_response(yaml_outline)
+    logging.info("Within validate_generated_yaml MCP tool.")
+    # save the yaml outline to a temporary file
+    import tempfile
+    with tempfile.NamedTemporaryFile(mode="w+", delete=False, suffix=".yaml") as temp_yaml_file:
+        temp_yaml_file.write(clean_yaml_res)
+        temp_yaml_file_path = temp_yaml_file.name
+    logging.info(f"Temporary YAML outline saved to: {temp_yaml_file_path}")
+    try:
+        validation_results = validate_yaml_outline(temp_yaml_file_path, test=True)
+    except Exception as e:
+        logging.error(f"Error during YAML validation: {e}")
+        validation_results = {"errors": [str(e)], "warnings": []}
+    logging.info(f"Validation results: {validation_results}")
+    return validation_results
+
+# =============================================================================
+# BIOSAMPLE MAPPING TOOLS
+# =============================================================================
+
+@mcp.tool()
+def validate_biosample_mapping(csv_mapping: str) -> dict:
+    """
+    Validate the provided biosample mapping CSV against the input data.
+    You must call this function after generating the CSV to ensure correctness.
+
+    This tool validates:
+    - Biosample IDs exist in biosample attributes and follow NMDC format (nmdc:bsm-XX-XXXXXXXX)
+    - Biosample names match the biosample IDs
+    - Processed sample placeholders exist in the material processing YAML
+    - Protocol IDs match top-level protocols in the YAML
+    - CSV formatting is correct with required columns
+    
+    Note: It is not unusual for some raw files to remain unmapped. This is expected for QC samples, blanks, standards, etc.
+
+    Parameters
+    ----------
+    csv_mapping (str): The biosample mapping CSV as a string (with or without markdown code fences)
+
+    Returns
+    -------
+    dict: Validation results with:
+          - 'valid' (bool): True if no errors found
+          - 'errors' (list of str): Critical issues that must be fixed
+          - 'warnings' (list of str): Non-critical issues for review
+          - 'message' (str): Summary message
+    """
+    global _biosample_attributes, _raw_files, _material_processing_yaml
+    
+    logging.info("Within validate_biosample_mapping MCP tool")
+    
+    # Check that context has been set
+    if _biosample_attributes is None or _raw_files is None or _material_processing_yaml is None:
+        return {
+            "valid": False,
+            "errors": ["Validation context not set. Please ensure biosample attributes, raw files, and material processing YAML have been provided."],
+            "warnings": [],
+            "message": "Validation context not initialized."
+        }
+    
+    # Clean the CSV response
+    clean_csv = _clean_csv_response(csv_mapping)
+    
+    # Perform validation
+    try:
+        validation_result = validate_biosample_mapping_csv(
+            csv_content=clean_csv,
+            biosample_attributes_csv=_biosample_attributes,
+            material_processing_yaml=_material_processing_yaml,
+            raw_files_csv=_raw_files
+        )
+        
+        logging.info(f"Biosample mapping validation result: {'PASS' if validation_result['valid'] else 'FAIL'}")
+        
+        # Handle errors
+        if not validation_result['valid']:
+            logging.warning(f"Biosample mapping validation errors: {len(validation_result['errors'])} found")
+            for error in validation_result['errors'][:5]:  # Log first 5 errors
+                logging.warning(f"  - {error}")
+        
+        # Handle warnings
+        if validation_result.get('warnings'):
+            logging.info(f"Biosample mapping validation warnings: {len(validation_result['warnings'])} found")
+            for warning in validation_result['warnings']:
+                logging.info(f"  - {warning}")
+
+        # Build response
+        response = {
+            "valid": validation_result['valid'],
+            "errors": validation_result['errors'],
+            "warnings": validation_result.get('warnings', [])
+        }
+        response["message"] = f"Biosample mapping validation {'passed' if validation_result['valid'] else 'failed'}."
+        
+        return response
+        
+    except Exception as e:
+        logging.error(f"Error during biosample mapping validation: {e}")
+        return {
+            "valid": False,
+            "errors": [f"Biosample mapping validation system error: {str(e)}"],
+            "warnings": [],
+            "message": "Validation failed due to system error."
+        }
+
+
+def main() -> None:
+    mcp.run()
+
+
+if __name__ == "__main__":
+    main()
+
+
+
