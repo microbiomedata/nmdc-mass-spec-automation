@@ -15,8 +15,6 @@ This module uses **code generation** for efficient biosample mapping:
 6. Output CSV is validated programmatically against NMDC format requirements and study YAML
 7. If validation fails, LLM iteratively fixes the script based on error feedback and re-runs
 
-**Performance**: ~30-60 seconds total for hundreds of files
-
 **Key Feature**: The system prevents template-based copying by constraining the LLM to analyze only the actual study data provided, not patterns from examples.
 
 ## Files

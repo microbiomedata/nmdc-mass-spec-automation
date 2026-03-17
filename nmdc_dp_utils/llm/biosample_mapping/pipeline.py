@@ -429,8 +429,8 @@ if __name__ == "__main__":
     additional_context_path = "nmdc_dp_utils/llm/examples/example_1/additional_mapping_context.txt"
     
     # Output paths
-    script_output_path = "nmdc_dp_utils/llm/examples/example_1/llm_generated_mapping_script.py"
-    csv_output_path = "nmdc_dp_utils/llm/examples/example_1/llm_generated_mapping.csv"
+    script_output_path = "nmdc_dp_utils/llm/examples/example_1/llm_generated_mapping_script_20260317.py"
+    csv_output_path = "nmdc_dp_utils/llm/examples/example_1/llm_generated_mapping_20260317.csv"
     
     # Check if additional context file exists
     if not os.path.exists(additional_context_path):
