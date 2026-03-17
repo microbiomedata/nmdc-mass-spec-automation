@@ -87,7 +87,18 @@ class LLMClient():
                 raise TimeoutError(f"LLM response timed out after {timeout_seconds} seconds. Try reducing input size or increasing timeout.")
         
         # With MCP servers
-        params = MCPServerStdioParams(command="python", args=self.mcp_servers)
+        import sys
+        from pathlib import Path
+        
+        # Get workspace root for proper module imports
+        workspace_root = Path(__file__).parent.parent.parent
+        
+        # Configure MCP server to run as a module with workspace as cwd
+        params = MCPServerStdioParams(
+            command="python",
+            args=["-m", "nmdc_dp_utils.llm.mcp_server"],
+            cwd=str(workspace_root)
+        )
 
         # Build MCP server kwargs
         mcp_kwargs = {
@@ -98,7 +109,6 @@ class LLMClient():
         # Add tool filter if provided
         if self.mcp_tool_filter is not None:
             mcp_kwargs["tool_filter"] = self.mcp_tool_filter
-            print("    [LLM] Using tool filter for MCP server")
 
         async with MCPServerStdio(**mcp_kwargs) as mcp_server_instance:
             # use the runner to run the agent with our mcp server and custom model client
