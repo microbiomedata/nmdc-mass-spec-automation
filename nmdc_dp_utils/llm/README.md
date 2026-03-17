@@ -15,8 +15,7 @@ Both workflows share common infrastructure and use [curated examples](examples/)
 llm/
 ├── llm_client.py                 # Shared: LLM API client with MCP server support & tool filtering
 ├── llm_conversation_manager.py   # Shared: Conversation state management
-├── mcp_server.py                 # Shared: Combined MCP server with all tools
-├── MCP_TOOL_FILTERING.md         # Documentation: Tool filtering guide
+├── mcp_server.py                 # Shared: Combined MCP server
 ├── examples/                     # Shared: Curated examples for both workflows
 ├── protocol_conversion/          # Pipeline 1: Protocol text → YAML
 │   ├── pipeline.py              # Main pipeline orchestration
@@ -38,14 +37,11 @@ The shared MCP (Model Context Protocol) server provides tools for both workflows
 - `protocol_get_schema_context`: Extract NMDC LinkML schema classes for MaterialProcessing
 - `protocol_validate_yaml`: Validate YAML outline against NMDC schema
 
-**Biosample Mapping Tools:**
-- `biosample_validate_mapping`: Validate biosample-to-raw-file CSV mapping
-
 Tool filtering allows agents to access only relevant tools for their task.
 
 ### LLMClient ([llm_client.py](llm_client.py))
 - Configures OpenAI-compatible LLM API connection
-- Manages MCP server connections with  tool filtering
+- Manages MCP server connections
 - Provides async interface for LLM interactions
 - Default model: `gemini-2.5-flash-project`
 
