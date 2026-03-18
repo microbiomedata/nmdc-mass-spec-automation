@@ -4872,27 +4872,45 @@ class WorkflowMetadataManager:
 class LLMWorkflowManagerMixin:
     """
     Mixin class for LLM workflow management.
+
+    Parameters
+    ----------  
+    interaction_type : str
+        The type of LLM interaction, either "protocol_conversion" or "biosample_mapping". 
+        This determines the configuration of the LLM client and conversation manager.
+        By default, it is set to "protocol_conversion".
     """
 
-    def __init__(self):
+    def __init__(self, interaction_type: str = "protocol_conversion"):
         """
         Initialize LLMWorkflowManagerMixin.
         """
         self._llm_client = None
         self._conversation_obj = None
+
+        # interaction_type must be one of the supported types
+        if interaction_type not in {"protocol_conversion", "biosample_mapping"}:
+            raise ValueError(f"Unsupported interaction_type: {interaction_type}")
+
+        self._interaction_type = interaction_type
     
     @property
     def llm_client(self):
         """Lazy-load LLM client on first access."""
         if self._llm_client is None:
-            self._llm_client = LLMClient()
+            if self._interaction_type == "protocol_conversion":
+                # For protocol conversion, use mcp without no tool filtering
+                self._llm_client = LLMClient()
+            elif self._interaction_type == "biosample_mapping":
+                # For biosample mapping, use LLM client without mcp server
+                self._llm_client = LLMClient(use_mcp=False)
         return self._llm_client
     
     @property
     def conversation_obj(self):
         """Lazy-load conversation object on first access."""
         if self._conversation_obj is None:
-            self._conversation_obj = ConversationManager(interaction_type="protocol_conversion")
+            self._conversation_obj = ConversationManager(interaction_type=self._interaction_type)
         return self._conversation_obj
         
     @skip_if_complete("protocol_outline_created", return_value=None)
@@ -4964,8 +4982,7 @@ class LLMWorkflowManagerMixin:
     @skip_if_complete("biosample_mapping_completed", return_value=True)
     async def generate_llm_biosample_mapping(
         self, 
-        max_iterations: int = 3,
-        additional_context_path: str = None
+        max_iterations: int = 3
     ) -> bool:
         """
         Generate biosample mapping using LLM code generation approach.
@@ -4982,9 +4999,6 @@ class LLMWorkflowManagerMixin:
         ----------
         max_iterations : int
             Maximum number of fix iterations (default: 3)
-        additional_context_path : str, optional
-            Path to additional context file with naming conventions.
-            If None, automatically checks for 'metadata/additional_mapping_context.txt'
         
         Returns
         -------
@@ -4999,47 +5013,33 @@ class LLMWorkflowManagerMixin:
         
         # Define file paths
         biosample_path = str(self.workflow_path / "metadata" / "biosample_attributes.csv")
-        
-        # Handle both old format (downloaded_files.csv) and new format (just file names)
-        downloaded_files_path = self.workflow_path / "metadata" / "downloaded_files.csv"
-        if downloaded_files_path.exists():
-            raw_files_path = str(downloaded_files_path)
-        else:
-            self.logger.error("downloaded_files.csv not found - run fetch_raw_data() first")
-            return False
-        
+        raw_files_path = self.workflow_path / "metadata" / "downloaded_files.csv"        
         yaml_path = str(self.workflow_path / "protocol_info" / "llm_generated_protocol_outline.yaml")
+
+        # Check that biosample_path, raw_files_path, and yaml_path exist before proceeding
+        if not Path(biosample_path).exists() or not Path(raw_files_path).exists() or not Path(yaml_path).exists():
+            self.logger.error("Required files for biosample mapping not found:")
+            if not Path(biosample_path).exists():
+                self.logger.error(f" - Biosample attributes file missing: {biosample_path}")
+            if not Path(raw_files_path).exists():
+                self.logger.error(f" - Downloaded files metadata missing: {raw_files_path}")
+            if not Path(yaml_path).exists():
+                self.logger.error(f" - Material processing YAML missing: {yaml_path}")
+            return False
+
         output_path = str(self.workflow_path / "metadata" / "llm_biosample_raw_file_mapper.csv")
         script_path = str(self.workflow_path / "scripts" / "llm_generated_biosample_mapping_script.py")
         
         # Check for additional context file if not explicitly provided
-        if additional_context_path is None:
-            default_context_path = self.workflow_path / "metadata" / "additional_mapping_context.txt"
-            if default_context_path.exists():
-                additional_context_path = str(default_context_path)
-                self.logger.info(f"Found additional context file: {additional_context_path}")
-            else:
-                self.logger.info("No additional mapping context file found (optional)")
-        
-        # Verify required files exist
-        if not Path(biosample_path).exists():
-            self.logger.error(f"Biosample attributes not found: {biosample_path}")
-            self.logger.error("Run get_biosample_attributes() first")
-            return False
-        
-        if not Path(yaml_path).exists():
-            self.logger.error(f"Material processing YAML not found: {yaml_path}")
-            self.logger.error("Run generate_material_processing_yaml() first")
-            return False
-        
-        # Create a new conversation manager for biosample mapping
-        self.logger.info("Initializing LLM conversation for biosample mapping...")
-        biosample_conversation = ConversationManager(interaction_type="biosample_mapping")
-        
+        default_context_path = self.workflow_path / "metadata" / "additional_mapping_context.txt"
+        if default_context_path.exists():
+            additional_context_path = str(default_context_path)
+            self.logger.info(f"Using additional context file for biosample mapping: {additional_context_path}")
+
         # Add study data to conversation context
         self.logger.info("Loading study data into conversation context...")
         await add_study_data_to_conversation(
-            conversation_obj=biosample_conversation,
+            conversation_obj=self.conversation_obj,
             biosample_attributes_path=biosample_path,
             raw_files_path=raw_files_path,
             material_processing_yaml_path=yaml_path,
@@ -5051,7 +5051,7 @@ class LLMWorkflowManagerMixin:
         try:
             script_code = await get_llm_generated_script(
                 llm_client=self.llm_client,
-                conversation_obj=biosample_conversation,
+                conversation_obj=self.conversation_obj,
                 biosample_path=biosample_path,
                 files_path=raw_files_path,
                 yaml_path=yaml_path,
@@ -5095,7 +5095,7 @@ class LLMWorkflowManagerMixin:
         try:
             success = await validate_and_fix_script(
                 llm_client=self.llm_client,
-                conversation_obj=biosample_conversation,
+                conversation_obj=self.conversation_obj,
                 script_path=script_path,
                 output_path=output_path,
                 biosample_path=biosample_path,
