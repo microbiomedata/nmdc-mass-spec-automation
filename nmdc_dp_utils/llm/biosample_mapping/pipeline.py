@@ -436,9 +436,9 @@ if __name__ == "__main__":
     if not os.path.exists(additional_context_path):
         additional_context_path = None
     
-    # Create LLM client (no MCP servers needed for code generation)
+    # Create LLM client (MCP tools not needed for code generation)
     logging.info("Initializing LLM client for code generation...")
-    llm_client = LLMClient(mcp_servers=[])
+    llm_client = LLMClient(use_mcp=False)
     
     # Create conversation manager with code generation prompt and examples
     logging.info("Setting up conversation with code generation prompt and examples...")

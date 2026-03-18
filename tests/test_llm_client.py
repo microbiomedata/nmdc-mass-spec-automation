@@ -1,6 +1,5 @@
 from types import SimpleNamespace
 from unittest.mock import AsyncMock, Mock
-import os
 import asyncio
 import pytest
 
@@ -14,7 +13,7 @@ def enable_api_key(monkeypatch):
 
 
 def test_llm_client_initialization(monkeypatch):
-    """Ensure client wires model, base URL, schema path when constructed."""
+    """Ensure client wires model, base URL, and default MCP mode when constructed."""
     async_openai = Mock(name="AsyncOpenAI", return_value="client")
     responses_model = Mock(name="OpenAIResponsesModel", return_value="model")
 
@@ -25,13 +24,9 @@ def test_llm_client_initialization(monkeypatch):
 
     async_openai.assert_called_once_with(base_url="https://ai-incubator-api.pnnl.gov", api_key="test-key")
     responses_model.assert_called_once_with(model="gemini-2.5-flash-project", openai_client="client")
-    expected_schema_path = os.path.join(
-        os.path.dirname(llm_client_module.__file__),
-        "mcp_server.py",
-    )
     assert client.client == "client"
     assert client.model_object == "model"
-    assert client.mcp_servers == [expected_schema_path]
+    assert client.use_mcp is True
 
 
 def test_llm_client_get_response_invokes_runner(monkeypatch):

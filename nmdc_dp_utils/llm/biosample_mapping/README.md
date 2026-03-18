@@ -43,7 +43,7 @@ from nmdc_dp_utils.llm.biosample_mapping.pipeline import (
 import asyncio
 
 # 1. Initialize LLM client and conversation manager
-llm_client = LLMClient(mcp_servers=[])  # No MCP servers needed for code generation
+llm_client = LLMClient(use_mcp=False)  # No MCP tools needed for code generation
 conversation_obj = ConversationManager(interaction_type="biosample_mapping")
 # Note: ConversationManager automatically loads system prompt and examples
 
