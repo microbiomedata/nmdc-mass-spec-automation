@@ -1,22 +1,13 @@
-import sys
-from pathlib import Path
-
-# Add workspace root to path to allow imports when running as MCP subprocess
-workspace_root = Path(__file__).parent.parent.parent.parent
-if str(workspace_root) not in sys.path:
-    sys.path.insert(0, str(workspace_root))
-
-import os
-from linkml_runtime.utils.schemaview import SchemaView
-import nmdc_schema
-from nmdc_ms_metadata_gen.validate_yaml_outline import validate_yaml_outline
 import logging
+import os
+
+import nmdc_schema
+from linkml_runtime.utils.schemaview import SchemaView
+from nmdc_ms_metadata_gen.validate_yaml_outline import validate_yaml_outline
+
 logging.basicConfig(level=logging.INFO)
 
 from mcp.server.fastmcp import FastMCP
-
-# Import after sys.path setup to allow module resolution
-from nmdc_dp_utils.llm.biosample_mapping.validation import validate_biosample_mapping_csv
 
 mcp = FastMCP(
     "NMDC Data Processing Tools",
@@ -25,11 +16,6 @@ mcp = FastMCP(
         "Tools for protocol conversion: get_protocol_schema_context, validate_generated_yaml. "
     ),
 )
-
-# Global storage for biosample mapping validation context
-_biosample_attributes = None
-_raw_files = None
-_material_processing_yaml = None
 
 # =============================================================================
 # PROTOCOL CONVERSION TOOLS
