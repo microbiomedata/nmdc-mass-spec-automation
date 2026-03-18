@@ -19,17 +19,17 @@ class LLMClient():
     
     Attributes:
         client (AsyncOpenAI): The OpenAI client instance.
-        mcp_servers (list): List of MCP server script paths.
+        use_mcp (bool): Whether MCP tools are enabled for agent execution.
         mcp_tool_filter (callable or None): Tool filter to apply to MCP server.
     """
-    def __init__(self, mcp_servers=None, mcp_tool_filter=None):
+    def __init__(self, use_mcp: bool = True, mcp_tool_filter=None):
         """
         Initialize LLM client.
         
         Parameters
         ----------
-        mcp_servers : list, optional
-            List of MCP server script paths. Defaults to shared mcp_server.py.
+        use_mcp : bool, optional
+            Whether to enable MCP server tools. Defaults to True.
         mcp_tool_filter : callable or None, optional
             Tool filter for MCP server. Defaults to None (no filtering).
         """
@@ -39,18 +39,8 @@ class LLMClient():
         client = AsyncOpenAI(base_url=self.base_url, api_key=API_KEY)
         self.client = client
         self.model_object = OpenAIResponsesModel(model=self.model_name, openai_client=self.client)
+        self.use_mcp = use_mcp
         self.mcp_tool_filter = mcp_tool_filter
-        
-        # Use shared MCP server by default
-        if mcp_servers is None:
-            self.mcp_servers = [os.path.join(os.path.dirname(__file__), "mcp_server.py")]
-            print(f"  [LLM] Using shared MCP server: {self.mcp_servers[0]}")
-        else:
-            self.mcp_servers = mcp_servers
-            if self.mcp_servers:
-                print(f"  [LLM] Using custom MCP servers: {self.mcp_servers}")
-            else:
-                print("  [LLM] No MCP servers configured")
 
     async def get_response(self, messages: list, timeout_seconds: int = 300):
         """
@@ -67,9 +57,9 @@ class LLMClient():
         # tracing is not supported in our AI Incubator instance. Must be disabled.
         set_tracing_disabled(disabled=True)
         
-        # If no MCP servers, run without them
-        if not self.mcp_servers:
-            print("    [LLM] No MCP servers, running agent directly...")
+        # If MCP is disabled, run without MCP tools
+        if not self.use_mcp:
+            print("    [LLM] MCP disabled, running agent directly...")
             try:
                 print(f"    [LLM] Creating agent with model {self.model_name}...")
                 agent = Agent(name="Assistant", model=self.model_object)
@@ -86,8 +76,7 @@ class LLMClient():
             except asyncio.TimeoutError:
                 raise TimeoutError(f"LLM response timed out after {timeout_seconds} seconds. Try reducing input size or increasing timeout.")
         
-        # With MCP servers
-        import sys
+        # With MCP enabled
         from pathlib import Path
         
         # Get workspace root for proper module imports
