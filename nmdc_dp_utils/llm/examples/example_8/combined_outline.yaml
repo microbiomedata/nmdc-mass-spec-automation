@@ -1,0 +1,202 @@
+polar_metabolites:
+  steps:
+    - Step 1_polar_metabolites:
+        SubSamplingProcess:
+          id: # nmdc:subspr-{shoulder}-{blade}
+          type: nmdc:SubSamplingProcess
+          name: Subsample soil for polar metabolite extraction
+          description: A 2 g portion taken from <Biosample> for polar metabolite extraction.
+          has_input:
+            - Biosample
+          has_output:
+            - ProcessedSample1_polar_metabolites
+          processing_institution: JGI
+          mass:
+            type: nmdc:QuantityValue
+            has_raw_value: 2 g
+            has_unit: g
+            has_numeric_value: 2
+          protocol_link:
+            name: Bacterial and fungal composition and exometabolites control the development and persistence of soil water repellency
+            url: https://doi.org/10.1093/ismeco/ycaf084
+            type: nmdc:Protocol
+
+    - Step 2_polar_metabolites:
+        Extraction:
+          id: # nmdc:extrp-{shoulder}-{blade}
+          type: nmdc:Extraction
+          name: Water extraction of polar metabolites
+          description: Polar metabolites extracted from <ProcessedSample1_polar_metabolites> using LC-MS water, including vortexing, sonication in an iced water bath (10 min), centrifugation (5 min at 5000 rpm), re-vortexing, re-sonication (4 min in iced water bath), and re-centrifugation (10 min at 8000 rpm). The supernatant was collected and then lyophilized.
+          has_input:
+            - ProcessedSample1_polar_metabolites
+          has_output:
+            - ProcessedSample2_polar_metabolites
+          processing_institution: JGI
+          extraction_targets:
+            - metabolite
+          substances_used:
+            - type: nmdc:PortionOfSubstance
+              known_as: water
+              substance_role: solvent
+              volume:
+                type: nmdc:QuantityValue
+                has_raw_value: 1.2 mL
+                has_unit: mL
+                has_numeric_value: 1.2
+          temperature:
+            type: nmdc:QuantityValue
+            has_raw_value: 0 Cel # Inferred from "iced water bath"
+            has_unit: Cel
+            has_numeric_value: 0
+          protocol_link:
+            name: Bacterial and fungal composition and exometabolites control the development and persistence of soil water repellency
+            url: https://doi.org/10.1093/ismeco/ycaf084
+            type: nmdc:Protocol
+
+    - Step 3_polar_metabolites:
+        DissolvingProcess:
+          id: # nmdc:dispro-{shoulder}-{blade}
+          type: nmdc:DissolvingProcess
+          name: Resuspension of dried polar metabolites
+          description: Dried polar metabolite extracts from <ProcessedSample2_polar_metabolites> resuspended in 100% methanol containing isotopically labeled internal standards for LC-MS analysis.
+          has_input:
+            - ProcessedSample2_polar_metabolites
+          has_output:
+            - ProcessedSample3_polar_metabolites
+          processing_institution: JGI
+          substances_used:
+            - type: nmdc:PortionOfSubstance
+              known_as: methanol
+              substance_role: solvent
+              volume:
+                type: nmdc:QuantityValue
+                has_raw_value: 120 ul
+                has_unit: uL
+                has_numeric_value: 120
+          protocol_link:
+            name: Bacterial and fungal composition and exometabolites control the development and persistence of soil water repellency
+            url: https://doi.org/10.1093/ismeco/ycaf084
+            type: nmdc:Protocol
+
+  processedsamples:
+    - ProcessedSample1_polar_metabolites:
+        ProcessedSample:
+          id: #nmdc:
+          type: nmdc:ProcessedSample
+          name: <Biosample>_polar_subsample
+          description: A 2 g subsample of <Biosample> prepared for polar metabolite extraction.
+
+    - ProcessedSample2_polar_metabolites:
+        ProcessedSample:
+          id: #nmdc:
+          type: nmdc:ProcessedSample
+          name: <Biosample>_dried_polar_extract
+          description: Dried polar metabolite extract obtained from <ProcessedSample1_polar_metabolites> after water extraction and lyophilization.
+          sampled_portion: aqueous_layer
+
+    - ProcessedSample3_polar_metabolites:
+        ProcessedSample:
+          id: #nmdc:
+          type: nmdc:ProcessedSample
+          name: <Biosample>_resuspended_polar_metabolites
+          description: Resuspended dried polar metabolite extracts from <ProcessedSample2_polar_metabolites> for LC-MS analysis.
+          sampled_portion: methanol_layer
+
+nonpolar_metabolites:
+  steps:
+    - Step 1_nonpolar_metabolites:
+        SubSamplingProcess:
+          id: # nmdc:subspr-{shoulder}-{blade}
+          type: nmdc:SubSamplingProcess
+          name: Subsample soil for nonpolar metabolite extraction
+          description: A 2 g portion taken from <Biosample> for nonpolar metabolite extraction.
+          has_input:
+            - Biosample
+          has_output:
+            - ProcessedSample1_nonpolar_metabolites
+          processing_institution: JGI
+          mass:
+            type: nmdc:QuantityValue
+            has_raw_value: 2 g
+            has_unit: g
+            has_numeric_value: 2
+          protocol_link:
+            name: Bacterial and fungal composition and exometabolites control the development and persistence of soil water repellency
+            url: https://doi.org/10.1093/ismeco/ycaf084
+            type: nmdc:Protocol
+
+    - Step 2_nonpolar_metabolites:
+        Extraction:
+          id: # nmdc:extrp-{shoulder}-{blade}
+          type: nmdc:Extraction
+          name: Methanol extraction of nonpolar metabolites
+          description: Nonpolar metabolites extracted from <ProcessedSample1_nonpolar_metabolites> using 100% methanol, including vortexing, sonication, and centrifugation. The supernatant was collected and dried in a SpeedVac.
+          has_input:
+            - ProcessedSample1_nonpolar_metabolites
+          has_output:
+            - ProcessedSample2_nonpolar_metabolites
+          processing_institution: JGI
+          extraction_targets:
+            - metabolite
+          substances_used:
+            - type: nmdc:PortionOfSubstance
+              known_as: methanol
+              substance_role: solvent
+              volume:
+                type: nmdc:QuantityValue
+                has_raw_value: 1 mL
+                has_unit: mL
+                has_numeric_value: 1
+          protocol_link:
+            name: Bacterial and fungal composition and exometabolites control the development and persistence of soil water repellency
+            url: https://doi.org/10.1093/ismeco/ycaf084
+            type: nmdc:Protocol
+
+    - Step 3_nonpolar_metabolites:
+        DissolvingProcess:
+          id: # nmdc:dispro-{shoulder}-{blade}
+          type: nmdc:DissolvingProcess
+          name: Resuspension of dried nonpolar metabolites
+          description: Dried nonpolar metabolite extracts from <ProcessedSample2_nonpolar_metabolites> resuspended in 100% methanol containing isotopically labeled internal standards for LC-MS analysis.
+          has_input:
+            - ProcessedSample2_nonpolar_metabolites
+          has_output:
+            - ProcessedSample3_nonpolar_metabolites
+          processing_institution: JGI
+          substances_used:
+            - type: nmdc:PortionOfSubstance
+              known_as: methanol
+              substance_role: solvent
+              volume:
+                type: nmdc:QuantityValue
+                has_raw_value: 120 ul
+                has_unit: uL
+                has_numeric_value: 120
+          protocol_link:
+            name: Bacterial and fungal composition and exometabolites control the development and persistence of soil water repellency
+            url: https://doi.org/10.1093/ismeco/ycaf084
+            type: nmdc:Protocol
+
+  processedsamples:
+    - ProcessedSample1_nonpolar_metabolites:
+        ProcessedSample:
+          id: #nmdc:
+          type: nmdc:ProcessedSample
+          name: <Biosample>_nonpolar_subsample
+          description: A 2 g subsample of <Biosample> prepared for nonpolar metabolite extraction.
+
+    - ProcessedSample2_nonpolar_metabolites:
+        ProcessedSample:
+          id: #nmdc:
+          type: nmdc:ProcessedSample
+          name: <Biosample>_dried_nonpolar_extract
+          description: Dried nonpolar metabolite extract obtained from <ProcessedSample1_nonpolar_metabolites> after methanol extraction and SpeedVac drying.
+          sampled_portion: methanol_layer
+
+    - ProcessedSample3_nonpolar_metabolites:
+        ProcessedSample:
+          id: #nmdc:
+          type: nmdc:ProcessedSample
+          name: <Biosample>_resuspended_nonpolar_metabolites
+          description: Resuspended dried nonpolar metabolite extracts from <ProcessedSample2_nonpolar_metabolites> for LC-MS analysis.
+          sampled_portion: methanol_layer

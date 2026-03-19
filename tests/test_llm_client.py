@@ -1,6 +1,5 @@
 from types import SimpleNamespace
 from unittest.mock import AsyncMock, Mock
-import os
 import asyncio
 import pytest
 
@@ -14,7 +13,7 @@ def enable_api_key(monkeypatch):
 
 
 def test_llm_client_initialization(monkeypatch):
-    """Ensure client wires model, base URL, schema path when constructed."""
+    """Ensure client wires model, base URL, and default MCP mode when constructed."""
     async_openai = Mock(name="AsyncOpenAI", return_value="client")
     responses_model = Mock(name="OpenAIResponsesModel", return_value="model")
 
@@ -25,13 +24,9 @@ def test_llm_client_initialization(monkeypatch):
 
     async_openai.assert_called_once_with(base_url="https://ai-incubator-api.pnnl.gov", api_key="test-key")
     responses_model.assert_called_once_with(model="gemini-2.5-flash-project", openai_client="client")
-    expected_schema_path = os.path.join(
-        os.path.dirname(llm_client_module.__file__),
-        "llm_protocol_context/schema_server.py",
-    )
     assert client.client == "client"
     assert client.model_object == "model"
-    assert client.mcp_servers == [expected_schema_path]
+    assert client.use_mcp is True
 
 
 def test_llm_client_get_response_invokes_runner(monkeypatch):
@@ -60,9 +55,10 @@ def test_llm_client_get_response_invokes_runner(monkeypatch):
     monkeypatch.setattr(llm_client_module, "Agent", DummyAgent)
 
     class DummyParams:
-        def __init__(self, command, args):
+        def __init__(self, command, args, cwd=None):
             self.command = command
             self.args = args
+            self.cwd = cwd
 
     monkeypatch.setattr(llm_client_module, "MCPServerStdioParams", DummyParams)
 
@@ -94,7 +90,8 @@ def test_llm_client_get_response_invokes_runner(monkeypatch):
         "model": "model",
     }
     assert captured_context["params"].command == "python"
-    assert captured_context["params"].args == client.mcp_servers
-    assert captured_context["timeout"] == 60
+    assert captured_context["params"].args == ["-m", "nmdc_dp_utils.llm.mcp_server"]
+    assert captured_context["params"].cwd is not None
+    assert captured_context["timeout"] == 120
     assert runner_mock.await_count == 1
     assert runner_mock.await_args.kwargs["input"] == messages

@@ -1,0 +1,15 @@
+Within 1000S_CFS1_FTMS_SPE_BTM_1_run1_Fir_22Apr22_300SA_p01_19_1_3376; 
+- 1000S refers to study, ignore
+- CFS1 refers to the core id, this should match perfectly to the beginning of samp_name
+- SPE means it this sample used solid phase extraction
+- BTM is bottom of core
+- Each sample was extracted thrice (BTM_1_ or _2_ or _3_), each corresponding to different processsed samples
+- Some samples were run on the instrument multiple times (same processed sample)
+- "RR" means re-run and should be accomodated for in the script to match to appropriate biosamples
+
+Some examples:
+1000S_FTA3_RR_FTMS_SPE_BTM_1_run1_Fir_22Apr22_300SA_p01_40_1_3397 should map to bioample with name "1000 soils - FTA3_CoreB_BTM"
+
+1000S_CFS1_FTMS_SPE_BTM_1_run1_Fir_22Apr22_300SA_p01_19_1_3376 should map to biosample with name "1000 soils - CFS1_CoreB_BTM"
+
+1000s_ANZA_FTMS_SPE_BTM_1_29Oct22_Mag_300SA_p025_167_1_7117 should map to biosample with name "1000 soils - ANZA_CoreB_BTM"
