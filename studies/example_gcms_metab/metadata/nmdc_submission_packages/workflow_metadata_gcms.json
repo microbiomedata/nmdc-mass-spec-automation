@@ -1,27 +1,27 @@
 {
   "calibration_set": [
     {
-      "id": "nmdc:calib-00-eeuc8142",
+      "id": "nmdc:calib-00-tm2d95wj",
       "type": "nmdc:CalibrationInformation",
       "name": "GC/MS FAMES calibration (GCMS_FAMEs_01_GCMS01_20180115.cdf)",
       "description": "Full scan GC/MS FAMES calibration run (GCMS_FAMEs_01_GCMS01_20180115.cdf).",
       "internal_calibration": false,
       "calibration_target": "retention_index",
-      "calibration_object": "nmdc:dobj-00-sm3yxkf8",
+      "calibration_object": "nmdc:dobj-00-erjhmf46",
       "calibration_standard": "fames"
     }
   ],
   "data_generation_set": [
     {
-      "id": "nmdc:dgms-00-gitb8vi6",
+      "id": "nmdc:dgms-00-rukggke5",
       "type": "nmdc:MassSpectrometry",
       "name": "Blanch_Nat_Met_C_12_AB_M_17",
       "description": "Generation of mass spectrometry data by GC/MS for the analysis of metabolites.",
       "has_input": [
-        "nmdc:procsm-11-zq1w8n86"
+        "nmdc:procsm-00-mcc5iir7"
       ],
       "has_output": [
-        "nmdc:dobj-00-c448uzlm"
+        "nmdc:dobj-00-382v57vk"
       ],
       "processing_institution": "EMSL",
       "end_date": "2018-01-15T08:14:00Z",
@@ -35,19 +35,19 @@
       ],
       "eluent_introduction_category": "gas_chromatography",
       "has_mass_spectrometry_configuration": "nmdc:mscon-14-5jk7rg60",
-      "generates_calibration": "nmdc:calib-00-eeuc8142",
+      "generates_calibration": "nmdc:calib-00-tm2d95wj",
       "has_chromatography_configuration": "nmdc:chrcon-14-qpvt3v15"
     },
     {
-      "id": "nmdc:dgms-00-3vz4ptpt",
+      "id": "nmdc:dgms-00-pw862u9x",
       "type": "nmdc:MassSpectrometry",
       "name": "Blanch_Nat_Met_C_12_AB_O_25",
       "description": "Generation of mass spectrometry data by GC/MS for the analysis of metabolites.",
       "has_input": [
-        "nmdc:procsm-11-eezxvc98"
+        "nmdc:procsm-00-5y7c8z6m"
       ],
       "has_output": [
-        "nmdc:dobj-00-xxjc8me8"
+        "nmdc:dobj-00-sw6v2v1c"
       ],
       "processing_institution": "EMSL",
       "end_date": "2018-01-16T06:11:00Z",
@@ -61,19 +61,19 @@
       ],
       "eluent_introduction_category": "gas_chromatography",
       "has_mass_spectrometry_configuration": "nmdc:mscon-14-5jk7rg60",
-      "generates_calibration": "nmdc:calib-00-eeuc8142",
+      "generates_calibration": "nmdc:calib-00-tm2d95wj",
       "has_chromatography_configuration": "nmdc:chrcon-14-qpvt3v15"
     },
     {
-      "id": "nmdc:dgms-00-31jm9hmb",
+      "id": "nmdc:dgms-00-f25ih9qv",
       "type": "nmdc:MassSpectrometry",
       "name": "Blanch_Nat_Met_C_14_AB_M_27",
       "description": "Generation of mass spectrometry data by GC/MS for the analysis of metabolites.",
       "has_input": [
-        "nmdc:procsm-11-jmrm9918"
+        "nmdc:procsm-00-zmu1e9og"
       ],
       "has_output": [
-        "nmdc:dobj-00-r8jefuvt"
+        "nmdc:dobj-00-5ts4j120"
       ],
       "processing_institution": "EMSL",
       "end_date": "2018-01-16T09:44:00Z",
@@ -87,19 +87,19 @@
       ],
       "eluent_introduction_category": "gas_chromatography",
       "has_mass_spectrometry_configuration": "nmdc:mscon-14-5jk7rg60",
-      "generates_calibration": "nmdc:calib-00-eeuc8142",
+      "generates_calibration": "nmdc:calib-00-tm2d95wj",
       "has_chromatography_configuration": "nmdc:chrcon-14-qpvt3v15"
     },
     {
-      "id": "nmdc:dgms-00-98fvczyd",
+      "id": "nmdc:dgms-00-4tab7eub",
       "type": "nmdc:MassSpectrometry",
       "name": "Blanch_Nat_Met_C_14_AB_O_09",
       "description": "Generation of mass spectrometry data by GC/MS for the analysis of metabolites.",
       "has_input": [
-        "nmdc:procsm-11-47crzf40"
+        "nmdc:procsm-00-casprjja"
       ],
       "has_output": [
-        "nmdc:dobj-00-06r2af1x"
+        "nmdc:dobj-00-fvj8iy1x"
       ],
       "processing_institution": "EMSL",
       "end_date": "2018-01-16T02:38:00Z",
@@ -113,19 +113,19 @@
       ],
       "eluent_introduction_category": "gas_chromatography",
       "has_mass_spectrometry_configuration": "nmdc:mscon-14-5jk7rg60",
-      "generates_calibration": "nmdc:calib-00-eeuc8142",
+      "generates_calibration": "nmdc:calib-00-tm2d95wj",
       "has_chromatography_configuration": "nmdc:chrcon-14-qpvt3v15"
     },
     {
-      "id": "nmdc:dgms-00-4gizpddd",
+      "id": "nmdc:dgms-00-pzql5g2p",
       "type": "nmdc:MassSpectrometry",
       "name": "Blanch_Nat_Met_C_19_AB_M_16",
       "description": "Generation of mass spectrometry data by GC/MS for the analysis of metabolites.",
       "has_input": [
-        "nmdc:procsm-11-pbvcnh98"
+        "nmdc:procsm-00-logue7kf"
       ],
       "has_output": [
-        "nmdc:dobj-00-d6qgvg9t"
+        "nmdc:dobj-00-y2gz9z1a"
       ],
       "processing_institution": "EMSL",
       "end_date": "2018-01-16T09:02:00Z",
@@ -139,19 +139,19 @@
       ],
       "eluent_introduction_category": "gas_chromatography",
       "has_mass_spectrometry_configuration": "nmdc:mscon-14-5jk7rg60",
-      "generates_calibration": "nmdc:calib-00-eeuc8142",
+      "generates_calibration": "nmdc:calib-00-tm2d95wj",
       "has_chromatography_configuration": "nmdc:chrcon-14-qpvt3v15"
     },
     {
-      "id": "nmdc:dgms-00-ggtwyf0r",
+      "id": "nmdc:dgms-00-awd4oj5a",
       "type": "nmdc:MassSpectrometry",
       "name": "Blanch_Nat_Met_C_19_AB_O_26",
       "description": "Generation of mass spectrometry data by GC/MS for the analysis of metabolites.",
       "has_input": [
-        "nmdc:procsm-11-vxvhg398"
+        "nmdc:procsm-00-9t05igzd"
       ],
       "has_output": [
-        "nmdc:dobj-00-1cdq3spd"
+        "nmdc:dobj-00-zd9hffor"
       ],
       "processing_institution": "EMSL",
       "end_date": "2018-01-15T06:05:00Z",
@@ -165,19 +165,19 @@
       ],
       "eluent_introduction_category": "gas_chromatography",
       "has_mass_spectrometry_configuration": "nmdc:mscon-14-5jk7rg60",
-      "generates_calibration": "nmdc:calib-00-eeuc8142",
+      "generates_calibration": "nmdc:calib-00-tm2d95wj",
       "has_chromatography_configuration": "nmdc:chrcon-14-qpvt3v15"
     },
     {
-      "id": "nmdc:dgms-00-ax34zyoy",
+      "id": "nmdc:dgms-00-6el1t048",
       "type": "nmdc:MassSpectrometry",
       "name": "Blanch_Nat_Met_C_27_AB_O_21",
       "description": "Generation of mass spectrometry data by GC/MS for the analysis of metabolites.",
       "has_input": [
-        "nmdc:procsm-11-p7ga4x41"
+        "nmdc:procsm-00-78a683fu"
       ],
       "has_output": [
-        "nmdc:dobj-00-jugi2hko"
+        "nmdc:dobj-00-8mo54mdy"
       ],
       "processing_institution": "EMSL",
       "end_date": "2018-01-16T08:19:00Z",
@@ -191,19 +191,19 @@
       ],
       "eluent_introduction_category": "gas_chromatography",
       "has_mass_spectrometry_configuration": "nmdc:mscon-14-5jk7rg60",
-      "generates_calibration": "nmdc:calib-00-eeuc8142",
+      "generates_calibration": "nmdc:calib-00-tm2d95wj",
       "has_chromatography_configuration": "nmdc:chrcon-14-qpvt3v15"
     },
     {
-      "id": "nmdc:dgms-00-2v4b4sg0",
+      "id": "nmdc:dgms-00-lbl5ixv8",
       "type": "nmdc:MassSpectrometry",
       "name": "Blanch_Nat_Met_C_30_AB_M_14",
       "description": "Generation of mass spectrometry data by GC/MS for the analysis of metabolites.",
       "has_input": [
-        "nmdc:procsm-11-8zkk9a37"
+        "nmdc:procsm-00-gnk1kpiv"
       ],
       "has_output": [
-        "nmdc:dobj-00-xpjg77ug"
+        "nmdc:dobj-00-tu4adwu2"
       ],
       "processing_institution": "EMSL",
       "end_date": "2018-01-16T10:27:00Z",
@@ -217,19 +217,19 @@
       ],
       "eluent_introduction_category": "gas_chromatography",
       "has_mass_spectrometry_configuration": "nmdc:mscon-14-5jk7rg60",
-      "generates_calibration": "nmdc:calib-00-eeuc8142",
+      "generates_calibration": "nmdc:calib-00-tm2d95wj",
       "has_chromatography_configuration": "nmdc:chrcon-14-qpvt3v15"
     },
     {
-      "id": "nmdc:dgms-00-cyb5k4t8",
+      "id": "nmdc:dgms-00-pziuzwzw",
       "type": "nmdc:MassSpectrometry",
       "name": "Blanch_Nat_Met_C_4_AB_M_08",
       "description": "Generation of mass spectrometry data by GC/MS for the analysis of metabolites.",
       "has_input": [
-        "nmdc:procsm-11-5fx00q94"
+        "nmdc:procsm-00-tqe1hgrx"
       ],
       "has_output": [
-        "nmdc:dobj-00-5yjevomq"
+        "nmdc:dobj-00-phga25et"
       ],
       "processing_institution": "EMSL",
       "end_date": "2018-01-15T09:39:00Z",
@@ -243,19 +243,19 @@
       ],
       "eluent_introduction_category": "gas_chromatography",
       "has_mass_spectrometry_configuration": "nmdc:mscon-14-5jk7rg60",
-      "generates_calibration": "nmdc:calib-00-eeuc8142",
+      "generates_calibration": "nmdc:calib-00-tm2d95wj",
       "has_chromatography_configuration": "nmdc:chrcon-14-qpvt3v15"
     },
     {
-      "id": "nmdc:dgms-00-o8n263oi",
+      "id": "nmdc:dgms-00-a3kaawn5",
       "type": "nmdc:MassSpectrometry",
       "name": "Blanch_Nat_Met_C_4_AB_O_04",
       "description": "Generation of mass spectrometry data by GC/MS for the analysis of metabolites.",
       "has_input": [
-        "nmdc:procsm-11-sgxgep46"
+        "nmdc:procsm-00-cyk1lavi"
       ],
       "has_output": [
-        "nmdc:dobj-00-ha4dfga6"
+        "nmdc:dobj-00-7jopueun"
       ],
       "processing_institution": "EMSL",
       "end_date": "2018-01-16T01:12:00Z",
@@ -269,19 +269,19 @@
       ],
       "eluent_introduction_category": "gas_chromatography",
       "has_mass_spectrometry_configuration": "nmdc:mscon-14-5jk7rg60",
-      "generates_calibration": "nmdc:calib-00-eeuc8142",
+      "generates_calibration": "nmdc:calib-00-tm2d95wj",
       "has_chromatography_configuration": "nmdc:chrcon-14-qpvt3v15"
     },
     {
-      "id": "nmdc:dgms-00-leu3hbfs",
+      "id": "nmdc:dgms-00-4lspduzx",
       "type": "nmdc:MassSpectrometry",
       "name": "Blanch_Nat_Met_C_7_AB_M_07",
       "description": "Generation of mass spectrometry data by GC/MS for the analysis of metabolites.",
       "has_input": [
-        "nmdc:procsm-11-xk7t6j25"
+        "nmdc:procsm-00-i6refcse"
       ],
       "has_output": [
-        "nmdc:dobj-00-v871ha3m"
+        "nmdc:dobj-00-2b3mtvi2"
       ],
       "processing_institution": "EMSL",
       "end_date": "2018-01-15T06:48:00Z",
@@ -295,19 +295,19 @@
       ],
       "eluent_introduction_category": "gas_chromatography",
       "has_mass_spectrometry_configuration": "nmdc:mscon-14-5jk7rg60",
-      "generates_calibration": "nmdc:calib-00-eeuc8142",
+      "generates_calibration": "nmdc:calib-00-tm2d95wj",
       "has_chromatography_configuration": "nmdc:chrcon-14-qpvt3v15"
     },
     {
-      "id": "nmdc:dgms-00-lv2salry",
+      "id": "nmdc:dgms-00-uytfkd6y",
       "type": "nmdc:MassSpectrometry",
       "name": "Blanch_Nat_Met_H_11_AB_M_13",
       "description": "Generation of mass spectrometry data by GC/MS for the analysis of metabolites.",
       "has_input": [
-        "nmdc:procsm-11-0wedgr31"
+        "nmdc:procsm-00-cthfcx0r"
       ],
       "has_output": [
-        "nmdc:dobj-00-15n8aa7z"
+        "nmdc:dobj-00-evc5538j"
       ],
       "processing_institution": "EMSL",
       "end_date": "2018-01-15T10:22:00Z",
@@ -321,19 +321,19 @@
       ],
       "eluent_introduction_category": "gas_chromatography",
       "has_mass_spectrometry_configuration": "nmdc:mscon-14-5jk7rg60",
-      "generates_calibration": "nmdc:calib-00-eeuc8142",
+      "generates_calibration": "nmdc:calib-00-tm2d95wj",
       "has_chromatography_configuration": "nmdc:chrcon-14-qpvt3v15"
     },
     {
-      "id": "nmdc:dgms-00-o09a7e0r",
+      "id": "nmdc:dgms-00-xp597fup",
       "type": "nmdc:MassSpectrometry",
       "name": "Blanch_Nat_Met_H_11_AB_O_24",
       "description": "Generation of mass spectrometry data by GC/MS for the analysis of metabolites.",
       "has_input": [
-        "nmdc:procsm-11-2tecf991"
+        "nmdc:procsm-00-bmwufuhf"
       ],
       "has_output": [
-        "nmdc:dobj-00-edvjiuyx"
+        "nmdc:dobj-00-mqy2c05k"
       ],
       "processing_institution": "EMSL",
       "end_date": "2018-01-15T05:23:00Z",
@@ -347,19 +347,19 @@
       ],
       "eluent_introduction_category": "gas_chromatography",
       "has_mass_spectrometry_configuration": "nmdc:mscon-14-5jk7rg60",
-      "generates_calibration": "nmdc:calib-00-eeuc8142",
+      "generates_calibration": "nmdc:calib-00-tm2d95wj",
       "has_chromatography_configuration": "nmdc:chrcon-14-qpvt3v15"
     },
     {
-      "id": "nmdc:dgms-00-omenmc3n",
+      "id": "nmdc:dgms-00-gukhjuar",
       "type": "nmdc:MassSpectrometry",
       "name": "Blanch_Nat_Met_H_17_AB_M_18",
       "description": "Generation of mass spectrometry data by GC/MS for the analysis of metabolites.",
       "has_input": [
-        "nmdc:procsm-11-1afb3q50"
+        "nmdc:procsm-00-x1f50fkc"
       ],
       "has_output": [
-        "nmdc:dobj-00-jwbyv2ik"
+        "nmdc:dobj-00-hc756huu"
       ],
       "processing_institution": "EMSL",
       "end_date": "2018-01-15T11:04:00Z",
@@ -373,19 +373,19 @@
       ],
       "eluent_introduction_category": "gas_chromatography",
       "has_mass_spectrometry_configuration": "nmdc:mscon-14-5jk7rg60",
-      "generates_calibration": "nmdc:calib-00-eeuc8142",
+      "generates_calibration": "nmdc:calib-00-tm2d95wj",
       "has_chromatography_configuration": "nmdc:chrcon-14-qpvt3v15"
     },
     {
-      "id": "nmdc:dgms-00-yrlvv3rv",
+      "id": "nmdc:dgms-00-751wt7i0",
       "type": "nmdc:MassSpectrometry",
       "name": "Blanch_Nat_Met_H_17_AB_O_22",
       "description": "Generation of mass spectrometry data by GC/MS for the analysis of metabolites.",
       "has_input": [
-        "nmdc:procsm-11-y1k8jv24"
+        "nmdc:procsm-00-crej76hj"
       ],
       "has_output": [
-        "nmdc:dobj-00-af8p4ly0"
+        "nmdc:dobj-00-3dfmo7lv"
       ],
       "processing_institution": "EMSL",
       "end_date": "2018-01-15T04:40:00Z",
@@ -399,19 +399,19 @@
       ],
       "eluent_introduction_category": "gas_chromatography",
       "has_mass_spectrometry_configuration": "nmdc:mscon-14-5jk7rg60",
-      "generates_calibration": "nmdc:calib-00-eeuc8142",
+      "generates_calibration": "nmdc:calib-00-tm2d95wj",
       "has_chromatography_configuration": "nmdc:chrcon-14-qpvt3v15"
     },
     {
-      "id": "nmdc:dgms-00-esrgl6eg",
+      "id": "nmdc:dgms-00-8j8o2qrb",
       "type": "nmdc:MassSpectrometry",
       "name": "Blanch_Nat_Met_H_26_AB_M_12",
       "description": "Generation of mass spectrometry data by GC/MS for the analysis of metabolites.",
       "has_input": [
-        "nmdc:procsm-11-223ezf88"
+        "nmdc:procsm-00-94ikkbqo"
       ],
       "has_output": [
-        "nmdc:dobj-00-9uaukv9u"
+        "nmdc:dobj-00-znzy7n13"
       ],
       "processing_institution": "EMSL",
       "end_date": "2018-01-16T05:29:00Z",
@@ -425,19 +425,19 @@
       ],
       "eluent_introduction_category": "gas_chromatography",
       "has_mass_spectrometry_configuration": "nmdc:mscon-14-5jk7rg60",
-      "generates_calibration": "nmdc:calib-00-eeuc8142",
+      "generates_calibration": "nmdc:calib-00-tm2d95wj",
       "has_chromatography_configuration": "nmdc:chrcon-14-qpvt3v15"
     },
     {
-      "id": "nmdc:dgms-00-f108hv5v",
+      "id": "nmdc:dgms-00-cyjkc82k",
       "type": "nmdc:MassSpectrometry",
       "name": "Blanch_Nat_Met_H_28_AB_M_03",
       "description": "Generation of mass spectrometry data by GC/MS for the analysis of metabolites.",
       "has_input": [
-        "nmdc:procsm-11-k35qfx25"
+        "nmdc:procsm-00-sqh3sstu"
       ],
       "has_output": [
-        "nmdc:dobj-00-s6ulj2nw"
+        "nmdc:dobj-00-30y35jjw"
       ],
       "processing_institution": "EMSL",
       "end_date": "2018-01-16T04:46:00Z",
@@ -451,19 +451,19 @@
       ],
       "eluent_introduction_category": "gas_chromatography",
       "has_mass_spectrometry_configuration": "nmdc:mscon-14-5jk7rg60",
-      "generates_calibration": "nmdc:calib-00-eeuc8142",
+      "generates_calibration": "nmdc:calib-00-tm2d95wj",
       "has_chromatography_configuration": "nmdc:chrcon-14-qpvt3v15"
     },
     {
-      "id": "nmdc:dgms-00-epibxec2",
+      "id": "nmdc:dgms-00-vdrsduqa",
       "type": "nmdc:MassSpectrometry",
       "name": "Blanch_Nat_Met_H_2_AB_M_23",
       "description": "Generation of mass spectrometry data by GC/MS for the analysis of metabolites.",
       "has_input": [
-        "nmdc:procsm-11-c4wj5n91"
+        "nmdc:procsm-00-1hbztn7e"
       ],
       "has_output": [
-        "nmdc:dobj-00-4yble7cr"
+        "nmdc:dobj-00-q6hw7t8o"
       ],
       "processing_institution": "EMSL",
       "end_date": "2018-01-16T04:03:00Z",
@@ -477,19 +477,19 @@
       ],
       "eluent_introduction_category": "gas_chromatography",
       "has_mass_spectrometry_configuration": "nmdc:mscon-14-5jk7rg60",
-      "generates_calibration": "nmdc:calib-00-eeuc8142",
+      "generates_calibration": "nmdc:calib-00-tm2d95wj",
       "has_chromatography_configuration": "nmdc:chrcon-14-qpvt3v15"
     },
     {
-      "id": "nmdc:dgms-00-8j9l39v2",
+      "id": "nmdc:dgms-00-3antfknu",
       "type": "nmdc:MassSpectrometry",
       "name": "Blanch_Nat_Met_H_2_AB_O_15",
       "description": "Generation of mass spectrometry data by GC/MS for the analysis of metabolites.",
       "has_input": [
-        "nmdc:procsm-11-px1pmx11"
+        "nmdc:procsm-00-2uwutalt"
       ],
       "has_output": [
-        "nmdc:dobj-00-652j92lp"
+        "nmdc:dobj-00-9n692di8"
       ],
       "processing_institution": "EMSL",
       "end_date": "2018-01-15T11:47:00Z",
@@ -503,19 +503,19 @@
       ],
       "eluent_introduction_category": "gas_chromatography",
       "has_mass_spectrometry_configuration": "nmdc:mscon-14-5jk7rg60",
-      "generates_calibration": "nmdc:calib-00-eeuc8142",
+      "generates_calibration": "nmdc:calib-00-tm2d95wj",
       "has_chromatography_configuration": "nmdc:chrcon-14-qpvt3v15"
     },
     {
-      "id": "nmdc:dgms-00-942ysmx6",
+      "id": "nmdc:dgms-00-el9tqhu4",
       "type": "nmdc:MassSpectrometry",
       "name": "Blanch_Nat_Met_H_32_AB_M_20",
       "description": "Generation of mass spectrometry data by GC/MS for the analysis of metabolites.",
       "has_input": [
-        "nmdc:procsm-11-rxg1tv76"
+        "nmdc:procsm-00-dh7ztctd"
       ],
       "has_output": [
-        "nmdc:dobj-00-2ppqh861"
+        "nmdc:dobj-00-0jt2743z"
       ],
       "processing_institution": "EMSL",
       "end_date": "2018-01-15T08:56:00Z",
@@ -529,19 +529,19 @@
       ],
       "eluent_introduction_category": "gas_chromatography",
       "has_mass_spectrometry_configuration": "nmdc:mscon-14-5jk7rg60",
-      "generates_calibration": "nmdc:calib-00-eeuc8142",
+      "generates_calibration": "nmdc:calib-00-tm2d95wj",
       "has_chromatography_configuration": "nmdc:chrcon-14-qpvt3v15"
     },
     {
-      "id": "nmdc:dgms-00-th099p1z",
+      "id": "nmdc:dgms-00-op5o7874",
       "type": "nmdc:MassSpectrometry",
       "name": "Blanch_Nat_Met_H_32_AB_O_19",
       "description": "Generation of mass spectrometry data by GC/MS for the analysis of metabolites.",
       "has_input": [
-        "nmdc:procsm-11-zxn09n66"
+        "nmdc:procsm-00-1h5r9qky"
       ],
       "has_output": [
-        "nmdc:dobj-00-0vx87pzd"
+        "nmdc:dobj-00-3aqdusou"
       ],
       "processing_institution": "EMSL",
       "end_date": "2018-01-16T01:55:00Z",
@@ -555,19 +555,19 @@
       ],
       "eluent_introduction_category": "gas_chromatography",
       "has_mass_spectrometry_configuration": "nmdc:mscon-14-5jk7rg60",
-      "generates_calibration": "nmdc:calib-00-eeuc8142",
+      "generates_calibration": "nmdc:calib-00-tm2d95wj",
       "has_chromatography_configuration": "nmdc:chrcon-14-qpvt3v15"
     },
     {
-      "id": "nmdc:dgms-00-xld7lunx",
+      "id": "nmdc:dgms-00-oi6og5bg",
       "type": "nmdc:MassSpectrometry",
       "name": "Blanch_Nat_Met_H_4_AB_M_05",
       "description": "Generation of mass spectrometry data by GC/MS for the analysis of metabolites.",
       "has_input": [
-        "nmdc:procsm-11-tjep2e89"
+        "nmdc:procsm-00-u27n4vtg"
       ],
       "has_output": [
-        "nmdc:dobj-00-xb9uwy9z"
+        "nmdc:dobj-00-v22zcpwj"
       ],
       "processing_institution": "EMSL",
       "end_date": "2018-01-16T03:21:00Z",
@@ -581,19 +581,19 @@
       ],
       "eluent_introduction_category": "gas_chromatography",
       "has_mass_spectrometry_configuration": "nmdc:mscon-14-5jk7rg60",
-      "generates_calibration": "nmdc:calib-00-eeuc8142",
+      "generates_calibration": "nmdc:calib-00-tm2d95wj",
       "has_chromatography_configuration": "nmdc:chrcon-14-qpvt3v15"
     },
     {
-      "id": "nmdc:dgms-00-3e889cgf",
+      "id": "nmdc:dgms-00-f7v02yj1",
       "type": "nmdc:MassSpectrometry",
       "name": "Blanch_Nat_Met_H_4_AB_O_06",
       "description": "Generation of mass spectrometry data by GC/MS for the analysis of metabolites.",
       "has_input": [
-        "nmdc:procsm-11-3x22m659"
+        "nmdc:procsm-00-u4r526eg"
       ],
       "has_output": [
-        "nmdc:dobj-00-wipow0o0"
+        "nmdc:dobj-00-plebrqis"
       ],
       "processing_institution": "EMSL",
       "end_date": "2018-01-15T07:31:00Z",
@@ -607,13 +607,13 @@
       ],
       "eluent_introduction_category": "gas_chromatography",
       "has_mass_spectrometry_configuration": "nmdc:mscon-14-5jk7rg60",
-      "generates_calibration": "nmdc:calib-00-eeuc8142",
+      "generates_calibration": "nmdc:calib-00-tm2d95wj",
       "has_chromatography_configuration": "nmdc:chrcon-14-qpvt3v15"
     }
   ],
   "data_object_set": [
     {
-      "id": "nmdc:dobj-00-sm3yxkf8",
+      "id": "nmdc:dobj-00-erjhmf46",
       "type": "nmdc:DataObject",
       "name": "GCMS_FAMEs_01_GCMS01_20180115.cdf",
       "description": "GC/MS low resolution raw data for metabolomics data acquisition.",
@@ -624,7 +624,7 @@
       "url": "https://nmdcdemo.emsl.pnnl.gov/metabolomics/blanchard_11_8ws97026/raw/GCMS_FAMEs_01_GCMS01_20180115.cdf"
     },
     {
-      "id": "nmdc:dobj-00-c448uzlm",
+      "id": "nmdc:dobj-00-382v57vk",
       "type": "nmdc:DataObject",
       "name": "Blanch_Nat_Met_C_12_AB_M_17.cdf",
       "description": "GC/MS low resolution raw data for metabolomics data acquisition.",
@@ -633,10 +633,10 @@
       "file_size_bytes": 19710512,
       "md5_checksum": "ba272523d2338386cf6b83dd3201de28",
       "url": "https://nmdcdemo.emsl.pnnl.gov/metabolomics/blanchard_11_8ws97026/raw/Blanch_Nat_Met_C_12_AB_M_17.cdf",
-      "was_generated_by": "nmdc:dgms-00-gitb8vi6"
+      "was_generated_by": "nmdc:dgms-00-rukggke5"
     },
     {
-      "id": "nmdc:dobj-00-4x7irh3i",
+      "id": "nmdc:dobj-00-b2mi1f2n",
       "type": "nmdc:DataObject",
       "name": "Blanch_Nat_Met_C_12_AB_M_17.csv",
       "description": "Metabolomics annotations as a result of a GC/MS metabolomics workflow activity.",
@@ -645,10 +645,10 @@
       "file_size_bytes": 593260,
       "md5_checksum": "f482666c4bab306d906d2b00457fc73a",
       "url": "https://nmdcdemo.emsl.pnnl.gov/metabolomics/blanchard_11_8ws97026/processed_20251223/Blanch_Nat_Met_C_12_AB_M_17.csv",
-      "was_generated_by": "nmdc:wfmb-00-1cf4v9vr.1"
+      "was_generated_by": "nmdc:wfmb-00-ag1hzoe7.1"
     },
     {
-      "id": "nmdc:dobj-00-xxjc8me8",
+      "id": "nmdc:dobj-00-sw6v2v1c",
       "type": "nmdc:DataObject",
       "name": "Blanch_Nat_Met_C_12_AB_O_25.cdf",
       "description": "GC/MS low resolution raw data for metabolomics data acquisition.",
@@ -657,10 +657,10 @@
       "file_size_bytes": 22298564,
       "md5_checksum": "508cabe2fe1f20240ae2019d58f3f758",
       "url": "https://nmdcdemo.emsl.pnnl.gov/metabolomics/blanchard_11_8ws97026/raw/Blanch_Nat_Met_C_12_AB_O_25.cdf",
-      "was_generated_by": "nmdc:dgms-00-3vz4ptpt"
+      "was_generated_by": "nmdc:dgms-00-pw862u9x"
     },
     {
-      "id": "nmdc:dobj-00-xn6ijsb6",
+      "id": "nmdc:dobj-00-0zt8fn3g",
       "type": "nmdc:DataObject",
       "name": "Blanch_Nat_Met_C_12_AB_O_25.csv",
       "description": "Metabolomics annotations as a result of a GC/MS metabolomics workflow activity.",
@@ -669,10 +669,10 @@
       "file_size_bytes": 661344,
       "md5_checksum": "aff1302a75c36d6bac5da34822390a0d",
       "url": "https://nmdcdemo.emsl.pnnl.gov/metabolomics/blanchard_11_8ws97026/processed_20251223/Blanch_Nat_Met_C_12_AB_O_25.csv",
-      "was_generated_by": "nmdc:wfmb-00-vpi1pphl.1"
+      "was_generated_by": "nmdc:wfmb-00-vibraapj.1"
     },
     {
-      "id": "nmdc:dobj-00-r8jefuvt",
+      "id": "nmdc:dobj-00-5ts4j120",
       "type": "nmdc:DataObject",
       "name": "Blanch_Nat_Met_C_14_AB_M_27.cdf",
       "description": "GC/MS low resolution raw data for metabolomics data acquisition.",
@@ -681,10 +681,10 @@
       "file_size_bytes": 21391308,
       "md5_checksum": "dd0d9f2211cb64072531276bf8a95c4f",
       "url": "https://nmdcdemo.emsl.pnnl.gov/metabolomics/blanchard_11_8ws97026/raw/Blanch_Nat_Met_C_14_AB_M_27.cdf",
-      "was_generated_by": "nmdc:dgms-00-31jm9hmb"
+      "was_generated_by": "nmdc:dgms-00-f25ih9qv"
     },
     {
-      "id": "nmdc:dobj-00-2egdlwso",
+      "id": "nmdc:dobj-00-1sb1ioja",
       "type": "nmdc:DataObject",
       "name": "Blanch_Nat_Met_C_14_AB_M_27.csv",
       "description": "Metabolomics annotations as a result of a GC/MS metabolomics workflow activity.",
@@ -693,10 +693,10 @@
       "file_size_bytes": 617282,
       "md5_checksum": "fc78f0b257b9956b5ecd223965de4cfc",
       "url": "https://nmdcdemo.emsl.pnnl.gov/metabolomics/blanchard_11_8ws97026/processed_20251223/Blanch_Nat_Met_C_14_AB_M_27.csv",
-      "was_generated_by": "nmdc:wfmb-00-u4tr687k.1"
+      "was_generated_by": "nmdc:wfmb-00-eo2rklkw.1"
     },
     {
-      "id": "nmdc:dobj-00-06r2af1x",
+      "id": "nmdc:dobj-00-fvj8iy1x",
       "type": "nmdc:DataObject",
       "name": "Blanch_Nat_Met_C_14_AB_O_09.cdf",
       "description": "GC/MS low resolution raw data for metabolomics data acquisition.",
@@ -705,10 +705,10 @@
       "file_size_bytes": 20137304,
       "md5_checksum": "2c396516eb558f6e784060562cdb8d1d",
       "url": "https://nmdcdemo.emsl.pnnl.gov/metabolomics/blanchard_11_8ws97026/raw/Blanch_Nat_Met_C_14_AB_O_09.cdf",
-      "was_generated_by": "nmdc:dgms-00-98fvczyd"
+      "was_generated_by": "nmdc:dgms-00-4tab7eub"
     },
     {
-      "id": "nmdc:dobj-00-7zik3hfe",
+      "id": "nmdc:dobj-00-pg7jo4un",
       "type": "nmdc:DataObject",
       "name": "Blanch_Nat_Met_C_14_AB_O_09.csv",
       "description": "Metabolomics annotations as a result of a GC/MS metabolomics workflow activity.",
@@ -717,10 +717,10 @@
       "file_size_bytes": 608244,
       "md5_checksum": "859399962cb572839f88ca5da6fea601",
       "url": "https://nmdcdemo.emsl.pnnl.gov/metabolomics/blanchard_11_8ws97026/processed_20251223/Blanch_Nat_Met_C_14_AB_O_09.csv",
-      "was_generated_by": "nmdc:wfmb-00-5q6lkkwk.1"
+      "was_generated_by": "nmdc:wfmb-00-36r0zfji.1"
     },
     {
-      "id": "nmdc:dobj-00-d6qgvg9t",
+      "id": "nmdc:dobj-00-y2gz9z1a",
       "type": "nmdc:DataObject",
       "name": "Blanch_Nat_Met_C_19_AB_M_16.cdf",
       "description": "GC/MS low resolution raw data for metabolomics data acquisition.",
@@ -729,10 +729,10 @@
       "file_size_bytes": 21353748,
       "md5_checksum": "047b27244c60ac84b94a25daebc29524",
       "url": "https://nmdcdemo.emsl.pnnl.gov/metabolomics/blanchard_11_8ws97026/raw/Blanch_Nat_Met_C_19_AB_M_16.cdf",
-      "was_generated_by": "nmdc:dgms-00-4gizpddd"
+      "was_generated_by": "nmdc:dgms-00-pzql5g2p"
     },
     {
-      "id": "nmdc:dobj-00-wjc16c2p",
+      "id": "nmdc:dobj-00-1e13ahw3",
       "type": "nmdc:DataObject",
       "name": "Blanch_Nat_Met_C_19_AB_M_16.csv",
       "description": "Metabolomics annotations as a result of a GC/MS metabolomics workflow activity.",
@@ -741,10 +741,10 @@
       "file_size_bytes": 633383,
       "md5_checksum": "1be0328ea29aecd7fe3deecd0fd3aa4a",
       "url": "https://nmdcdemo.emsl.pnnl.gov/metabolomics/blanchard_11_8ws97026/processed_20251223/Blanch_Nat_Met_C_19_AB_M_16.csv",
-      "was_generated_by": "nmdc:wfmb-00-4ori3u14.1"
+      "was_generated_by": "nmdc:wfmb-00-t2cr4hps.1"
     },
     {
-      "id": "nmdc:dobj-00-1cdq3spd",
+      "id": "nmdc:dobj-00-zd9hffor",
       "type": "nmdc:DataObject",
       "name": "Blanch_Nat_Met_C_19_AB_O_26.cdf",
       "description": "GC/MS low resolution raw data for metabolomics data acquisition.",
@@ -753,10 +753,10 @@
       "file_size_bytes": 18967692,
       "md5_checksum": "09c5f620cf04227e3615693d824fbe95",
       "url": "https://nmdcdemo.emsl.pnnl.gov/metabolomics/blanchard_11_8ws97026/raw/Blanch_Nat_Met_C_19_AB_O_26.cdf",
-      "was_generated_by": "nmdc:dgms-00-ggtwyf0r"
+      "was_generated_by": "nmdc:dgms-00-awd4oj5a"
     },
     {
-      "id": "nmdc:dobj-00-ci5z9zrw",
+      "id": "nmdc:dobj-00-ekcd2mtc",
       "type": "nmdc:DataObject",
       "name": "Blanch_Nat_Met_C_19_AB_O_26.csv",
       "description": "Metabolomics annotations as a result of a GC/MS metabolomics workflow activity.",
@@ -765,10 +765,10 @@
       "file_size_bytes": 595445,
       "md5_checksum": "210e3fd9a060f586681d5e763dd644ec",
       "url": "https://nmdcdemo.emsl.pnnl.gov/metabolomics/blanchard_11_8ws97026/processed_20251223/Blanch_Nat_Met_C_19_AB_O_26.csv",
-      "was_generated_by": "nmdc:wfmb-00-ipjwb1om.1"
+      "was_generated_by": "nmdc:wfmb-00-jmwvumuy.1"
     },
     {
-      "id": "nmdc:dobj-00-jugi2hko",
+      "id": "nmdc:dobj-00-8mo54mdy",
       "type": "nmdc:DataObject",
       "name": "Blanch_Nat_Met_C_27_AB_O_21.cdf",
       "description": "GC/MS low resolution raw data for metabolomics data acquisition.",
@@ -777,10 +777,10 @@
       "file_size_bytes": 21163712,
       "md5_checksum": "e716448c7e4ba5e24f0de74db9486d3e",
       "url": "https://nmdcdemo.emsl.pnnl.gov/metabolomics/blanchard_11_8ws97026/raw/Blanch_Nat_Met_C_27_AB_O_21.cdf",
-      "was_generated_by": "nmdc:dgms-00-ax34zyoy"
+      "was_generated_by": "nmdc:dgms-00-6el1t048"
     },
     {
-      "id": "nmdc:dobj-00-s8aawjoq",
+      "id": "nmdc:dobj-00-y7zuebp4",
       "type": "nmdc:DataObject",
       "name": "Blanch_Nat_Met_C_27_AB_O_21.csv",
       "description": "Metabolomics annotations as a result of a GC/MS metabolomics workflow activity.",
@@ -789,10 +789,10 @@
       "file_size_bytes": 612757,
       "md5_checksum": "a93d315dd24aec7fd61322d4979b34af",
       "url": "https://nmdcdemo.emsl.pnnl.gov/metabolomics/blanchard_11_8ws97026/processed_20251223/Blanch_Nat_Met_C_27_AB_O_21.csv",
-      "was_generated_by": "nmdc:wfmb-00-1dmfyd72.1"
+      "was_generated_by": "nmdc:wfmb-00-oly0wp72.1"
     },
     {
-      "id": "nmdc:dobj-00-xpjg77ug",
+      "id": "nmdc:dobj-00-tu4adwu2",
       "type": "nmdc:DataObject",
       "name": "Blanch_Nat_Met_C_30_AB_M_14.cdf",
       "description": "GC/MS low resolution raw data for metabolomics data acquisition.",
@@ -801,10 +801,10 @@
       "file_size_bytes": 21083132,
       "md5_checksum": "c434f641555d11ec8b27c5f1026a8b22",
       "url": "https://nmdcdemo.emsl.pnnl.gov/metabolomics/blanchard_11_8ws97026/raw/Blanch_Nat_Met_C_30_AB_M_14.cdf",
-      "was_generated_by": "nmdc:dgms-00-2v4b4sg0"
+      "was_generated_by": "nmdc:dgms-00-lbl5ixv8"
     },
     {
-      "id": "nmdc:dobj-00-9z324xmq",
+      "id": "nmdc:dobj-00-q6zg1rdy",
       "type": "nmdc:DataObject",
       "name": "Blanch_Nat_Met_C_30_AB_M_14.csv",
       "description": "Metabolomics annotations as a result of a GC/MS metabolomics workflow activity.",
@@ -813,10 +813,10 @@
       "file_size_bytes": 600173,
       "md5_checksum": "5f079077959a2a869b92a752d4068860",
       "url": "https://nmdcdemo.emsl.pnnl.gov/metabolomics/blanchard_11_8ws97026/processed_20251223/Blanch_Nat_Met_C_30_AB_M_14.csv",
-      "was_generated_by": "nmdc:wfmb-00-jl1tmtwu.1"
+      "was_generated_by": "nmdc:wfmb-00-3xsif4nc.1"
     },
     {
-      "id": "nmdc:dobj-00-5yjevomq",
+      "id": "nmdc:dobj-00-phga25et",
       "type": "nmdc:DataObject",
       "name": "Blanch_Nat_Met_C_4_AB_M_08.cdf",
       "description": "GC/MS low resolution raw data for metabolomics data acquisition.",
@@ -825,10 +825,10 @@
       "file_size_bytes": 18829760,
       "md5_checksum": "8a74cce4c951ac537eae7967fff3b8c5",
       "url": "https://nmdcdemo.emsl.pnnl.gov/metabolomics/blanchard_11_8ws97026/raw/Blanch_Nat_Met_C_4_AB_M_08.cdf",
-      "was_generated_by": "nmdc:dgms-00-cyb5k4t8"
+      "was_generated_by": "nmdc:dgms-00-pziuzwzw"
     },
     {
-      "id": "nmdc:dobj-00-97v908et",
+      "id": "nmdc:dobj-00-8hwuxjqy",
       "type": "nmdc:DataObject",
       "name": "Blanch_Nat_Met_C_4_AB_M_08.csv",
       "description": "Metabolomics annotations as a result of a GC/MS metabolomics workflow activity.",
@@ -837,10 +837,10 @@
       "file_size_bytes": 595770,
       "md5_checksum": "643d09252f5093a35a803df05eac1350",
       "url": "https://nmdcdemo.emsl.pnnl.gov/metabolomics/blanchard_11_8ws97026/processed_20251223/Blanch_Nat_Met_C_4_AB_M_08.csv",
-      "was_generated_by": "nmdc:wfmb-00-xsmon7f3.1"
+      "was_generated_by": "nmdc:wfmb-00-2ore6h2b.1"
     },
     {
-      "id": "nmdc:dobj-00-ha4dfga6",
+      "id": "nmdc:dobj-00-7jopueun",
       "type": "nmdc:DataObject",
       "name": "Blanch_Nat_Met_C_4_AB_O_04.cdf",
       "description": "GC/MS low resolution raw data for metabolomics data acquisition.",
@@ -849,10 +849,10 @@
       "file_size_bytes": 20549120,
       "md5_checksum": "adeb4da24d3c1f7b525ec8de54abd3d2",
       "url": "https://nmdcdemo.emsl.pnnl.gov/metabolomics/blanchard_11_8ws97026/raw/Blanch_Nat_Met_C_4_AB_O_04.cdf",
-      "was_generated_by": "nmdc:dgms-00-o8n263oi"
+      "was_generated_by": "nmdc:dgms-00-a3kaawn5"
     },
     {
-      "id": "nmdc:dobj-00-8trr9vpc",
+      "id": "nmdc:dobj-00-w10ben7l",
       "type": "nmdc:DataObject",
       "name": "Blanch_Nat_Met_C_4_AB_O_04.csv",
       "description": "Metabolomics annotations as a result of a GC/MS metabolomics workflow activity.",
@@ -861,10 +861,10 @@
       "file_size_bytes": 628904,
       "md5_checksum": "fe1729bc5de33abf4a72767146f51d3c",
       "url": "https://nmdcdemo.emsl.pnnl.gov/metabolomics/blanchard_11_8ws97026/processed_20251223/Blanch_Nat_Met_C_4_AB_O_04.csv",
-      "was_generated_by": "nmdc:wfmb-00-xa2pyxfq.1"
+      "was_generated_by": "nmdc:wfmb-00-10sok15o.1"
     },
     {
-      "id": "nmdc:dobj-00-v871ha3m",
+      "id": "nmdc:dobj-00-2b3mtvi2",
       "type": "nmdc:DataObject",
       "name": "Blanch_Nat_Met_C_7_AB_M_07.cdf",
       "description": "GC/MS low resolution raw data for metabolomics data acquisition.",
@@ -873,10 +873,10 @@
       "file_size_bytes": 17863280,
       "md5_checksum": "eb4ff10d7c35ef425249c9dc20791584",
       "url": "https://nmdcdemo.emsl.pnnl.gov/metabolomics/blanchard_11_8ws97026/raw/Blanch_Nat_Met_C_7_AB_M_07.cdf",
-      "was_generated_by": "nmdc:dgms-00-leu3hbfs"
+      "was_generated_by": "nmdc:dgms-00-4lspduzx"
     },
     {
-      "id": "nmdc:dobj-00-e89jcjt4",
+      "id": "nmdc:dobj-00-wudr4805",
       "type": "nmdc:DataObject",
       "name": "Blanch_Nat_Met_C_7_AB_M_07.csv",
       "description": "Metabolomics annotations as a result of a GC/MS metabolomics workflow activity.",
@@ -885,10 +885,10 @@
       "file_size_bytes": 598200,
       "md5_checksum": "c0ec1b5c6a3aab437a444b6be65992e5",
       "url": "https://nmdcdemo.emsl.pnnl.gov/metabolomics/blanchard_11_8ws97026/processed_20251223/Blanch_Nat_Met_C_7_AB_M_07.csv",
-      "was_generated_by": "nmdc:wfmb-00-wqt5rgah.1"
+      "was_generated_by": "nmdc:wfmb-00-ofwi5owu.1"
     },
     {
-      "id": "nmdc:dobj-00-15n8aa7z",
+      "id": "nmdc:dobj-00-evc5538j",
       "type": "nmdc:DataObject",
       "name": "Blanch_Nat_Met_H_11_AB_M_13.cdf",
       "description": "GC/MS low resolution raw data for metabolomics data acquisition.",
@@ -897,10 +897,10 @@
       "file_size_bytes": 19112160,
       "md5_checksum": "5705f959c3be277ecb47807d4c7ffcac",
       "url": "https://nmdcdemo.emsl.pnnl.gov/metabolomics/blanchard_11_8ws97026/raw/Blanch_Nat_Met_H_11_AB_M_13.cdf",
-      "was_generated_by": "nmdc:dgms-00-lv2salry"
+      "was_generated_by": "nmdc:dgms-00-uytfkd6y"
     },
     {
-      "id": "nmdc:dobj-00-yct0fjg2",
+      "id": "nmdc:dobj-00-u1gg3syg",
       "type": "nmdc:DataObject",
       "name": "Blanch_Nat_Met_H_11_AB_M_13.csv",
       "description": "Metabolomics annotations as a result of a GC/MS metabolomics workflow activity.",
@@ -909,10 +909,10 @@
       "file_size_bytes": 556775,
       "md5_checksum": "7fa7c002d1c20268a8f4246ae8dbc9ab",
       "url": "https://nmdcdemo.emsl.pnnl.gov/metabolomics/blanchard_11_8ws97026/processed_20251223/Blanch_Nat_Met_H_11_AB_M_13.csv",
-      "was_generated_by": "nmdc:wfmb-00-nlag0pjr.1"
+      "was_generated_by": "nmdc:wfmb-00-zqh4d8n6.1"
     },
     {
-      "id": "nmdc:dobj-00-edvjiuyx",
+      "id": "nmdc:dobj-00-mqy2c05k",
       "type": "nmdc:DataObject",
       "name": "Blanch_Nat_Met_H_11_AB_O_24.cdf",
       "description": "GC/MS low resolution raw data for metabolomics data acquisition.",
@@ -921,10 +921,10 @@
       "file_size_bytes": 16806368,
       "md5_checksum": "5677499fa702fd8bcef2f0c07d4ba60c",
       "url": "https://nmdcdemo.emsl.pnnl.gov/metabolomics/blanchard_11_8ws97026/raw/Blanch_Nat_Met_H_11_AB_O_24.cdf",
-      "was_generated_by": "nmdc:dgms-00-o09a7e0r"
+      "was_generated_by": "nmdc:dgms-00-xp597fup"
     },
     {
-      "id": "nmdc:dobj-00-jyrhmhlz",
+      "id": "nmdc:dobj-00-la6aw295",
       "type": "nmdc:DataObject",
       "name": "Blanch_Nat_Met_H_11_AB_O_24.csv",
       "description": "Metabolomics annotations as a result of a GC/MS metabolomics workflow activity.",
@@ -933,10 +933,10 @@
       "file_size_bytes": 544227,
       "md5_checksum": "be70d1825e1c0139bde9ce947bb46f91",
       "url": "https://nmdcdemo.emsl.pnnl.gov/metabolomics/blanchard_11_8ws97026/processed_20251223/Blanch_Nat_Met_H_11_AB_O_24.csv",
-      "was_generated_by": "nmdc:wfmb-00-8aq8h05d.1"
+      "was_generated_by": "nmdc:wfmb-00-z3czylvp.1"
     },
     {
-      "id": "nmdc:dobj-00-jwbyv2ik",
+      "id": "nmdc:dobj-00-hc756huu",
       "type": "nmdc:DataObject",
       "name": "Blanch_Nat_Met_H_17_AB_M_18.cdf",
       "description": "GC/MS low resolution raw data for metabolomics data acquisition.",
@@ -945,10 +945,10 @@
       "file_size_bytes": 19616436,
       "md5_checksum": "6c7a0832715feb06b404107aeaba8f8a",
       "url": "https://nmdcdemo.emsl.pnnl.gov/metabolomics/blanchard_11_8ws97026/raw/Blanch_Nat_Met_H_17_AB_M_18.cdf",
-      "was_generated_by": "nmdc:dgms-00-omenmc3n"
+      "was_generated_by": "nmdc:dgms-00-gukhjuar"
     },
     {
-      "id": "nmdc:dobj-00-sa17sk3j",
+      "id": "nmdc:dobj-00-xz2a3b9i",
       "type": "nmdc:DataObject",
       "name": "Blanch_Nat_Met_H_17_AB_M_18.csv",
       "description": "Metabolomics annotations as a result of a GC/MS metabolomics workflow activity.",
@@ -957,10 +957,10 @@
       "file_size_bytes": 565360,
       "md5_checksum": "719bff5889365cc682265034e45cf9cf",
       "url": "https://nmdcdemo.emsl.pnnl.gov/metabolomics/blanchard_11_8ws97026/processed_20251223/Blanch_Nat_Met_H_17_AB_M_18.csv",
-      "was_generated_by": "nmdc:wfmb-00-pyevuy15.1"
+      "was_generated_by": "nmdc:wfmb-00-8kiy5olg.1"
     },
     {
-      "id": "nmdc:dobj-00-af8p4ly0",
+      "id": "nmdc:dobj-00-3dfmo7lv",
       "type": "nmdc:DataObject",
       "name": "Blanch_Nat_Met_H_17_AB_O_22.cdf",
       "description": "GC/MS low resolution raw data for metabolomics data acquisition.",
@@ -969,10 +969,10 @@
       "file_size_bytes": 19618656,
       "md5_checksum": "e98f5899b91d4193f4775c0e4c461c51",
       "url": "https://nmdcdemo.emsl.pnnl.gov/metabolomics/blanchard_11_8ws97026/raw/Blanch_Nat_Met_H_17_AB_O_22.cdf",
-      "was_generated_by": "nmdc:dgms-00-yrlvv3rv"
+      "was_generated_by": "nmdc:dgms-00-751wt7i0"
     },
     {
-      "id": "nmdc:dobj-00-w9f4rlh8",
+      "id": "nmdc:dobj-00-3nzxkzmn",
       "type": "nmdc:DataObject",
       "name": "Blanch_Nat_Met_H_17_AB_O_22.csv",
       "description": "Metabolomics annotations as a result of a GC/MS metabolomics workflow activity.",
@@ -981,10 +981,10 @@
       "file_size_bytes": 627291,
       "md5_checksum": "49c6dd813af917c2b3015eac62b4676f",
       "url": "https://nmdcdemo.emsl.pnnl.gov/metabolomics/blanchard_11_8ws97026/processed_20251223/Blanch_Nat_Met_H_17_AB_O_22.csv",
-      "was_generated_by": "nmdc:wfmb-00-oo6j3kqy.1"
+      "was_generated_by": "nmdc:wfmb-00-8r1a4zmc.1"
     },
     {
-      "id": "nmdc:dobj-00-9uaukv9u",
+      "id": "nmdc:dobj-00-znzy7n13",
       "type": "nmdc:DataObject",
       "name": "Blanch_Nat_Met_H_26_AB_M_12.cdf",
       "description": "GC/MS low resolution raw data for metabolomics data acquisition.",
@@ -993,10 +993,10 @@
       "file_size_bytes": 20183720,
       "md5_checksum": "ae00e9ad0083ea83570657bb3b92345f",
       "url": "https://nmdcdemo.emsl.pnnl.gov/metabolomics/blanchard_11_8ws97026/raw/Blanch_Nat_Met_H_26_AB_M_12.cdf",
-      "was_generated_by": "nmdc:dgms-00-esrgl6eg"
+      "was_generated_by": "nmdc:dgms-00-8j8o2qrb"
     },
     {
-      "id": "nmdc:dobj-00-cusnddhu",
+      "id": "nmdc:dobj-00-uleh2bxn",
       "type": "nmdc:DataObject",
       "name": "Blanch_Nat_Met_H_26_AB_M_12.csv",
       "description": "Metabolomics annotations as a result of a GC/MS metabolomics workflow activity.",
@@ -1005,10 +1005,10 @@
       "file_size_bytes": 566666,
       "md5_checksum": "37ea208110e6da82d3a5565aefdadc3c",
       "url": "https://nmdcdemo.emsl.pnnl.gov/metabolomics/blanchard_11_8ws97026/processed_20251223/Blanch_Nat_Met_H_26_AB_M_12.csv",
-      "was_generated_by": "nmdc:wfmb-00-v44nx6sx.1"
+      "was_generated_by": "nmdc:wfmb-00-rbq6w9m5.1"
     },
     {
-      "id": "nmdc:dobj-00-s6ulj2nw",
+      "id": "nmdc:dobj-00-30y35jjw",
       "type": "nmdc:DataObject",
       "name": "Blanch_Nat_Met_H_28_AB_M_03.cdf",
       "description": "GC/MS low resolution raw data for metabolomics data acquisition.",
@@ -1017,10 +1017,10 @@
       "file_size_bytes": 20457792,
       "md5_checksum": "c999fdac59f9e9d31978bc25f448c360",
       "url": "https://nmdcdemo.emsl.pnnl.gov/metabolomics/blanchard_11_8ws97026/raw/Blanch_Nat_Met_H_28_AB_M_03.cdf",
-      "was_generated_by": "nmdc:dgms-00-f108hv5v"
+      "was_generated_by": "nmdc:dgms-00-cyjkc82k"
     },
     {
-      "id": "nmdc:dobj-00-n5jz3ys6",
+      "id": "nmdc:dobj-00-cwl2yp9j",
       "type": "nmdc:DataObject",
       "name": "Blanch_Nat_Met_H_28_AB_M_03.csv",
       "description": "Metabolomics annotations as a result of a GC/MS metabolomics workflow activity.",
@@ -1029,10 +1029,10 @@
       "file_size_bytes": 615058,
       "md5_checksum": "d7d787c88a3d99acb193d79601f88dc5",
       "url": "https://nmdcdemo.emsl.pnnl.gov/metabolomics/blanchard_11_8ws97026/processed_20251223/Blanch_Nat_Met_H_28_AB_M_03.csv",
-      "was_generated_by": "nmdc:wfmb-00-j1dgz2n9.1"
+      "was_generated_by": "nmdc:wfmb-00-1wzfn6ux.1"
     },
     {
-      "id": "nmdc:dobj-00-4yble7cr",
+      "id": "nmdc:dobj-00-q6hw7t8o",
       "type": "nmdc:DataObject",
       "name": "Blanch_Nat_Met_H_2_AB_M_23.cdf",
       "description": "GC/MS low resolution raw data for metabolomics data acquisition.",
@@ -1041,10 +1041,10 @@
       "file_size_bytes": 19184924,
       "md5_checksum": "c034b4a190c348d7b38ffd7b1194fb24",
       "url": "https://nmdcdemo.emsl.pnnl.gov/metabolomics/blanchard_11_8ws97026/raw/Blanch_Nat_Met_H_2_AB_M_23.cdf",
-      "was_generated_by": "nmdc:dgms-00-epibxec2"
+      "was_generated_by": "nmdc:dgms-00-vdrsduqa"
     },
     {
-      "id": "nmdc:dobj-00-pbpxgcmi",
+      "id": "nmdc:dobj-00-a48dgp3b",
       "type": "nmdc:DataObject",
       "name": "Blanch_Nat_Met_H_2_AB_M_23.csv",
       "description": "Metabolomics annotations as a result of a GC/MS metabolomics workflow activity.",
@@ -1053,10 +1053,10 @@
       "file_size_bytes": 532551,
       "md5_checksum": "bd7338e589bc4b1653f7f4ccca2c66e7",
       "url": "https://nmdcdemo.emsl.pnnl.gov/metabolomics/blanchard_11_8ws97026/processed_20251223/Blanch_Nat_Met_H_2_AB_M_23.csv",
-      "was_generated_by": "nmdc:wfmb-00-mfugz1ww.1"
+      "was_generated_by": "nmdc:wfmb-00-oi54ozhw.1"
     },
     {
-      "id": "nmdc:dobj-00-652j92lp",
+      "id": "nmdc:dobj-00-9n692di8",
       "type": "nmdc:DataObject",
       "name": "Blanch_Nat_Met_H_2_AB_O_15.cdf",
       "description": "GC/MS low resolution raw data for metabolomics data acquisition.",
@@ -1065,10 +1065,10 @@
       "file_size_bytes": 19442552,
       "md5_checksum": "2b7f58e5dabb2bd9e7dccb40f09f2f39",
       "url": "https://nmdcdemo.emsl.pnnl.gov/metabolomics/blanchard_11_8ws97026/raw/Blanch_Nat_Met_H_2_AB_O_15.cdf",
-      "was_generated_by": "nmdc:dgms-00-8j9l39v2"
+      "was_generated_by": "nmdc:dgms-00-3antfknu"
     },
     {
-      "id": "nmdc:dobj-00-l4msi9ki",
+      "id": "nmdc:dobj-00-mjfxi8hd",
       "type": "nmdc:DataObject",
       "name": "Blanch_Nat_Met_H_2_AB_O_15.csv",
       "description": "Metabolomics annotations as a result of a GC/MS metabolomics workflow activity.",
@@ -1077,10 +1077,10 @@
       "file_size_bytes": 587780,
       "md5_checksum": "01b08d5b587722886b08aa2cbc6d2ad0",
       "url": "https://nmdcdemo.emsl.pnnl.gov/metabolomics/blanchard_11_8ws97026/processed_20251223/Blanch_Nat_Met_H_2_AB_O_15.csv",
-      "was_generated_by": "nmdc:wfmb-00-9mpr5o3m.1"
+      "was_generated_by": "nmdc:wfmb-00-a1hxuar8.1"
     },
     {
-      "id": "nmdc:dobj-00-2ppqh861",
+      "id": "nmdc:dobj-00-0jt2743z",
       "type": "nmdc:DataObject",
       "name": "Blanch_Nat_Met_H_32_AB_M_20.cdf",
       "description": "GC/MS low resolution raw data for metabolomics data acquisition.",
@@ -1089,10 +1089,10 @@
       "file_size_bytes": 19966008,
       "md5_checksum": "8ef87f5214ba3741a96cb04ddd4a0b93",
       "url": "https://nmdcdemo.emsl.pnnl.gov/metabolomics/blanchard_11_8ws97026/raw/Blanch_Nat_Met_H_32_AB_M_20.cdf",
-      "was_generated_by": "nmdc:dgms-00-942ysmx6"
+      "was_generated_by": "nmdc:dgms-00-el9tqhu4"
     },
     {
-      "id": "nmdc:dobj-00-hr4b3p16",
+      "id": "nmdc:dobj-00-fr79ubei",
       "type": "nmdc:DataObject",
       "name": "Blanch_Nat_Met_H_32_AB_M_20.csv",
       "description": "Metabolomics annotations as a result of a GC/MS metabolomics workflow activity.",
@@ -1101,10 +1101,10 @@
       "file_size_bytes": 531815,
       "md5_checksum": "fbcfb68df9b15941e5267de07adaf2a7",
       "url": "https://nmdcdemo.emsl.pnnl.gov/metabolomics/blanchard_11_8ws97026/processed_20251223/Blanch_Nat_Met_H_32_AB_M_20.csv",
-      "was_generated_by": "nmdc:wfmb-00-t2a9w99z.1"
+      "was_generated_by": "nmdc:wfmb-00-cxykcg6d.1"
     },
     {
-      "id": "nmdc:dobj-00-0vx87pzd",
+      "id": "nmdc:dobj-00-3aqdusou",
       "type": "nmdc:DataObject",
       "name": "Blanch_Nat_Met_H_32_AB_O_19.cdf",
       "description": "GC/MS low resolution raw data for metabolomics data acquisition.",
@@ -1113,10 +1113,10 @@
       "file_size_bytes": 19409760,
       "md5_checksum": "642fbf67238637c3f434d1dead07e4e6",
       "url": "https://nmdcdemo.emsl.pnnl.gov/metabolomics/blanchard_11_8ws97026/raw/Blanch_Nat_Met_H_32_AB_O_19.cdf",
-      "was_generated_by": "nmdc:dgms-00-th099p1z"
+      "was_generated_by": "nmdc:dgms-00-op5o7874"
     },
     {
-      "id": "nmdc:dobj-00-9u4t79f0",
+      "id": "nmdc:dobj-00-6a0nfwp1",
       "type": "nmdc:DataObject",
       "name": "Blanch_Nat_Met_H_32_AB_O_19.csv",
       "description": "Metabolomics annotations as a result of a GC/MS metabolomics workflow activity.",
@@ -1125,10 +1125,10 @@
       "file_size_bytes": 544360,
       "md5_checksum": "f79df2ac125bc4a710df0f6395bf1514",
       "url": "https://nmdcdemo.emsl.pnnl.gov/metabolomics/blanchard_11_8ws97026/processed_20251223/Blanch_Nat_Met_H_32_AB_O_19.csv",
-      "was_generated_by": "nmdc:wfmb-00-7250qn8h.1"
+      "was_generated_by": "nmdc:wfmb-00-zt8pr3mi.1"
     },
     {
-      "id": "nmdc:dobj-00-xb9uwy9z",
+      "id": "nmdc:dobj-00-v22zcpwj",
       "type": "nmdc:DataObject",
       "name": "Blanch_Nat_Met_H_4_AB_M_05.cdf",
       "description": "GC/MS low resolution raw data for metabolomics data acquisition.",
@@ -1137,10 +1137,10 @@
       "file_size_bytes": 19319760,
       "md5_checksum": "333853e0b9659933351c3bb87e80312c",
       "url": "https://nmdcdemo.emsl.pnnl.gov/metabolomics/blanchard_11_8ws97026/raw/Blanch_Nat_Met_H_4_AB_M_05.cdf",
-      "was_generated_by": "nmdc:dgms-00-xld7lunx"
+      "was_generated_by": "nmdc:dgms-00-oi6og5bg"
     },
     {
-      "id": "nmdc:dobj-00-zf1fl7lj",
+      "id": "nmdc:dobj-00-96mcfor3",
       "type": "nmdc:DataObject",
       "name": "Blanch_Nat_Met_H_4_AB_M_05.csv",
       "description": "Metabolomics annotations as a result of a GC/MS metabolomics workflow activity.",
@@ -1149,10 +1149,10 @@
       "file_size_bytes": 554202,
       "md5_checksum": "a3d71398818e42887ba1710f72afc88c",
       "url": "https://nmdcdemo.emsl.pnnl.gov/metabolomics/blanchard_11_8ws97026/processed_20251223/Blanch_Nat_Met_H_4_AB_M_05.csv",
-      "was_generated_by": "nmdc:wfmb-00-m4vcl2en.1"
+      "was_generated_by": "nmdc:wfmb-00-xsw83y1m.1"
     },
     {
-      "id": "nmdc:dobj-00-wipow0o0",
+      "id": "nmdc:dobj-00-plebrqis",
       "type": "nmdc:DataObject",
       "name": "Blanch_Nat_Met_H_4_AB_O_06.cdf",
       "description": "GC/MS low resolution raw data for metabolomics data acquisition.",
@@ -1161,10 +1161,10 @@
       "file_size_bytes": 19369368,
       "md5_checksum": "60737509783c510986a32b14c137c1df",
       "url": "https://nmdcdemo.emsl.pnnl.gov/metabolomics/blanchard_11_8ws97026/raw/Blanch_Nat_Met_H_4_AB_O_06.cdf",
-      "was_generated_by": "nmdc:dgms-00-3e889cgf"
+      "was_generated_by": "nmdc:dgms-00-f7v02yj1"
     },
     {
-      "id": "nmdc:dobj-00-ar4zi4wu",
+      "id": "nmdc:dobj-00-17yryf4j",
       "type": "nmdc:DataObject",
       "name": "Blanch_Nat_Met_H_4_AB_O_06.csv",
       "description": "Metabolomics annotations as a result of a GC/MS metabolomics workflow activity.",
@@ -1173,27 +1173,27 @@
       "file_size_bytes": 608394,
       "md5_checksum": "e154d408f1b73eb85eb3169c20539de8",
       "url": "https://nmdcdemo.emsl.pnnl.gov/metabolomics/blanchard_11_8ws97026/processed_20251223/Blanch_Nat_Met_H_4_AB_O_06.csv",
-      "was_generated_by": "nmdc:wfmb-00-zivw3vdd.1"
+      "was_generated_by": "nmdc:wfmb-00-p13x54ul.1"
     }
   ],
   "workflow_execution_set": [
     {
-      "id": "nmdc:wfmb-00-1cf4v9vr.1",
+      "id": "nmdc:wfmb-00-ag1hzoe7.1",
       "type": "nmdc:MetabolomicsAnalysis",
       "name": "GC/MS Metabolomics analysis for Blanch_Nat_Met_C_12_AB_M_17.cdf",
       "description": "Analysis of raw mass spectrometry data for the annotation of metabolites.",
       "has_input": [
         "nmdc:dobj-11-5tax4f20",
-        "nmdc:dobj-00-c448uzlm"
+        "nmdc:dobj-00-382v57vk"
       ],
       "has_output": [
-        "nmdc:dobj-00-4x7irh3i"
+        "nmdc:dobj-00-b2mi1f2n"
       ],
       "processing_institution": "NMDC",
       "git_url": "https://github.com/microbiomedata/metaMS/wdl/metaMS_gcms.wdl",
       "started_at_time": "2025-12-23 13:39:34",
       "was_informed_by": [
-        "nmdc:dgms-00-gitb8vi6"
+        "nmdc:dgms-00-rukggke5"
       ],
       "ended_at_time": "2025-12-23 13:39:34",
       "version": "3.3.1",
@@ -1444,9 +1444,9 @@
         {
           "type": "nmdc:MetaboliteIdentification",
           "alternative_identifiers": [
-            "kegg:C15571",
             "kegg:C00090",
-            "kegg:C01785"
+            "kegg:C01785",
+            "kegg:C15571"
           ],
           "highest_similarity_score": 0.665064409564182,
           "metabolite_identified": "chebi:18135"
@@ -2676,26 +2676,26 @@
         }
       ],
       "uses_calibration": [
-        "nmdc:calib-00-eeuc8142"
+        "nmdc:calib-00-tm2d95wj"
       ]
     },
     {
-      "id": "nmdc:wfmb-00-vpi1pphl.1",
+      "id": "nmdc:wfmb-00-vibraapj.1",
       "type": "nmdc:MetabolomicsAnalysis",
       "name": "GC/MS Metabolomics analysis for Blanch_Nat_Met_C_12_AB_O_25.cdf",
       "description": "Analysis of raw mass spectrometry data for the annotation of metabolites.",
       "has_input": [
         "nmdc:dobj-11-5tax4f20",
-        "nmdc:dobj-00-xxjc8me8"
+        "nmdc:dobj-00-sw6v2v1c"
       ],
       "has_output": [
-        "nmdc:dobj-00-xn6ijsb6"
+        "nmdc:dobj-00-0zt8fn3g"
       ],
       "processing_institution": "NMDC",
       "git_url": "https://github.com/microbiomedata/metaMS/wdl/metaMS_gcms.wdl",
       "started_at_time": "2025-12-23 13:43:03",
       "was_informed_by": [
-        "nmdc:dgms-00-3vz4ptpt"
+        "nmdc:dgms-00-pw862u9x"
       ],
       "ended_at_time": "2025-12-23 13:43:03",
       "version": "3.3.1",
@@ -4409,26 +4409,26 @@
         }
       ],
       "uses_calibration": [
-        "nmdc:calib-00-eeuc8142"
+        "nmdc:calib-00-tm2d95wj"
       ]
     },
     {
-      "id": "nmdc:wfmb-00-u4tr687k.1",
+      "id": "nmdc:wfmb-00-eo2rklkw.1",
       "type": "nmdc:MetabolomicsAnalysis",
       "name": "GC/MS Metabolomics analysis for Blanch_Nat_Met_C_14_AB_M_27.cdf",
       "description": "Analysis of raw mass spectrometry data for the annotation of metabolites.",
       "has_input": [
         "nmdc:dobj-11-5tax4f20",
-        "nmdc:dobj-00-r8jefuvt"
+        "nmdc:dobj-00-5ts4j120"
       ],
       "has_output": [
-        "nmdc:dobj-00-2egdlwso"
+        "nmdc:dobj-00-1sb1ioja"
       ],
       "processing_institution": "NMDC",
       "git_url": "https://github.com/microbiomedata/metaMS/wdl/metaMS_gcms.wdl",
       "started_at_time": "2025-12-23 13:42:17",
       "was_informed_by": [
-        "nmdc:dgms-00-31jm9hmb"
+        "nmdc:dgms-00-f25ih9qv"
       ],
       "ended_at_time": "2025-12-23 13:42:17",
       "version": "3.3.1",
@@ -4734,9 +4734,9 @@
         {
           "type": "nmdc:MetaboliteIdentification",
           "alternative_identifiers": [
-            "kegg:C15571",
             "kegg:C00090",
-            "kegg:C01785"
+            "kegg:C01785",
+            "kegg:C15571"
           ],
           "highest_similarity_score": 0.643367132314235,
           "metabolite_identified": "chebi:18135"
@@ -5545,8 +5545,8 @@
         {
           "type": "nmdc:MetaboliteIdentification",
           "alternative_identifiers": [
-            "kegg:C01197",
-            "kegg:C01481"
+            "kegg:C01481",
+            "kegg:C01197"
           ],
           "highest_similarity_score": 0.5954280698539056,
           "metabolite_identified": "chebi:16433"
@@ -5741,8 +5741,8 @@
         {
           "type": "nmdc:MetaboliteIdentification",
           "alternative_identifiers": [
-            "kegg:C00281",
-            "kegg:C05382"
+            "kegg:C05382",
+            "kegg:C00281"
           ],
           "highest_similarity_score": 0.6046953272189843,
           "metabolite_identified": "chebi:15721"
@@ -5995,26 +5995,26 @@
         }
       ],
       "uses_calibration": [
-        "nmdc:calib-00-eeuc8142"
+        "nmdc:calib-00-tm2d95wj"
       ]
     },
     {
-      "id": "nmdc:wfmb-00-5q6lkkwk.1",
+      "id": "nmdc:wfmb-00-36r0zfji.1",
       "type": "nmdc:MetabolomicsAnalysis",
       "name": "GC/MS Metabolomics analysis for Blanch_Nat_Met_C_14_AB_O_09.cdf",
       "description": "Analysis of raw mass spectrometry data for the annotation of metabolites.",
       "has_input": [
         "nmdc:dobj-11-5tax4f20",
-        "nmdc:dobj-00-06r2af1x"
+        "nmdc:dobj-00-fvj8iy1x"
       ],
       "has_output": [
-        "nmdc:dobj-00-7zik3hfe"
+        "nmdc:dobj-00-pg7jo4un"
       ],
       "processing_institution": "NMDC",
       "git_url": "https://github.com/microbiomedata/metaMS/wdl/metaMS_gcms.wdl",
       "started_at_time": "2025-12-23 13:41:46",
       "was_informed_by": [
-        "nmdc:dgms-00-98fvczyd"
+        "nmdc:dgms-00-4tab7eub"
       ],
       "ended_at_time": "2025-12-23 13:41:46",
       "version": "3.3.1",
@@ -6290,9 +6290,9 @@
         {
           "type": "nmdc:MetaboliteIdentification",
           "alternative_identifiers": [
-            "kegg:C15571",
             "kegg:C00090",
-            "kegg:C01785"
+            "kegg:C01785",
+            "kegg:C15571"
           ],
           "highest_similarity_score": 0.6516994055144286,
           "metabolite_identified": "chebi:18135"
@@ -7556,26 +7556,26 @@
         }
       ],
       "uses_calibration": [
-        "nmdc:calib-00-eeuc8142"
+        "nmdc:calib-00-tm2d95wj"
       ]
     },
     {
-      "id": "nmdc:wfmb-00-4ori3u14.1",
+      "id": "nmdc:wfmb-00-t2cr4hps.1",
       "type": "nmdc:MetabolomicsAnalysis",
       "name": "GC/MS Metabolomics analysis for Blanch_Nat_Met_C_19_AB_M_16.cdf",
       "description": "Analysis of raw mass spectrometry data for the annotation of metabolites.",
       "has_input": [
         "nmdc:dobj-11-5tax4f20",
-        "nmdc:dobj-00-d6qgvg9t"
+        "nmdc:dobj-00-y2gz9z1a"
       ],
       "has_output": [
-        "nmdc:dobj-00-wjc16c2p"
+        "nmdc:dobj-00-1e13ahw3"
       ],
       "processing_institution": "NMDC",
       "git_url": "https://github.com/microbiomedata/metaMS/wdl/metaMS_gcms.wdl",
       "started_at_time": "2025-12-23 13:41:04",
       "was_informed_by": [
-        "nmdc:dgms-00-4gizpddd"
+        "nmdc:dgms-00-pzql5g2p"
       ],
       "ended_at_time": "2025-12-23 13:41:04",
       "version": "3.3.1",
@@ -7852,9 +7852,9 @@
         {
           "type": "nmdc:MetaboliteIdentification",
           "alternative_identifiers": [
-            "kegg:C15571",
             "kegg:C00090",
-            "kegg:C01785"
+            "kegg:C01785",
+            "kegg:C15571"
           ],
           "highest_similarity_score": 0.6575029541573362,
           "metabolite_identified": "chebi:18135"
@@ -8707,8 +8707,8 @@
         {
           "type": "nmdc:MetaboliteIdentification",
           "alternative_identifiers": [
-            "kegg:C01197",
-            "kegg:C01481"
+            "kegg:C01481",
+            "kegg:C01197"
           ],
           "highest_similarity_score": 0.5412229903652299,
           "metabolite_identified": "chebi:16433"
@@ -8927,8 +8927,8 @@
         {
           "type": "nmdc:MetaboliteIdentification",
           "alternative_identifiers": [
-            "kegg:C00281",
-            "kegg:C05382"
+            "kegg:C05382",
+            "kegg:C00281"
           ],
           "highest_similarity_score": 0.5961189413735802,
           "metabolite_identified": "chebi:15721"
@@ -9177,26 +9177,26 @@
         }
       ],
       "uses_calibration": [
-        "nmdc:calib-00-eeuc8142"
+        "nmdc:calib-00-tm2d95wj"
       ]
     },
     {
-      "id": "nmdc:wfmb-00-ipjwb1om.1",
+      "id": "nmdc:wfmb-00-jmwvumuy.1",
       "type": "nmdc:MetabolomicsAnalysis",
       "name": "GC/MS Metabolomics analysis for Blanch_Nat_Met_C_19_AB_O_26.cdf",
       "description": "Analysis of raw mass spectrometry data for the annotation of metabolites.",
       "has_input": [
         "nmdc:dobj-11-5tax4f20",
-        "nmdc:dobj-00-1cdq3spd"
+        "nmdc:dobj-00-zd9hffor"
       ],
       "has_output": [
-        "nmdc:dobj-00-ci5z9zrw"
+        "nmdc:dobj-00-ekcd2mtc"
       ],
       "processing_institution": "NMDC",
       "git_url": "https://github.com/microbiomedata/metaMS/wdl/metaMS_gcms.wdl",
       "started_at_time": "2025-12-23 13:41:44",
       "was_informed_by": [
-        "nmdc:dgms-00-ggtwyf0r"
+        "nmdc:dgms-00-awd4oj5a"
       ],
       "ended_at_time": "2025-12-23 13:41:44",
       "version": "3.3.1",
@@ -9449,9 +9449,9 @@
         {
           "type": "nmdc:MetaboliteIdentification",
           "alternative_identifiers": [
-            "kegg:C15571",
             "kegg:C00090",
-            "kegg:C01785"
+            "kegg:C01785",
+            "kegg:C15571"
           ],
           "highest_similarity_score": 0.7037189063081263,
           "metabolite_identified": "chebi:18135"
@@ -10446,8 +10446,8 @@
         {
           "type": "nmdc:MetaboliteIdentification",
           "alternative_identifiers": [
-            "kegg:C00281",
-            "kegg:C05382"
+            "kegg:C05382",
+            "kegg:C00281"
           ],
           "highest_similarity_score": 0.7810816355936003,
           "metabolite_identified": "chebi:15721"
@@ -10712,26 +10712,26 @@
         }
       ],
       "uses_calibration": [
-        "nmdc:calib-00-eeuc8142"
+        "nmdc:calib-00-tm2d95wj"
       ]
     },
     {
-      "id": "nmdc:wfmb-00-1dmfyd72.1",
+      "id": "nmdc:wfmb-00-oly0wp72.1",
       "type": "nmdc:MetabolomicsAnalysis",
       "name": "GC/MS Metabolomics analysis for Blanch_Nat_Met_C_27_AB_O_21.cdf",
       "description": "Analysis of raw mass spectrometry data for the annotation of metabolites.",
       "has_input": [
         "nmdc:dobj-11-5tax4f20",
-        "nmdc:dobj-00-jugi2hko"
+        "nmdc:dobj-00-8mo54mdy"
       ],
       "has_output": [
-        "nmdc:dobj-00-s8aawjoq"
+        "nmdc:dobj-00-y7zuebp4"
       ],
       "processing_institution": "NMDC",
       "git_url": "https://github.com/microbiomedata/metaMS/wdl/metaMS_gcms.wdl",
       "started_at_time": "2025-12-23 13:41:02",
       "was_informed_by": [
-        "nmdc:dgms-00-ax34zyoy"
+        "nmdc:dgms-00-6el1t048"
       ],
       "ended_at_time": "2025-12-23 13:41:02",
       "version": "3.3.1",
@@ -10981,9 +10981,9 @@
         {
           "type": "nmdc:MetaboliteIdentification",
           "alternative_identifiers": [
-            "kegg:C15571",
             "kegg:C00090",
-            "kegg:C01785"
+            "kegg:C01785",
+            "kegg:C15571"
           ],
           "highest_similarity_score": 0.649412839071718,
           "metabolite_identified": "chebi:18135"
@@ -11819,8 +11819,8 @@
         {
           "type": "nmdc:MetaboliteIdentification",
           "alternative_identifiers": [
-            "kegg:C01197",
-            "kegg:C01481"
+            "kegg:C01481",
+            "kegg:C01197"
           ],
           "highest_similarity_score": 0.559554846168662,
           "metabolite_identified": "chebi:16433"
@@ -12251,26 +12251,26 @@
         }
       ],
       "uses_calibration": [
-        "nmdc:calib-00-eeuc8142"
+        "nmdc:calib-00-tm2d95wj"
       ]
     },
     {
-      "id": "nmdc:wfmb-00-jl1tmtwu.1",
+      "id": "nmdc:wfmb-00-3xsif4nc.1",
       "type": "nmdc:MetabolomicsAnalysis",
       "name": "GC/MS Metabolomics analysis for Blanch_Nat_Met_C_30_AB_M_14.cdf",
       "description": "Analysis of raw mass spectrometry data for the annotation of metabolites.",
       "has_input": [
         "nmdc:dobj-11-5tax4f20",
-        "nmdc:dobj-00-xpjg77ug"
+        "nmdc:dobj-00-tu4adwu2"
       ],
       "has_output": [
-        "nmdc:dobj-00-9z324xmq"
+        "nmdc:dobj-00-q6zg1rdy"
       ],
       "processing_institution": "NMDC",
       "git_url": "https://github.com/microbiomedata/metaMS/wdl/metaMS_gcms.wdl",
       "started_at_time": "2025-12-23 13:41:42",
       "was_informed_by": [
-        "nmdc:dgms-00-2v4b4sg0"
+        "nmdc:dgms-00-lbl5ixv8"
       ],
       "ended_at_time": "2025-12-23 13:41:42",
       "version": "3.3.1",
@@ -12470,9 +12470,9 @@
         {
           "type": "nmdc:MetaboliteIdentification",
           "alternative_identifiers": [
-            "kegg:C15571",
             "kegg:C00090",
-            "kegg:C01785"
+            "kegg:C01785",
+            "kegg:C15571"
           ],
           "highest_similarity_score": 0.6394151455612,
           "metabolite_identified": "chebi:18135"
@@ -13294,8 +13294,8 @@
         {
           "type": "nmdc:MetaboliteIdentification",
           "alternative_identifiers": [
-            "kegg:C01197",
-            "kegg:C01481"
+            "kegg:C01481",
+            "kegg:C01197"
           ],
           "highest_similarity_score": 0.5552288676129866,
           "metabolite_identified": "chebi:16433"
@@ -13771,26 +13771,26 @@
         }
       ],
       "uses_calibration": [
-        "nmdc:calib-00-eeuc8142"
+        "nmdc:calib-00-tm2d95wj"
       ]
     },
     {
-      "id": "nmdc:wfmb-00-xsmon7f3.1",
+      "id": "nmdc:wfmb-00-2ore6h2b.1",
       "type": "nmdc:MetabolomicsAnalysis",
       "name": "GC/MS Metabolomics analysis for Blanch_Nat_Met_C_4_AB_M_08.cdf",
       "description": "Analysis of raw mass spectrometry data for the annotation of metabolites.",
       "has_input": [
         "nmdc:dobj-11-5tax4f20",
-        "nmdc:dobj-00-5yjevomq"
+        "nmdc:dobj-00-phga25et"
       ],
       "has_output": [
-        "nmdc:dobj-00-97v908et"
+        "nmdc:dobj-00-8hwuxjqy"
       ],
       "processing_institution": "NMDC",
       "git_url": "https://github.com/microbiomedata/metaMS/wdl/metaMS_gcms.wdl",
       "started_at_time": "2025-12-23 13:40:59",
       "was_informed_by": [
-        "nmdc:dgms-00-cyb5k4t8"
+        "nmdc:dgms-00-pziuzwzw"
       ],
       "ended_at_time": "2025-12-23 13:40:59",
       "version": "3.3.1",
@@ -14056,9 +14056,9 @@
         {
           "type": "nmdc:MetaboliteIdentification",
           "alternative_identifiers": [
-            "kegg:C15571",
             "kegg:C00090",
-            "kegg:C01785"
+            "kegg:C01785",
+            "kegg:C15571"
           ],
           "highest_similarity_score": 0.6651922511275573,
           "metabolite_identified": "chebi:18135"
@@ -15236,26 +15236,26 @@
         }
       ],
       "uses_calibration": [
-        "nmdc:calib-00-eeuc8142"
+        "nmdc:calib-00-tm2d95wj"
       ]
     },
     {
-      "id": "nmdc:wfmb-00-xa2pyxfq.1",
+      "id": "nmdc:wfmb-00-10sok15o.1",
       "type": "nmdc:MetabolomicsAnalysis",
       "name": "GC/MS Metabolomics analysis for Blanch_Nat_Met_C_4_AB_O_04.cdf",
       "description": "Analysis of raw mass spectrometry data for the annotation of metabolites.",
       "has_input": [
         "nmdc:dobj-11-5tax4f20",
-        "nmdc:dobj-00-ha4dfga6"
+        "nmdc:dobj-00-7jopueun"
       ],
       "has_output": [
-        "nmdc:dobj-00-8trr9vpc"
+        "nmdc:dobj-00-w10ben7l"
       ],
       "processing_institution": "NMDC",
       "git_url": "https://github.com/microbiomedata/metaMS/wdl/metaMS_gcms.wdl",
       "started_at_time": "2025-12-23 13:41:33",
       "was_informed_by": [
-        "nmdc:dgms-00-o8n263oi"
+        "nmdc:dgms-00-a3kaawn5"
       ],
       "ended_at_time": "2025-12-23 13:41:33",
       "version": "3.3.1",
@@ -15569,9 +15569,9 @@
         {
           "type": "nmdc:MetaboliteIdentification",
           "alternative_identifiers": [
-            "kegg:C15571",
             "kegg:C00090",
-            "kegg:C01785"
+            "kegg:C01785",
+            "kegg:C15571"
           ],
           "highest_similarity_score": 0.639865621428589,
           "metabolite_identified": "chebi:18135"
@@ -16909,26 +16909,26 @@
         }
       ],
       "uses_calibration": [
-        "nmdc:calib-00-eeuc8142"
+        "nmdc:calib-00-tm2d95wj"
       ]
     },
     {
-      "id": "nmdc:wfmb-00-wqt5rgah.1",
+      "id": "nmdc:wfmb-00-ofwi5owu.1",
       "type": "nmdc:MetabolomicsAnalysis",
       "name": "GC/MS Metabolomics analysis for Blanch_Nat_Met_C_7_AB_M_07.cdf",
       "description": "Analysis of raw mass spectrometry data for the annotation of metabolites.",
       "has_input": [
         "nmdc:dobj-11-5tax4f20",
-        "nmdc:dobj-00-v871ha3m"
+        "nmdc:dobj-00-2b3mtvi2"
       ],
       "has_output": [
-        "nmdc:dobj-00-e89jcjt4"
+        "nmdc:dobj-00-wudr4805"
       ],
       "processing_institution": "NMDC",
       "git_url": "https://github.com/microbiomedata/metaMS/wdl/metaMS_gcms.wdl",
       "started_at_time": "2025-12-23 13:42:13",
       "was_informed_by": [
-        "nmdc:dgms-00-leu3hbfs"
+        "nmdc:dgms-00-4lspduzx"
       ],
       "ended_at_time": "2025-12-23 13:42:13",
       "version": "3.3.1",
@@ -17152,9 +17152,9 @@
         {
           "type": "nmdc:MetaboliteIdentification",
           "alternative_identifiers": [
-            "kegg:C15571",
             "kegg:C00090",
-            "kegg:C01785"
+            "kegg:C01785",
+            "kegg:C15571"
           ],
           "highest_similarity_score": 0.6571731031780393,
           "metabolite_identified": "chebi:18135"
@@ -18336,26 +18336,26 @@
         }
       ],
       "uses_calibration": [
-        "nmdc:calib-00-eeuc8142"
+        "nmdc:calib-00-tm2d95wj"
       ]
     },
     {
-      "id": "nmdc:wfmb-00-nlag0pjr.1",
+      "id": "nmdc:wfmb-00-zqh4d8n6.1",
       "type": "nmdc:MetabolomicsAnalysis",
       "name": "GC/MS Metabolomics analysis for Blanch_Nat_Met_H_11_AB_M_13.cdf",
       "description": "Analysis of raw mass spectrometry data for the annotation of metabolites.",
       "has_input": [
         "nmdc:dobj-11-5tax4f20",
-        "nmdc:dobj-00-15n8aa7z"
+        "nmdc:dobj-00-evc5538j"
       ],
       "has_output": [
-        "nmdc:dobj-00-yct0fjg2"
+        "nmdc:dobj-00-u1gg3syg"
       ],
       "processing_institution": "NMDC",
       "git_url": "https://github.com/microbiomedata/metaMS/wdl/metaMS_gcms.wdl",
       "started_at_time": "2025-12-23 13:41:35",
       "was_informed_by": [
-        "nmdc:dgms-00-lv2salry"
+        "nmdc:dgms-00-uytfkd6y"
       ],
       "ended_at_time": "2025-12-23 13:41:35",
       "version": "3.3.1",
@@ -18595,9 +18595,9 @@
         {
           "type": "nmdc:MetaboliteIdentification",
           "alternative_identifiers": [
-            "kegg:C15571",
             "kegg:C00090",
-            "kegg:C01785"
+            "kegg:C01785",
+            "kegg:C15571"
           ],
           "highest_similarity_score": 0.6390802656876521,
           "metabolite_identified": "chebi:18135"
@@ -19348,8 +19348,8 @@
         {
           "type": "nmdc:MetaboliteIdentification",
           "alternative_identifiers": [
-            "kegg:C01197",
-            "kegg:C01481"
+            "kegg:C01481",
+            "kegg:C01197"
           ],
           "highest_similarity_score": 0.5195581843742488,
           "metabolite_identified": "chebi:16433"
@@ -19762,26 +19762,26 @@
         }
       ],
       "uses_calibration": [
-        "nmdc:calib-00-eeuc8142"
+        "nmdc:calib-00-tm2d95wj"
       ]
     },
     {
-      "id": "nmdc:wfmb-00-8aq8h05d.1",
+      "id": "nmdc:wfmb-00-z3czylvp.1",
       "type": "nmdc:MetabolomicsAnalysis",
       "name": "GC/MS Metabolomics analysis for Blanch_Nat_Met_H_11_AB_O_24.cdf",
       "description": "Analysis of raw mass spectrometry data for the annotation of metabolites.",
       "has_input": [
         "nmdc:dobj-11-5tax4f20",
-        "nmdc:dobj-00-edvjiuyx"
+        "nmdc:dobj-00-mqy2c05k"
       ],
       "has_output": [
-        "nmdc:dobj-00-jyrhmhlz"
+        "nmdc:dobj-00-la6aw295"
       ],
       "processing_institution": "NMDC",
       "git_url": "https://github.com/microbiomedata/metaMS/wdl/metaMS_gcms.wdl",
       "started_at_time": "2025-12-23 13:40:51",
       "was_informed_by": [
-        "nmdc:dgms-00-o09a7e0r"
+        "nmdc:dgms-00-xp597fup"
       ],
       "ended_at_time": "2025-12-23 13:40:51",
       "version": "3.3.1",
@@ -20002,9 +20002,9 @@
         {
           "type": "nmdc:MetaboliteIdentification",
           "alternative_identifiers": [
-            "kegg:C15571",
             "kegg:C00090",
-            "kegg:C01785"
+            "kegg:C01785",
+            "kegg:C15571"
           ],
           "highest_similarity_score": 0.6510743951197593,
           "metabolite_identified": "chebi:18135"
@@ -20748,8 +20748,8 @@
         {
           "type": "nmdc:MetaboliteIdentification",
           "alternative_identifiers": [
-            "kegg:C01197",
-            "kegg:C01481"
+            "kegg:C01481",
+            "kegg:C01197"
           ],
           "highest_similarity_score": 0.5476543138740839,
           "metabolite_identified": "chebi:16433"
@@ -21080,26 +21080,26 @@
         }
       ],
       "uses_calibration": [
-        "nmdc:calib-00-eeuc8142"
+        "nmdc:calib-00-tm2d95wj"
       ]
     },
     {
-      "id": "nmdc:wfmb-00-pyevuy15.1",
+      "id": "nmdc:wfmb-00-8kiy5olg.1",
       "type": "nmdc:MetabolomicsAnalysis",
       "name": "GC/MS Metabolomics analysis for Blanch_Nat_Met_H_17_AB_M_18.cdf",
       "description": "Analysis of raw mass spectrometry data for the annotation of metabolites.",
       "has_input": [
         "nmdc:dobj-11-5tax4f20",
-        "nmdc:dobj-00-jwbyv2ik"
+        "nmdc:dobj-00-hc756huu"
       ],
       "has_output": [
-        "nmdc:dobj-00-sa17sk3j"
+        "nmdc:dobj-00-xz2a3b9i"
       ],
       "processing_institution": "NMDC",
       "git_url": "https://github.com/microbiomedata/metaMS/wdl/metaMS_gcms.wdl",
       "started_at_time": "2025-12-23 13:40:20",
       "was_informed_by": [
-        "nmdc:dgms-00-omenmc3n"
+        "nmdc:dgms-00-gukhjuar"
       ],
       "ended_at_time": "2025-12-23 13:40:20",
       "version": "3.3.1",
@@ -21331,9 +21331,9 @@
         {
           "type": "nmdc:MetaboliteIdentification",
           "alternative_identifiers": [
-            "kegg:C15571",
             "kegg:C00090",
-            "kegg:C01785"
+            "kegg:C01785",
+            "kegg:C15571"
           ],
           "highest_similarity_score": 0.6350622319499449,
           "metabolite_identified": "chebi:18135"
@@ -22453,26 +22453,26 @@
         }
       ],
       "uses_calibration": [
-        "nmdc:calib-00-eeuc8142"
+        "nmdc:calib-00-tm2d95wj"
       ]
     },
     {
-      "id": "nmdc:wfmb-00-oo6j3kqy.1",
+      "id": "nmdc:wfmb-00-8r1a4zmc.1",
       "type": "nmdc:MetabolomicsAnalysis",
       "name": "GC/MS Metabolomics analysis for Blanch_Nat_Met_H_17_AB_O_22.cdf",
       "description": "Analysis of raw mass spectrometry data for the annotation of metabolites.",
       "has_input": [
         "nmdc:dobj-11-5tax4f20",
-        "nmdc:dobj-00-af8p4ly0"
+        "nmdc:dobj-00-3dfmo7lv"
       ],
       "has_output": [
-        "nmdc:dobj-00-w9f4rlh8"
+        "nmdc:dobj-00-3nzxkzmn"
       ],
       "processing_institution": "NMDC",
       "git_url": "https://github.com/microbiomedata/metaMS/wdl/metaMS_gcms.wdl",
       "started_at_time": "2025-12-23 13:39:36",
       "was_informed_by": [
-        "nmdc:dgms-00-yrlvv3rv"
+        "nmdc:dgms-00-751wt7i0"
       ],
       "ended_at_time": "2025-12-23 13:39:36",
       "version": "3.3.1",
@@ -24093,26 +24093,26 @@
         }
       ],
       "uses_calibration": [
-        "nmdc:calib-00-eeuc8142"
+        "nmdc:calib-00-tm2d95wj"
       ]
     },
     {
-      "id": "nmdc:wfmb-00-v44nx6sx.1",
+      "id": "nmdc:wfmb-00-rbq6w9m5.1",
       "type": "nmdc:MetabolomicsAnalysis",
       "name": "GC/MS Metabolomics analysis for Blanch_Nat_Met_H_26_AB_M_12.cdf",
       "description": "Analysis of raw mass spectrometry data for the annotation of metabolites.",
       "has_input": [
         "nmdc:dobj-11-5tax4f20",
-        "nmdc:dobj-00-9uaukv9u"
+        "nmdc:dobj-00-znzy7n13"
       ],
       "has_output": [
-        "nmdc:dobj-00-cusnddhu"
+        "nmdc:dobj-00-uleh2bxn"
       ],
       "processing_institution": "NMDC",
       "git_url": "https://github.com/microbiomedata/metaMS/wdl/metaMS_gcms.wdl",
       "started_at_time": "2025-12-23 13:40:17",
       "was_informed_by": [
-        "nmdc:dgms-00-esrgl6eg"
+        "nmdc:dgms-00-8j8o2qrb"
       ],
       "ended_at_time": "2025-12-23 13:40:17",
       "version": "3.3.1",
@@ -24363,9 +24363,9 @@
         {
           "type": "nmdc:MetaboliteIdentification",
           "alternative_identifiers": [
-            "kegg:C15571",
             "kegg:C00090",
-            "kegg:C01785"
+            "kegg:C01785",
+            "kegg:C15571"
           ],
           "highest_similarity_score": 0.6482415609161079,
           "metabolite_identified": "chebi:18135"
@@ -25093,8 +25093,8 @@
         {
           "type": "nmdc:MetaboliteIdentification",
           "alternative_identifiers": [
-            "kegg:C01197",
-            "kegg:C01481"
+            "kegg:C01481",
+            "kegg:C01197"
           ],
           "highest_similarity_score": 0.545359426702196,
           "metabolite_identified": "chebi:16433"
@@ -25488,26 +25488,26 @@
         }
       ],
       "uses_calibration": [
-        "nmdc:calib-00-eeuc8142"
+        "nmdc:calib-00-tm2d95wj"
       ]
     },
     {
-      "id": "nmdc:wfmb-00-j1dgz2n9.1",
+      "id": "nmdc:wfmb-00-1wzfn6ux.1",
       "type": "nmdc:MetabolomicsAnalysis",
       "name": "GC/MS Metabolomics analysis for Blanch_Nat_Met_H_28_AB_M_03.cdf",
       "description": "Analysis of raw mass spectrometry data for the annotation of metabolites.",
       "has_input": [
         "nmdc:dobj-11-5tax4f20",
-        "nmdc:dobj-00-s6ulj2nw"
+        "nmdc:dobj-00-30y35jjw"
       ],
       "has_output": [
-        "nmdc:dobj-00-n5jz3ys6"
+        "nmdc:dobj-00-cwl2yp9j"
       ],
       "processing_institution": "NMDC",
       "git_url": "https://github.com/microbiomedata/metaMS/wdl/metaMS_gcms.wdl",
       "started_at_time": "2025-12-23 13:39:36",
       "was_informed_by": [
-        "nmdc:dgms-00-f108hv5v"
+        "nmdc:dgms-00-cyjkc82k"
       ],
       "ended_at_time": "2025-12-23 13:39:36",
       "version": "3.3.1",
@@ -25734,9 +25734,9 @@
         {
           "type": "nmdc:MetaboliteIdentification",
           "alternative_identifiers": [
-            "kegg:C15571",
             "kegg:C00090",
-            "kegg:C01785"
+            "kegg:C01785",
+            "kegg:C15571"
           ],
           "highest_similarity_score": 0.6533856262462528,
           "metabolite_identified": "chebi:18135"
@@ -27004,26 +27004,26 @@
         }
       ],
       "uses_calibration": [
-        "nmdc:calib-00-eeuc8142"
+        "nmdc:calib-00-tm2d95wj"
       ]
     },
     {
-      "id": "nmdc:wfmb-00-mfugz1ww.1",
+      "id": "nmdc:wfmb-00-oi54ozhw.1",
       "type": "nmdc:MetabolomicsAnalysis",
       "name": "GC/MS Metabolomics analysis for Blanch_Nat_Met_H_2_AB_M_23.cdf",
       "description": "Analysis of raw mass spectrometry data for the annotation of metabolites.",
       "has_input": [
         "nmdc:dobj-11-5tax4f20",
-        "nmdc:dobj-00-4yble7cr"
+        "nmdc:dobj-00-q6hw7t8o"
       ],
       "has_output": [
-        "nmdc:dobj-00-pbpxgcmi"
+        "nmdc:dobj-00-a48dgp3b"
       ],
       "processing_institution": "NMDC",
       "git_url": "https://github.com/microbiomedata/metaMS/wdl/metaMS_gcms.wdl",
       "started_at_time": "2025-12-23 13:40:13",
       "was_informed_by": [
-        "nmdc:dgms-00-epibxec2"
+        "nmdc:dgms-00-vdrsduqa"
       ],
       "ended_at_time": "2025-12-23 13:40:13",
       "version": "3.3.1",
@@ -27244,9 +27244,9 @@
         {
           "type": "nmdc:MetaboliteIdentification",
           "alternative_identifiers": [
-            "kegg:C15571",
             "kegg:C00090",
-            "kegg:C01785"
+            "kegg:C01785",
+            "kegg:C15571"
           ],
           "highest_similarity_score": 0.6543695415163332,
           "metabolite_identified": "chebi:18135"
@@ -28331,26 +28331,26 @@
         }
       ],
       "uses_calibration": [
-        "nmdc:calib-00-eeuc8142"
+        "nmdc:calib-00-tm2d95wj"
       ]
     },
     {
-      "id": "nmdc:wfmb-00-9mpr5o3m.1",
+      "id": "nmdc:wfmb-00-a1hxuar8.1",
       "type": "nmdc:MetabolomicsAnalysis",
       "name": "GC/MS Metabolomics analysis for Blanch_Nat_Met_H_2_AB_O_15.cdf",
       "description": "Analysis of raw mass spectrometry data for the annotation of metabolites.",
       "has_input": [
         "nmdc:dobj-11-5tax4f20",
-        "nmdc:dobj-00-652j92lp"
+        "nmdc:dobj-00-9n692di8"
       ],
       "has_output": [
-        "nmdc:dobj-00-l4msi9ki"
+        "nmdc:dobj-00-mjfxi8hd"
       ],
       "processing_institution": "NMDC",
       "git_url": "https://github.com/microbiomedata/metaMS/wdl/metaMS_gcms.wdl",
       "started_at_time": "2025-12-23 13:39:33",
       "was_informed_by": [
-        "nmdc:dgms-00-8j9l39v2"
+        "nmdc:dgms-00-3antfknu"
       ],
       "ended_at_time": "2025-12-23 13:39:33",
       "version": "3.3.1",
@@ -28566,9 +28566,9 @@
         {
           "type": "nmdc:MetaboliteIdentification",
           "alternative_identifiers": [
-            "kegg:C15571",
             "kegg:C00090",
-            "kegg:C01785"
+            "kegg:C01785",
+            "kegg:C15571"
           ],
           "highest_similarity_score": 0.6442807964354196,
           "metabolite_identified": "chebi:18135"
@@ -29850,26 +29850,26 @@
         }
       ],
       "uses_calibration": [
-        "nmdc:calib-00-eeuc8142"
+        "nmdc:calib-00-tm2d95wj"
       ]
     },
     {
-      "id": "nmdc:wfmb-00-t2a9w99z.1",
+      "id": "nmdc:wfmb-00-cxykcg6d.1",
       "type": "nmdc:MetabolomicsAnalysis",
       "name": "GC/MS Metabolomics analysis for Blanch_Nat_Met_H_32_AB_M_20.cdf",
       "description": "Analysis of raw mass spectrometry data for the annotation of metabolites.",
       "has_input": [
         "nmdc:dobj-11-5tax4f20",
-        "nmdc:dobj-00-2ppqh861"
+        "nmdc:dobj-00-0jt2743z"
       ],
       "has_output": [
-        "nmdc:dobj-00-hr4b3p16"
+        "nmdc:dobj-00-fr79ubei"
       ],
       "processing_institution": "NMDC",
       "git_url": "https://github.com/microbiomedata/metaMS/wdl/metaMS_gcms.wdl",
       "started_at_time": "2025-12-23 13:40:13",
       "was_informed_by": [
-        "nmdc:dgms-00-942ysmx6"
+        "nmdc:dgms-00-el9tqhu4"
       ],
       "ended_at_time": "2025-12-23 13:40:13",
       "version": "3.3.1",
@@ -30074,9 +30074,9 @@
         {
           "type": "nmdc:MetaboliteIdentification",
           "alternative_identifiers": [
-            "kegg:C15571",
             "kegg:C00090",
-            "kegg:C01785"
+            "kegg:C01785",
+            "kegg:C15571"
           ],
           "highest_similarity_score": 0.6697940577356745,
           "metabolite_identified": "chebi:18135"
@@ -31264,26 +31264,26 @@
         }
       ],
       "uses_calibration": [
-        "nmdc:calib-00-eeuc8142"
+        "nmdc:calib-00-tm2d95wj"
       ]
     },
     {
-      "id": "nmdc:wfmb-00-7250qn8h.1",
+      "id": "nmdc:wfmb-00-zt8pr3mi.1",
       "type": "nmdc:MetabolomicsAnalysis",
       "name": "GC/MS Metabolomics analysis for Blanch_Nat_Met_H_32_AB_O_19.cdf",
       "description": "Analysis of raw mass spectrometry data for the annotation of metabolites.",
       "has_input": [
         "nmdc:dobj-11-5tax4f20",
-        "nmdc:dobj-00-0vx87pzd"
+        "nmdc:dobj-00-3aqdusou"
       ],
       "has_output": [
-        "nmdc:dobj-00-9u4t79f0"
+        "nmdc:dobj-00-6a0nfwp1"
       ],
       "processing_institution": "NMDC",
       "git_url": "https://github.com/microbiomedata/metaMS/wdl/metaMS_gcms.wdl",
       "started_at_time": "2025-12-23 13:39:33",
       "was_informed_by": [
-        "nmdc:dgms-00-th099p1z"
+        "nmdc:dgms-00-op5o7874"
       ],
       "ended_at_time": "2025-12-23 13:39:33",
       "version": "3.3.1",
@@ -31515,9 +31515,9 @@
         {
           "type": "nmdc:MetaboliteIdentification",
           "alternative_identifiers": [
-            "kegg:C15571",
             "kegg:C00090",
-            "kegg:C01785"
+            "kegg:C01785",
+            "kegg:C15571"
           ],
           "highest_similarity_score": 0.6312163552176719,
           "metabolite_identified": "chebi:18135"
@@ -32266,8 +32266,8 @@
         {
           "type": "nmdc:MetaboliteIdentification",
           "alternative_identifiers": [
-            "kegg:C01197",
-            "kegg:C01481"
+            "kegg:C01481",
+            "kegg:C01197"
           ],
           "highest_similarity_score": 0.5332503403878305,
           "metabolite_identified": "chebi:16433"
@@ -32572,26 +32572,26 @@
         }
       ],
       "uses_calibration": [
-        "nmdc:calib-00-eeuc8142"
+        "nmdc:calib-00-tm2d95wj"
       ]
     },
     {
-      "id": "nmdc:wfmb-00-m4vcl2en.1",
+      "id": "nmdc:wfmb-00-xsw83y1m.1",
       "type": "nmdc:MetabolomicsAnalysis",
       "name": "GC/MS Metabolomics analysis for Blanch_Nat_Met_H_4_AB_M_05.cdf",
       "description": "Analysis of raw mass spectrometry data for the annotation of metabolites.",
       "has_input": [
         "nmdc:dobj-11-5tax4f20",
-        "nmdc:dobj-00-xb9uwy9z"
+        "nmdc:dobj-00-v22zcpwj"
       ],
       "has_output": [
-        "nmdc:dobj-00-zf1fl7lj"
+        "nmdc:dobj-00-96mcfor3"
       ],
       "processing_institution": "NMDC",
       "git_url": "https://github.com/microbiomedata/metaMS/wdl/metaMS_gcms.wdl",
       "started_at_time": "2025-12-23 13:40:16",
       "was_informed_by": [
-        "nmdc:dgms-00-xld7lunx"
+        "nmdc:dgms-00-oi6og5bg"
       ],
       "ended_at_time": "2025-12-23 13:40:16",
       "version": "3.3.1",
@@ -32834,9 +32834,9 @@
         {
           "type": "nmdc:MetaboliteIdentification",
           "alternative_identifiers": [
-            "kegg:C15571",
             "kegg:C00090",
-            "kegg:C01785"
+            "kegg:C01785",
+            "kegg:C15571"
           ],
           "highest_similarity_score": 0.6321663174544822,
           "metabolite_identified": "chebi:18135"
@@ -33561,8 +33561,8 @@
         {
           "type": "nmdc:MetaboliteIdentification",
           "alternative_identifiers": [
-            "kegg:C01197",
-            "kegg:C01481"
+            "kegg:C01481",
+            "kegg:C01197"
           ],
           "highest_similarity_score": 0.510152018316519,
           "metabolite_identified": "chebi:16433"
@@ -33969,26 +33969,26 @@
         }
       ],
       "uses_calibration": [
-        "nmdc:calib-00-eeuc8142"
+        "nmdc:calib-00-tm2d95wj"
       ]
     },
     {
-      "id": "nmdc:wfmb-00-zivw3vdd.1",
+      "id": "nmdc:wfmb-00-p13x54ul.1",
       "type": "nmdc:MetabolomicsAnalysis",
       "name": "GC/MS Metabolomics analysis for Blanch_Nat_Met_H_4_AB_O_06.cdf",
       "description": "Analysis of raw mass spectrometry data for the annotation of metabolites.",
       "has_input": [
         "nmdc:dobj-11-5tax4f20",
-        "nmdc:dobj-00-wipow0o0"
+        "nmdc:dobj-00-plebrqis"
       ],
       "has_output": [
-        "nmdc:dobj-00-ar4zi4wu"
+        "nmdc:dobj-00-17yryf4j"
       ],
       "processing_institution": "NMDC",
       "git_url": "https://github.com/microbiomedata/metaMS/wdl/metaMS_gcms.wdl",
       "started_at_time": "2025-12-23 13:40:55",
       "was_informed_by": [
-        "nmdc:dgms-00-3e889cgf"
+        "nmdc:dgms-00-f7v02yj1"
       ],
       "ended_at_time": "2025-12-23 13:40:55",
       "version": "3.3.1",
@@ -34276,9 +34276,9 @@
         {
           "type": "nmdc:MetaboliteIdentification",
           "alternative_identifiers": [
-            "kegg:C15571",
             "kegg:C00090",
-            "kegg:C01785"
+            "kegg:C01785",
+            "kegg:C15571"
           ],
           "highest_similarity_score": 0.420960551083082,
           "metabolite_identified": "chebi:18135"
@@ -34286,9 +34286,9 @@
         {
           "type": "nmdc:MetaboliteIdentification",
           "alternative_identifiers": [
-            "kegg:C15571",
             "kegg:C00090",
-            "kegg:C01785"
+            "kegg:C01785",
+            "kegg:C15571"
           ],
           "highest_similarity_score": 0.6455220756396048,
           "metabolite_identified": "chebi:18135"
@@ -35585,7 +35585,7 @@
         }
       ],
       "uses_calibration": [
-        "nmdc:calib-00-eeuc8142"
+        "nmdc:calib-00-tm2d95wj"
       ]
     }
   ],
