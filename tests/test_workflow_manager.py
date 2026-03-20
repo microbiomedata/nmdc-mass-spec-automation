@@ -191,7 +191,7 @@ processing_steps:
         
         # Create mock input CSV
         input_csv_path = metadata_dir / "llm_biosample_raw_file_mapper.csv"
-        input_csv_content = "biosample_id,raw_file_name,processed_sample_id\nnmdc:bsm-11-test,test_file.raw,nmdc:procsm-11-test\n"
+        input_csv_content = "raw_data_identifier,biosample_id,biosample_name,match_confidence\ntest_file.raw,nmdc:bsm-11-test,Test Sample,high\n"
         with open(input_csv_path, "w") as f:
             f.write(input_csv_content)
         
@@ -218,7 +218,7 @@ processing_steps:
             assert call_args.kwargs["test"] is True
             assert call_args.kwargs["study_id"] == "nmdc:sty-11-test"
             assert "llm_generated_protocol_outline.yaml" in call_args.kwargs["yaml_outline_path"]
-            assert "llm_biosample_raw_file_mapper.csv" in call_args.kwargs["sample_to_dg_mapping_path"]
+            assert "biosample_mapping_for_mp_metadata_generation.csv" in call_args.kwargs["sample_to_dg_mapping_path"]
             
             # Verify skip trigger was set
             assert manager.should_skip("material_processing_metadata_generated") is True

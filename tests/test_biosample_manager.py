@@ -97,8 +97,8 @@ class TestNMDCWorkflowBiosampleManager:
         
         assert result is False
 
-    def test_generate_mapped_files_list_with_file_types(self, lcms_config_file):
-        """Test generation of mapped files list with raw_file_type column."""
+    def test_generate_mapped_files_list_with_calibrant(self, lcms_config_file):
+        """Test generation of mapped files list including calibrant entries."""
         from nmdc_dp_utils.workflow_manager import NMDCWorkflowManager
         
         manager = NMDCWorkflowManager(str(lcms_config_file))
@@ -107,13 +107,12 @@ class TestNMDCWorkflowBiosampleManager:
         metadata_dir = manager.workflow_path / "metadata"
         metadata_dir.mkdir(parents=True, exist_ok=True)
         
-        # Create mapping with raw_file_type column (new format)
+        # Create mapping with calibrant confidence tagging
         mapping_df = pd.DataFrame({
             "raw_data_identifier": ["sample1.raw", "sample2.raw", "cal1.raw", "sample3.raw"],
             "biosample_id": ["nmdc:bsm-11-001", "nmdc:bsm-11-002", "", ""],
             "biosample_name": ["Sample 1", "Sample 2", "", ""],
-            "match_confidence": ["high", "medium", "no_match", "low"],
-            "raw_file_type": ["sample", "sample", "calibration", "sample"]
+            "match_confidence": ["high", "medium", "calibrant", "low"]
         })
         mapping_df.to_csv(metadata_dir / "llm_biosample_raw_file_mapper.csv", index=False)
         
@@ -135,8 +134,8 @@ class TestNMDCWorkflowBiosampleManager:
         assert "sample2.raw" in result_df["raw_file_path"].apply(lambda x: Path(x).name).values
         assert "cal1.raw" in result_df["raw_file_path"].apply(lambda x: Path(x).name).values
 
-    def test_generate_mapped_files_list_legacy_format(self, lcms_config_file):
-        """Test generation of mapped files list without raw_file_type (backwards compatibility)."""
+    def test_generate_mapped_files_list_samples_only(self, lcms_config_file):
+        """Test generation of mapped files list with only sample confidence values."""
         from nmdc_dp_utils.workflow_manager import NMDCWorkflowManager
         
         manager = NMDCWorkflowManager(str(lcms_config_file))
@@ -145,7 +144,7 @@ class TestNMDCWorkflowBiosampleManager:
         metadata_dir = manager.workflow_path / "metadata"
         metadata_dir.mkdir(parents=True, exist_ok=True)
         
-        # Create mapping without raw_file_type column (old format)
+        # Create mapping with sample confidence values only
         mapping_df = pd.DataFrame({
             "raw_data_identifier": ["sample1.raw", "sample2.raw", "sample3.raw"],
             "biosample_id": ["nmdc:bsm-11-001", "nmdc:bsm-11-002", ""],

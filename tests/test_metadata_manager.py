@@ -153,13 +153,6 @@ class TestWorkflowMetadataManager:
                 'calibration_02.cdf',
                 'sample_03.cdf'
             ],
-            'raw_file_type': [
-                'calibration',
-                'sample',
-                'sample',
-                'calibration',
-                'sample'
-            ],
             'biosample_id': [
                 None,
                 'nmdc:bsm-1',
@@ -168,10 +161,10 @@ class TestWorkflowMetadataManager:
                 'nmdc:bsm-3'
             ],
             'match_confidence': [
-                None,
+                'calibrant',
                 'high',
                 'high',
-                None,
+                'calibrant',
                 'high'
             ]
         })

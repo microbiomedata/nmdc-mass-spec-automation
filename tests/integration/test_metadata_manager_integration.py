@@ -73,12 +73,10 @@ class TestWorkflowMetadataManagerIntegration:
         manual_mapping = biosample_mapping[biosample_mapping["match_confidence"] == "high"].copy()
         manual_mapping = manual_mapping.merge(
             workflowref_df[["raw_data_identifier", "last_processed_sample"]],
-            left_on="raw_file_name",
+            left_on="raw_data_identifier",
             right_on="raw_data_identifier",
             how="left"
         )
-        # Keep raw_data_identifier as the filename (drop the duplicate from merge)
-        manual_mapping["raw_data_identifier"] = manual_mapping["raw_file_name"]
         manual_mapping.to_csv(
             metadata_dir / "mapped_raw_files_wprocessed_MANUAL.csv",
             index=False
@@ -205,12 +203,10 @@ class TestWorkflowMetadataManagerIntegration:
         manual_mapping = biosample_mapping[biosample_mapping["match_confidence"] == "high"].copy()
         manual_mapping = manual_mapping.merge(
             workflowref_df[["raw_data_identifier", "last_processed_sample"]],
-            left_on="raw_file_name",
+            left_on="raw_data_identifier",
             right_on="raw_data_identifier",
             how="left"
         )
-        # Keep raw_data_identifier as the filename (drop the duplicate from merge)
-        manual_mapping["raw_data_identifier"] = manual_mapping["raw_file_name"]
         manual_mapping.to_csv(
             metadata_dir / "mapped_raw_files_wprocessed_MANUAL.csv",
             index=False
@@ -230,7 +226,9 @@ class TestWorkflowMetadataManagerIntegration:
         
         # Verify calibration file exists in mapping
         mapping_df = pd.read_csv(biosample_mapping_path)
-        calibration_files = mapping_df[mapping_df["raw_file_type"] == "calibration"]
+        calibration_files = mapping_df[
+            mapping_df["match_confidence"].fillna("").astype(str).str.strip().str.lower() == "calibrant"
+        ]
         assert len(calibration_files) > 0, "No calibration files found in biosample mapping"
         
         # Generate CSV metadata mappings (now includes processed_sample_id mapping)
@@ -457,12 +455,10 @@ class TestWorkflowMetadataManagerIntegration:
         manual_mapping = biosample_mapping[biosample_mapping["match_confidence"] == "high"].copy()
         manual_mapping = manual_mapping.merge(
             workflowref_df[["raw_data_identifier", "last_processed_sample"]],
-            left_on="raw_file_name",
+            left_on="raw_data_identifier",
             right_on="raw_data_identifier",
             how="left"
         )
-        # Keep raw_data_identifier as the filename (drop the duplicate from merge)
-        manual_mapping["raw_data_identifier"] = manual_mapping["raw_file_name"]
         manual_mapping.to_csv(
             metadata_dir / "mapped_raw_files_wprocessed_MANUAL.csv",
             index=False
