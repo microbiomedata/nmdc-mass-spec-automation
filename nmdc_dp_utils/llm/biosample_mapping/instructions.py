@@ -85,9 +85,11 @@ The 'match_confidence' column MUST contain ONLY these values:
 - **"calibrant"** - ONLY for calibrant files (FAMES or SRFA) - NOT for regular samples, regular QCs, or external standards
 - **""** (empty string) - Files that cannot be mapped to any biosample (QC samples, blanks, method blanks, etc.)
 
-CRITICAL: Do NOT use any other values like "no_match", "unmapped", "none", "N/A", "control", etc.
+CRITICAL:
 For files that don't match biosamples, use empty string "" in match_confidence column.
 Use "calibrant" ONLY for known calibrant/quality control standards (FAMES, SRFA) unless additional context specifies others.
+Rows with a non-empty biosample_id MUST use only "high", "medium", or "low" (never "calibrant" and never empty).
+Do NOT force calibrant assignment from filename alone; if additional context indicates a FAME/FAMES/SRFA-named file is a biosample, map it to that biosample with high/medium/low confidence instead of "calibrant".
 
 # OUTPUT CSV FORMAT - EXACT REQUIREMENTS
 The output CSV MUST have these exact column names:
@@ -97,6 +99,15 @@ The output CSV MUST have these exact column names:
 - **"match_confidence"** - One of: "high", "medium", "low", "calibrant", or "" (empty string)
 - **"processedsample_placeholder"** - ProcessedSample placeholder from YAML or empty string
 - **"material_processing_protocol_id"** - Protocol ID from YAML or empty string
+
+CRITICAL PLACEHOLDER RULE:
+- processedsample_placeholder MUST be the ProcessedSample ID key from the processedsamples list under the selected material_processing_protocol_id.
+- Example pattern: if material_processing_protocol_id is "<protocol_id>", select one key listed under that protocol's processedsamples (for example, "ProcessedSample1_<protocol_id>").
+- Never use the nested ProcessedSample.name value as processedsample_placeholder.
+
+CRITICAL DATA QUALITY RULES:
+- If match_confidence is "high", "medium", "low", or "calibrant", then BOTH processedsample_placeholder and material_processing_protocol_id must be non-empty and valid in the YAML.
+- Do not output values like "exact"; use only the allowed values above.
 
 CRITICAL: The first column MUST be named "raw_data_identifier" (not "raw_file_name").
 

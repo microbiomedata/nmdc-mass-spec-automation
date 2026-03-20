@@ -4982,7 +4982,7 @@ class LLMWorkflowManagerMixin:
     @skip_if_complete("biosample_mapping_completed", return_value=True)
     async def generate_llm_biosample_mapping(
         self, 
-        max_iterations: int = 3
+        max_iterations: int = 6
     ) -> bool:
         """
         Generate biosample mapping using LLM code generation approach.
@@ -4998,7 +4998,7 @@ class LLMWorkflowManagerMixin:
         Parameters
         ----------
         max_iterations : int
-            Maximum number of fix iterations (default: 3)
+            Maximum number of fix iterations (default: 6)
         
         Returns
         -------
@@ -5031,6 +5031,7 @@ class LLMWorkflowManagerMixin:
         script_path = str(self.workflow_path / "scripts" / "llm_generated_biosample_mapping_script.py")
         
         # Check for additional context file if not explicitly provided
+        additional_context_path = None
         default_context_path = self.workflow_path / "metadata" / "additional_mapping_context.txt"
         if default_context_path.exists():
             additional_context_path = str(default_context_path)
