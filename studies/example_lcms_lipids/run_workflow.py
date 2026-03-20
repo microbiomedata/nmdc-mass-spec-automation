@@ -40,7 +40,7 @@ async def main():
     # Optional: add "additional_mapping_context.txt" in metadata/ folder for extra mapping context
     logger.info("4. Mapping raw data files to biosamples using LLM...")
     manager.get_biosample_attributes()
-    mapping_success = await manager.generate_llm_biosample_mapping(max_iterations=3)
+    mapping_success = await manager.generate_llm_biosample_mapping()
     
     if not mapping_success:
         logger.warning("Biosample mapping failed - review logs and add additional context if needed")

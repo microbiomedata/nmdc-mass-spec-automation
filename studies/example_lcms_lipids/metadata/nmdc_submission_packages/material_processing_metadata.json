@@ -1,7 +1,7 @@
 {
   "material_processing_set": [
     {
-      "id": "nmdc:subspr-00-a4g5xgjt",
+      "id": "nmdc:subspr-00-iny98zz9",
       "type": "nmdc:SubSamplingProcess",
       "name": "Subsample soil for nonpolar metabolites",
       "description": "A 2 g soil sample is subsampled from nmdc:bsm-11-pdcjjc38 for nonpolar metabolite extraction.",
@@ -9,7 +9,7 @@
         "nmdc:bsm-11-pdcjjc38"
       ],
       "has_output": [
-        "nmdc:procsm-00-28g5ebpl"
+        "nmdc:procsm-00-73uezwzw"
       ],
       "processing_institution": "JGI",
       "protocol_link": {
@@ -25,15 +25,15 @@
       }
     },
     {
-      "id": "nmdc:extrp-00-wh1a2l0r",
+      "id": "nmdc:extrp-00-qqv9i4sd",
       "type": "nmdc:Extraction",
       "name": "Nonpolar metabolite extraction",
-      "description": "Nonpolar metabolites extracted from nmdc:procsm-00-28g5ebpl using methanol, followed by vortexing, sonication in an iced water bath, and centrifugation. The supernatant containing extracted nonpolar metabolites is then dried in a SpeedVac.",
+      "description": "Nonpolar metabolites extracted from nmdc:procsm-00-73uezwzw using methanol, followed by vortexing, sonication in an iced water bath, and centrifugation. The supernatant containing extracted nonpolar metabolites is then dried in a SpeedVac.",
       "has_input": [
-        "nmdc:procsm-00-28g5ebpl"
+        "nmdc:procsm-00-73uezwzw"
       ],
       "has_output": [
-        "nmdc:procsm-00-h3vqs715"
+        "nmdc:procsm-00-gpqfes2b"
       ],
       "processing_institution": "JGI",
       "protocol_link": {
@@ -65,15 +65,15 @@
       }
     },
     {
-      "id": "nmdc:dispro-00-lww9nemb",
+      "id": "nmdc:dispro-00-nossh02c",
       "type": "nmdc:DissolvingProcess",
       "name": "Resuspension of nonpolar extract",
-      "description": "Dried nonpolar metabolite extract from nmdc:procsm-00-h3vqs715 resuspended in methanol with internal standards for LC-MS.",
+      "description": "Dried nonpolar metabolite extract from nmdc:procsm-00-gpqfes2b resuspended in methanol with internal standards for LC-MS.",
       "has_input": [
-        "nmdc:procsm-00-h3vqs715"
+        "nmdc:procsm-00-gpqfes2b"
       ],
       "has_output": [
-        "nmdc:procsm-00-608maw9o"
+        "nmdc:procsm-00-aanj3izd"
       ],
       "processing_institution": "JGI",
       "protocol_link": {
@@ -98,25 +98,25 @@
   ],
   "processed_sample_set": [
     {
-      "id": "nmdc:procsm-00-28g5ebpl",
+      "id": "nmdc:procsm-00-73uezwzw",
       "type": "nmdc:ProcessedSample",
       "name": "nmdc:bsm-11-pdcjjc38_subsample_nonpolar",
       "description": "Subsample of nmdc:bsm-11-pdcjjc38 for nonpolar metabolite extraction."
     },
     {
-      "id": "nmdc:procsm-00-h3vqs715",
+      "id": "nmdc:procsm-00-gpqfes2b",
       "type": "nmdc:ProcessedSample",
       "name": "nmdc:bsm-11-pdcjjc38_nonpolar_extract_supernatant_dried",
-      "description": "Supernatant containing extracted nonpolar metabolites from nmdc:procsm-00-28g5ebpl, dried in a SpeedVac.",
+      "description": "Supernatant containing extracted nonpolar metabolites from nmdc:procsm-00-73uezwzw, dried in a SpeedVac.",
       "sampled_portion": [
         "supernatant"
       ]
     },
     {
-      "id": "nmdc:procsm-00-608maw9o",
+      "id": "nmdc:procsm-00-aanj3izd",
       "type": "nmdc:ProcessedSample",
       "name": "nmdc:bsm-11-pdcjjc38_nonpolar_extract_resuspended",
-      "description": "Resuspended nonpolar metabolite extract from nmdc:procsm-00-h3vqs715 for LC-MS analysis."
+      "description": "Resuspended nonpolar metabolite extract from nmdc:procsm-00-gpqfes2b for LC-MS analysis."
     }
   ],
   "@type": "Database"
