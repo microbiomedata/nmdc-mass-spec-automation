@@ -42,10 +42,6 @@ gcms_metabolomics:
           has_raw_value: 4 Cel
           has_unit: Cel
           has_numeric_value: 4
-        protocol_link:
-          name: "Placeholder Protocol Name"
-          url: "https://example.com/protocol"
-          type: nmdc:Protocol
 
   - Step 2_gcms_metabolomics:
       DissolvingProcess:
@@ -66,10 +62,6 @@ gcms_metabolomics:
             has_raw_value: 200 uL
             has_unit: uL
             has_numeric_value: 200
-        protocol_link:
-          name: "Placeholder Protocol Name"
-          url: "https://example.com/protocol"
-          type: nmdc:Protocol
 
   - Step 3_gcms_metabolomics:
       FiltrationProcess:
@@ -81,10 +73,6 @@ gcms_metabolomics:
         - ProcessedSample2_gcms_metabolomics
         has_output:
         - ProcessedSample3_gcms_metabolomics
-        protocol_link:
-          name: "Placeholder Protocol Name"
-          url: "https://example.com/protocol"
-          type: nmdc:Protocol
 
   - Step 4_gcms_metabolomics:
       ChemicalConversionProcess:
@@ -116,10 +104,6 @@ gcms_metabolomics:
           has_raw_value: 90 min
           has_unit: min
           has_numeric_value: 90
-        protocol_link:
-          name: "Placeholder Protocol Name"
-          url: "https://example.com/protocol"
-          type: nmdc:Protocol
 
   processedsamples:
   - ProcessedSample1_gcms_metabolomics:

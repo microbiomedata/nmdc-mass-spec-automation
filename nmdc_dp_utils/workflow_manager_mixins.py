@@ -1138,8 +1138,15 @@ class NMDCWorkflowDataProcessManager:
             )
             if mapping_file.exists():
                 mapping_df = pd.read_csv(mapping_file)
+                match_conf = (
+                    mapping_df.get("match_confidence", pd.Series(dtype=str))
+                    .fillna("")
+                    .astype(str)
+                    .str.strip()
+                    .str.lower()
+                )
                 calibration_files_set = set(
-                    mapping_df[mapping_df["raw_file_type"] == "calibration"][
+                    mapping_df[match_conf == "calibrant"][
                         "raw_data_identifier"
                     ].tolist()
                 )
@@ -1426,26 +1433,33 @@ class NMDCWorkflowDataProcessManager:
         mapping_df = pd.read_csv(mapping_file)
         inspection_df = pd.read_csv(inspection_results_path)
 
+        mapping_conf_lookup = {
+            str(row["raw_data_identifier"]): str(row.get("match_confidence", ""))
+            .strip()
+            .lower()
+            for _, row in mapping_df.iterrows()
+        }
+
         # Build DataFrame for batch files with their metadata
-        batch_df = pd.DataFrame(
-            [
+        batch_rows = []
+        for f in batch_files:
+            write_time = inspection_df[
+                inspection_df["file_name"] == f.name
+            ].iloc[0]["write_time"]
+            batch_rows.append(
                 {
                     "raw_data_file_short": f.name,
                     "file_path": str(f),
-                    "raw_file_type": mapping_df[
-                        mapping_df["raw_data_identifier"] == f.name
-                    ].iloc[0]["raw_file_type"],
-                    "write_time": inspection_df[
-                        inspection_df["file_name"] == f.name
-                    ].iloc[0]["write_time"],
+                    "is_calibration": mapping_conf_lookup.get(f.name, "")
+                    == "calibrant",
+                    "write_time": write_time,
                 }
-                for f in batch_files
-            ]
-        )
+            )
+        batch_df = pd.DataFrame(batch_rows)
 
         # Separate calibration and sample files
-        sample_files_df = batch_df[batch_df["raw_file_type"] != "calibration"].copy()
-        calibration_count = len(batch_df[batch_df["raw_file_type"] == "calibration"])
+        sample_files_df = batch_df[~batch_df["is_calibration"]].copy()
+        calibration_count = int(batch_df["is_calibration"].sum())
 
         if calibration_count == 0:
             raise ValueError(
@@ -2134,25 +2148,14 @@ class NMDCWorkflowBiosampleManager:
         try:
             mapping_df = pd.read_csv(mapping_file)
 
-            # Check if raw_file_type column exists (new format) or not (old format for backwards compatibility)
-            has_file_type = "raw_file_type" in mapping_df.columns
-
-            if has_file_type:
-                # New format: Filter for high/medium confidence matches AND include calibration/qc files
-                # Calibration files are needed for raw_data_inspector even though they don't map to biosamples
-                mapped_df = mapping_df[
-                    (mapping_df["match_confidence"].isin(["high", "medium"]))
-                    | (mapping_df["raw_file_type"].isin(["qc", "calibration"]))
-                ].copy()
-            else:
-                # Old format (backwards compatible): Filter for only high and medium confidence matches
-                mapped_df = mapping_df[
-                    mapping_df["match_confidence"].isin(["high", "medium"])
-                ].copy()
+            # Forward schema: use match_confidence values only.
+            mapped_df = mapping_df[
+                mapping_df["match_confidence"].isin(["high", "medium", "calibrant"])
+            ].copy()
 
             if len(mapped_df) == 0:
                 self.logger.warning(
-                    "No high or medium confidence matches found - no files will be processed"
+                    "No high/medium matches or calibrant files found - no files will be processed"
                 )
                 return
 
@@ -2190,25 +2193,14 @@ class NMDCWorkflowBiosampleManager:
                     lambda x: str(raw_data_dir / x)
                 )
 
-            # Select columns for output - include raw_file_type if it exists
-            if has_file_type:
-                output_df = mapped_df[
-                    [
-                        "raw_file_path",
-                        "biosample_id",
-                        "biosample_name",
-                        "match_confidence",
-                    ]
-                ].copy()
-            else:
-                output_df = mapped_df[
-                    [
-                        "raw_file_path",
-                        "biosample_id",
-                        "biosample_name",
-                        "match_confidence",
-                    ]
-                ].copy()
+            output_df = mapped_df[
+                [
+                    "raw_file_path",
+                    "biosample_id",
+                    "biosample_name",
+                    "match_confidence",
+                ]
+            ].copy()
 
             # Save the filtered file list
             output_file = self.workflow_path / "metadata" / "mapped_raw_files.csv"
@@ -2226,13 +2218,14 @@ class NMDCWorkflowBiosampleManager:
             self.logger.info(f"High confidence: {high_conf}")
             self.logger.info(f"Medium confidence: {med_conf}")
 
-            if has_file_type:
-                calibration_files = len(
-                    mapped_df[mapped_df["raw_file_type"].isin(["qc", "calibration"])]
-                )
-                sample_files = len(mapped_df[mapped_df["raw_file_type"] == "sample"])
-                self.logger.info(f"Sample files: {sample_files}")
-                self.logger.info(f"Calibration/QC files: {calibration_files}")
+            calibrant_files = len(
+                mapped_df[mapped_df["match_confidence"] == "calibrant"]
+            )
+            sample_files = len(
+                mapped_df[mapped_df["match_confidence"].isin(["high", "medium"])]
+            )
+            self.logger.info(f"Sample files: {sample_files}")
+            self.logger.info(f"Calibrant files: {calibrant_files}")
 
             self.logger.info(
                 f"Files excluded: {total_files - len(output_df)} (no_match + low confidence)"
@@ -3483,7 +3476,8 @@ class WorkflowMetadataManager:
 
         # Get calibration files from mapping
         calibration_files_df = mapping_df[
-            mapping_df["raw_file_type"] == "calibration"
+            mapping_df["match_confidence"].fillna("").astype(str).str.strip().str.lower()
+            == "calibrant"
         ].copy()
 
         if len(calibration_files_df) == 0:
@@ -4676,6 +4670,35 @@ class WorkflowMetadataManager:
                 self.logger.error("Run generate_material_processing_input_csv() first")
                 return False
 
+            # MaterialProcessingMetadataGenerator expects valid biosample IDs.
+            # Exclude calibrant/unmapped rows with empty biosample_id values.
+            mapping_df = pd.read_csv(input_csv_path)
+            valid_biosample_mask = (
+                mapping_df["biosample_id"].notna()
+                & (mapping_df["biosample_id"].astype(str).str.strip() != "")
+            )
+            filtered_mapping_df = mapping_df[valid_biosample_mask].copy()
+
+            dropped_rows = len(mapping_df) - len(filtered_mapping_df)
+            if dropped_rows > 0:
+                self.logger.info(
+                    f"Excluding {dropped_rows} rows without biosample_id from material processing metadata generation"
+                )
+
+            if len(filtered_mapping_df) == 0:
+                self.logger.error(
+                    "No rows with valid biosample_id found for material processing metadata generation"
+                )
+                return False
+
+            # Write filtered mapping for MP metadata generation to metadata_gen_input_csvs
+            mapping_input_dir = self.workflow_path / "metadata" / "metadata_gen_input_csvs"
+            mapping_input_dir.mkdir(parents=True, exist_ok=True)
+            filtered_input_csv_path = (
+                mapping_input_dir / "biosample_mapping_for_mp_metadata_generation.csv"
+            )
+            filtered_mapping_df.to_csv(filtered_input_csv_path, index=False)
+
             # Get study ID from config
             study_id = self.config.get("study", {}).get("id")
             if not study_id:
@@ -4694,7 +4717,7 @@ class WorkflowMetadataManager:
                 database_dump_json_path=str(db_path),
                 study_id=study_id,
                 yaml_outline_path=str(yaml_path),
-                sample_to_dg_mapping_path=str(input_csv_path),
+                sample_to_dg_mapping_path=str(filtered_input_csv_path),
                 test=True,
             )
 
@@ -4718,7 +4741,7 @@ class WorkflowMetadataManager:
                     database_dump_json_path=str(db_path),
                     study_id=study_id,
                     yaml_outline_path=str(yaml_path),
-                    sample_to_dg_mapping_path=str(input_csv_path),
+                    sample_to_dg_mapping_path=str(filtered_input_csv_path),
                     test=False,
                 )
                 # Run metadata generation

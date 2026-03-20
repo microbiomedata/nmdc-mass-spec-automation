@@ -60,7 +60,7 @@ async def main():
 
     # Step 8: Generate and submit NMDC metadata packages
     logger.info("8. Generating NMDC metadata packages...")
-    manager.generate_nmdc_metadata_for_workflow()
+    manager.generate_nmdc_metadata_for_workflow(test=True)
     assert manager.should_skip('metadata_packages_generated'), "NMDC metadata package generation must complete successfully to proceed"
 
     # Step 9: Submit metadata packages to dev environment

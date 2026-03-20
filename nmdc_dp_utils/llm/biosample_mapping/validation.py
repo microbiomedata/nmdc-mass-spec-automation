@@ -168,14 +168,14 @@ def validate_biosample_mapping_csv(
         
         # Check processedsample_placeholder
         ps_placeholder = row.get('processedsample_placeholder', '').strip()
-        if match_confidence in ['high', 'medium', 'low', 'calibrant'] and not ps_placeholder:
+        if match_confidence in ['high', 'medium', 'low'] and not ps_placeholder:
             errors.append(f"{row_num}: processedsample_placeholder is required when match_confidence is '{match_confidence}'")
         if ps_placeholder and ps_placeholder not in processed_samples:
             errors.append(f"{row_num}: processedsample_placeholder '{ps_placeholder}' not found in material processing YAML")
         
         # Check material_processing_protocol_id
         protocol_id = row.get('material_processing_protocol_id', '').strip()
-        if match_confidence in ['high', 'medium', 'low', 'calibrant'] and not protocol_id:
+        if match_confidence in ['high', 'medium', 'low'] and not protocol_id:
             errors.append(f"{row_num}: material_processing_protocol_id is required when match_confidence is '{match_confidence}'")
         if protocol_id and protocol_id not in protocol_names:
             errors.append(f"{row_num}: material_processing_protocol_id '{protocol_id}' not found in material processing YAML (available: {', '.join(protocol_names)})")

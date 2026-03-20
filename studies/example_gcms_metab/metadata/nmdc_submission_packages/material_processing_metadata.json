@@ -1,0 +1,3710 @@
+{
+  "material_processing_set": [
+    {
+      "id": "nmdc:extrp-11-17fsmv72",
+      "type": "nmdc:Extraction",
+      "name": "Metabolite Extraction from Soil",
+      "description": "Soil was bead beat in 60% methanol solution for 15 min at 4Cel. Then, 12 mL of ice-cold chloroform was added. Samples were probe sonicated at 60% amplitude for 30 seconds on ice, cooled, and sonicated again. Samples were incubated for 5 min at -80Cel, vortexed for 1 min, and centrifuged at 4500g for 10 min at 4Cel. The upper aqueous phase was collected into a separate glass vial, dried in a vacuum concentrator.",
+      "has_input": [
+        "nmdc:bsm-11-622k6044"
+      ],
+      "has_output": [
+        "nmdc:procsm-11-077ze677"
+      ],
+      "substances_used": [
+        {
+          "type": "nmdc:PortionOfSubstance",
+          "final_concentration": {
+            "type": "nmdc:QuantityValue",
+            "has_raw_value": "60 %",
+            "has_unit": "%",
+            "has_numeric_value": 60
+          },
+          "known_as": "methanol",
+          "substance_role": "solvent"
+        },
+        {
+          "type": "nmdc:PortionOfSubstance",
+          "final_concentration": {
+            "type": "nmdc:QuantityValue",
+            "has_raw_value": "40 %",
+            "has_unit": "%",
+            "has_numeric_value": 40
+          },
+          "known_as": "water",
+          "substance_role": "solvent"
+        },
+        {
+          "type": "nmdc:PortionOfSubstance",
+          "known_as": "chloroform",
+          "substance_role": "solvent",
+          "volume": {
+            "type": "nmdc:QuantityValue",
+            "has_raw_value": "12 mL",
+            "has_unit": "mL",
+            "has_numeric_value": 12
+          }
+        }
+      ],
+      "extraction_targets": [
+        "metabolite"
+      ],
+      "temperature": {
+        "type": "nmdc:QuantityValue",
+        "has_raw_value": "4 Cel",
+        "has_unit": "Cel",
+        "has_numeric_value": 4
+      }
+    },
+    {
+      "id": "nmdc:dispro-11-xrbpjm29",
+      "type": "nmdc:DissolvingProcess",
+      "name": "Resuspension of Dried Aqueous Extract",
+      "description": "The dried aqueous phase from nmdc:procsm-11-077ze677 was resuspended in 200 uL of methanol.",
+      "has_input": [
+        "nmdc:procsm-11-077ze677"
+      ],
+      "has_output": [
+        "nmdc:procsm-11-5pggbx62"
+      ],
+      "substances_used": [
+        {
+          "type": "nmdc:PortionOfSubstance",
+          "known_as": "methanol",
+          "substance_role": "solvent",
+          "volume": {
+            "type": "nmdc:QuantityValue",
+            "has_raw_value": "200 uL",
+            "has_unit": "uL",
+            "has_numeric_value": 200
+          }
+        }
+      ]
+    },
+    {
+      "id": "nmdc:filtpr-11-1t78y979",
+      "type": "nmdc:FiltrationProcess",
+      "name": "Supernatant Collection after Resuspension",
+      "description": "After resuspension, the sample was centrifuged at 4500g for 10 min at 4Cel, and the supernatant was transferred to a smaller glass vial and dried in a vacuum concentrator.",
+      "has_input": [
+        "nmdc:procsm-11-5pggbx62"
+      ],
+      "has_output": [
+        "nmdc:procsm-11-wjvw9w87"
+      ]
+    },
+    {
+      "id": "nmdc:chcpr-11-54c7sx90",
+      "type": "nmdc:ChemicalConversionProcess",
+      "name": "Methoxyamination for GC-MS",
+      "description": "Dried samples from nmdc:procsm-11-wjvw9w87 were dissolved in 20 uL methoxyamine solution, incubated at 37Cel for 90min, then centrifuged and vialed for GC-MS analysis.",
+      "has_input": [
+        "nmdc:procsm-11-wjvw9w87"
+      ],
+      "has_output": [
+        "nmdc:procsm-11-zq1w8n86"
+      ],
+      "chemical_conversion_category": "substitution",
+      "duration": {
+        "type": "nmdc:QuantityValue",
+        "has_raw_value": "90 min",
+        "has_unit": "min",
+        "has_numeric_value": 90
+      },
+      "temperature": {
+        "type": "nmdc:QuantityValue",
+        "has_raw_value": "37 Cel",
+        "has_unit": "Cel",
+        "has_numeric_value": 37
+      },
+      "substances_used": [
+        {
+          "type": "nmdc:PortionOfSubstance",
+          "known_as": "methoxyamine",
+          "substance_role": "derivatizing_agent",
+          "volume": {
+            "type": "nmdc:QuantityValue",
+            "has_raw_value": "20 uL",
+            "has_unit": "uL",
+            "has_numeric_value": 20
+          }
+        }
+      ]
+    },
+    {
+      "id": "nmdc:extrp-11-f8e01607",
+      "type": "nmdc:Extraction",
+      "name": "Metabolite Extraction from Soil",
+      "description": "Soil was bead beat in 60% methanol solution for 15 min at 4Cel. Then, 12 mL of ice-cold chloroform was added. Samples were probe sonicated at 60% amplitude for 30 seconds on ice, cooled, and sonicated again. Samples were incubated for 5 min at -80Cel, vortexed for 1 min, and centrifuged at 4500g for 10 min at 4Cel. The upper aqueous phase was collected into a separate glass vial, dried in a vacuum concentrator.",
+      "has_input": [
+        "nmdc:bsm-11-8rn9bm20"
+      ],
+      "has_output": [
+        "nmdc:procsm-11-vy1sws42"
+      ],
+      "substances_used": [
+        {
+          "type": "nmdc:PortionOfSubstance",
+          "final_concentration": {
+            "type": "nmdc:QuantityValue",
+            "has_raw_value": "60 %",
+            "has_unit": "%",
+            "has_numeric_value": 60
+          },
+          "known_as": "methanol",
+          "substance_role": "solvent"
+        },
+        {
+          "type": "nmdc:PortionOfSubstance",
+          "final_concentration": {
+            "type": "nmdc:QuantityValue",
+            "has_raw_value": "40 %",
+            "has_unit": "%",
+            "has_numeric_value": 40
+          },
+          "known_as": "water",
+          "substance_role": "solvent"
+        },
+        {
+          "type": "nmdc:PortionOfSubstance",
+          "known_as": "chloroform",
+          "substance_role": "solvent",
+          "volume": {
+            "type": "nmdc:QuantityValue",
+            "has_raw_value": "12 mL",
+            "has_unit": "mL",
+            "has_numeric_value": 12
+          }
+        }
+      ],
+      "extraction_targets": [
+        "metabolite"
+      ],
+      "temperature": {
+        "type": "nmdc:QuantityValue",
+        "has_raw_value": "4 Cel",
+        "has_unit": "Cel",
+        "has_numeric_value": 4
+      }
+    },
+    {
+      "id": "nmdc:dispro-11-wwvjdj09",
+      "type": "nmdc:DissolvingProcess",
+      "name": "Resuspension of Dried Aqueous Extract",
+      "description": "The dried aqueous phase from nmdc:procsm-11-vy1sws42 was resuspended in 200 uL of methanol.",
+      "has_input": [
+        "nmdc:procsm-11-vy1sws42"
+      ],
+      "has_output": [
+        "nmdc:procsm-11-wk7g8822"
+      ],
+      "substances_used": [
+        {
+          "type": "nmdc:PortionOfSubstance",
+          "known_as": "methanol",
+          "substance_role": "solvent",
+          "volume": {
+            "type": "nmdc:QuantityValue",
+            "has_raw_value": "200 uL",
+            "has_unit": "uL",
+            "has_numeric_value": 200
+          }
+        }
+      ]
+    },
+    {
+      "id": "nmdc:filtpr-11-c5jw0h54",
+      "type": "nmdc:FiltrationProcess",
+      "name": "Supernatant Collection after Resuspension",
+      "description": "After resuspension, the sample was centrifuged at 4500g for 10 min at 4Cel, and the supernatant was transferred to a smaller glass vial and dried in a vacuum concentrator.",
+      "has_input": [
+        "nmdc:procsm-11-wk7g8822"
+      ],
+      "has_output": [
+        "nmdc:procsm-11-q0c3ta06"
+      ]
+    },
+    {
+      "id": "nmdc:chcpr-11-n2rhyy28",
+      "type": "nmdc:ChemicalConversionProcess",
+      "name": "Methoxyamination for GC-MS",
+      "description": "Dried samples from nmdc:procsm-11-q0c3ta06 were dissolved in 20 uL methoxyamine solution, incubated at 37Cel for 90min, then centrifuged and vialed for GC-MS analysis.",
+      "has_input": [
+        "nmdc:procsm-11-q0c3ta06"
+      ],
+      "has_output": [
+        "nmdc:procsm-11-eezxvc98"
+      ],
+      "chemical_conversion_category": "substitution",
+      "duration": {
+        "type": "nmdc:QuantityValue",
+        "has_raw_value": "90 min",
+        "has_unit": "min",
+        "has_numeric_value": 90
+      },
+      "temperature": {
+        "type": "nmdc:QuantityValue",
+        "has_raw_value": "37 Cel",
+        "has_unit": "Cel",
+        "has_numeric_value": 37
+      },
+      "substances_used": [
+        {
+          "type": "nmdc:PortionOfSubstance",
+          "known_as": "methoxyamine",
+          "substance_role": "derivatizing_agent",
+          "volume": {
+            "type": "nmdc:QuantityValue",
+            "has_raw_value": "20 uL",
+            "has_unit": "uL",
+            "has_numeric_value": 20
+          }
+        }
+      ]
+    },
+    {
+      "id": "nmdc:extrp-11-z6fpaz55",
+      "type": "nmdc:Extraction",
+      "name": "Metabolite Extraction from Soil",
+      "description": "Soil was bead beat in 60% methanol solution for 15 min at 4Cel. Then, 12 mL of ice-cold chloroform was added. Samples were probe sonicated at 60% amplitude for 30 seconds on ice, cooled, and sonicated again. Samples were incubated for 5 min at -80Cel, vortexed for 1 min, and centrifuged at 4500g for 10 min at 4Cel. The upper aqueous phase was collected into a separate glass vial, dried in a vacuum concentrator.",
+      "has_input": [
+        "nmdc:bsm-11-frgt4x11"
+      ],
+      "has_output": [
+        "nmdc:procsm-11-a272ar17"
+      ],
+      "substances_used": [
+        {
+          "type": "nmdc:PortionOfSubstance",
+          "final_concentration": {
+            "type": "nmdc:QuantityValue",
+            "has_raw_value": "60 %",
+            "has_unit": "%",
+            "has_numeric_value": 60
+          },
+          "known_as": "methanol",
+          "substance_role": "solvent"
+        },
+        {
+          "type": "nmdc:PortionOfSubstance",
+          "final_concentration": {
+            "type": "nmdc:QuantityValue",
+            "has_raw_value": "40 %",
+            "has_unit": "%",
+            "has_numeric_value": 40
+          },
+          "known_as": "water",
+          "substance_role": "solvent"
+        },
+        {
+          "type": "nmdc:PortionOfSubstance",
+          "known_as": "chloroform",
+          "substance_role": "solvent",
+          "volume": {
+            "type": "nmdc:QuantityValue",
+            "has_raw_value": "12 mL",
+            "has_unit": "mL",
+            "has_numeric_value": 12
+          }
+        }
+      ],
+      "extraction_targets": [
+        "metabolite"
+      ],
+      "temperature": {
+        "type": "nmdc:QuantityValue",
+        "has_raw_value": "4 Cel",
+        "has_unit": "Cel",
+        "has_numeric_value": 4
+      }
+    },
+    {
+      "id": "nmdc:dispro-11-8ms8cx56",
+      "type": "nmdc:DissolvingProcess",
+      "name": "Resuspension of Dried Aqueous Extract",
+      "description": "The dried aqueous phase from nmdc:procsm-11-a272ar17 was resuspended in 200 uL of methanol.",
+      "has_input": [
+        "nmdc:procsm-11-a272ar17"
+      ],
+      "has_output": [
+        "nmdc:procsm-11-ctrj4x36"
+      ],
+      "substances_used": [
+        {
+          "type": "nmdc:PortionOfSubstance",
+          "known_as": "methanol",
+          "substance_role": "solvent",
+          "volume": {
+            "type": "nmdc:QuantityValue",
+            "has_raw_value": "200 uL",
+            "has_unit": "uL",
+            "has_numeric_value": 200
+          }
+        }
+      ]
+    },
+    {
+      "id": "nmdc:filtpr-11-5t0mw425",
+      "type": "nmdc:FiltrationProcess",
+      "name": "Supernatant Collection after Resuspension",
+      "description": "After resuspension, the sample was centrifuged at 4500g for 10 min at 4Cel, and the supernatant was transferred to a smaller glass vial and dried in a vacuum concentrator.",
+      "has_input": [
+        "nmdc:procsm-11-ctrj4x36"
+      ],
+      "has_output": [
+        "nmdc:procsm-11-avde2x58"
+      ]
+    },
+    {
+      "id": "nmdc:chcpr-11-3ywydj67",
+      "type": "nmdc:ChemicalConversionProcess",
+      "name": "Methoxyamination for GC-MS",
+      "description": "Dried samples from nmdc:procsm-11-avde2x58 were dissolved in 20 uL methoxyamine solution, incubated at 37Cel for 90min, then centrifuged and vialed for GC-MS analysis.",
+      "has_input": [
+        "nmdc:procsm-11-avde2x58"
+      ],
+      "has_output": [
+        "nmdc:procsm-11-jmrm9918"
+      ],
+      "chemical_conversion_category": "substitution",
+      "duration": {
+        "type": "nmdc:QuantityValue",
+        "has_raw_value": "90 min",
+        "has_unit": "min",
+        "has_numeric_value": 90
+      },
+      "temperature": {
+        "type": "nmdc:QuantityValue",
+        "has_raw_value": "37 Cel",
+        "has_unit": "Cel",
+        "has_numeric_value": 37
+      },
+      "substances_used": [
+        {
+          "type": "nmdc:PortionOfSubstance",
+          "known_as": "methoxyamine",
+          "substance_role": "derivatizing_agent",
+          "volume": {
+            "type": "nmdc:QuantityValue",
+            "has_raw_value": "20 uL",
+            "has_unit": "uL",
+            "has_numeric_value": 20
+          }
+        }
+      ]
+    },
+    {
+      "id": "nmdc:extrp-11-w4p1bf22",
+      "type": "nmdc:Extraction",
+      "name": "Metabolite Extraction from Soil",
+      "description": "Soil was bead beat in 60% methanol solution for 15 min at 4Cel. Then, 12 mL of ice-cold chloroform was added. Samples were probe sonicated at 60% amplitude for 30 seconds on ice, cooled, and sonicated again. Samples were incubated for 5 min at -80Cel, vortexed for 1 min, and centrifuged at 4500g for 10 min at 4Cel. The upper aqueous phase was collected into a separate glass vial, dried in a vacuum concentrator.",
+      "has_input": [
+        "nmdc:bsm-11-hebdaz02"
+      ],
+      "has_output": [
+        "nmdc:procsm-11-9b33q041"
+      ],
+      "substances_used": [
+        {
+          "type": "nmdc:PortionOfSubstance",
+          "final_concentration": {
+            "type": "nmdc:QuantityValue",
+            "has_raw_value": "60 %",
+            "has_unit": "%",
+            "has_numeric_value": 60
+          },
+          "known_as": "methanol",
+          "substance_role": "solvent"
+        },
+        {
+          "type": "nmdc:PortionOfSubstance",
+          "final_concentration": {
+            "type": "nmdc:QuantityValue",
+            "has_raw_value": "40 %",
+            "has_unit": "%",
+            "has_numeric_value": 40
+          },
+          "known_as": "water",
+          "substance_role": "solvent"
+        },
+        {
+          "type": "nmdc:PortionOfSubstance",
+          "known_as": "chloroform",
+          "substance_role": "solvent",
+          "volume": {
+            "type": "nmdc:QuantityValue",
+            "has_raw_value": "12 mL",
+            "has_unit": "mL",
+            "has_numeric_value": 12
+          }
+        }
+      ],
+      "extraction_targets": [
+        "metabolite"
+      ],
+      "temperature": {
+        "type": "nmdc:QuantityValue",
+        "has_raw_value": "4 Cel",
+        "has_unit": "Cel",
+        "has_numeric_value": 4
+      }
+    },
+    {
+      "id": "nmdc:dispro-11-gh64ec27",
+      "type": "nmdc:DissolvingProcess",
+      "name": "Resuspension of Dried Aqueous Extract",
+      "description": "The dried aqueous phase from nmdc:procsm-11-9b33q041 was resuspended in 200 uL of methanol.",
+      "has_input": [
+        "nmdc:procsm-11-9b33q041"
+      ],
+      "has_output": [
+        "nmdc:procsm-11-1kb9ee34"
+      ],
+      "substances_used": [
+        {
+          "type": "nmdc:PortionOfSubstance",
+          "known_as": "methanol",
+          "substance_role": "solvent",
+          "volume": {
+            "type": "nmdc:QuantityValue",
+            "has_raw_value": "200 uL",
+            "has_unit": "uL",
+            "has_numeric_value": 200
+          }
+        }
+      ]
+    },
+    {
+      "id": "nmdc:filtpr-11-cbsm3p56",
+      "type": "nmdc:FiltrationProcess",
+      "name": "Supernatant Collection after Resuspension",
+      "description": "After resuspension, the sample was centrifuged at 4500g for 10 min at 4Cel, and the supernatant was transferred to a smaller glass vial and dried in a vacuum concentrator.",
+      "has_input": [
+        "nmdc:procsm-11-1kb9ee34"
+      ],
+      "has_output": [
+        "nmdc:procsm-11-qwjkx177"
+      ]
+    },
+    {
+      "id": "nmdc:chcpr-11-6kvz5m53",
+      "type": "nmdc:ChemicalConversionProcess",
+      "name": "Methoxyamination for GC-MS",
+      "description": "Dried samples from nmdc:procsm-11-qwjkx177 were dissolved in 20 uL methoxyamine solution, incubated at 37Cel for 90min, then centrifuged and vialed for GC-MS analysis.",
+      "has_input": [
+        "nmdc:procsm-11-qwjkx177"
+      ],
+      "has_output": [
+        "nmdc:procsm-11-47crzf40"
+      ],
+      "chemical_conversion_category": "substitution",
+      "duration": {
+        "type": "nmdc:QuantityValue",
+        "has_raw_value": "90 min",
+        "has_unit": "min",
+        "has_numeric_value": 90
+      },
+      "temperature": {
+        "type": "nmdc:QuantityValue",
+        "has_raw_value": "37 Cel",
+        "has_unit": "Cel",
+        "has_numeric_value": 37
+      },
+      "substances_used": [
+        {
+          "type": "nmdc:PortionOfSubstance",
+          "known_as": "methoxyamine",
+          "substance_role": "derivatizing_agent",
+          "volume": {
+            "type": "nmdc:QuantityValue",
+            "has_raw_value": "20 uL",
+            "has_unit": "uL",
+            "has_numeric_value": 20
+          }
+        }
+      ]
+    },
+    {
+      "id": "nmdc:extrp-11-tp2a9p35",
+      "type": "nmdc:Extraction",
+      "name": "Metabolite Extraction from Soil",
+      "description": "Soil was bead beat in 60% methanol solution for 15 min at 4Cel. Then, 12 mL of ice-cold chloroform was added. Samples were probe sonicated at 60% amplitude for 30 seconds on ice, cooled, and sonicated again. Samples were incubated for 5 min at -80Cel, vortexed for 1 min, and centrifuged at 4500g for 10 min at 4Cel. The upper aqueous phase was collected into a separate glass vial, dried in a vacuum concentrator.",
+      "has_input": [
+        "nmdc:bsm-11-93mc8g67"
+      ],
+      "has_output": [
+        "nmdc:procsm-11-q1pmx329"
+      ],
+      "substances_used": [
+        {
+          "type": "nmdc:PortionOfSubstance",
+          "final_concentration": {
+            "type": "nmdc:QuantityValue",
+            "has_raw_value": "60 %",
+            "has_unit": "%",
+            "has_numeric_value": 60
+          },
+          "known_as": "methanol",
+          "substance_role": "solvent"
+        },
+        {
+          "type": "nmdc:PortionOfSubstance",
+          "final_concentration": {
+            "type": "nmdc:QuantityValue",
+            "has_raw_value": "40 %",
+            "has_unit": "%",
+            "has_numeric_value": 40
+          },
+          "known_as": "water",
+          "substance_role": "solvent"
+        },
+        {
+          "type": "nmdc:PortionOfSubstance",
+          "known_as": "chloroform",
+          "substance_role": "solvent",
+          "volume": {
+            "type": "nmdc:QuantityValue",
+            "has_raw_value": "12 mL",
+            "has_unit": "mL",
+            "has_numeric_value": 12
+          }
+        }
+      ],
+      "extraction_targets": [
+        "metabolite"
+      ],
+      "temperature": {
+        "type": "nmdc:QuantityValue",
+        "has_raw_value": "4 Cel",
+        "has_unit": "Cel",
+        "has_numeric_value": 4
+      }
+    },
+    {
+      "id": "nmdc:dispro-11-jrt6q908",
+      "type": "nmdc:DissolvingProcess",
+      "name": "Resuspension of Dried Aqueous Extract",
+      "description": "The dried aqueous phase from nmdc:procsm-11-q1pmx329 was resuspended in 200 uL of methanol.",
+      "has_input": [
+        "nmdc:procsm-11-q1pmx329"
+      ],
+      "has_output": [
+        "nmdc:procsm-11-kf35c470"
+      ],
+      "substances_used": [
+        {
+          "type": "nmdc:PortionOfSubstance",
+          "known_as": "methanol",
+          "substance_role": "solvent",
+          "volume": {
+            "type": "nmdc:QuantityValue",
+            "has_raw_value": "200 uL",
+            "has_unit": "uL",
+            "has_numeric_value": 200
+          }
+        }
+      ]
+    },
+    {
+      "id": "nmdc:filtpr-11-hna5cq77",
+      "type": "nmdc:FiltrationProcess",
+      "name": "Supernatant Collection after Resuspension",
+      "description": "After resuspension, the sample was centrifuged at 4500g for 10 min at 4Cel, and the supernatant was transferred to a smaller glass vial and dried in a vacuum concentrator.",
+      "has_input": [
+        "nmdc:procsm-11-kf35c470"
+      ],
+      "has_output": [
+        "nmdc:procsm-11-cddhrn76"
+      ]
+    },
+    {
+      "id": "nmdc:chcpr-11-achvgj37",
+      "type": "nmdc:ChemicalConversionProcess",
+      "name": "Methoxyamination for GC-MS",
+      "description": "Dried samples from nmdc:procsm-11-cddhrn76 were dissolved in 20 uL methoxyamine solution, incubated at 37Cel for 90min, then centrifuged and vialed for GC-MS analysis.",
+      "has_input": [
+        "nmdc:procsm-11-cddhrn76"
+      ],
+      "has_output": [
+        "nmdc:procsm-11-pbvcnh98"
+      ],
+      "chemical_conversion_category": "substitution",
+      "duration": {
+        "type": "nmdc:QuantityValue",
+        "has_raw_value": "90 min",
+        "has_unit": "min",
+        "has_numeric_value": 90
+      },
+      "temperature": {
+        "type": "nmdc:QuantityValue",
+        "has_raw_value": "37 Cel",
+        "has_unit": "Cel",
+        "has_numeric_value": 37
+      },
+      "substances_used": [
+        {
+          "type": "nmdc:PortionOfSubstance",
+          "known_as": "methoxyamine",
+          "substance_role": "derivatizing_agent",
+          "volume": {
+            "type": "nmdc:QuantityValue",
+            "has_raw_value": "20 uL",
+            "has_unit": "uL",
+            "has_numeric_value": 20
+          }
+        }
+      ]
+    },
+    {
+      "id": "nmdc:extrp-11-qw9wpz73",
+      "type": "nmdc:Extraction",
+      "name": "Metabolite Extraction from Soil",
+      "description": "Soil was bead beat in 60% methanol solution for 15 min at 4Cel. Then, 12 mL of ice-cold chloroform was added. Samples were probe sonicated at 60% amplitude for 30 seconds on ice, cooled, and sonicated again. Samples were incubated for 5 min at -80Cel, vortexed for 1 min, and centrifuged at 4500g for 10 min at 4Cel. The upper aqueous phase was collected into a separate glass vial, dried in a vacuum concentrator.",
+      "has_input": [
+        "nmdc:bsm-11-71991e79"
+      ],
+      "has_output": [
+        "nmdc:procsm-11-n03azr83"
+      ],
+      "substances_used": [
+        {
+          "type": "nmdc:PortionOfSubstance",
+          "final_concentration": {
+            "type": "nmdc:QuantityValue",
+            "has_raw_value": "60 %",
+            "has_unit": "%",
+            "has_numeric_value": 60
+          },
+          "known_as": "methanol",
+          "substance_role": "solvent"
+        },
+        {
+          "type": "nmdc:PortionOfSubstance",
+          "final_concentration": {
+            "type": "nmdc:QuantityValue",
+            "has_raw_value": "40 %",
+            "has_unit": "%",
+            "has_numeric_value": 40
+          },
+          "known_as": "water",
+          "substance_role": "solvent"
+        },
+        {
+          "type": "nmdc:PortionOfSubstance",
+          "known_as": "chloroform",
+          "substance_role": "solvent",
+          "volume": {
+            "type": "nmdc:QuantityValue",
+            "has_raw_value": "12 mL",
+            "has_unit": "mL",
+            "has_numeric_value": 12
+          }
+        }
+      ],
+      "extraction_targets": [
+        "metabolite"
+      ],
+      "temperature": {
+        "type": "nmdc:QuantityValue",
+        "has_raw_value": "4 Cel",
+        "has_unit": "Cel",
+        "has_numeric_value": 4
+      }
+    },
+    {
+      "id": "nmdc:dispro-11-fh2jer23",
+      "type": "nmdc:DissolvingProcess",
+      "name": "Resuspension of Dried Aqueous Extract",
+      "description": "The dried aqueous phase from nmdc:procsm-11-n03azr83 was resuspended in 200 uL of methanol.",
+      "has_input": [
+        "nmdc:procsm-11-n03azr83"
+      ],
+      "has_output": [
+        "nmdc:procsm-11-w4pf0g68"
+      ],
+      "substances_used": [
+        {
+          "type": "nmdc:PortionOfSubstance",
+          "known_as": "methanol",
+          "substance_role": "solvent",
+          "volume": {
+            "type": "nmdc:QuantityValue",
+            "has_raw_value": "200 uL",
+            "has_unit": "uL",
+            "has_numeric_value": 200
+          }
+        }
+      ]
+    },
+    {
+      "id": "nmdc:filtpr-11-8tvn8r95",
+      "type": "nmdc:FiltrationProcess",
+      "name": "Supernatant Collection after Resuspension",
+      "description": "After resuspension, the sample was centrifuged at 4500g for 10 min at 4Cel, and the supernatant was transferred to a smaller glass vial and dried in a vacuum concentrator.",
+      "has_input": [
+        "nmdc:procsm-11-w4pf0g68"
+      ],
+      "has_output": [
+        "nmdc:procsm-11-5cysz035"
+      ]
+    },
+    {
+      "id": "nmdc:chcpr-11-qr8nv159",
+      "type": "nmdc:ChemicalConversionProcess",
+      "name": "Methoxyamination for GC-MS",
+      "description": "Dried samples from nmdc:procsm-11-5cysz035 were dissolved in 20 uL methoxyamine solution, incubated at 37Cel for 90min, then centrifuged and vialed for GC-MS analysis.",
+      "has_input": [
+        "nmdc:procsm-11-5cysz035"
+      ],
+      "has_output": [
+        "nmdc:procsm-11-vxvhg398"
+      ],
+      "chemical_conversion_category": "substitution",
+      "duration": {
+        "type": "nmdc:QuantityValue",
+        "has_raw_value": "90 min",
+        "has_unit": "min",
+        "has_numeric_value": 90
+      },
+      "temperature": {
+        "type": "nmdc:QuantityValue",
+        "has_raw_value": "37 Cel",
+        "has_unit": "Cel",
+        "has_numeric_value": 37
+      },
+      "substances_used": [
+        {
+          "type": "nmdc:PortionOfSubstance",
+          "known_as": "methoxyamine",
+          "substance_role": "derivatizing_agent",
+          "volume": {
+            "type": "nmdc:QuantityValue",
+            "has_raw_value": "20 uL",
+            "has_unit": "uL",
+            "has_numeric_value": 20
+          }
+        }
+      ]
+    },
+    {
+      "id": "nmdc:extrp-11-b8mgv184",
+      "type": "nmdc:Extraction",
+      "name": "Metabolite Extraction from Soil",
+      "description": "Soil was bead beat in 60% methanol solution for 15 min at 4Cel. Then, 12 mL of ice-cold chloroform was added. Samples were probe sonicated at 60% amplitude for 30 seconds on ice, cooled, and sonicated again. Samples were incubated for 5 min at -80Cel, vortexed for 1 min, and centrifuged at 4500g for 10 min at 4Cel. The upper aqueous phase was collected into a separate glass vial, dried in a vacuum concentrator.",
+      "has_input": [
+        "nmdc:bsm-11-7m09me46"
+      ],
+      "has_output": [
+        "nmdc:procsm-11-ryct6p55"
+      ],
+      "substances_used": [
+        {
+          "type": "nmdc:PortionOfSubstance",
+          "final_concentration": {
+            "type": "nmdc:QuantityValue",
+            "has_raw_value": "60 %",
+            "has_unit": "%",
+            "has_numeric_value": 60
+          },
+          "known_as": "methanol",
+          "substance_role": "solvent"
+        },
+        {
+          "type": "nmdc:PortionOfSubstance",
+          "final_concentration": {
+            "type": "nmdc:QuantityValue",
+            "has_raw_value": "40 %",
+            "has_unit": "%",
+            "has_numeric_value": 40
+          },
+          "known_as": "water",
+          "substance_role": "solvent"
+        },
+        {
+          "type": "nmdc:PortionOfSubstance",
+          "known_as": "chloroform",
+          "substance_role": "solvent",
+          "volume": {
+            "type": "nmdc:QuantityValue",
+            "has_raw_value": "12 mL",
+            "has_unit": "mL",
+            "has_numeric_value": 12
+          }
+        }
+      ],
+      "extraction_targets": [
+        "metabolite"
+      ],
+      "temperature": {
+        "type": "nmdc:QuantityValue",
+        "has_raw_value": "4 Cel",
+        "has_unit": "Cel",
+        "has_numeric_value": 4
+      }
+    },
+    {
+      "id": "nmdc:dispro-11-by4e3n34",
+      "type": "nmdc:DissolvingProcess",
+      "name": "Resuspension of Dried Aqueous Extract",
+      "description": "The dried aqueous phase from nmdc:procsm-11-ryct6p55 was resuspended in 200 uL of methanol.",
+      "has_input": [
+        "nmdc:procsm-11-ryct6p55"
+      ],
+      "has_output": [
+        "nmdc:procsm-11-q91vx245"
+      ],
+      "substances_used": [
+        {
+          "type": "nmdc:PortionOfSubstance",
+          "known_as": "methanol",
+          "substance_role": "solvent",
+          "volume": {
+            "type": "nmdc:QuantityValue",
+            "has_raw_value": "200 uL",
+            "has_unit": "uL",
+            "has_numeric_value": 200
+          }
+        }
+      ]
+    },
+    {
+      "id": "nmdc:filtpr-11-jh6r6r53",
+      "type": "nmdc:FiltrationProcess",
+      "name": "Supernatant Collection after Resuspension",
+      "description": "After resuspension, the sample was centrifuged at 4500g for 10 min at 4Cel, and the supernatant was transferred to a smaller glass vial and dried in a vacuum concentrator.",
+      "has_input": [
+        "nmdc:procsm-11-q91vx245"
+      ],
+      "has_output": [
+        "nmdc:procsm-11-60mbda94"
+      ]
+    },
+    {
+      "id": "nmdc:chcpr-11-wqna0b12",
+      "type": "nmdc:ChemicalConversionProcess",
+      "name": "Methoxyamination for GC-MS",
+      "description": "Dried samples from nmdc:procsm-11-60mbda94 were dissolved in 20 uL methoxyamine solution, incubated at 37Cel for 90min, then centrifuged and vialed for GC-MS analysis.",
+      "has_input": [
+        "nmdc:procsm-11-60mbda94"
+      ],
+      "has_output": [
+        "nmdc:procsm-11-p7ga4x41"
+      ],
+      "chemical_conversion_category": "substitution",
+      "duration": {
+        "type": "nmdc:QuantityValue",
+        "has_raw_value": "90 min",
+        "has_unit": "min",
+        "has_numeric_value": 90
+      },
+      "temperature": {
+        "type": "nmdc:QuantityValue",
+        "has_raw_value": "37 Cel",
+        "has_unit": "Cel",
+        "has_numeric_value": 37
+      },
+      "substances_used": [
+        {
+          "type": "nmdc:PortionOfSubstance",
+          "known_as": "methoxyamine",
+          "substance_role": "derivatizing_agent",
+          "volume": {
+            "type": "nmdc:QuantityValue",
+            "has_raw_value": "20 uL",
+            "has_unit": "uL",
+            "has_numeric_value": 20
+          }
+        }
+      ]
+    },
+    {
+      "id": "nmdc:extrp-11-g7scqy86",
+      "type": "nmdc:Extraction",
+      "name": "Metabolite Extraction from Soil",
+      "description": "Soil was bead beat in 60% methanol solution for 15 min at 4Cel. Then, 12 mL of ice-cold chloroform was added. Samples were probe sonicated at 60% amplitude for 30 seconds on ice, cooled, and sonicated again. Samples were incubated for 5 min at -80Cel, vortexed for 1 min, and centrifuged at 4500g for 10 min at 4Cel. The upper aqueous phase was collected into a separate glass vial, dried in a vacuum concentrator.",
+      "has_input": [
+        "nmdc:bsm-11-cpekyy11"
+      ],
+      "has_output": [
+        "nmdc:procsm-11-ts4wgz63"
+      ],
+      "substances_used": [
+        {
+          "type": "nmdc:PortionOfSubstance",
+          "final_concentration": {
+            "type": "nmdc:QuantityValue",
+            "has_raw_value": "60 %",
+            "has_unit": "%",
+            "has_numeric_value": 60
+          },
+          "known_as": "methanol",
+          "substance_role": "solvent"
+        },
+        {
+          "type": "nmdc:PortionOfSubstance",
+          "final_concentration": {
+            "type": "nmdc:QuantityValue",
+            "has_raw_value": "40 %",
+            "has_unit": "%",
+            "has_numeric_value": 40
+          },
+          "known_as": "water",
+          "substance_role": "solvent"
+        },
+        {
+          "type": "nmdc:PortionOfSubstance",
+          "known_as": "chloroform",
+          "substance_role": "solvent",
+          "volume": {
+            "type": "nmdc:QuantityValue",
+            "has_raw_value": "12 mL",
+            "has_unit": "mL",
+            "has_numeric_value": 12
+          }
+        }
+      ],
+      "extraction_targets": [
+        "metabolite"
+      ],
+      "temperature": {
+        "type": "nmdc:QuantityValue",
+        "has_raw_value": "4 Cel",
+        "has_unit": "Cel",
+        "has_numeric_value": 4
+      }
+    },
+    {
+      "id": "nmdc:dispro-11-9ryz3f59",
+      "type": "nmdc:DissolvingProcess",
+      "name": "Resuspension of Dried Aqueous Extract",
+      "description": "The dried aqueous phase from nmdc:procsm-11-ts4wgz63 was resuspended in 200 uL of methanol.",
+      "has_input": [
+        "nmdc:procsm-11-ts4wgz63"
+      ],
+      "has_output": [
+        "nmdc:procsm-11-gqrbst17"
+      ],
+      "substances_used": [
+        {
+          "type": "nmdc:PortionOfSubstance",
+          "known_as": "methanol",
+          "substance_role": "solvent",
+          "volume": {
+            "type": "nmdc:QuantityValue",
+            "has_raw_value": "200 uL",
+            "has_unit": "uL",
+            "has_numeric_value": 200
+          }
+        }
+      ]
+    },
+    {
+      "id": "nmdc:filtpr-11-656zw030",
+      "type": "nmdc:FiltrationProcess",
+      "name": "Supernatant Collection after Resuspension",
+      "description": "After resuspension, the sample was centrifuged at 4500g for 10 min at 4Cel, and the supernatant was transferred to a smaller glass vial and dried in a vacuum concentrator.",
+      "has_input": [
+        "nmdc:procsm-11-gqrbst17"
+      ],
+      "has_output": [
+        "nmdc:procsm-11-ey8pfc78"
+      ]
+    },
+    {
+      "id": "nmdc:chcpr-11-kda2pw35",
+      "type": "nmdc:ChemicalConversionProcess",
+      "name": "Methoxyamination for GC-MS",
+      "description": "Dried samples from nmdc:procsm-11-ey8pfc78 were dissolved in 20 uL methoxyamine solution, incubated at 37Cel for 90min, then centrifuged and vialed for GC-MS analysis.",
+      "has_input": [
+        "nmdc:procsm-11-ey8pfc78"
+      ],
+      "has_output": [
+        "nmdc:procsm-11-8zkk9a37"
+      ],
+      "chemical_conversion_category": "substitution",
+      "duration": {
+        "type": "nmdc:QuantityValue",
+        "has_raw_value": "90 min",
+        "has_unit": "min",
+        "has_numeric_value": 90
+      },
+      "temperature": {
+        "type": "nmdc:QuantityValue",
+        "has_raw_value": "37 Cel",
+        "has_unit": "Cel",
+        "has_numeric_value": 37
+      },
+      "substances_used": [
+        {
+          "type": "nmdc:PortionOfSubstance",
+          "known_as": "methoxyamine",
+          "substance_role": "derivatizing_agent",
+          "volume": {
+            "type": "nmdc:QuantityValue",
+            "has_raw_value": "20 uL",
+            "has_unit": "uL",
+            "has_numeric_value": 20
+          }
+        }
+      ]
+    },
+    {
+      "id": "nmdc:extrp-11-zzrmn228",
+      "type": "nmdc:Extraction",
+      "name": "Metabolite Extraction from Soil",
+      "description": "Soil was bead beat in 60% methanol solution for 15 min at 4Cel. Then, 12 mL of ice-cold chloroform was added. Samples were probe sonicated at 60% amplitude for 30 seconds on ice, cooled, and sonicated again. Samples were incubated for 5 min at -80Cel, vortexed for 1 min, and centrifuged at 4500g for 10 min at 4Cel. The upper aqueous phase was collected into a separate glass vial, dried in a vacuum concentrator.",
+      "has_input": [
+        "nmdc:bsm-11-q0bxzb10"
+      ],
+      "has_output": [
+        "nmdc:procsm-11-e8cw4907"
+      ],
+      "substances_used": [
+        {
+          "type": "nmdc:PortionOfSubstance",
+          "final_concentration": {
+            "type": "nmdc:QuantityValue",
+            "has_raw_value": "60 %",
+            "has_unit": "%",
+            "has_numeric_value": 60
+          },
+          "known_as": "methanol",
+          "substance_role": "solvent"
+        },
+        {
+          "type": "nmdc:PortionOfSubstance",
+          "final_concentration": {
+            "type": "nmdc:QuantityValue",
+            "has_raw_value": "40 %",
+            "has_unit": "%",
+            "has_numeric_value": 40
+          },
+          "known_as": "water",
+          "substance_role": "solvent"
+        },
+        {
+          "type": "nmdc:PortionOfSubstance",
+          "known_as": "chloroform",
+          "substance_role": "solvent",
+          "volume": {
+            "type": "nmdc:QuantityValue",
+            "has_raw_value": "12 mL",
+            "has_unit": "mL",
+            "has_numeric_value": 12
+          }
+        }
+      ],
+      "extraction_targets": [
+        "metabolite"
+      ],
+      "temperature": {
+        "type": "nmdc:QuantityValue",
+        "has_raw_value": "4 Cel",
+        "has_unit": "Cel",
+        "has_numeric_value": 4
+      }
+    },
+    {
+      "id": "nmdc:dispro-11-tbyc8j74",
+      "type": "nmdc:DissolvingProcess",
+      "name": "Resuspension of Dried Aqueous Extract",
+      "description": "The dried aqueous phase from nmdc:procsm-11-e8cw4907 was resuspended in 200 uL of methanol.",
+      "has_input": [
+        "nmdc:procsm-11-e8cw4907"
+      ],
+      "has_output": [
+        "nmdc:procsm-11-varr5s37"
+      ],
+      "substances_used": [
+        {
+          "type": "nmdc:PortionOfSubstance",
+          "known_as": "methanol",
+          "substance_role": "solvent",
+          "volume": {
+            "type": "nmdc:QuantityValue",
+            "has_raw_value": "200 uL",
+            "has_unit": "uL",
+            "has_numeric_value": 200
+          }
+        }
+      ]
+    },
+    {
+      "id": "nmdc:filtpr-11-cqv5qx49",
+      "type": "nmdc:FiltrationProcess",
+      "name": "Supernatant Collection after Resuspension",
+      "description": "After resuspension, the sample was centrifuged at 4500g for 10 min at 4Cel, and the supernatant was transferred to a smaller glass vial and dried in a vacuum concentrator.",
+      "has_input": [
+        "nmdc:procsm-11-varr5s37"
+      ],
+      "has_output": [
+        "nmdc:procsm-11-db1gby77"
+      ]
+    },
+    {
+      "id": "nmdc:chcpr-11-wx5wds72",
+      "type": "nmdc:ChemicalConversionProcess",
+      "name": "Methoxyamination for GC-MS",
+      "description": "Dried samples from nmdc:procsm-11-db1gby77 were dissolved in 20 uL methoxyamine solution, incubated at 37Cel for 90min, then centrifuged and vialed for GC-MS analysis.",
+      "has_input": [
+        "nmdc:procsm-11-db1gby77"
+      ],
+      "has_output": [
+        "nmdc:procsm-11-5fx00q94"
+      ],
+      "chemical_conversion_category": "substitution",
+      "duration": {
+        "type": "nmdc:QuantityValue",
+        "has_raw_value": "90 min",
+        "has_unit": "min",
+        "has_numeric_value": 90
+      },
+      "temperature": {
+        "type": "nmdc:QuantityValue",
+        "has_raw_value": "37 Cel",
+        "has_unit": "Cel",
+        "has_numeric_value": 37
+      },
+      "substances_used": [
+        {
+          "type": "nmdc:PortionOfSubstance",
+          "known_as": "methoxyamine",
+          "substance_role": "derivatizing_agent",
+          "volume": {
+            "type": "nmdc:QuantityValue",
+            "has_raw_value": "20 uL",
+            "has_unit": "uL",
+            "has_numeric_value": 20
+          }
+        }
+      ]
+    },
+    {
+      "id": "nmdc:extrp-11-zr8z8k63",
+      "type": "nmdc:Extraction",
+      "name": "Metabolite Extraction from Soil",
+      "description": "Soil was bead beat in 60% methanol solution for 15 min at 4Cel. Then, 12 mL of ice-cold chloroform was added. Samples were probe sonicated at 60% amplitude for 30 seconds on ice, cooled, and sonicated again. Samples were incubated for 5 min at -80Cel, vortexed for 1 min, and centrifuged at 4500g for 10 min at 4Cel. The upper aqueous phase was collected into a separate glass vial, dried in a vacuum concentrator.",
+      "has_input": [
+        "nmdc:bsm-11-ssfs1051"
+      ],
+      "has_output": [
+        "nmdc:procsm-11-xye9tv42"
+      ],
+      "substances_used": [
+        {
+          "type": "nmdc:PortionOfSubstance",
+          "final_concentration": {
+            "type": "nmdc:QuantityValue",
+            "has_raw_value": "60 %",
+            "has_unit": "%",
+            "has_numeric_value": 60
+          },
+          "known_as": "methanol",
+          "substance_role": "solvent"
+        },
+        {
+          "type": "nmdc:PortionOfSubstance",
+          "final_concentration": {
+            "type": "nmdc:QuantityValue",
+            "has_raw_value": "40 %",
+            "has_unit": "%",
+            "has_numeric_value": 40
+          },
+          "known_as": "water",
+          "substance_role": "solvent"
+        },
+        {
+          "type": "nmdc:PortionOfSubstance",
+          "known_as": "chloroform",
+          "substance_role": "solvent",
+          "volume": {
+            "type": "nmdc:QuantityValue",
+            "has_raw_value": "12 mL",
+            "has_unit": "mL",
+            "has_numeric_value": 12
+          }
+        }
+      ],
+      "extraction_targets": [
+        "metabolite"
+      ],
+      "temperature": {
+        "type": "nmdc:QuantityValue",
+        "has_raw_value": "4 Cel",
+        "has_unit": "Cel",
+        "has_numeric_value": 4
+      }
+    },
+    {
+      "id": "nmdc:dispro-11-hb6pn178",
+      "type": "nmdc:DissolvingProcess",
+      "name": "Resuspension of Dried Aqueous Extract",
+      "description": "The dried aqueous phase from nmdc:procsm-11-xye9tv42 was resuspended in 200 uL of methanol.",
+      "has_input": [
+        "nmdc:procsm-11-xye9tv42"
+      ],
+      "has_output": [
+        "nmdc:procsm-11-f8nen968"
+      ],
+      "substances_used": [
+        {
+          "type": "nmdc:PortionOfSubstance",
+          "known_as": "methanol",
+          "substance_role": "solvent",
+          "volume": {
+            "type": "nmdc:QuantityValue",
+            "has_raw_value": "200 uL",
+            "has_unit": "uL",
+            "has_numeric_value": 200
+          }
+        }
+      ]
+    },
+    {
+      "id": "nmdc:filtpr-11-30abak88",
+      "type": "nmdc:FiltrationProcess",
+      "name": "Supernatant Collection after Resuspension",
+      "description": "After resuspension, the sample was centrifuged at 4500g for 10 min at 4Cel, and the supernatant was transferred to a smaller glass vial and dried in a vacuum concentrator.",
+      "has_input": [
+        "nmdc:procsm-11-f8nen968"
+      ],
+      "has_output": [
+        "nmdc:procsm-11-7bcea466"
+      ]
+    },
+    {
+      "id": "nmdc:chcpr-11-qqwswp59",
+      "type": "nmdc:ChemicalConversionProcess",
+      "name": "Methoxyamination for GC-MS",
+      "description": "Dried samples from nmdc:procsm-11-7bcea466 were dissolved in 20 uL methoxyamine solution, incubated at 37Cel for 90min, then centrifuged and vialed for GC-MS analysis.",
+      "has_input": [
+        "nmdc:procsm-11-7bcea466"
+      ],
+      "has_output": [
+        "nmdc:procsm-11-sgxgep46"
+      ],
+      "chemical_conversion_category": "substitution",
+      "duration": {
+        "type": "nmdc:QuantityValue",
+        "has_raw_value": "90 min",
+        "has_unit": "min",
+        "has_numeric_value": 90
+      },
+      "temperature": {
+        "type": "nmdc:QuantityValue",
+        "has_raw_value": "37 Cel",
+        "has_unit": "Cel",
+        "has_numeric_value": 37
+      },
+      "substances_used": [
+        {
+          "type": "nmdc:PortionOfSubstance",
+          "known_as": "methoxyamine",
+          "substance_role": "derivatizing_agent",
+          "volume": {
+            "type": "nmdc:QuantityValue",
+            "has_raw_value": "20 uL",
+            "has_unit": "uL",
+            "has_numeric_value": 20
+          }
+        }
+      ]
+    },
+    {
+      "id": "nmdc:extrp-11-g6sd8h63",
+      "type": "nmdc:Extraction",
+      "name": "Metabolite Extraction from Soil",
+      "description": "Soil was bead beat in 60% methanol solution for 15 min at 4Cel. Then, 12 mL of ice-cold chloroform was added. Samples were probe sonicated at 60% amplitude for 30 seconds on ice, cooled, and sonicated again. Samples were incubated for 5 min at -80Cel, vortexed for 1 min, and centrifuged at 4500g for 10 min at 4Cel. The upper aqueous phase was collected into a separate glass vial, dried in a vacuum concentrator.",
+      "has_input": [
+        "nmdc:bsm-11-042nd237"
+      ],
+      "has_output": [
+        "nmdc:procsm-11-xgwdkj34"
+      ],
+      "substances_used": [
+        {
+          "type": "nmdc:PortionOfSubstance",
+          "final_concentration": {
+            "type": "nmdc:QuantityValue",
+            "has_raw_value": "60 %",
+            "has_unit": "%",
+            "has_numeric_value": 60
+          },
+          "known_as": "methanol",
+          "substance_role": "solvent"
+        },
+        {
+          "type": "nmdc:PortionOfSubstance",
+          "final_concentration": {
+            "type": "nmdc:QuantityValue",
+            "has_raw_value": "40 %",
+            "has_unit": "%",
+            "has_numeric_value": 40
+          },
+          "known_as": "water",
+          "substance_role": "solvent"
+        },
+        {
+          "type": "nmdc:PortionOfSubstance",
+          "known_as": "chloroform",
+          "substance_role": "solvent",
+          "volume": {
+            "type": "nmdc:QuantityValue",
+            "has_raw_value": "12 mL",
+            "has_unit": "mL",
+            "has_numeric_value": 12
+          }
+        }
+      ],
+      "extraction_targets": [
+        "metabolite"
+      ],
+      "temperature": {
+        "type": "nmdc:QuantityValue",
+        "has_raw_value": "4 Cel",
+        "has_unit": "Cel",
+        "has_numeric_value": 4
+      }
+    },
+    {
+      "id": "nmdc:dispro-11-6nmzg971",
+      "type": "nmdc:DissolvingProcess",
+      "name": "Resuspension of Dried Aqueous Extract",
+      "description": "The dried aqueous phase from nmdc:procsm-11-xgwdkj34 was resuspended in 200 uL of methanol.",
+      "has_input": [
+        "nmdc:procsm-11-xgwdkj34"
+      ],
+      "has_output": [
+        "nmdc:procsm-11-agh4k256"
+      ],
+      "substances_used": [
+        {
+          "type": "nmdc:PortionOfSubstance",
+          "known_as": "methanol",
+          "substance_role": "solvent",
+          "volume": {
+            "type": "nmdc:QuantityValue",
+            "has_raw_value": "200 uL",
+            "has_unit": "uL",
+            "has_numeric_value": 200
+          }
+        }
+      ]
+    },
+    {
+      "id": "nmdc:filtpr-11-zkysmd15",
+      "type": "nmdc:FiltrationProcess",
+      "name": "Supernatant Collection after Resuspension",
+      "description": "After resuspension, the sample was centrifuged at 4500g for 10 min at 4Cel, and the supernatant was transferred to a smaller glass vial and dried in a vacuum concentrator.",
+      "has_input": [
+        "nmdc:procsm-11-agh4k256"
+      ],
+      "has_output": [
+        "nmdc:procsm-11-3gter540"
+      ]
+    },
+    {
+      "id": "nmdc:chcpr-11-j5zgbq13",
+      "type": "nmdc:ChemicalConversionProcess",
+      "name": "Methoxyamination for GC-MS",
+      "description": "Dried samples from nmdc:procsm-11-3gter540 were dissolved in 20 uL methoxyamine solution, incubated at 37Cel for 90min, then centrifuged and vialed for GC-MS analysis.",
+      "has_input": [
+        "nmdc:procsm-11-3gter540"
+      ],
+      "has_output": [
+        "nmdc:procsm-11-xk7t6j25"
+      ],
+      "chemical_conversion_category": "substitution",
+      "duration": {
+        "type": "nmdc:QuantityValue",
+        "has_raw_value": "90 min",
+        "has_unit": "min",
+        "has_numeric_value": 90
+      },
+      "temperature": {
+        "type": "nmdc:QuantityValue",
+        "has_raw_value": "37 Cel",
+        "has_unit": "Cel",
+        "has_numeric_value": 37
+      },
+      "substances_used": [
+        {
+          "type": "nmdc:PortionOfSubstance",
+          "known_as": "methoxyamine",
+          "substance_role": "derivatizing_agent",
+          "volume": {
+            "type": "nmdc:QuantityValue",
+            "has_raw_value": "20 uL",
+            "has_unit": "uL",
+            "has_numeric_value": 20
+          }
+        }
+      ]
+    },
+    {
+      "id": "nmdc:extrp-11-sr04hy65",
+      "type": "nmdc:Extraction",
+      "name": "Metabolite Extraction from Soil",
+      "description": "Soil was bead beat in 60% methanol solution for 15 min at 4Cel. Then, 12 mL of ice-cold chloroform was added. Samples were probe sonicated at 60% amplitude for 30 seconds on ice, cooled, and sonicated again. Samples were incubated for 5 min at -80Cel, vortexed for 1 min, and centrifuged at 4500g for 10 min at 4Cel. The upper aqueous phase was collected into a separate glass vial, dried in a vacuum concentrator.",
+      "has_input": [
+        "nmdc:bsm-11-65a4xw75"
+      ],
+      "has_output": [
+        "nmdc:procsm-11-e7843n71"
+      ],
+      "substances_used": [
+        {
+          "type": "nmdc:PortionOfSubstance",
+          "final_concentration": {
+            "type": "nmdc:QuantityValue",
+            "has_raw_value": "60 %",
+            "has_unit": "%",
+            "has_numeric_value": 60
+          },
+          "known_as": "methanol",
+          "substance_role": "solvent"
+        },
+        {
+          "type": "nmdc:PortionOfSubstance",
+          "final_concentration": {
+            "type": "nmdc:QuantityValue",
+            "has_raw_value": "40 %",
+            "has_unit": "%",
+            "has_numeric_value": 40
+          },
+          "known_as": "water",
+          "substance_role": "solvent"
+        },
+        {
+          "type": "nmdc:PortionOfSubstance",
+          "known_as": "chloroform",
+          "substance_role": "solvent",
+          "volume": {
+            "type": "nmdc:QuantityValue",
+            "has_raw_value": "12 mL",
+            "has_unit": "mL",
+            "has_numeric_value": 12
+          }
+        }
+      ],
+      "extraction_targets": [
+        "metabolite"
+      ],
+      "temperature": {
+        "type": "nmdc:QuantityValue",
+        "has_raw_value": "4 Cel",
+        "has_unit": "Cel",
+        "has_numeric_value": 4
+      }
+    },
+    {
+      "id": "nmdc:dispro-11-x2878r52",
+      "type": "nmdc:DissolvingProcess",
+      "name": "Resuspension of Dried Aqueous Extract",
+      "description": "The dried aqueous phase from nmdc:procsm-11-e7843n71 was resuspended in 200 uL of methanol.",
+      "has_input": [
+        "nmdc:procsm-11-e7843n71"
+      ],
+      "has_output": [
+        "nmdc:procsm-11-yxz83719"
+      ],
+      "substances_used": [
+        {
+          "type": "nmdc:PortionOfSubstance",
+          "known_as": "methanol",
+          "substance_role": "solvent",
+          "volume": {
+            "type": "nmdc:QuantityValue",
+            "has_raw_value": "200 uL",
+            "has_unit": "uL",
+            "has_numeric_value": 200
+          }
+        }
+      ]
+    },
+    {
+      "id": "nmdc:filtpr-11-qjf61r67",
+      "type": "nmdc:FiltrationProcess",
+      "name": "Supernatant Collection after Resuspension",
+      "description": "After resuspension, the sample was centrifuged at 4500g for 10 min at 4Cel, and the supernatant was transferred to a smaller glass vial and dried in a vacuum concentrator.",
+      "has_input": [
+        "nmdc:procsm-11-yxz83719"
+      ],
+      "has_output": [
+        "nmdc:procsm-11-07j22c04"
+      ]
+    },
+    {
+      "id": "nmdc:chcpr-11-6k551223",
+      "type": "nmdc:ChemicalConversionProcess",
+      "name": "Methoxyamination for GC-MS",
+      "description": "Dried samples from nmdc:procsm-11-07j22c04 were dissolved in 20 uL methoxyamine solution, incubated at 37Cel for 90min, then centrifuged and vialed for GC-MS analysis.",
+      "has_input": [
+        "nmdc:procsm-11-07j22c04"
+      ],
+      "has_output": [
+        "nmdc:procsm-11-0wedgr31"
+      ],
+      "chemical_conversion_category": "substitution",
+      "duration": {
+        "type": "nmdc:QuantityValue",
+        "has_raw_value": "90 min",
+        "has_unit": "min",
+        "has_numeric_value": 90
+      },
+      "temperature": {
+        "type": "nmdc:QuantityValue",
+        "has_raw_value": "37 Cel",
+        "has_unit": "Cel",
+        "has_numeric_value": 37
+      },
+      "substances_used": [
+        {
+          "type": "nmdc:PortionOfSubstance",
+          "known_as": "methoxyamine",
+          "substance_role": "derivatizing_agent",
+          "volume": {
+            "type": "nmdc:QuantityValue",
+            "has_raw_value": "20 uL",
+            "has_unit": "uL",
+            "has_numeric_value": 20
+          }
+        }
+      ]
+    },
+    {
+      "id": "nmdc:extrp-11-09d3aj11",
+      "type": "nmdc:Extraction",
+      "name": "Metabolite Extraction from Soil",
+      "description": "Soil was bead beat in 60% methanol solution for 15 min at 4Cel. Then, 12 mL of ice-cold chloroform was added. Samples were probe sonicated at 60% amplitude for 30 seconds on ice, cooled, and sonicated again. Samples were incubated for 5 min at -80Cel, vortexed for 1 min, and centrifuged at 4500g for 10 min at 4Cel. The upper aqueous phase was collected into a separate glass vial, dried in a vacuum concentrator.",
+      "has_input": [
+        "nmdc:bsm-11-6m6c9g55"
+      ],
+      "has_output": [
+        "nmdc:procsm-11-q14wkg40"
+      ],
+      "substances_used": [
+        {
+          "type": "nmdc:PortionOfSubstance",
+          "final_concentration": {
+            "type": "nmdc:QuantityValue",
+            "has_raw_value": "60 %",
+            "has_unit": "%",
+            "has_numeric_value": 60
+          },
+          "known_as": "methanol",
+          "substance_role": "solvent"
+        },
+        {
+          "type": "nmdc:PortionOfSubstance",
+          "final_concentration": {
+            "type": "nmdc:QuantityValue",
+            "has_raw_value": "40 %",
+            "has_unit": "%",
+            "has_numeric_value": 40
+          },
+          "known_as": "water",
+          "substance_role": "solvent"
+        },
+        {
+          "type": "nmdc:PortionOfSubstance",
+          "known_as": "chloroform",
+          "substance_role": "solvent",
+          "volume": {
+            "type": "nmdc:QuantityValue",
+            "has_raw_value": "12 mL",
+            "has_unit": "mL",
+            "has_numeric_value": 12
+          }
+        }
+      ],
+      "extraction_targets": [
+        "metabolite"
+      ],
+      "temperature": {
+        "type": "nmdc:QuantityValue",
+        "has_raw_value": "4 Cel",
+        "has_unit": "Cel",
+        "has_numeric_value": 4
+      }
+    },
+    {
+      "id": "nmdc:dispro-11-tdbs8646",
+      "type": "nmdc:DissolvingProcess",
+      "name": "Resuspension of Dried Aqueous Extract",
+      "description": "The dried aqueous phase from nmdc:procsm-11-q14wkg40 was resuspended in 200 uL of methanol.",
+      "has_input": [
+        "nmdc:procsm-11-q14wkg40"
+      ],
+      "has_output": [
+        "nmdc:procsm-11-xxa59a41"
+      ],
+      "substances_used": [
+        {
+          "type": "nmdc:PortionOfSubstance",
+          "known_as": "methanol",
+          "substance_role": "solvent",
+          "volume": {
+            "type": "nmdc:QuantityValue",
+            "has_raw_value": "200 uL",
+            "has_unit": "uL",
+            "has_numeric_value": 200
+          }
+        }
+      ]
+    },
+    {
+      "id": "nmdc:filtpr-11-cemxkh51",
+      "type": "nmdc:FiltrationProcess",
+      "name": "Supernatant Collection after Resuspension",
+      "description": "After resuspension, the sample was centrifuged at 4500g for 10 min at 4Cel, and the supernatant was transferred to a smaller glass vial and dried in a vacuum concentrator.",
+      "has_input": [
+        "nmdc:procsm-11-xxa59a41"
+      ],
+      "has_output": [
+        "nmdc:procsm-11-xys7tj17"
+      ]
+    },
+    {
+      "id": "nmdc:chcpr-11-kbaa5n40",
+      "type": "nmdc:ChemicalConversionProcess",
+      "name": "Methoxyamination for GC-MS",
+      "description": "Dried samples from nmdc:procsm-11-xys7tj17 were dissolved in 20 uL methoxyamine solution, incubated at 37Cel for 90min, then centrifuged and vialed for GC-MS analysis.",
+      "has_input": [
+        "nmdc:procsm-11-xys7tj17"
+      ],
+      "has_output": [
+        "nmdc:procsm-11-2tecf991"
+      ],
+      "chemical_conversion_category": "substitution",
+      "duration": {
+        "type": "nmdc:QuantityValue",
+        "has_raw_value": "90 min",
+        "has_unit": "min",
+        "has_numeric_value": 90
+      },
+      "temperature": {
+        "type": "nmdc:QuantityValue",
+        "has_raw_value": "37 Cel",
+        "has_unit": "Cel",
+        "has_numeric_value": 37
+      },
+      "substances_used": [
+        {
+          "type": "nmdc:PortionOfSubstance",
+          "known_as": "methoxyamine",
+          "substance_role": "derivatizing_agent",
+          "volume": {
+            "type": "nmdc:QuantityValue",
+            "has_raw_value": "20 uL",
+            "has_unit": "uL",
+            "has_numeric_value": 20
+          }
+        }
+      ]
+    },
+    {
+      "id": "nmdc:extrp-11-bn1qy315",
+      "type": "nmdc:Extraction",
+      "name": "Metabolite Extraction from Soil",
+      "description": "Soil was bead beat in 60% methanol solution for 15 min at 4Cel. Then, 12 mL of ice-cold chloroform was added. Samples were probe sonicated at 60% amplitude for 30 seconds on ice, cooled, and sonicated again. Samples were incubated for 5 min at -80Cel, vortexed for 1 min, and centrifuged at 4500g for 10 min at 4Cel. The upper aqueous phase was collected into a separate glass vial, dried in a vacuum concentrator.",
+      "has_input": [
+        "nmdc:bsm-11-efm5hh51"
+      ],
+      "has_output": [
+        "nmdc:procsm-11-jd7jfs90"
+      ],
+      "substances_used": [
+        {
+          "type": "nmdc:PortionOfSubstance",
+          "final_concentration": {
+            "type": "nmdc:QuantityValue",
+            "has_raw_value": "60 %",
+            "has_unit": "%",
+            "has_numeric_value": 60
+          },
+          "known_as": "methanol",
+          "substance_role": "solvent"
+        },
+        {
+          "type": "nmdc:PortionOfSubstance",
+          "final_concentration": {
+            "type": "nmdc:QuantityValue",
+            "has_raw_value": "40 %",
+            "has_unit": "%",
+            "has_numeric_value": 40
+          },
+          "known_as": "water",
+          "substance_role": "solvent"
+        },
+        {
+          "type": "nmdc:PortionOfSubstance",
+          "known_as": "chloroform",
+          "substance_role": "solvent",
+          "volume": {
+            "type": "nmdc:QuantityValue",
+            "has_raw_value": "12 mL",
+            "has_unit": "mL",
+            "has_numeric_value": 12
+          }
+        }
+      ],
+      "extraction_targets": [
+        "metabolite"
+      ],
+      "temperature": {
+        "type": "nmdc:QuantityValue",
+        "has_raw_value": "4 Cel",
+        "has_unit": "Cel",
+        "has_numeric_value": 4
+      }
+    },
+    {
+      "id": "nmdc:dispro-11-ajvbwv39",
+      "type": "nmdc:DissolvingProcess",
+      "name": "Resuspension of Dried Aqueous Extract",
+      "description": "The dried aqueous phase from nmdc:procsm-11-jd7jfs90 was resuspended in 200 uL of methanol.",
+      "has_input": [
+        "nmdc:procsm-11-jd7jfs90"
+      ],
+      "has_output": [
+        "nmdc:procsm-11-senxh523"
+      ],
+      "substances_used": [
+        {
+          "type": "nmdc:PortionOfSubstance",
+          "known_as": "methanol",
+          "substance_role": "solvent",
+          "volume": {
+            "type": "nmdc:QuantityValue",
+            "has_raw_value": "200 uL",
+            "has_unit": "uL",
+            "has_numeric_value": 200
+          }
+        }
+      ]
+    },
+    {
+      "id": "nmdc:filtpr-11-9qzr5s73",
+      "type": "nmdc:FiltrationProcess",
+      "name": "Supernatant Collection after Resuspension",
+      "description": "After resuspension, the sample was centrifuged at 4500g for 10 min at 4Cel, and the supernatant was transferred to a smaller glass vial and dried in a vacuum concentrator.",
+      "has_input": [
+        "nmdc:procsm-11-senxh523"
+      ],
+      "has_output": [
+        "nmdc:procsm-11-ph4s4362"
+      ]
+    },
+    {
+      "id": "nmdc:chcpr-11-rabvk569",
+      "type": "nmdc:ChemicalConversionProcess",
+      "name": "Methoxyamination for GC-MS",
+      "description": "Dried samples from nmdc:procsm-11-ph4s4362 were dissolved in 20 uL methoxyamine solution, incubated at 37Cel for 90min, then centrifuged and vialed for GC-MS analysis.",
+      "has_input": [
+        "nmdc:procsm-11-ph4s4362"
+      ],
+      "has_output": [
+        "nmdc:procsm-11-1afb3q50"
+      ],
+      "chemical_conversion_category": "substitution",
+      "duration": {
+        "type": "nmdc:QuantityValue",
+        "has_raw_value": "90 min",
+        "has_unit": "min",
+        "has_numeric_value": 90
+      },
+      "temperature": {
+        "type": "nmdc:QuantityValue",
+        "has_raw_value": "37 Cel",
+        "has_unit": "Cel",
+        "has_numeric_value": 37
+      },
+      "substances_used": [
+        {
+          "type": "nmdc:PortionOfSubstance",
+          "known_as": "methoxyamine",
+          "substance_role": "derivatizing_agent",
+          "volume": {
+            "type": "nmdc:QuantityValue",
+            "has_raw_value": "20 uL",
+            "has_unit": "uL",
+            "has_numeric_value": 20
+          }
+        }
+      ]
+    },
+    {
+      "id": "nmdc:extrp-11-se1aq296",
+      "type": "nmdc:Extraction",
+      "name": "Metabolite Extraction from Soil",
+      "description": "Soil was bead beat in 60% methanol solution for 15 min at 4Cel. Then, 12 mL of ice-cold chloroform was added. Samples were probe sonicated at 60% amplitude for 30 seconds on ice, cooled, and sonicated again. Samples were incubated for 5 min at -80Cel, vortexed for 1 min, and centrifuged at 4500g for 10 min at 4Cel. The upper aqueous phase was collected into a separate glass vial, dried in a vacuum concentrator.",
+      "has_input": [
+        "nmdc:bsm-11-xtz7he28"
+      ],
+      "has_output": [
+        "nmdc:procsm-11-7s3bpz36"
+      ],
+      "substances_used": [
+        {
+          "type": "nmdc:PortionOfSubstance",
+          "final_concentration": {
+            "type": "nmdc:QuantityValue",
+            "has_raw_value": "60 %",
+            "has_unit": "%",
+            "has_numeric_value": 60
+          },
+          "known_as": "methanol",
+          "substance_role": "solvent"
+        },
+        {
+          "type": "nmdc:PortionOfSubstance",
+          "final_concentration": {
+            "type": "nmdc:QuantityValue",
+            "has_raw_value": "40 %",
+            "has_unit": "%",
+            "has_numeric_value": 40
+          },
+          "known_as": "water",
+          "substance_role": "solvent"
+        },
+        {
+          "type": "nmdc:PortionOfSubstance",
+          "known_as": "chloroform",
+          "substance_role": "solvent",
+          "volume": {
+            "type": "nmdc:QuantityValue",
+            "has_raw_value": "12 mL",
+            "has_unit": "mL",
+            "has_numeric_value": 12
+          }
+        }
+      ],
+      "extraction_targets": [
+        "metabolite"
+      ],
+      "temperature": {
+        "type": "nmdc:QuantityValue",
+        "has_raw_value": "4 Cel",
+        "has_unit": "Cel",
+        "has_numeric_value": 4
+      }
+    },
+    {
+      "id": "nmdc:dispro-11-bv9np664",
+      "type": "nmdc:DissolvingProcess",
+      "name": "Resuspension of Dried Aqueous Extract",
+      "description": "The dried aqueous phase from nmdc:procsm-11-7s3bpz36 was resuspended in 200 uL of methanol.",
+      "has_input": [
+        "nmdc:procsm-11-7s3bpz36"
+      ],
+      "has_output": [
+        "nmdc:procsm-11-nxhen895"
+      ],
+      "substances_used": [
+        {
+          "type": "nmdc:PortionOfSubstance",
+          "known_as": "methanol",
+          "substance_role": "solvent",
+          "volume": {
+            "type": "nmdc:QuantityValue",
+            "has_raw_value": "200 uL",
+            "has_unit": "uL",
+            "has_numeric_value": 200
+          }
+        }
+      ]
+    },
+    {
+      "id": "nmdc:filtpr-11-328xxa81",
+      "type": "nmdc:FiltrationProcess",
+      "name": "Supernatant Collection after Resuspension",
+      "description": "After resuspension, the sample was centrifuged at 4500g for 10 min at 4Cel, and the supernatant was transferred to a smaller glass vial and dried in a vacuum concentrator.",
+      "has_input": [
+        "nmdc:procsm-11-nxhen895"
+      ],
+      "has_output": [
+        "nmdc:procsm-11-kxc98634"
+      ]
+    },
+    {
+      "id": "nmdc:chcpr-11-9t9r8752",
+      "type": "nmdc:ChemicalConversionProcess",
+      "name": "Methoxyamination for GC-MS",
+      "description": "Dried samples from nmdc:procsm-11-kxc98634 were dissolved in 20 uL methoxyamine solution, incubated at 37Cel for 90min, then centrifuged and vialed for GC-MS analysis.",
+      "has_input": [
+        "nmdc:procsm-11-kxc98634"
+      ],
+      "has_output": [
+        "nmdc:procsm-11-y1k8jv24"
+      ],
+      "chemical_conversion_category": "substitution",
+      "duration": {
+        "type": "nmdc:QuantityValue",
+        "has_raw_value": "90 min",
+        "has_unit": "min",
+        "has_numeric_value": 90
+      },
+      "temperature": {
+        "type": "nmdc:QuantityValue",
+        "has_raw_value": "37 Cel",
+        "has_unit": "Cel",
+        "has_numeric_value": 37
+      },
+      "substances_used": [
+        {
+          "type": "nmdc:PortionOfSubstance",
+          "known_as": "methoxyamine",
+          "substance_role": "derivatizing_agent",
+          "volume": {
+            "type": "nmdc:QuantityValue",
+            "has_raw_value": "20 uL",
+            "has_unit": "uL",
+            "has_numeric_value": 20
+          }
+        }
+      ]
+    },
+    {
+      "id": "nmdc:extrp-11-yzp6v254",
+      "type": "nmdc:Extraction",
+      "name": "Metabolite Extraction from Soil",
+      "description": "Soil was bead beat in 60% methanol solution for 15 min at 4Cel. Then, 12 mL of ice-cold chloroform was added. Samples were probe sonicated at 60% amplitude for 30 seconds on ice, cooled, and sonicated again. Samples were incubated for 5 min at -80Cel, vortexed for 1 min, and centrifuged at 4500g for 10 min at 4Cel. The upper aqueous phase was collected into a separate glass vial, dried in a vacuum concentrator.",
+      "has_input": [
+        "nmdc:bsm-11-gk0czc37"
+      ],
+      "has_output": [
+        "nmdc:procsm-11-38f5h183"
+      ],
+      "substances_used": [
+        {
+          "type": "nmdc:PortionOfSubstance",
+          "final_concentration": {
+            "type": "nmdc:QuantityValue",
+            "has_raw_value": "60 %",
+            "has_unit": "%",
+            "has_numeric_value": 60
+          },
+          "known_as": "methanol",
+          "substance_role": "solvent"
+        },
+        {
+          "type": "nmdc:PortionOfSubstance",
+          "final_concentration": {
+            "type": "nmdc:QuantityValue",
+            "has_raw_value": "40 %",
+            "has_unit": "%",
+            "has_numeric_value": 40
+          },
+          "known_as": "water",
+          "substance_role": "solvent"
+        },
+        {
+          "type": "nmdc:PortionOfSubstance",
+          "known_as": "chloroform",
+          "substance_role": "solvent",
+          "volume": {
+            "type": "nmdc:QuantityValue",
+            "has_raw_value": "12 mL",
+            "has_unit": "mL",
+            "has_numeric_value": 12
+          }
+        }
+      ],
+      "extraction_targets": [
+        "metabolite"
+      ],
+      "temperature": {
+        "type": "nmdc:QuantityValue",
+        "has_raw_value": "4 Cel",
+        "has_unit": "Cel",
+        "has_numeric_value": 4
+      }
+    },
+    {
+      "id": "nmdc:dispro-11-4s6mc745",
+      "type": "nmdc:DissolvingProcess",
+      "name": "Resuspension of Dried Aqueous Extract",
+      "description": "The dried aqueous phase from nmdc:procsm-11-38f5h183 was resuspended in 200 uL of methanol.",
+      "has_input": [
+        "nmdc:procsm-11-38f5h183"
+      ],
+      "has_output": [
+        "nmdc:procsm-11-gyja6564"
+      ],
+      "substances_used": [
+        {
+          "type": "nmdc:PortionOfSubstance",
+          "known_as": "methanol",
+          "substance_role": "solvent",
+          "volume": {
+            "type": "nmdc:QuantityValue",
+            "has_raw_value": "200 uL",
+            "has_unit": "uL",
+            "has_numeric_value": 200
+          }
+        }
+      ]
+    },
+    {
+      "id": "nmdc:filtpr-11-px6xp594",
+      "type": "nmdc:FiltrationProcess",
+      "name": "Supernatant Collection after Resuspension",
+      "description": "After resuspension, the sample was centrifuged at 4500g for 10 min at 4Cel, and the supernatant was transferred to a smaller glass vial and dried in a vacuum concentrator.",
+      "has_input": [
+        "nmdc:procsm-11-gyja6564"
+      ],
+      "has_output": [
+        "nmdc:procsm-11-yqpk8x29"
+      ]
+    },
+    {
+      "id": "nmdc:chcpr-11-6sre4462",
+      "type": "nmdc:ChemicalConversionProcess",
+      "name": "Methoxyamination for GC-MS",
+      "description": "Dried samples from nmdc:procsm-11-yqpk8x29 were dissolved in 20 uL methoxyamine solution, incubated at 37Cel for 90min, then centrifuged and vialed for GC-MS analysis.",
+      "has_input": [
+        "nmdc:procsm-11-yqpk8x29"
+      ],
+      "has_output": [
+        "nmdc:procsm-11-223ezf88"
+      ],
+      "chemical_conversion_category": "substitution",
+      "duration": {
+        "type": "nmdc:QuantityValue",
+        "has_raw_value": "90 min",
+        "has_unit": "min",
+        "has_numeric_value": 90
+      },
+      "temperature": {
+        "type": "nmdc:QuantityValue",
+        "has_raw_value": "37 Cel",
+        "has_unit": "Cel",
+        "has_numeric_value": 37
+      },
+      "substances_used": [
+        {
+          "type": "nmdc:PortionOfSubstance",
+          "known_as": "methoxyamine",
+          "substance_role": "derivatizing_agent",
+          "volume": {
+            "type": "nmdc:QuantityValue",
+            "has_raw_value": "20 uL",
+            "has_unit": "uL",
+            "has_numeric_value": 20
+          }
+        }
+      ]
+    },
+    {
+      "id": "nmdc:extrp-11-w4m9gf78",
+      "type": "nmdc:Extraction",
+      "name": "Metabolite Extraction from Soil",
+      "description": "Soil was bead beat in 60% methanol solution for 15 min at 4Cel. Then, 12 mL of ice-cold chloroform was added. Samples were probe sonicated at 60% amplitude for 30 seconds on ice, cooled, and sonicated again. Samples were incubated for 5 min at -80Cel, vortexed for 1 min, and centrifuged at 4500g for 10 min at 4Cel. The upper aqueous phase was collected into a separate glass vial, dried in a vacuum concentrator.",
+      "has_input": [
+        "nmdc:bsm-11-gr59rt72"
+      ],
+      "has_output": [
+        "nmdc:procsm-11-wjw80s83"
+      ],
+      "substances_used": [
+        {
+          "type": "nmdc:PortionOfSubstance",
+          "final_concentration": {
+            "type": "nmdc:QuantityValue",
+            "has_raw_value": "60 %",
+            "has_unit": "%",
+            "has_numeric_value": 60
+          },
+          "known_as": "methanol",
+          "substance_role": "solvent"
+        },
+        {
+          "type": "nmdc:PortionOfSubstance",
+          "final_concentration": {
+            "type": "nmdc:QuantityValue",
+            "has_raw_value": "40 %",
+            "has_unit": "%",
+            "has_numeric_value": 40
+          },
+          "known_as": "water",
+          "substance_role": "solvent"
+        },
+        {
+          "type": "nmdc:PortionOfSubstance",
+          "known_as": "chloroform",
+          "substance_role": "solvent",
+          "volume": {
+            "type": "nmdc:QuantityValue",
+            "has_raw_value": "12 mL",
+            "has_unit": "mL",
+            "has_numeric_value": 12
+          }
+        }
+      ],
+      "extraction_targets": [
+        "metabolite"
+      ],
+      "temperature": {
+        "type": "nmdc:QuantityValue",
+        "has_raw_value": "4 Cel",
+        "has_unit": "Cel",
+        "has_numeric_value": 4
+      }
+    },
+    {
+      "id": "nmdc:dispro-11-akdf2k70",
+      "type": "nmdc:DissolvingProcess",
+      "name": "Resuspension of Dried Aqueous Extract",
+      "description": "The dried aqueous phase from nmdc:procsm-11-wjw80s83 was resuspended in 200 uL of methanol.",
+      "has_input": [
+        "nmdc:procsm-11-wjw80s83"
+      ],
+      "has_output": [
+        "nmdc:procsm-11-rs8dn467"
+      ],
+      "substances_used": [
+        {
+          "type": "nmdc:PortionOfSubstance",
+          "known_as": "methanol",
+          "substance_role": "solvent",
+          "volume": {
+            "type": "nmdc:QuantityValue",
+            "has_raw_value": "200 uL",
+            "has_unit": "uL",
+            "has_numeric_value": 200
+          }
+        }
+      ]
+    },
+    {
+      "id": "nmdc:filtpr-11-be4frt69",
+      "type": "nmdc:FiltrationProcess",
+      "name": "Supernatant Collection after Resuspension",
+      "description": "After resuspension, the sample was centrifuged at 4500g for 10 min at 4Cel, and the supernatant was transferred to a smaller glass vial and dried in a vacuum concentrator.",
+      "has_input": [
+        "nmdc:procsm-11-rs8dn467"
+      ],
+      "has_output": [
+        "nmdc:procsm-11-h6qyzg46"
+      ]
+    },
+    {
+      "id": "nmdc:chcpr-11-5y4pcm72",
+      "type": "nmdc:ChemicalConversionProcess",
+      "name": "Methoxyamination for GC-MS",
+      "description": "Dried samples from nmdc:procsm-11-h6qyzg46 were dissolved in 20 uL methoxyamine solution, incubated at 37Cel for 90min, then centrifuged and vialed for GC-MS analysis.",
+      "has_input": [
+        "nmdc:procsm-11-h6qyzg46"
+      ],
+      "has_output": [
+        "nmdc:procsm-11-k35qfx25"
+      ],
+      "chemical_conversion_category": "substitution",
+      "duration": {
+        "type": "nmdc:QuantityValue",
+        "has_raw_value": "90 min",
+        "has_unit": "min",
+        "has_numeric_value": 90
+      },
+      "temperature": {
+        "type": "nmdc:QuantityValue",
+        "has_raw_value": "37 Cel",
+        "has_unit": "Cel",
+        "has_numeric_value": 37
+      },
+      "substances_used": [
+        {
+          "type": "nmdc:PortionOfSubstance",
+          "known_as": "methoxyamine",
+          "substance_role": "derivatizing_agent",
+          "volume": {
+            "type": "nmdc:QuantityValue",
+            "has_raw_value": "20 uL",
+            "has_unit": "uL",
+            "has_numeric_value": 20
+          }
+        }
+      ]
+    },
+    {
+      "id": "nmdc:extrp-11-bt3dfn32",
+      "type": "nmdc:Extraction",
+      "name": "Metabolite Extraction from Soil",
+      "description": "Soil was bead beat in 60% methanol solution for 15 min at 4Cel. Then, 12 mL of ice-cold chloroform was added. Samples were probe sonicated at 60% amplitude for 30 seconds on ice, cooled, and sonicated again. Samples were incubated for 5 min at -80Cel, vortexed for 1 min, and centrifuged at 4500g for 10 min at 4Cel. The upper aqueous phase was collected into a separate glass vial, dried in a vacuum concentrator.",
+      "has_input": [
+        "nmdc:bsm-11-xxvfda22"
+      ],
+      "has_output": [
+        "nmdc:procsm-11-gfb5vy33"
+      ],
+      "substances_used": [
+        {
+          "type": "nmdc:PortionOfSubstance",
+          "final_concentration": {
+            "type": "nmdc:QuantityValue",
+            "has_raw_value": "60 %",
+            "has_unit": "%",
+            "has_numeric_value": 60
+          },
+          "known_as": "methanol",
+          "substance_role": "solvent"
+        },
+        {
+          "type": "nmdc:PortionOfSubstance",
+          "final_concentration": {
+            "type": "nmdc:QuantityValue",
+            "has_raw_value": "40 %",
+            "has_unit": "%",
+            "has_numeric_value": 40
+          },
+          "known_as": "water",
+          "substance_role": "solvent"
+        },
+        {
+          "type": "nmdc:PortionOfSubstance",
+          "known_as": "chloroform",
+          "substance_role": "solvent",
+          "volume": {
+            "type": "nmdc:QuantityValue",
+            "has_raw_value": "12 mL",
+            "has_unit": "mL",
+            "has_numeric_value": 12
+          }
+        }
+      ],
+      "extraction_targets": [
+        "metabolite"
+      ],
+      "temperature": {
+        "type": "nmdc:QuantityValue",
+        "has_raw_value": "4 Cel",
+        "has_unit": "Cel",
+        "has_numeric_value": 4
+      }
+    },
+    {
+      "id": "nmdc:dispro-11-2r6xq177",
+      "type": "nmdc:DissolvingProcess",
+      "name": "Resuspension of Dried Aqueous Extract",
+      "description": "The dried aqueous phase from nmdc:procsm-11-gfb5vy33 was resuspended in 200 uL of methanol.",
+      "has_input": [
+        "nmdc:procsm-11-gfb5vy33"
+      ],
+      "has_output": [
+        "nmdc:procsm-11-npbew995"
+      ],
+      "substances_used": [
+        {
+          "type": "nmdc:PortionOfSubstance",
+          "known_as": "methanol",
+          "substance_role": "solvent",
+          "volume": {
+            "type": "nmdc:QuantityValue",
+            "has_raw_value": "200 uL",
+            "has_unit": "uL",
+            "has_numeric_value": 200
+          }
+        }
+      ]
+    },
+    {
+      "id": "nmdc:filtpr-11-s3v5te50",
+      "type": "nmdc:FiltrationProcess",
+      "name": "Supernatant Collection after Resuspension",
+      "description": "After resuspension, the sample was centrifuged at 4500g for 10 min at 4Cel, and the supernatant was transferred to a smaller glass vial and dried in a vacuum concentrator.",
+      "has_input": [
+        "nmdc:procsm-11-npbew995"
+      ],
+      "has_output": [
+        "nmdc:procsm-11-0gf5sh75"
+      ]
+    },
+    {
+      "id": "nmdc:chcpr-11-y8zydz69",
+      "type": "nmdc:ChemicalConversionProcess",
+      "name": "Methoxyamination for GC-MS",
+      "description": "Dried samples from nmdc:procsm-11-0gf5sh75 were dissolved in 20 uL methoxyamine solution, incubated at 37Cel for 90min, then centrifuged and vialed for GC-MS analysis.",
+      "has_input": [
+        "nmdc:procsm-11-0gf5sh75"
+      ],
+      "has_output": [
+        "nmdc:procsm-11-c4wj5n91"
+      ],
+      "chemical_conversion_category": "substitution",
+      "duration": {
+        "type": "nmdc:QuantityValue",
+        "has_raw_value": "90 min",
+        "has_unit": "min",
+        "has_numeric_value": 90
+      },
+      "temperature": {
+        "type": "nmdc:QuantityValue",
+        "has_raw_value": "37 Cel",
+        "has_unit": "Cel",
+        "has_numeric_value": 37
+      },
+      "substances_used": [
+        {
+          "type": "nmdc:PortionOfSubstance",
+          "known_as": "methoxyamine",
+          "substance_role": "derivatizing_agent",
+          "volume": {
+            "type": "nmdc:QuantityValue",
+            "has_raw_value": "20 uL",
+            "has_unit": "uL",
+            "has_numeric_value": 20
+          }
+        }
+      ]
+    },
+    {
+      "id": "nmdc:extrp-11-c29en119",
+      "type": "nmdc:Extraction",
+      "name": "Metabolite Extraction from Soil",
+      "description": "Soil was bead beat in 60% methanol solution for 15 min at 4Cel. Then, 12 mL of ice-cold chloroform was added. Samples were probe sonicated at 60% amplitude for 30 seconds on ice, cooled, and sonicated again. Samples were incubated for 5 min at -80Cel, vortexed for 1 min, and centrifuged at 4500g for 10 min at 4Cel. The upper aqueous phase was collected into a separate glass vial, dried in a vacuum concentrator.",
+      "has_input": [
+        "nmdc:bsm-11-3p2mnz08"
+      ],
+      "has_output": [
+        "nmdc:procsm-11-0ap6se20"
+      ],
+      "substances_used": [
+        {
+          "type": "nmdc:PortionOfSubstance",
+          "final_concentration": {
+            "type": "nmdc:QuantityValue",
+            "has_raw_value": "60 %",
+            "has_unit": "%",
+            "has_numeric_value": 60
+          },
+          "known_as": "methanol",
+          "substance_role": "solvent"
+        },
+        {
+          "type": "nmdc:PortionOfSubstance",
+          "final_concentration": {
+            "type": "nmdc:QuantityValue",
+            "has_raw_value": "40 %",
+            "has_unit": "%",
+            "has_numeric_value": 40
+          },
+          "known_as": "water",
+          "substance_role": "solvent"
+        },
+        {
+          "type": "nmdc:PortionOfSubstance",
+          "known_as": "chloroform",
+          "substance_role": "solvent",
+          "volume": {
+            "type": "nmdc:QuantityValue",
+            "has_raw_value": "12 mL",
+            "has_unit": "mL",
+            "has_numeric_value": 12
+          }
+        }
+      ],
+      "extraction_targets": [
+        "metabolite"
+      ],
+      "temperature": {
+        "type": "nmdc:QuantityValue",
+        "has_raw_value": "4 Cel",
+        "has_unit": "Cel",
+        "has_numeric_value": 4
+      }
+    },
+    {
+      "id": "nmdc:dispro-11-4h55m460",
+      "type": "nmdc:DissolvingProcess",
+      "name": "Resuspension of Dried Aqueous Extract",
+      "description": "The dried aqueous phase from nmdc:procsm-11-0ap6se20 was resuspended in 200 uL of methanol.",
+      "has_input": [
+        "nmdc:procsm-11-0ap6se20"
+      ],
+      "has_output": [
+        "nmdc:procsm-11-avq1ms18"
+      ],
+      "substances_used": [
+        {
+          "type": "nmdc:PortionOfSubstance",
+          "known_as": "methanol",
+          "substance_role": "solvent",
+          "volume": {
+            "type": "nmdc:QuantityValue",
+            "has_raw_value": "200 uL",
+            "has_unit": "uL",
+            "has_numeric_value": 200
+          }
+        }
+      ]
+    },
+    {
+      "id": "nmdc:filtpr-11-725zyc02",
+      "type": "nmdc:FiltrationProcess",
+      "name": "Supernatant Collection after Resuspension",
+      "description": "After resuspension, the sample was centrifuged at 4500g for 10 min at 4Cel, and the supernatant was transferred to a smaller glass vial and dried in a vacuum concentrator.",
+      "has_input": [
+        "nmdc:procsm-11-avq1ms18"
+      ],
+      "has_output": [
+        "nmdc:procsm-11-jvnncq14"
+      ]
+    },
+    {
+      "id": "nmdc:chcpr-11-zgxrjn54",
+      "type": "nmdc:ChemicalConversionProcess",
+      "name": "Methoxyamination for GC-MS",
+      "description": "Dried samples from nmdc:procsm-11-jvnncq14 were dissolved in 20 uL methoxyamine solution, incubated at 37Cel for 90min, then centrifuged and vialed for GC-MS analysis.",
+      "has_input": [
+        "nmdc:procsm-11-jvnncq14"
+      ],
+      "has_output": [
+        "nmdc:procsm-11-px1pmx11"
+      ],
+      "chemical_conversion_category": "substitution",
+      "duration": {
+        "type": "nmdc:QuantityValue",
+        "has_raw_value": "90 min",
+        "has_unit": "min",
+        "has_numeric_value": 90
+      },
+      "temperature": {
+        "type": "nmdc:QuantityValue",
+        "has_raw_value": "37 Cel",
+        "has_unit": "Cel",
+        "has_numeric_value": 37
+      },
+      "substances_used": [
+        {
+          "type": "nmdc:PortionOfSubstance",
+          "known_as": "methoxyamine",
+          "substance_role": "derivatizing_agent",
+          "volume": {
+            "type": "nmdc:QuantityValue",
+            "has_raw_value": "20 uL",
+            "has_unit": "uL",
+            "has_numeric_value": 20
+          }
+        }
+      ]
+    },
+    {
+      "id": "nmdc:extrp-11-zb8ths31",
+      "type": "nmdc:Extraction",
+      "name": "Metabolite Extraction from Soil",
+      "description": "Soil was bead beat in 60% methanol solution for 15 min at 4Cel. Then, 12 mL of ice-cold chloroform was added. Samples were probe sonicated at 60% amplitude for 30 seconds on ice, cooled, and sonicated again. Samples were incubated for 5 min at -80Cel, vortexed for 1 min, and centrifuged at 4500g for 10 min at 4Cel. The upper aqueous phase was collected into a separate glass vial, dried in a vacuum concentrator.",
+      "has_input": [
+        "nmdc:bsm-11-cwey4y35"
+      ],
+      "has_output": [
+        "nmdc:procsm-11-nm7x2m45"
+      ],
+      "substances_used": [
+        {
+          "type": "nmdc:PortionOfSubstance",
+          "final_concentration": {
+            "type": "nmdc:QuantityValue",
+            "has_raw_value": "60 %",
+            "has_unit": "%",
+            "has_numeric_value": 60
+          },
+          "known_as": "methanol",
+          "substance_role": "solvent"
+        },
+        {
+          "type": "nmdc:PortionOfSubstance",
+          "final_concentration": {
+            "type": "nmdc:QuantityValue",
+            "has_raw_value": "40 %",
+            "has_unit": "%",
+            "has_numeric_value": 40
+          },
+          "known_as": "water",
+          "substance_role": "solvent"
+        },
+        {
+          "type": "nmdc:PortionOfSubstance",
+          "known_as": "chloroform",
+          "substance_role": "solvent",
+          "volume": {
+            "type": "nmdc:QuantityValue",
+            "has_raw_value": "12 mL",
+            "has_unit": "mL",
+            "has_numeric_value": 12
+          }
+        }
+      ],
+      "extraction_targets": [
+        "metabolite"
+      ],
+      "temperature": {
+        "type": "nmdc:QuantityValue",
+        "has_raw_value": "4 Cel",
+        "has_unit": "Cel",
+        "has_numeric_value": 4
+      }
+    },
+    {
+      "id": "nmdc:dispro-11-5pn6mz15",
+      "type": "nmdc:DissolvingProcess",
+      "name": "Resuspension of Dried Aqueous Extract",
+      "description": "The dried aqueous phase from nmdc:procsm-11-nm7x2m45 was resuspended in 200 uL of methanol.",
+      "has_input": [
+        "nmdc:procsm-11-nm7x2m45"
+      ],
+      "has_output": [
+        "nmdc:procsm-11-9n2aaw31"
+      ],
+      "substances_used": [
+        {
+          "type": "nmdc:PortionOfSubstance",
+          "known_as": "methanol",
+          "substance_role": "solvent",
+          "volume": {
+            "type": "nmdc:QuantityValue",
+            "has_raw_value": "200 uL",
+            "has_unit": "uL",
+            "has_numeric_value": 200
+          }
+        }
+      ]
+    },
+    {
+      "id": "nmdc:filtpr-11-5s2yx872",
+      "type": "nmdc:FiltrationProcess",
+      "name": "Supernatant Collection after Resuspension",
+      "description": "After resuspension, the sample was centrifuged at 4500g for 10 min at 4Cel, and the supernatant was transferred to a smaller glass vial and dried in a vacuum concentrator.",
+      "has_input": [
+        "nmdc:procsm-11-9n2aaw31"
+      ],
+      "has_output": [
+        "nmdc:procsm-11-nhzqt026"
+      ]
+    },
+    {
+      "id": "nmdc:chcpr-11-6bdmyr72",
+      "type": "nmdc:ChemicalConversionProcess",
+      "name": "Methoxyamination for GC-MS",
+      "description": "Dried samples from nmdc:procsm-11-nhzqt026 were dissolved in 20 uL methoxyamine solution, incubated at 37Cel for 90min, then centrifuged and vialed for GC-MS analysis.",
+      "has_input": [
+        "nmdc:procsm-11-nhzqt026"
+      ],
+      "has_output": [
+        "nmdc:procsm-11-rxg1tv76"
+      ],
+      "chemical_conversion_category": "substitution",
+      "duration": {
+        "type": "nmdc:QuantityValue",
+        "has_raw_value": "90 min",
+        "has_unit": "min",
+        "has_numeric_value": 90
+      },
+      "temperature": {
+        "type": "nmdc:QuantityValue",
+        "has_raw_value": "37 Cel",
+        "has_unit": "Cel",
+        "has_numeric_value": 37
+      },
+      "substances_used": [
+        {
+          "type": "nmdc:PortionOfSubstance",
+          "known_as": "methoxyamine",
+          "substance_role": "derivatizing_agent",
+          "volume": {
+            "type": "nmdc:QuantityValue",
+            "has_raw_value": "20 uL",
+            "has_unit": "uL",
+            "has_numeric_value": 20
+          }
+        }
+      ]
+    },
+    {
+      "id": "nmdc:extrp-11-bjm7yt29",
+      "type": "nmdc:Extraction",
+      "name": "Metabolite Extraction from Soil",
+      "description": "Soil was bead beat in 60% methanol solution for 15 min at 4Cel. Then, 12 mL of ice-cold chloroform was added. Samples were probe sonicated at 60% amplitude for 30 seconds on ice, cooled, and sonicated again. Samples were incubated for 5 min at -80Cel, vortexed for 1 min, and centrifuged at 4500g for 10 min at 4Cel. The upper aqueous phase was collected into a separate glass vial, dried in a vacuum concentrator.",
+      "has_input": [
+        "nmdc:bsm-11-wrvmh591"
+      ],
+      "has_output": [
+        "nmdc:procsm-11-5b4rj544"
+      ],
+      "substances_used": [
+        {
+          "type": "nmdc:PortionOfSubstance",
+          "final_concentration": {
+            "type": "nmdc:QuantityValue",
+            "has_raw_value": "60 %",
+            "has_unit": "%",
+            "has_numeric_value": 60
+          },
+          "known_as": "methanol",
+          "substance_role": "solvent"
+        },
+        {
+          "type": "nmdc:PortionOfSubstance",
+          "final_concentration": {
+            "type": "nmdc:QuantityValue",
+            "has_raw_value": "40 %",
+            "has_unit": "%",
+            "has_numeric_value": 40
+          },
+          "known_as": "water",
+          "substance_role": "solvent"
+        },
+        {
+          "type": "nmdc:PortionOfSubstance",
+          "known_as": "chloroform",
+          "substance_role": "solvent",
+          "volume": {
+            "type": "nmdc:QuantityValue",
+            "has_raw_value": "12 mL",
+            "has_unit": "mL",
+            "has_numeric_value": 12
+          }
+        }
+      ],
+      "extraction_targets": [
+        "metabolite"
+      ],
+      "temperature": {
+        "type": "nmdc:QuantityValue",
+        "has_raw_value": "4 Cel",
+        "has_unit": "Cel",
+        "has_numeric_value": 4
+      }
+    },
+    {
+      "id": "nmdc:dispro-11-h84tp253",
+      "type": "nmdc:DissolvingProcess",
+      "name": "Resuspension of Dried Aqueous Extract",
+      "description": "The dried aqueous phase from nmdc:procsm-11-5b4rj544 was resuspended in 200 uL of methanol.",
+      "has_input": [
+        "nmdc:procsm-11-5b4rj544"
+      ],
+      "has_output": [
+        "nmdc:procsm-11-08348834"
+      ],
+      "substances_used": [
+        {
+          "type": "nmdc:PortionOfSubstance",
+          "known_as": "methanol",
+          "substance_role": "solvent",
+          "volume": {
+            "type": "nmdc:QuantityValue",
+            "has_raw_value": "200 uL",
+            "has_unit": "uL",
+            "has_numeric_value": 200
+          }
+        }
+      ]
+    },
+    {
+      "id": "nmdc:filtpr-11-pfta1g85",
+      "type": "nmdc:FiltrationProcess",
+      "name": "Supernatant Collection after Resuspension",
+      "description": "After resuspension, the sample was centrifuged at 4500g for 10 min at 4Cel, and the supernatant was transferred to a smaller glass vial and dried in a vacuum concentrator.",
+      "has_input": [
+        "nmdc:procsm-11-08348834"
+      ],
+      "has_output": [
+        "nmdc:procsm-11-p3bnbk38"
+      ]
+    },
+    {
+      "id": "nmdc:chcpr-11-phk3w007",
+      "type": "nmdc:ChemicalConversionProcess",
+      "name": "Methoxyamination for GC-MS",
+      "description": "Dried samples from nmdc:procsm-11-p3bnbk38 were dissolved in 20 uL methoxyamine solution, incubated at 37Cel for 90min, then centrifuged and vialed for GC-MS analysis.",
+      "has_input": [
+        "nmdc:procsm-11-p3bnbk38"
+      ],
+      "has_output": [
+        "nmdc:procsm-11-zxn09n66"
+      ],
+      "chemical_conversion_category": "substitution",
+      "duration": {
+        "type": "nmdc:QuantityValue",
+        "has_raw_value": "90 min",
+        "has_unit": "min",
+        "has_numeric_value": 90
+      },
+      "temperature": {
+        "type": "nmdc:QuantityValue",
+        "has_raw_value": "37 Cel",
+        "has_unit": "Cel",
+        "has_numeric_value": 37
+      },
+      "substances_used": [
+        {
+          "type": "nmdc:PortionOfSubstance",
+          "known_as": "methoxyamine",
+          "substance_role": "derivatizing_agent",
+          "volume": {
+            "type": "nmdc:QuantityValue",
+            "has_raw_value": "20 uL",
+            "has_unit": "uL",
+            "has_numeric_value": 20
+          }
+        }
+      ]
+    },
+    {
+      "id": "nmdc:extrp-11-evk64c09",
+      "type": "nmdc:Extraction",
+      "name": "Metabolite Extraction from Soil",
+      "description": "Soil was bead beat in 60% methanol solution for 15 min at 4Cel. Then, 12 mL of ice-cold chloroform was added. Samples were probe sonicated at 60% amplitude for 30 seconds on ice, cooled, and sonicated again. Samples were incubated for 5 min at -80Cel, vortexed for 1 min, and centrifuged at 4500g for 10 min at 4Cel. The upper aqueous phase was collected into a separate glass vial, dried in a vacuum concentrator.",
+      "has_input": [
+        "nmdc:bsm-11-nq2tfm26"
+      ],
+      "has_output": [
+        "nmdc:procsm-11-rxck5t30"
+      ],
+      "substances_used": [
+        {
+          "type": "nmdc:PortionOfSubstance",
+          "final_concentration": {
+            "type": "nmdc:QuantityValue",
+            "has_raw_value": "60 %",
+            "has_unit": "%",
+            "has_numeric_value": 60
+          },
+          "known_as": "methanol",
+          "substance_role": "solvent"
+        },
+        {
+          "type": "nmdc:PortionOfSubstance",
+          "final_concentration": {
+            "type": "nmdc:QuantityValue",
+            "has_raw_value": "40 %",
+            "has_unit": "%",
+            "has_numeric_value": 40
+          },
+          "known_as": "water",
+          "substance_role": "solvent"
+        },
+        {
+          "type": "nmdc:PortionOfSubstance",
+          "known_as": "chloroform",
+          "substance_role": "solvent",
+          "volume": {
+            "type": "nmdc:QuantityValue",
+            "has_raw_value": "12 mL",
+            "has_unit": "mL",
+            "has_numeric_value": 12
+          }
+        }
+      ],
+      "extraction_targets": [
+        "metabolite"
+      ],
+      "temperature": {
+        "type": "nmdc:QuantityValue",
+        "has_raw_value": "4 Cel",
+        "has_unit": "Cel",
+        "has_numeric_value": 4
+      }
+    },
+    {
+      "id": "nmdc:dispro-11-wq8v1567",
+      "type": "nmdc:DissolvingProcess",
+      "name": "Resuspension of Dried Aqueous Extract",
+      "description": "The dried aqueous phase from nmdc:procsm-11-rxck5t30 was resuspended in 200 uL of methanol.",
+      "has_input": [
+        "nmdc:procsm-11-rxck5t30"
+      ],
+      "has_output": [
+        "nmdc:procsm-11-851fey29"
+      ],
+      "substances_used": [
+        {
+          "type": "nmdc:PortionOfSubstance",
+          "known_as": "methanol",
+          "substance_role": "solvent",
+          "volume": {
+            "type": "nmdc:QuantityValue",
+            "has_raw_value": "200 uL",
+            "has_unit": "uL",
+            "has_numeric_value": 200
+          }
+        }
+      ]
+    },
+    {
+      "id": "nmdc:filtpr-11-qpgck040",
+      "type": "nmdc:FiltrationProcess",
+      "name": "Supernatant Collection after Resuspension",
+      "description": "After resuspension, the sample was centrifuged at 4500g for 10 min at 4Cel, and the supernatant was transferred to a smaller glass vial and dried in a vacuum concentrator.",
+      "has_input": [
+        "nmdc:procsm-11-851fey29"
+      ],
+      "has_output": [
+        "nmdc:procsm-11-fe54v361"
+      ]
+    },
+    {
+      "id": "nmdc:chcpr-11-a3c8d342",
+      "type": "nmdc:ChemicalConversionProcess",
+      "name": "Methoxyamination for GC-MS",
+      "description": "Dried samples from nmdc:procsm-11-fe54v361 were dissolved in 20 uL methoxyamine solution, incubated at 37Cel for 90min, then centrifuged and vialed for GC-MS analysis.",
+      "has_input": [
+        "nmdc:procsm-11-fe54v361"
+      ],
+      "has_output": [
+        "nmdc:procsm-11-tjep2e89"
+      ],
+      "chemical_conversion_category": "substitution",
+      "duration": {
+        "type": "nmdc:QuantityValue",
+        "has_raw_value": "90 min",
+        "has_unit": "min",
+        "has_numeric_value": 90
+      },
+      "temperature": {
+        "type": "nmdc:QuantityValue",
+        "has_raw_value": "37 Cel",
+        "has_unit": "Cel",
+        "has_numeric_value": 37
+      },
+      "substances_used": [
+        {
+          "type": "nmdc:PortionOfSubstance",
+          "known_as": "methoxyamine",
+          "substance_role": "derivatizing_agent",
+          "volume": {
+            "type": "nmdc:QuantityValue",
+            "has_raw_value": "20 uL",
+            "has_unit": "uL",
+            "has_numeric_value": 20
+          }
+        }
+      ]
+    },
+    {
+      "id": "nmdc:extrp-11-82j93b79",
+      "type": "nmdc:Extraction",
+      "name": "Metabolite Extraction from Soil",
+      "description": "Soil was bead beat in 60% methanol solution for 15 min at 4Cel. Then, 12 mL of ice-cold chloroform was added. Samples were probe sonicated at 60% amplitude for 30 seconds on ice, cooled, and sonicated again. Samples were incubated for 5 min at -80Cel, vortexed for 1 min, and centrifuged at 4500g for 10 min at 4Cel. The upper aqueous phase was collected into a separate glass vial, dried in a vacuum concentrator.",
+      "has_input": [
+        "nmdc:bsm-11-6x067s27"
+      ],
+      "has_output": [
+        "nmdc:procsm-11-kdqr5w66"
+      ],
+      "substances_used": [
+        {
+          "type": "nmdc:PortionOfSubstance",
+          "final_concentration": {
+            "type": "nmdc:QuantityValue",
+            "has_raw_value": "60 %",
+            "has_unit": "%",
+            "has_numeric_value": 60
+          },
+          "known_as": "methanol",
+          "substance_role": "solvent"
+        },
+        {
+          "type": "nmdc:PortionOfSubstance",
+          "final_concentration": {
+            "type": "nmdc:QuantityValue",
+            "has_raw_value": "40 %",
+            "has_unit": "%",
+            "has_numeric_value": 40
+          },
+          "known_as": "water",
+          "substance_role": "solvent"
+        },
+        {
+          "type": "nmdc:PortionOfSubstance",
+          "known_as": "chloroform",
+          "substance_role": "solvent",
+          "volume": {
+            "type": "nmdc:QuantityValue",
+            "has_raw_value": "12 mL",
+            "has_unit": "mL",
+            "has_numeric_value": 12
+          }
+        }
+      ],
+      "extraction_targets": [
+        "metabolite"
+      ],
+      "temperature": {
+        "type": "nmdc:QuantityValue",
+        "has_raw_value": "4 Cel",
+        "has_unit": "Cel",
+        "has_numeric_value": 4
+      }
+    },
+    {
+      "id": "nmdc:dispro-11-n14yfc03",
+      "type": "nmdc:DissolvingProcess",
+      "name": "Resuspension of Dried Aqueous Extract",
+      "description": "The dried aqueous phase from nmdc:procsm-11-kdqr5w66 was resuspended in 200 uL of methanol.",
+      "has_input": [
+        "nmdc:procsm-11-kdqr5w66"
+      ],
+      "has_output": [
+        "nmdc:procsm-11-c76qnj04"
+      ],
+      "substances_used": [
+        {
+          "type": "nmdc:PortionOfSubstance",
+          "known_as": "methanol",
+          "substance_role": "solvent",
+          "volume": {
+            "type": "nmdc:QuantityValue",
+            "has_raw_value": "200 uL",
+            "has_unit": "uL",
+            "has_numeric_value": 200
+          }
+        }
+      ]
+    },
+    {
+      "id": "nmdc:filtpr-11-stfa3525",
+      "type": "nmdc:FiltrationProcess",
+      "name": "Supernatant Collection after Resuspension",
+      "description": "After resuspension, the sample was centrifuged at 4500g for 10 min at 4Cel, and the supernatant was transferred to a smaller glass vial and dried in a vacuum concentrator.",
+      "has_input": [
+        "nmdc:procsm-11-c76qnj04"
+      ],
+      "has_output": [
+        "nmdc:procsm-11-6101sf31"
+      ]
+    },
+    {
+      "id": "nmdc:chcpr-11-xs0gqc30",
+      "type": "nmdc:ChemicalConversionProcess",
+      "name": "Methoxyamination for GC-MS",
+      "description": "Dried samples from nmdc:procsm-11-6101sf31 were dissolved in 20 uL methoxyamine solution, incubated at 37Cel for 90min, then centrifuged and vialed for GC-MS analysis.",
+      "has_input": [
+        "nmdc:procsm-11-6101sf31"
+      ],
+      "has_output": [
+        "nmdc:procsm-11-3x22m659"
+      ],
+      "chemical_conversion_category": "substitution",
+      "duration": {
+        "type": "nmdc:QuantityValue",
+        "has_raw_value": "90 min",
+        "has_unit": "min",
+        "has_numeric_value": 90
+      },
+      "temperature": {
+        "type": "nmdc:QuantityValue",
+        "has_raw_value": "37 Cel",
+        "has_unit": "Cel",
+        "has_numeric_value": 37
+      },
+      "substances_used": [
+        {
+          "type": "nmdc:PortionOfSubstance",
+          "known_as": "methoxyamine",
+          "substance_role": "derivatizing_agent",
+          "volume": {
+            "type": "nmdc:QuantityValue",
+            "has_raw_value": "20 uL",
+            "has_unit": "uL",
+            "has_numeric_value": 20
+          }
+        }
+      ]
+    }
+  ],
+  "processed_sample_set": [
+    {
+      "id": "nmdc:procsm-11-077ze677",
+      "type": "nmdc:ProcessedSample",
+      "name": "nmdc:bsm-11-622k6044_aqueous_extract",
+      "description": "The collected upper aqueous phase after initial extraction and phase separation, subsequently dried.",
+      "sampled_portion": [
+        "aqueous_layer"
+      ]
+    },
+    {
+      "id": "nmdc:procsm-11-5pggbx62",
+      "type": "nmdc:ProcessedSample",
+      "name": "nmdc:bsm-11-622k6044_resuspended_extract",
+      "description": "The dried aqueous extract from nmdc:procsm-11-077ze677 resuspended in methanol."
+    },
+    {
+      "id": "nmdc:procsm-11-wjvw9w87",
+      "type": "nmdc:ProcessedSample",
+      "name": "nmdc:bsm-11-622k6044_methanol_supernatant",
+      "description": "The dried supernatant after methanol resuspension and centrifugation.",
+      "sampled_portion": [
+        "supernatant"
+      ]
+    },
+    {
+      "id": "nmdc:procsm-11-zq1w8n86",
+      "type": "nmdc:ProcessedSample",
+      "name": "nmdc:bsm-11-622k6044_derivatized_GCMS_sample",
+      "description": "The methoxyamine-derivatized sample, ready for GC-MS analysis."
+    },
+    {
+      "id": "nmdc:procsm-11-vy1sws42",
+      "type": "nmdc:ProcessedSample",
+      "name": "nmdc:bsm-11-8rn9bm20_aqueous_extract",
+      "description": "The collected upper aqueous phase after initial extraction and phase separation, subsequently dried.",
+      "sampled_portion": [
+        "aqueous_layer"
+      ]
+    },
+    {
+      "id": "nmdc:procsm-11-wk7g8822",
+      "type": "nmdc:ProcessedSample",
+      "name": "nmdc:bsm-11-8rn9bm20_resuspended_extract",
+      "description": "The dried aqueous extract from nmdc:procsm-11-vy1sws42 resuspended in methanol."
+    },
+    {
+      "id": "nmdc:procsm-11-q0c3ta06",
+      "type": "nmdc:ProcessedSample",
+      "name": "nmdc:bsm-11-8rn9bm20_methanol_supernatant",
+      "description": "The dried supernatant after methanol resuspension and centrifugation.",
+      "sampled_portion": [
+        "supernatant"
+      ]
+    },
+    {
+      "id": "nmdc:procsm-11-eezxvc98",
+      "type": "nmdc:ProcessedSample",
+      "name": "nmdc:bsm-11-8rn9bm20_derivatized_GCMS_sample",
+      "description": "The methoxyamine-derivatized sample, ready for GC-MS analysis."
+    },
+    {
+      "id": "nmdc:procsm-11-a272ar17",
+      "type": "nmdc:ProcessedSample",
+      "name": "nmdc:bsm-11-frgt4x11_aqueous_extract",
+      "description": "The collected upper aqueous phase after initial extraction and phase separation, subsequently dried.",
+      "sampled_portion": [
+        "aqueous_layer"
+      ]
+    },
+    {
+      "id": "nmdc:procsm-11-ctrj4x36",
+      "type": "nmdc:ProcessedSample",
+      "name": "nmdc:bsm-11-frgt4x11_resuspended_extract",
+      "description": "The dried aqueous extract from nmdc:procsm-11-a272ar17 resuspended in methanol."
+    },
+    {
+      "id": "nmdc:procsm-11-avde2x58",
+      "type": "nmdc:ProcessedSample",
+      "name": "nmdc:bsm-11-frgt4x11_methanol_supernatant",
+      "description": "The dried supernatant after methanol resuspension and centrifugation.",
+      "sampled_portion": [
+        "supernatant"
+      ]
+    },
+    {
+      "id": "nmdc:procsm-11-jmrm9918",
+      "type": "nmdc:ProcessedSample",
+      "name": "nmdc:bsm-11-frgt4x11_derivatized_GCMS_sample",
+      "description": "The methoxyamine-derivatized sample, ready for GC-MS analysis."
+    },
+    {
+      "id": "nmdc:procsm-11-9b33q041",
+      "type": "nmdc:ProcessedSample",
+      "name": "nmdc:bsm-11-hebdaz02_aqueous_extract",
+      "description": "The collected upper aqueous phase after initial extraction and phase separation, subsequently dried.",
+      "sampled_portion": [
+        "aqueous_layer"
+      ]
+    },
+    {
+      "id": "nmdc:procsm-11-1kb9ee34",
+      "type": "nmdc:ProcessedSample",
+      "name": "nmdc:bsm-11-hebdaz02_resuspended_extract",
+      "description": "The dried aqueous extract from nmdc:procsm-11-9b33q041 resuspended in methanol."
+    },
+    {
+      "id": "nmdc:procsm-11-qwjkx177",
+      "type": "nmdc:ProcessedSample",
+      "name": "nmdc:bsm-11-hebdaz02_methanol_supernatant",
+      "description": "The dried supernatant after methanol resuspension and centrifugation.",
+      "sampled_portion": [
+        "supernatant"
+      ]
+    },
+    {
+      "id": "nmdc:procsm-11-47crzf40",
+      "type": "nmdc:ProcessedSample",
+      "name": "nmdc:bsm-11-hebdaz02_derivatized_GCMS_sample",
+      "description": "The methoxyamine-derivatized sample, ready for GC-MS analysis."
+    },
+    {
+      "id": "nmdc:procsm-11-q1pmx329",
+      "type": "nmdc:ProcessedSample",
+      "name": "nmdc:bsm-11-93mc8g67_aqueous_extract",
+      "description": "The collected upper aqueous phase after initial extraction and phase separation, subsequently dried.",
+      "sampled_portion": [
+        "aqueous_layer"
+      ]
+    },
+    {
+      "id": "nmdc:procsm-11-kf35c470",
+      "type": "nmdc:ProcessedSample",
+      "name": "nmdc:bsm-11-93mc8g67_resuspended_extract",
+      "description": "The dried aqueous extract from nmdc:procsm-11-q1pmx329 resuspended in methanol."
+    },
+    {
+      "id": "nmdc:procsm-11-cddhrn76",
+      "type": "nmdc:ProcessedSample",
+      "name": "nmdc:bsm-11-93mc8g67_methanol_supernatant",
+      "description": "The dried supernatant after methanol resuspension and centrifugation.",
+      "sampled_portion": [
+        "supernatant"
+      ]
+    },
+    {
+      "id": "nmdc:procsm-11-pbvcnh98",
+      "type": "nmdc:ProcessedSample",
+      "name": "nmdc:bsm-11-93mc8g67_derivatized_GCMS_sample",
+      "description": "The methoxyamine-derivatized sample, ready for GC-MS analysis."
+    },
+    {
+      "id": "nmdc:procsm-11-n03azr83",
+      "type": "nmdc:ProcessedSample",
+      "name": "nmdc:bsm-11-71991e79_aqueous_extract",
+      "description": "The collected upper aqueous phase after initial extraction and phase separation, subsequently dried.",
+      "sampled_portion": [
+        "aqueous_layer"
+      ]
+    },
+    {
+      "id": "nmdc:procsm-11-w4pf0g68",
+      "type": "nmdc:ProcessedSample",
+      "name": "nmdc:bsm-11-71991e79_resuspended_extract",
+      "description": "The dried aqueous extract from nmdc:procsm-11-n03azr83 resuspended in methanol."
+    },
+    {
+      "id": "nmdc:procsm-11-5cysz035",
+      "type": "nmdc:ProcessedSample",
+      "name": "nmdc:bsm-11-71991e79_methanol_supernatant",
+      "description": "The dried supernatant after methanol resuspension and centrifugation.",
+      "sampled_portion": [
+        "supernatant"
+      ]
+    },
+    {
+      "id": "nmdc:procsm-11-vxvhg398",
+      "type": "nmdc:ProcessedSample",
+      "name": "nmdc:bsm-11-71991e79_derivatized_GCMS_sample",
+      "description": "The methoxyamine-derivatized sample, ready for GC-MS analysis."
+    },
+    {
+      "id": "nmdc:procsm-11-ryct6p55",
+      "type": "nmdc:ProcessedSample",
+      "name": "nmdc:bsm-11-7m09me46_aqueous_extract",
+      "description": "The collected upper aqueous phase after initial extraction and phase separation, subsequently dried.",
+      "sampled_portion": [
+        "aqueous_layer"
+      ]
+    },
+    {
+      "id": "nmdc:procsm-11-q91vx245",
+      "type": "nmdc:ProcessedSample",
+      "name": "nmdc:bsm-11-7m09me46_resuspended_extract",
+      "description": "The dried aqueous extract from nmdc:procsm-11-ryct6p55 resuspended in methanol."
+    },
+    {
+      "id": "nmdc:procsm-11-60mbda94",
+      "type": "nmdc:ProcessedSample",
+      "name": "nmdc:bsm-11-7m09me46_methanol_supernatant",
+      "description": "The dried supernatant after methanol resuspension and centrifugation.",
+      "sampled_portion": [
+        "supernatant"
+      ]
+    },
+    {
+      "id": "nmdc:procsm-11-p7ga4x41",
+      "type": "nmdc:ProcessedSample",
+      "name": "nmdc:bsm-11-7m09me46_derivatized_GCMS_sample",
+      "description": "The methoxyamine-derivatized sample, ready for GC-MS analysis."
+    },
+    {
+      "id": "nmdc:procsm-11-ts4wgz63",
+      "type": "nmdc:ProcessedSample",
+      "name": "nmdc:bsm-11-cpekyy11_aqueous_extract",
+      "description": "The collected upper aqueous phase after initial extraction and phase separation, subsequently dried.",
+      "sampled_portion": [
+        "aqueous_layer"
+      ]
+    },
+    {
+      "id": "nmdc:procsm-11-gqrbst17",
+      "type": "nmdc:ProcessedSample",
+      "name": "nmdc:bsm-11-cpekyy11_resuspended_extract",
+      "description": "The dried aqueous extract from nmdc:procsm-11-ts4wgz63 resuspended in methanol."
+    },
+    {
+      "id": "nmdc:procsm-11-ey8pfc78",
+      "type": "nmdc:ProcessedSample",
+      "name": "nmdc:bsm-11-cpekyy11_methanol_supernatant",
+      "description": "The dried supernatant after methanol resuspension and centrifugation.",
+      "sampled_portion": [
+        "supernatant"
+      ]
+    },
+    {
+      "id": "nmdc:procsm-11-8zkk9a37",
+      "type": "nmdc:ProcessedSample",
+      "name": "nmdc:bsm-11-cpekyy11_derivatized_GCMS_sample",
+      "description": "The methoxyamine-derivatized sample, ready for GC-MS analysis."
+    },
+    {
+      "id": "nmdc:procsm-11-e8cw4907",
+      "type": "nmdc:ProcessedSample",
+      "name": "nmdc:bsm-11-q0bxzb10_aqueous_extract",
+      "description": "The collected upper aqueous phase after initial extraction and phase separation, subsequently dried.",
+      "sampled_portion": [
+        "aqueous_layer"
+      ]
+    },
+    {
+      "id": "nmdc:procsm-11-varr5s37",
+      "type": "nmdc:ProcessedSample",
+      "name": "nmdc:bsm-11-q0bxzb10_resuspended_extract",
+      "description": "The dried aqueous extract from nmdc:procsm-11-e8cw4907 resuspended in methanol."
+    },
+    {
+      "id": "nmdc:procsm-11-db1gby77",
+      "type": "nmdc:ProcessedSample",
+      "name": "nmdc:bsm-11-q0bxzb10_methanol_supernatant",
+      "description": "The dried supernatant after methanol resuspension and centrifugation.",
+      "sampled_portion": [
+        "supernatant"
+      ]
+    },
+    {
+      "id": "nmdc:procsm-11-5fx00q94",
+      "type": "nmdc:ProcessedSample",
+      "name": "nmdc:bsm-11-q0bxzb10_derivatized_GCMS_sample",
+      "description": "The methoxyamine-derivatized sample, ready for GC-MS analysis."
+    },
+    {
+      "id": "nmdc:procsm-11-xye9tv42",
+      "type": "nmdc:ProcessedSample",
+      "name": "nmdc:bsm-11-ssfs1051_aqueous_extract",
+      "description": "The collected upper aqueous phase after initial extraction and phase separation, subsequently dried.",
+      "sampled_portion": [
+        "aqueous_layer"
+      ]
+    },
+    {
+      "id": "nmdc:procsm-11-f8nen968",
+      "type": "nmdc:ProcessedSample",
+      "name": "nmdc:bsm-11-ssfs1051_resuspended_extract",
+      "description": "The dried aqueous extract from nmdc:procsm-11-xye9tv42 resuspended in methanol."
+    },
+    {
+      "id": "nmdc:procsm-11-7bcea466",
+      "type": "nmdc:ProcessedSample",
+      "name": "nmdc:bsm-11-ssfs1051_methanol_supernatant",
+      "description": "The dried supernatant after methanol resuspension and centrifugation.",
+      "sampled_portion": [
+        "supernatant"
+      ]
+    },
+    {
+      "id": "nmdc:procsm-11-sgxgep46",
+      "type": "nmdc:ProcessedSample",
+      "name": "nmdc:bsm-11-ssfs1051_derivatized_GCMS_sample",
+      "description": "The methoxyamine-derivatized sample, ready for GC-MS analysis."
+    },
+    {
+      "id": "nmdc:procsm-11-xgwdkj34",
+      "type": "nmdc:ProcessedSample",
+      "name": "nmdc:bsm-11-042nd237_aqueous_extract",
+      "description": "The collected upper aqueous phase after initial extraction and phase separation, subsequently dried.",
+      "sampled_portion": [
+        "aqueous_layer"
+      ]
+    },
+    {
+      "id": "nmdc:procsm-11-agh4k256",
+      "type": "nmdc:ProcessedSample",
+      "name": "nmdc:bsm-11-042nd237_resuspended_extract",
+      "description": "The dried aqueous extract from nmdc:procsm-11-xgwdkj34 resuspended in methanol."
+    },
+    {
+      "id": "nmdc:procsm-11-3gter540",
+      "type": "nmdc:ProcessedSample",
+      "name": "nmdc:bsm-11-042nd237_methanol_supernatant",
+      "description": "The dried supernatant after methanol resuspension and centrifugation.",
+      "sampled_portion": [
+        "supernatant"
+      ]
+    },
+    {
+      "id": "nmdc:procsm-11-xk7t6j25",
+      "type": "nmdc:ProcessedSample",
+      "name": "nmdc:bsm-11-042nd237_derivatized_GCMS_sample",
+      "description": "The methoxyamine-derivatized sample, ready for GC-MS analysis."
+    },
+    {
+      "id": "nmdc:procsm-11-e7843n71",
+      "type": "nmdc:ProcessedSample",
+      "name": "nmdc:bsm-11-65a4xw75_aqueous_extract",
+      "description": "The collected upper aqueous phase after initial extraction and phase separation, subsequently dried.",
+      "sampled_portion": [
+        "aqueous_layer"
+      ]
+    },
+    {
+      "id": "nmdc:procsm-11-yxz83719",
+      "type": "nmdc:ProcessedSample",
+      "name": "nmdc:bsm-11-65a4xw75_resuspended_extract",
+      "description": "The dried aqueous extract from nmdc:procsm-11-e7843n71 resuspended in methanol."
+    },
+    {
+      "id": "nmdc:procsm-11-07j22c04",
+      "type": "nmdc:ProcessedSample",
+      "name": "nmdc:bsm-11-65a4xw75_methanol_supernatant",
+      "description": "The dried supernatant after methanol resuspension and centrifugation.",
+      "sampled_portion": [
+        "supernatant"
+      ]
+    },
+    {
+      "id": "nmdc:procsm-11-0wedgr31",
+      "type": "nmdc:ProcessedSample",
+      "name": "nmdc:bsm-11-65a4xw75_derivatized_GCMS_sample",
+      "description": "The methoxyamine-derivatized sample, ready for GC-MS analysis."
+    },
+    {
+      "id": "nmdc:procsm-11-q14wkg40",
+      "type": "nmdc:ProcessedSample",
+      "name": "nmdc:bsm-11-6m6c9g55_aqueous_extract",
+      "description": "The collected upper aqueous phase after initial extraction and phase separation, subsequently dried.",
+      "sampled_portion": [
+        "aqueous_layer"
+      ]
+    },
+    {
+      "id": "nmdc:procsm-11-xxa59a41",
+      "type": "nmdc:ProcessedSample",
+      "name": "nmdc:bsm-11-6m6c9g55_resuspended_extract",
+      "description": "The dried aqueous extract from nmdc:procsm-11-q14wkg40 resuspended in methanol."
+    },
+    {
+      "id": "nmdc:procsm-11-xys7tj17",
+      "type": "nmdc:ProcessedSample",
+      "name": "nmdc:bsm-11-6m6c9g55_methanol_supernatant",
+      "description": "The dried supernatant after methanol resuspension and centrifugation.",
+      "sampled_portion": [
+        "supernatant"
+      ]
+    },
+    {
+      "id": "nmdc:procsm-11-2tecf991",
+      "type": "nmdc:ProcessedSample",
+      "name": "nmdc:bsm-11-6m6c9g55_derivatized_GCMS_sample",
+      "description": "The methoxyamine-derivatized sample, ready for GC-MS analysis."
+    },
+    {
+      "id": "nmdc:procsm-11-jd7jfs90",
+      "type": "nmdc:ProcessedSample",
+      "name": "nmdc:bsm-11-efm5hh51_aqueous_extract",
+      "description": "The collected upper aqueous phase after initial extraction and phase separation, subsequently dried.",
+      "sampled_portion": [
+        "aqueous_layer"
+      ]
+    },
+    {
+      "id": "nmdc:procsm-11-senxh523",
+      "type": "nmdc:ProcessedSample",
+      "name": "nmdc:bsm-11-efm5hh51_resuspended_extract",
+      "description": "The dried aqueous extract from nmdc:procsm-11-jd7jfs90 resuspended in methanol."
+    },
+    {
+      "id": "nmdc:procsm-11-ph4s4362",
+      "type": "nmdc:ProcessedSample",
+      "name": "nmdc:bsm-11-efm5hh51_methanol_supernatant",
+      "description": "The dried supernatant after methanol resuspension and centrifugation.",
+      "sampled_portion": [
+        "supernatant"
+      ]
+    },
+    {
+      "id": "nmdc:procsm-11-1afb3q50",
+      "type": "nmdc:ProcessedSample",
+      "name": "nmdc:bsm-11-efm5hh51_derivatized_GCMS_sample",
+      "description": "The methoxyamine-derivatized sample, ready for GC-MS analysis."
+    },
+    {
+      "id": "nmdc:procsm-11-7s3bpz36",
+      "type": "nmdc:ProcessedSample",
+      "name": "nmdc:bsm-11-xtz7he28_aqueous_extract",
+      "description": "The collected upper aqueous phase after initial extraction and phase separation, subsequently dried.",
+      "sampled_portion": [
+        "aqueous_layer"
+      ]
+    },
+    {
+      "id": "nmdc:procsm-11-nxhen895",
+      "type": "nmdc:ProcessedSample",
+      "name": "nmdc:bsm-11-xtz7he28_resuspended_extract",
+      "description": "The dried aqueous extract from nmdc:procsm-11-7s3bpz36 resuspended in methanol."
+    },
+    {
+      "id": "nmdc:procsm-11-kxc98634",
+      "type": "nmdc:ProcessedSample",
+      "name": "nmdc:bsm-11-xtz7he28_methanol_supernatant",
+      "description": "The dried supernatant after methanol resuspension and centrifugation.",
+      "sampled_portion": [
+        "supernatant"
+      ]
+    },
+    {
+      "id": "nmdc:procsm-11-y1k8jv24",
+      "type": "nmdc:ProcessedSample",
+      "name": "nmdc:bsm-11-xtz7he28_derivatized_GCMS_sample",
+      "description": "The methoxyamine-derivatized sample, ready for GC-MS analysis."
+    },
+    {
+      "id": "nmdc:procsm-11-38f5h183",
+      "type": "nmdc:ProcessedSample",
+      "name": "nmdc:bsm-11-gk0czc37_aqueous_extract",
+      "description": "The collected upper aqueous phase after initial extraction and phase separation, subsequently dried.",
+      "sampled_portion": [
+        "aqueous_layer"
+      ]
+    },
+    {
+      "id": "nmdc:procsm-11-gyja6564",
+      "type": "nmdc:ProcessedSample",
+      "name": "nmdc:bsm-11-gk0czc37_resuspended_extract",
+      "description": "The dried aqueous extract from nmdc:procsm-11-38f5h183 resuspended in methanol."
+    },
+    {
+      "id": "nmdc:procsm-11-yqpk8x29",
+      "type": "nmdc:ProcessedSample",
+      "name": "nmdc:bsm-11-gk0czc37_methanol_supernatant",
+      "description": "The dried supernatant after methanol resuspension and centrifugation.",
+      "sampled_portion": [
+        "supernatant"
+      ]
+    },
+    {
+      "id": "nmdc:procsm-11-223ezf88",
+      "type": "nmdc:ProcessedSample",
+      "name": "nmdc:bsm-11-gk0czc37_derivatized_GCMS_sample",
+      "description": "The methoxyamine-derivatized sample, ready for GC-MS analysis."
+    },
+    {
+      "id": "nmdc:procsm-11-wjw80s83",
+      "type": "nmdc:ProcessedSample",
+      "name": "nmdc:bsm-11-gr59rt72_aqueous_extract",
+      "description": "The collected upper aqueous phase after initial extraction and phase separation, subsequently dried.",
+      "sampled_portion": [
+        "aqueous_layer"
+      ]
+    },
+    {
+      "id": "nmdc:procsm-11-rs8dn467",
+      "type": "nmdc:ProcessedSample",
+      "name": "nmdc:bsm-11-gr59rt72_resuspended_extract",
+      "description": "The dried aqueous extract from nmdc:procsm-11-wjw80s83 resuspended in methanol."
+    },
+    {
+      "id": "nmdc:procsm-11-h6qyzg46",
+      "type": "nmdc:ProcessedSample",
+      "name": "nmdc:bsm-11-gr59rt72_methanol_supernatant",
+      "description": "The dried supernatant after methanol resuspension and centrifugation.",
+      "sampled_portion": [
+        "supernatant"
+      ]
+    },
+    {
+      "id": "nmdc:procsm-11-k35qfx25",
+      "type": "nmdc:ProcessedSample",
+      "name": "nmdc:bsm-11-gr59rt72_derivatized_GCMS_sample",
+      "description": "The methoxyamine-derivatized sample, ready for GC-MS analysis."
+    },
+    {
+      "id": "nmdc:procsm-11-gfb5vy33",
+      "type": "nmdc:ProcessedSample",
+      "name": "nmdc:bsm-11-xxvfda22_aqueous_extract",
+      "description": "The collected upper aqueous phase after initial extraction and phase separation, subsequently dried.",
+      "sampled_portion": [
+        "aqueous_layer"
+      ]
+    },
+    {
+      "id": "nmdc:procsm-11-npbew995",
+      "type": "nmdc:ProcessedSample",
+      "name": "nmdc:bsm-11-xxvfda22_resuspended_extract",
+      "description": "The dried aqueous extract from nmdc:procsm-11-gfb5vy33 resuspended in methanol."
+    },
+    {
+      "id": "nmdc:procsm-11-0gf5sh75",
+      "type": "nmdc:ProcessedSample",
+      "name": "nmdc:bsm-11-xxvfda22_methanol_supernatant",
+      "description": "The dried supernatant after methanol resuspension and centrifugation.",
+      "sampled_portion": [
+        "supernatant"
+      ]
+    },
+    {
+      "id": "nmdc:procsm-11-c4wj5n91",
+      "type": "nmdc:ProcessedSample",
+      "name": "nmdc:bsm-11-xxvfda22_derivatized_GCMS_sample",
+      "description": "The methoxyamine-derivatized sample, ready for GC-MS analysis."
+    },
+    {
+      "id": "nmdc:procsm-11-0ap6se20",
+      "type": "nmdc:ProcessedSample",
+      "name": "nmdc:bsm-11-3p2mnz08_aqueous_extract",
+      "description": "The collected upper aqueous phase after initial extraction and phase separation, subsequently dried.",
+      "sampled_portion": [
+        "aqueous_layer"
+      ]
+    },
+    {
+      "id": "nmdc:procsm-11-avq1ms18",
+      "type": "nmdc:ProcessedSample",
+      "name": "nmdc:bsm-11-3p2mnz08_resuspended_extract",
+      "description": "The dried aqueous extract from nmdc:procsm-11-0ap6se20 resuspended in methanol."
+    },
+    {
+      "id": "nmdc:procsm-11-jvnncq14",
+      "type": "nmdc:ProcessedSample",
+      "name": "nmdc:bsm-11-3p2mnz08_methanol_supernatant",
+      "description": "The dried supernatant after methanol resuspension and centrifugation.",
+      "sampled_portion": [
+        "supernatant"
+      ]
+    },
+    {
+      "id": "nmdc:procsm-11-px1pmx11",
+      "type": "nmdc:ProcessedSample",
+      "name": "nmdc:bsm-11-3p2mnz08_derivatized_GCMS_sample",
+      "description": "The methoxyamine-derivatized sample, ready for GC-MS analysis."
+    },
+    {
+      "id": "nmdc:procsm-11-nm7x2m45",
+      "type": "nmdc:ProcessedSample",
+      "name": "nmdc:bsm-11-cwey4y35_aqueous_extract",
+      "description": "The collected upper aqueous phase after initial extraction and phase separation, subsequently dried.",
+      "sampled_portion": [
+        "aqueous_layer"
+      ]
+    },
+    {
+      "id": "nmdc:procsm-11-9n2aaw31",
+      "type": "nmdc:ProcessedSample",
+      "name": "nmdc:bsm-11-cwey4y35_resuspended_extract",
+      "description": "The dried aqueous extract from nmdc:procsm-11-nm7x2m45 resuspended in methanol."
+    },
+    {
+      "id": "nmdc:procsm-11-nhzqt026",
+      "type": "nmdc:ProcessedSample",
+      "name": "nmdc:bsm-11-cwey4y35_methanol_supernatant",
+      "description": "The dried supernatant after methanol resuspension and centrifugation.",
+      "sampled_portion": [
+        "supernatant"
+      ]
+    },
+    {
+      "id": "nmdc:procsm-11-rxg1tv76",
+      "type": "nmdc:ProcessedSample",
+      "name": "nmdc:bsm-11-cwey4y35_derivatized_GCMS_sample",
+      "description": "The methoxyamine-derivatized sample, ready for GC-MS analysis."
+    },
+    {
+      "id": "nmdc:procsm-11-5b4rj544",
+      "type": "nmdc:ProcessedSample",
+      "name": "nmdc:bsm-11-wrvmh591_aqueous_extract",
+      "description": "The collected upper aqueous phase after initial extraction and phase separation, subsequently dried.",
+      "sampled_portion": [
+        "aqueous_layer"
+      ]
+    },
+    {
+      "id": "nmdc:procsm-11-08348834",
+      "type": "nmdc:ProcessedSample",
+      "name": "nmdc:bsm-11-wrvmh591_resuspended_extract",
+      "description": "The dried aqueous extract from nmdc:procsm-11-5b4rj544 resuspended in methanol."
+    },
+    {
+      "id": "nmdc:procsm-11-p3bnbk38",
+      "type": "nmdc:ProcessedSample",
+      "name": "nmdc:bsm-11-wrvmh591_methanol_supernatant",
+      "description": "The dried supernatant after methanol resuspension and centrifugation.",
+      "sampled_portion": [
+        "supernatant"
+      ]
+    },
+    {
+      "id": "nmdc:procsm-11-zxn09n66",
+      "type": "nmdc:ProcessedSample",
+      "name": "nmdc:bsm-11-wrvmh591_derivatized_GCMS_sample",
+      "description": "The methoxyamine-derivatized sample, ready for GC-MS analysis."
+    },
+    {
+      "id": "nmdc:procsm-11-rxck5t30",
+      "type": "nmdc:ProcessedSample",
+      "name": "nmdc:bsm-11-nq2tfm26_aqueous_extract",
+      "description": "The collected upper aqueous phase after initial extraction and phase separation, subsequently dried.",
+      "sampled_portion": [
+        "aqueous_layer"
+      ]
+    },
+    {
+      "id": "nmdc:procsm-11-851fey29",
+      "type": "nmdc:ProcessedSample",
+      "name": "nmdc:bsm-11-nq2tfm26_resuspended_extract",
+      "description": "The dried aqueous extract from nmdc:procsm-11-rxck5t30 resuspended in methanol."
+    },
+    {
+      "id": "nmdc:procsm-11-fe54v361",
+      "type": "nmdc:ProcessedSample",
+      "name": "nmdc:bsm-11-nq2tfm26_methanol_supernatant",
+      "description": "The dried supernatant after methanol resuspension and centrifugation.",
+      "sampled_portion": [
+        "supernatant"
+      ]
+    },
+    {
+      "id": "nmdc:procsm-11-tjep2e89",
+      "type": "nmdc:ProcessedSample",
+      "name": "nmdc:bsm-11-nq2tfm26_derivatized_GCMS_sample",
+      "description": "The methoxyamine-derivatized sample, ready for GC-MS analysis."
+    },
+    {
+      "id": "nmdc:procsm-11-kdqr5w66",
+      "type": "nmdc:ProcessedSample",
+      "name": "nmdc:bsm-11-6x067s27_aqueous_extract",
+      "description": "The collected upper aqueous phase after initial extraction and phase separation, subsequently dried.",
+      "sampled_portion": [
+        "aqueous_layer"
+      ]
+    },
+    {
+      "id": "nmdc:procsm-11-c76qnj04",
+      "type": "nmdc:ProcessedSample",
+      "name": "nmdc:bsm-11-6x067s27_resuspended_extract",
+      "description": "The dried aqueous extract from nmdc:procsm-11-kdqr5w66 resuspended in methanol."
+    },
+    {
+      "id": "nmdc:procsm-11-6101sf31",
+      "type": "nmdc:ProcessedSample",
+      "name": "nmdc:bsm-11-6x067s27_methanol_supernatant",
+      "description": "The dried supernatant after methanol resuspension and centrifugation.",
+      "sampled_portion": [
+        "supernatant"
+      ]
+    },
+    {
+      "id": "nmdc:procsm-11-3x22m659",
+      "type": "nmdc:ProcessedSample",
+      "name": "nmdc:bsm-11-6x067s27_derivatized_GCMS_sample",
+      "description": "The methoxyamine-derivatized sample, ready for GC-MS analysis."
+    }
+  ],
+  "@type": "Database"
+}
