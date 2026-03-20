@@ -3,11 +3,11 @@ import re
 import yaml
 
 # Load input data
-biosamples_df = pd.read_csv('/Users/heal742/LOCAL/05_NMDC/07_automation/nmdc_mass_spec_automation/studies/kroeger_11_dwsv7q78_lcms_metab/metadata/biosample_attributes.csv')
-files_df = pd.read_csv('/Users/heal742/LOCAL/05_NMDC/07_automation/nmdc_mass_spec_automation/studies/kroeger_11_dwsv7q78_lcms_metab/metadata/downloaded_files.csv')
+biosamples_df = pd.read_csv('/Users/heal742/LOCAL/05_NMDC/07_automation/nmdc_mass_spec_automation/workflows/kroeger_11_dwsv7q78_lcms_metab/metadata/biosample_attributes.csv')
+files_df = pd.read_csv('/Users/heal742/LOCAL/05_NMDC/07_automation/nmdc_mass_spec_automation/workflows/kroeger_11_dwsv7q78_lcms_metab/metadata/downloaded_files.csv')
 
 # Load material processing YAML
-with open('/Users/heal742/LOCAL/05_NMDC/07_automation/nmdc_mass_spec_automation/studies/kroeger_11_dwsv7q78_lcms_metab/protocol_info/llm_generated_protocol_outline.yaml', 'r') as f:
+with open('/Users/heal742/LOCAL/05_NMDC/07_automation/nmdc_mass_spec_automation/workflows/kroeger_11_dwsv7q78_lcms_metab/protocol_info/llm_generated_protocol_outline.yaml', 'r') as f:
     material_processing_protocols = yaml.safe_load(f)
 
 # Create a dictionary for quick biosample lookup
@@ -81,4 +81,4 @@ for filename in files_df['file_name']:
 
 # Save output
 output_df = pd.DataFrame(results)
-output_df.to_csv('/Users/heal742/LOCAL/05_NMDC/07_automation/nmdc_mass_spec_automation/studies/kroeger_11_dwsv7q78_lcms_metab/metadata/llm_biosample_raw_file_mapper.csv', index=False)
+output_df.to_csv('/Users/heal742/LOCAL/05_NMDC/07_automation/nmdc_mass_spec_automation/workflows/kroeger_11_dwsv7q78_lcms_metab/metadata/llm_biosample_raw_file_mapper.csv', index=False)

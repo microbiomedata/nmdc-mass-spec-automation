@@ -25,7 +25,7 @@ async def main():
     """Run the Singer study workflow."""
 
     # Initialize study manager
-    config_path = "studies/singer_11_46aje659_lcms_metab/singer_11_46aje659_lcms_metab_config.json"
+    config_path = "workflows/singer_11_46aje659_lcms_metab/singer_11_46aje659_lcms_metab_config.json"
     manager = NMDCWorkflowManager(str(config_path))
 
     logger = manager.logger

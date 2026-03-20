@@ -5,7 +5,7 @@
 from nmdc_ms_metadata_gen.metadata_generator import NMDCMetadataGenerator
 from pathlib import Path
 
-JSON_PATH = "studies/singer_11_46aje659_lcms_metab/metadata/nmdc_submission_packages/instrument.json"
+JSON_PATH = "workflows/singer_11_46aje659_lcms_metab/metadata/nmdc_submission_packages/instrument.json"
 
 # Example usage of NMDCMetadataGenerator
 if __name__ == "__main__":

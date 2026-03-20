@@ -18,7 +18,7 @@ async def main():
     """Run the Example GCMS Metabolomics workflow."""
 
     # Initialize study manager
-    config_path = "studies/example_gcms_metab/example_gcms_metab_config.json"
+    config_path = "workflows/example_gcms_metab/example_gcms_metab_config.json"
     manager = NMDCWorkflowManager(str(config_path))
 
     logger = manager.logger

@@ -32,7 +32,7 @@ class TestWorkflowMetadataManagerIntegration:
         from nmdc_dp_utils.workflow_manager import NMDCWorkflowManager
         
         # Create workflow directory structure
-        workflow_dir = tmp_path / "studies" / integration_lcms_config["workflow"]["name"]
+        workflow_dir = tmp_path / "workflows" / integration_lcms_config["workflow"]["name"]
         metadata_dir = workflow_dir / "metadata"
         raw_info_dir = workflow_dir / "raw_file_info"
         nmdc_packages_dir = metadata_dir / "nmdc_submission_packages"
@@ -162,7 +162,7 @@ class TestWorkflowMetadataManagerIntegration:
         from nmdc_dp_utils.workflow_manager import NMDCWorkflowManager
         
         # Create workflow directory structure
-        workflow_dir = tmp_path / "studies" / integration_gcms_config["workflow"]["name"]
+        workflow_dir = tmp_path / "workflows" / integration_gcms_config["workflow"]["name"]
         metadata_dir = workflow_dir / "metadata"
         raw_info_dir = workflow_dir / "raw_file_info"
         nmdc_packages_dir = metadata_dir / "nmdc_submission_packages"
@@ -410,7 +410,7 @@ class TestWorkflowMetadataManagerIntegration:
         ]
         
         # Create workflow directory structure
-        workflow_dir = tmp_path / "studies" / config["workflow"]["name"]
+        workflow_dir = tmp_path / "workflows" / config["workflow"]["name"]
         metadata_dir = workflow_dir / "metadata"
         raw_info_dir = workflow_dir / "raw_file_info"
         nmdc_packages_dir = metadata_dir / "nmdc_submission_packages"
@@ -544,7 +544,7 @@ class TestWorkflowMetadataManagerIntegration:
         from nmdc_dp_utils.workflow_manager import NMDCWorkflowManager
         
         # Create workflow directory structure
-        workflow_dir = tmp_path / "studies" / integration_lcms_config["workflow"]["name"]
+        workflow_dir = tmp_path / "workflows" / integration_lcms_config["workflow"]["name"]
         protocol_dir = workflow_dir / "protocol_info"
         metadata_dir = workflow_dir / "metadata"
         nmdc_packages_dir = metadata_dir / "nmdc_submission_packages"

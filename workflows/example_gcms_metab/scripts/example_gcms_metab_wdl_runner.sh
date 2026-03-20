@@ -1,20 +1,20 @@
 #!/bin/bash
 
-# WDL Runner Script for kroeger_11_dwsv7q78
+# WDL Runner Script for blanchard_11_8ws97026
 # Generated automatically by NMDC Study Manager
 
 # Base directory for the JSON files
-BASE_DIR="/Users/heal742/LOCAL/05_NMDC/07_automation/nmdc_mass_spec_automation/studies/kroeger_11_dwsv7q78_lcms_metab/wdl_jsons"
+BASE_DIR="/Users/heal742/LOCAL/05_NMDC/07_automation/nmdc_mass_spec_automation/workflows/example_gcms_metab/wdl_jsons"
 
 # Count total batch files
 NUM_BATCHES=$(find "${BASE_DIR}" -type f -name '*.json' | wc -l)
 
-echo "Found $NUM_BATCHES JSON files to process for study: kroeger_11_dwsv7q78"
-echo "Study ID: nmdc:sty-11-dwsv7q78"
+echo "Found $NUM_BATCHES JSON files to process for study: blanchard_11_8ws97026"
+echo "Study ID: nmdc:sty-11-8ws97026"
 echo "========================"
 
 # Check if WDL file exists in current directory
-WDL_FILE="wdl/metaMS_lcms_metabolomics.wdl"
+WDL_FILE="wdl/metaMS_gcms.wdl"
 if [ ! -f "$WDL_FILE" ]; then
     echo "ERROR: WDL file not found: $WDL_FILE"
     echo "Please run this script from a directory containing the wdl/ subdirectory"
@@ -52,7 +52,7 @@ echo "WORKFLOW SUMMARY:"
 echo "  Total batches: $NUM_BATCHES"
 echo "  Successful: $SUCCESS_COUNT"
 echo "  Failed: $FAILED_COUNT"
-echo "  Study: kroeger_11_dwsv7q78 (nmdc:sty-11-dwsv7q78)"
+echo "  Study: blanchard_11_8ws97026 (nmdc:sty-11-8ws97026)"
 
 if [ $FAILED_COUNT -eq 0 ]; then
     echo "🎉 All batches completed successfully!"

@@ -60,7 +60,7 @@ See `.env-example` for a complete list of available environment variables and th
 from nmdc_dp_utils.workflow_manager import NMDCWorkflowManager
 
 # Initialize workflow manager
-manager = NMDCWorkflowManager("studies/your_study/config.json")
+manager = NMDCWorkflowManager("workflows/your_study/config.json")
 
 # Step 1: Create directory structure
 manager.create_workflow_structure()
@@ -116,7 +116,7 @@ nmdc_mass_spec_automation/
 │   └── templates/                  # Script templates
 │       ├── biosample_mapping_script_template.py
 │       └── README.md
-├── studies/                        # Individual study/workflow directories
+├── workflows/                        # Individual study/workflow directories
 │   └── kroeger_11_dwsv7q78_lcms_metab/  # Example: complete LC-MS Metabolomics workflow
 ├── requirements.txt                # Python dependencies
 └── README.md                       # This file
@@ -127,7 +127,7 @@ nmdc_mass_spec_automation/
 Each workflow creates the following structure:
 
 ```
-studies/workflow_name/
+workflows/workflow_name/
 ├── workflow_config.json            # Workflow configuration
 ├── run_workflow.py                 # Workflow runner script
 ├── scripts/                        # Generated and custom scripts
