@@ -9,7 +9,7 @@
         "massive_id": "v06/MSV000093271",
         "file_type": ".mzML",
         "file_filters": [
-            "msms"
+            "MSMS"
         ],
         "processed_data_date_tag": "20260219",
         "workflow_type": "LCMS Metabolomics",
@@ -43,7 +43,7 @@
         {
             "name": "hilic_neg",
             "file_filter": [
-                "HILICZ",
+                "HILIC",
                 "_NEG_"
             ],
             "corems_toml": "workflow_inputs/metams_hilic_corems.toml",
@@ -70,12 +70,11 @@
     },
     "skip_triggers": {
         "study_structure_created": true,
-        "raw_data_downloaded": false,
+        "raw_data_downloaded": true,
         "protocol_outline_created": true,
         "biosample_attributes_fetched": true,
-        "biosample_mapping_script_generated": false,
-        "biosample_mapping_completed": false,
-        "raw_data_inspected": false,
+        "biosample_mapping_completed": true,
+        "raw_data_inspected": true,
         "data_processed": false,
         "processed_data_uploaded_to_minio": false,
         "material_processing_metadata_generated": false,

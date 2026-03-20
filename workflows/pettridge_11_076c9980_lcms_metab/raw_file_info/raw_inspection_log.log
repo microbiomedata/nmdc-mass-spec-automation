@@ -1,0 +1,18 @@
+2026-03-20 19:54:08,423 - INFO - Found 108 files to inspect
+2026-03-20 19:54:08,425 - INFO - Results will be written to: /mnt/Users/heal742/LOCAL/05_NMDC/07_automation/nmdc_mass_spec_automation/workflows/pettridge_11_076c9980_lcms_metab/raw_file_info/raw_file_inspection_results.csv
+2026-03-20 19:54:08,426 - INFO - Errors will be logged to: /mnt/Users/heal742/LOCAL/05_NMDC/07_automation/nmdc_mass_spec_automation/workflows/pettridge_11_076c9980_lcms_metab/raw_file_info/raw_file_inspection_errors.csv
+2026-03-20 19:54:08,426 - INFO - CoreMS available: True
+2026-03-20 19:54:16,397 - ERROR - Error processing 20170605_KBL_JP_CSPSoilCC_TestEx_PRSoil_QE139-UV_ZHILIC5um200A_715851_NEG-MSMS_1_PRSoil-pt5g-H2Oonly___B_102030eV___Run15.mzML after 1 attempts: Mixed polarities detected in scan data
+2026-03-20 19:54:18,847 - ERROR - Error processing 20170605_KBL_JP_CSPSoilCC_TestEx_PRSoil_QE139-UV_ZHILIC5um200A_715851_POS-MSMS_1_PRSoil-pt5g-H2Oonly___B_102030eV___Run14.mzML after 1 attempts: Mixed polarities detected in scan data
+2026-03-20 19:54:21,376 - ERROR - Error processing 20170605_KBL_JP_CSPSoilCC_TestEx_PRSoil_QE139-UV_ZHILIC5um200A_715851_POS-MSMS_1_PRSoil-pt5g-H2Oonly___A_102030eV___Run11.mzML after 1 attempts: Mixed polarities detected in scan data
+2026-03-20 19:54:37,133 - ERROR - Error processing 20170605_KBL_JP_CSPSoilCC_TestEx_PRSoil_QE139-UV_ZHILIC5um200A_715851_POS-MSMS_1ex_ExBlank-H2Oonly___A_102030eV___Run8.mzML after 1 attempts: Mixed polarities detected in scan data
+2026-03-20 19:54:46,414 - ERROR - Error processing 20170605_KBL_JP_CSPSoilCC_TestEx_PRSoil_QE139-UV_ZHILIC5um200A_715851_NEG-MSMS_2ex_ExBlank-H2OEDTA___A_102030eV___Run18.mzML after 1 attempts: Mixed polarities detected in scan data
+2026-03-20 19:55:00,208 - ERROR - Error processing 20170605_KBL_JP_CSPSoilCC_TestEx_PRSoil_QE139-UV_ZHILIC5um200A_715851_POS-MSMS_2ex_ExBlank-H2OEDTA___A_102030eV___Run17.mzML after 1 attempts: Mixed polarities detected in scan data
+2026-03-20 19:55:08,599 - ERROR - Error processing 20170605_KBL_JP_CSPSoilCC_TestEx_PRSoil_QE139-UV_ZHILIC5um200A_715851_NEG-MSMS_1ex_ExBlank-H2Oonly___A_102030eV___Run9.mzML after 1 attempts: Mixed polarities detected in scan data
+2026-03-20 19:55:12,715 - ERROR - Error processing 20170605_KBL_JP_CSPSoilCC_TestEx_PRSoil_QE139-UV_ZHILIC5um200A_715851_NEG-MSMS_1_PRSoil-pt5g-H2Oonly___A_102030eV___Run12.mzML after 1 attempts: Mixed polarities detected in scan data
+2026-03-20 19:55:22,417 - INFO - Inspection complete!
+2026-03-20 19:55:22,418 - INFO - Successfully processed: 100 files
+2026-03-20 19:55:22,418 - INFO - Failed to process: 8 files
+2026-03-20 19:55:22,418 - INFO - Results saved to: /mnt/Users/heal742/LOCAL/05_NMDC/07_automation/nmdc_mass_spec_automation/workflows/pettridge_11_076c9980_lcms_metab/raw_file_info/raw_file_inspection_results.csv
+2026-03-20 19:55:22,418 - INFO - Error details saved to: /mnt/Users/heal742/LOCAL/05_NMDC/07_automation/nmdc_mass_spec_automation/workflows/pettridge_11_076c9980_lcms_metab/raw_file_info/raw_file_inspection_errors.csv
+2026-03-20 19:55:22,418 - INFO - Processing log saved to: /mnt/Users/heal742/LOCAL/05_NMDC/07_automation/nmdc_mass_spec_automation/workflows/pettridge_11_076c9980_lcms_metab/raw_file_info/raw_inspection_log.log
