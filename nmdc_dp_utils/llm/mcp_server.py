@@ -20,16 +20,8 @@ mcp = FastMCP(
     instructions=(
         "You are an MCP server that provides tools for NMDC data processing. "
         "Tools for protocol conversion: get_protocol_schema_context, validate_generated_yaml. "
-        "Tools for biosample mapping: set_biosample_validation_context, execute_and_validate_mapping_script, validate_biosample_mapping. "
-        "For biosample mapping workflow: (1) call set_biosample_validation_context first, "
-        "(2) then generate and test scripts with execute_and_validate_mapping_script."
     ),
 )
-
-# Global storage for biosample mapping validation context
-_biosample_attributes = None
-_raw_files = None
-_material_processing_yaml = None
 
 # =============================================================================
 # PROTOCOL CONVERSION TOOLS
@@ -143,19 +135,6 @@ def _clean_yaml_response(response: str) -> str:
     if response.endswith("```"):
         response = response[:-3]  # Remove trailing ```
     return response.strip()
-
-
-def _clean_csv_response(response: str) -> str:
-    """Remove markdown code fences from CSV LLM response."""
-    response = response.strip()
-    if response.startswith("```csv"):
-        response = response[6:]  # Remove ```csv
-    elif response.startswith("```"):
-        response = response[3:]  # Remove ```
-    if response.endswith("```"):
-        response = response[:-3]  # Remove trailing ```
-    return response.strip()
-
 
 @mcp.tool()
 def validate_generated_yaml(yaml_outline: str) -> dict:
