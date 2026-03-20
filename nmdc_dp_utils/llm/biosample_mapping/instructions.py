@@ -87,7 +87,7 @@ The 'match_confidence' column MUST contain ONLY these values:
 
 CRITICAL:
 For files that don't match biosamples, use empty string "" in match_confidence column.
-Use "calibrant" ONLY for known calibrant/quality control standards (FAMES, SRFA) unless additional context specifies others.
+Use "calibrant" ONLY for known calibrant/quality control standards (FAMES, SRFA) unless additional context specifies others. This should be used SPARINGLY and only when the filename clearly indicates it's a calibrant or when additional context confirms it.
 Rows with a non-empty biosample_id MUST use only "high", "medium", or "low" (never "calibrant" and never empty).
 Do NOT force calibrant assignment from filename alone; if additional context indicates a FAME/FAMES/SRFA-named file is a biosample, map it to that biosample with high/medium/low confidence instead of "calibrant".
 
