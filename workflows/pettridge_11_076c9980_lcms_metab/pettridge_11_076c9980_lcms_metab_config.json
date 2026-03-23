@@ -65,7 +65,8 @@
         "use_massive_urls": true,
         "serial_numbers_to_remove": [
             "Unknown",
-            "Exactive Series slot #1"
+            "Exactive Series slot #1",
+            "Exactive Series slot #913"
         ]
     },
     "skip_triggers": {
@@ -78,7 +79,7 @@
         "data_processed": true,
         "processed_data_uploaded_to_minio": true,
         "material_processing_metadata_generated": true,
-        "metadata_mapping_generated": false,
+        "metadata_mapping_generated": true,
         "metadata_packages_generated": false,
         "metadata_submitted_dev": false,
         "metadata_submitted_prod": false

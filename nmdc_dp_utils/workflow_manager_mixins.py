@@ -4032,6 +4032,7 @@ class WorkflowMetadataManager:
         import urllib.request
         import urllib.error
         import ssl
+        import time
 
         # Create SSL context that ignores certificate verification for MASSIVE
         ssl_context = ssl.create_default_context()
@@ -4042,6 +4043,9 @@ class WorkflowMetadataManager:
         total_tested = min(len(urls), max_attempts)
 
         for i, url in enumerate(urls[:max_attempts]):
+            # Add delay between requests to avoid rate limiting (except for first request)
+            if i > 0:
+                time.sleep(3)
             try:
                 # Use HEAD request to check accessibility without downloading
                 req = urllib.request.Request(url, method="HEAD")
