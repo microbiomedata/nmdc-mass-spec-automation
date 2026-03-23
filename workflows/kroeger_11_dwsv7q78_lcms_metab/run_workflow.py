@@ -1,6 +1,8 @@
 #!/usr/bin/env python3
 """
-Example Lipid study, lcms_lipidomics workflow runner.
+Kroeger study, lcms_metabolomics workflow runner.
+Study: Microbial regulation of soil water repellency to control soil degradation
+MASSIVE ID: MSV000094090
 """
 
 import sys
@@ -15,10 +17,10 @@ if str(PROJECT_ROOT) not in sys.path:
 from nmdc_dp_utils.workflow_manager import NMDCWorkflowManager
 
 async def main():
-    """Run the Example Lipid study workflow."""
+    """Run the Kroeger study workflow."""
 
     # Initialize study manager
-    config_path = "studies/example_lcms_lipids/example_config_lcms_lipids.json"
+    config_path = "workflows/kroeger_11_dwsv7q78_lcms_metab/kroeger_lcms_metab_config.json"
     manager = NMDCWorkflowManager(str(config_path))
 
     logger = manager.logger
@@ -40,7 +42,7 @@ async def main():
     # Optional: add "additional_mapping_context.txt" in metadata/ folder for extra mapping context
     logger.info("4. Mapping raw data files to biosamples using LLM...")
     manager.get_biosample_attributes()
-    mapping_success = await manager.generate_llm_biosample_mapping()
+    mapping_success = await manager.generate_llm_biosample_mapping(max_iterations=3)
     
     if not mapping_success:
         logger.warning("Biosample mapping failed - review logs and add additional context if needed")
@@ -58,19 +60,31 @@ async def main():
 
     # Step 7: Upload processed data to MinIO
     logger.info("7. Uploading processed data to MinIO...")
-    #manager.upload_processed_data_to_minio()
+    manager.upload_processed_data_to_minio()
     assert manager.should_skip('processed_data_uploaded_to_minio'), "Processed data upload to MinIO must complete successfully to proceed"
 
     # Step 8: Generate and submit NMDC metadata packages
     logger.info("8. Generating NMDC metadata packages...")
-    manager.generate_nmdc_metadata_for_workflow(test=True)
+    manager.generate_nmdc_metadata_for_workflow() # Set test to FALSE for actual run.
     assert manager.should_skip('metadata_packages_generated'), "NMDC metadata package generation must complete successfully to proceed"
 
-    # Step 9: Submit metadata packages to dev and prod environments 
+    # Step 9: Submit metadata packages to dev environment
     logger.info("9. Submitting metadata packages to dev environment...")
-    #dev_success = manager.submit_metadata_packages_to_dev()
+    dev_success = manager.submit_metadata_packages_to_dev()
+    if not dev_success:
+        logger.error("Failed to submit metadata packages to dev environment")
+        logger.error("Please fix the issues and re-run. Skipping production submission.")
+        return  # Exit without proceeding to prod
+    else:
+        logger.info("Successfully submitted metadata packages to dev environment")
+
+    # Step 10: Submit metadata packages to prod environment (will only run if dev submission was successful)
     logger.info("10. Submitting metadata packages to prod environment...")
-    #prod_success = manager.submit_metadata_packages_to_prod()
+    prod_success = manager.submit_metadata_packages_to_prod()
+    if not prod_success:
+        logger.error("Failed to submit metadata packages to prod environment")
+    else:
+        logger.info("Successfully submitted metadata packages to prod environment")
 
 if __name__ == "__main__":
     asyncio.run(main())

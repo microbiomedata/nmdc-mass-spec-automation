@@ -3,10 +3,10 @@ import yaml
 import re
 
 # File paths (as specified in the prompt)
-BIOSAMPLE_ATTRIBUTES_PATH = '/Users/heal742/LOCAL/05_NMDC/07_automation/nmdc_mass_spec_automation/studies/example_lcms_lipids/metadata/biosample_attributes.csv'
-DOWNLOADED_FILES_PATH = '/Users/heal742/LOCAL/05_NMDC/07_automation/nmdc_mass_spec_automation/studies/example_lcms_lipids/metadata/downloaded_files.csv'
-PROTOCOL_YAML_PATH = '/Users/heal742/LOCAL/05_NMDC/07_automation/nmdc_mass_spec_automation/studies/example_lcms_lipids/protocol_info/llm_generated_protocol_outline.yaml'
-OUTPUT_CSV_PATH = '/Users/heal742/LOCAL/05_NMDC/07_automation/nmdc_mass_spec_automation/studies/example_lcms_lipids/metadata/llm_biosample_raw_file_mapper.csv'
+BIOSAMPLE_ATTRIBUTES_PATH = '/Users/heal742/LOCAL/05_NMDC/07_automation/nmdc_mass_spec_automation/workflows/example_lcms_lipids/metadata/biosample_attributes.csv'
+DOWNLOADED_FILES_PATH = '/Users/heal742/LOCAL/05_NMDC/07_automation/nmdc_mass_spec_automation/workflows/example_lcms_lipids/metadata/downloaded_files.csv'
+PROTOCOL_YAML_PATH = '/Users/heal742/LOCAL/05_NMDC/07_automation/nmdc_mass_spec_automation/workflows/example_lcms_lipids/protocol_info/llm_generated_protocol_outline.yaml'
+OUTPUT_CSV_PATH = '/Users/heal742/LOCAL/05_NMDC/07_automation/nmdc_mass_spec_automation/workflows/example_lcms_lipids/metadata/llm_biosample_raw_file_mapper.csv'
 
 # --- 1. Load Data ---
 biosamples_df = pd.read_csv(BIOSAMPLE_ATTRIBUTES_PATH)

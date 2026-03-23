@@ -70,7 +70,7 @@ class TestNMDCWorkflowManager:
         manager = NMDCWorkflowManager(str(lcms_config_file))
         
         assert manager.base_path == temp_config_dir / "lcms_base"
-        assert manager.workflow_path == temp_config_dir / "lcms_base/studies/test_lcms_workflow"
+        assert manager.workflow_path == temp_config_dir / "lcms_base/workflows/test_lcms_workflow"
         assert manager.raw_data_directory == temp_config_dir / "lcms_data/test_lcms_study/raw"
 
     def test_processed_data_directory_with_date_tag(self, temp_config_dir, lcms_config):

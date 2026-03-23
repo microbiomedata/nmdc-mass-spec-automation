@@ -1,13 +1,14 @@
 """
 NMDC Study Management Utilities
 
-A comprehensive system for managing NMDC metabolomics studies, providing:
+A comprehensive system for managing NMDC mass spectrometry workflows, providing:
 - Automated discovery and download of datasets from MASSIVE
 - MinIO object storage integration for processed data
 - WDL workflow JSON generation for batch processing
 - Standardized directory structures and configuration management
 
-This module enables reproducible workflows across different NMDC studies
+This module enables reproducible workflows across different data processing configurations 
+(e.g. LC-MS metabolomics, GC-MS, etc.) while maintaining flexibility for study-specific requirements.
 while maintaining flexibility for study-specific requirements.
 """
 
@@ -79,7 +80,7 @@ class NMDCWorkflowManager(
         self.study_name = self.config["study"]["name"]
         self.study_id = self.config["study"]["id"]
         self.base_path = Path(self.config["paths"]["base_directory"])
-        self.workflow_path = self.base_path / "studies" / f"{self.workflow_name}"
+        self.workflow_path = self.base_path / "workflows" / f"{self.workflow_name}"
 
         # Initialize logger
         self.logger = logging.getLogger(f"nmdc.{self.workflow_name}")

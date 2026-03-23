@@ -4,10 +4,10 @@ import re
 
 def map_raw_files_to_biosamples():
     # Define file paths
-    biosample_attributes_path = "/Users/heal742/LOCAL/05_NMDC/07_automation/nmdc_mass_spec_automation/studies/example_gcms_metab/metadata/biosample_attributes.csv"
-    raw_files_path = "/Users/heal742/LOCAL/05_NMDC/07_automation/nmdc_mass_spec_automation/studies/example_gcms_metab/metadata/downloaded_files.csv"
-    yaml_path = "/Users/heal742/LOCAL/05_NMDC/07_automation/nmdc_mass_spec_automation/studies/example_gcms_metab/protocol_info/llm_generated_protocol_outline.yaml"
-    output_csv_path = "/Users/heal742/LOCAL/05_NMDC/07_automation/nmdc_mass_spec_automation/studies/example_gcms_metab/metadata/llm_biosample_raw_file_mapper.csv"
+    biosample_attributes_path = "/Users/heal742/LOCAL/05_NMDC/07_automation/nmdc_mass_spec_automation/workflows/example_gcms_metab/metadata/biosample_attributes.csv"
+    raw_files_path = "/Users/heal742/LOCAL/05_NMDC/07_automation/nmdc_mass_spec_automation/workflows/example_gcms_metab/metadata/downloaded_files.csv"
+    yaml_path = "/Users/heal742/LOCAL/05_NMDC/07_automation/nmdc_mass_spec_automation/workflows/example_gcms_metab/protocol_info/llm_generated_protocol_outline.yaml"
+    output_csv_path = "/Users/heal742/LOCAL/05_NMDC/07_automation/nmdc_mass_spec_automation/workflows/example_gcms_metab/metadata/llm_biosample_raw_file_mapper.csv"
 
     # Load data
     biosamples_df = pd.read_csv(biosample_attributes_path)

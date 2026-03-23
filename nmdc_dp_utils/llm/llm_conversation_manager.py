@@ -70,7 +70,7 @@ class ConversationManager:
         2. How protocols relate to processed samples
         3. The expected output CSV format
         
-        Important: Examples are NOT templates to copy - they show the process for different studies.
+        Important: Examples are NOT templates to copy - they show the process for different workflows.
         """
         import yaml as yaml_lib
         

@@ -4,7 +4,7 @@
 # Generated automatically by NMDC Study Manager
 
 # Base directory for the JSON files
-BASE_DIR="/Users/heal742/LOCAL/05_NMDC/07_automation/nmdc_mass_spec_automation/studies/example_lcms_lipids/wdl_jsons"
+BASE_DIR="/Users/heal742/LOCAL/05_NMDC/07_automation/nmdc_mass_spec_automation/workflows/example_lcms_lipids/wdl_jsons"
 
 # Count total batch files
 NUM_BATCHES=$(find "${BASE_DIR}" -type f -name '*.json' | wc -l)
