@@ -6,7 +6,6 @@
     },
     "workflow": {
         "name": "pettridge_11_076c9980_lcms_metab",
-        "massive_id": "v06/MSV000093271",
         "file_type": ".mzML",
         "file_filters": [
             "MSMS"
@@ -62,7 +61,7 @@
         "existing_data_objects": [
             "nmdc:dobj-11-7kab3m51"
         ],
-        "use_massive_urls": true,
+        "raw_data_location": "MinIO",
         "serial_numbers_to_remove": [
             "Unknown",
             "Exactive Series slot #1",
@@ -80,7 +79,7 @@
         "processed_data_uploaded_to_minio": true,
         "material_processing_metadata_generated": true,
         "metadata_mapping_generated": true,
-        "metadata_packages_generated": false,
+        "metadata_packages_generated": true,
         "metadata_submitted_dev": false,
         "metadata_submitted_prod": false
     }
