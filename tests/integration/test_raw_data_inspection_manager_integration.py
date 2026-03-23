@@ -10,6 +10,7 @@ from pathlib import Path
 import pandas as pd
 import requests
 import subprocess
+import os
 
 
 class TestWorkflowRawDataInspectionManagerIntegration:
