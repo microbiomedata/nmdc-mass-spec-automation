@@ -135,7 +135,7 @@ class TestWDLGenerationEndToEnd:
         # Copy biosample mapping from test data
         shutil.copy(
             TEST_DATA_DIR / "metadata" / "gcms_biosample_mapping.csv",
-            metadata_dir / "mapped_raw_file_biosample_mapping.csv"
+            metadata_dir / "llm_biosample_raw_file_mapper.csv"
         )
         
         # Generate JSONs

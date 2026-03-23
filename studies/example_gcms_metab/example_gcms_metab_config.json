@@ -30,11 +30,6 @@
             "cores": 5
         }
     ],
-    "material_processing": {
-        "processedsample_placeholder": "ProcessedSample2_metabolomics_extraction",
-        "protocol_id": "metabolomics_extraction",
-        "minting_config_creds": ""
-    },
     "metadata": {
         "study_id": "nmdc:sty-11-8ws97026",
         "instrument_used": "Agilent 7980A GC-MS",
@@ -53,15 +48,15 @@
         "study_structure_created": true,
         "raw_data_downloaded": true,
         "biosample_attributes_fetched": true,
-        "biosample_mapping_script_generated": true,
         "biosample_mapping_completed": true,
         "raw_data_inspected": true,
-        "material_processing_metadata_generated": false,
+        "material_processing_metadata_generated": true,
         "metadata_mapping_generated": true,
         "data_processed": true,
         "processed_data_uploaded_to_minio": true,
         "metadata_packages_generated": true,
         "metadata_submitted_dev": false,
-        "metadata_submitted_prod": false
+        "metadata_submitted_prod": false,
+        "protocol_outline_created": true
     }
 }

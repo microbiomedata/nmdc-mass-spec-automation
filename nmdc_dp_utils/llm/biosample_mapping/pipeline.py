@@ -99,7 +99,7 @@ Provide ONLY the Python script code, no markdown blocks or explanations."""
 async def validate_and_fix_script(llm_client: LLMClient, conversation_obj: ConversationManager,
                                   script_path: str, output_path: str, 
                                   biosample_path: str, files_path: str, yaml_path: str,
-                                  max_iterations: int = 3):
+                                  max_iterations: int = 6):
     """
     Execute script, validate output, and fix if needed.
     
@@ -240,6 +240,42 @@ async def validate_and_fix_script(llm_client: LLMClient, conversation_obj: Conve
                     unmapped_path = output_path.replace('.csv', '_unmapped_files.txt')
                     with open(unmapped_path, 'w') as f:
                         f.write('\n'.join(unmapped_files))
+
+                    # Ask LLM to make another pass and try mapping currently-unmapped files.
+                    # Keep this bounded by max_iterations and do not fail if some remain unmapped.
+                    if iteration < max_iterations - 1:
+                        preview_count = min(25, len(unmapped_files))
+                        preview_list = '\n'.join(unmapped_files[:preview_count])
+                        remainder = len(unmapped_files) - preview_count
+                        if remainder > 0:
+                            preview_list += f"\n... and {remainder} more"
+
+                        conversation_obj.add_message(
+                            role="user",
+                            content=f"""Validation passed, but there are still {len(unmapped_files)} unmapped raw_data_identifier values.
+
+Please reevaluate whether any of these can be mapped using biosample names/IDs, protocol context, and any additional study context. If a file can be mapped confidently, map it and provide valid protocol/ProcessedSample placeholder values. If not mappable, keep it unmapped.
+
+Unmapped file candidates:
+{preview_list}
+
+Update the script accordingly and provide the complete corrected script."""
+                        )
+
+                        logging.info("Asking LLM to reevaluate unmapped files...")
+                        fixed_script = await llm_client.get_response(conversation_obj.messages, timeout_seconds=300)
+
+                        if '```python' in fixed_script:
+                            fixed_script = fixed_script.split('```python')[1].split('```')[0].strip()
+                        elif '```' in fixed_script:
+                            fixed_script = fixed_script.split('```')[1].split('```')[0].strip()
+
+                        with open(script_path, 'w') as f:
+                            f.write(fixed_script)
+                        logging.info("Script updated after unmapped-file reevaluation")
+
+                        conversation_obj.add_message(role="assistant", content=fixed_script)
+                        continue
                 
                 return True
             else:
@@ -264,7 +300,11 @@ Fix the script to resolve these validation errors. The validation checks:
 - Biosample names match the biosample IDs
 - Processed sample placeholders exist in the YAML
 - Protocol IDs match top-level protocols in the YAML
+- processedsample_placeholder must be the ProcessedSample ID key under the selected material_processing_protocol_id (not the ProcessedSample name field)
 - All raw files are mapped
+- Rows with biosample_id must use match_confidence high/medium/low (not empty, not calibrant)
+- Calibrant labeling must follow study context (including additional context), not filename-only heuristics
+- Rows with match_confidence high/medium/low/calibrant must include non-empty processedsample_placeholder and material_processing_protocol_id
 
 Provide the complete corrected script."""
                 )
@@ -492,7 +532,7 @@ if __name__ == "__main__":
         biosample_path=biosample_attributes_path,
         files_path=raw_files_path,
         yaml_path=material_processing_yaml_path,
-        max_iterations=3
+        max_iterations=6
     ))
 
     if success:

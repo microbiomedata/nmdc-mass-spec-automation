@@ -107,7 +107,6 @@ The system includes skip triggers to avoid repeating completed workflow steps wh
 - **`skip_triggers.raw_data_downloaded`**: Skip FTP discovery and download if raw data is ready
 - **`skip_triggers.protocol_outline_created`**: Skip LLM protocol description to YAMl outline.
 - **`skip_triggers.biosample_attributes_fetched`**: Skip biosample attribute fetching if already done
-- **`skip_triggers.biosample_mapping_script_generated`**: Skip biosample mapping script generation if already done
 - **`skip_triggers.biosample_mapping_completed`**: Skip biosample mapping if already done
 - **`skip_triggers.raw_data_inspected`**: Skip raw data inspection if already done
 - **`skip_triggers.metadata_mapping_generated`**: Skip metadata mapping if already done

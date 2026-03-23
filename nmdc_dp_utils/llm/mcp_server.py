@@ -3,11 +3,11 @@ import os
 
 import nmdc_schema
 from linkml_runtime.utils.schemaview import SchemaView
+from mcp.server.fastmcp import FastMCP
 from nmdc_ms_metadata_gen.validate_yaml_outline import validate_yaml_outline
 
 logging.basicConfig(level=logging.INFO)
 
-from mcp.server.fastmcp import FastMCP
 
 mcp = FastMCP(
     "NMDC Data Processing Tools",

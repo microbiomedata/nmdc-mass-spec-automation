@@ -57,7 +57,14 @@ def map_file_to_biosample(filename):
 results = []
 for filename in files['COLUMN_NAME']:
     mapping = map_file_to_biosample(filename)
-    results.append({...})
+    results.append({
+        'raw_data_identifier': filename,  # MUST use this exact column name
+        'biosample_id': mapping['biosample_id'],
+        'biosample_name': mapping['biosample_name'],
+        'match_confidence': mapping['match_confidence'],
+        'processedsample_placeholder': mapping['processedsample_placeholder'],
+        'material_processing_protocol_id': mapping['protocol_id']
+    })
 
 # Save output
 output = pd.DataFrame(results)
@@ -69,7 +76,40 @@ output.to_csv('OUTPUT_PATH', index=False)
 - Match sample identifiers to biosample names from the provided biosample list
 - Use method indicators in filenames to determine which protocol from the YAML applies
 - Handle QC/blank/control samples appropriately (may have empty biosample fields)
-- Set confidence based on match quality (high/medium/low)
+
+# MATCH CONFIDENCE VALUES - STRICT REQUIREMENTS
+The 'match_confidence' column MUST contain ONLY these values:
+- **"high"** - Exact match between filename sample ID and biosample name/ID
+- **"medium"** - Partial match with high confidence (e.g., abbreviations, consistent patterns)
+- **"low"** - Uncertain match, filename pattern unclear or biosample match ambiguous
+- **"calibrant"** - ONLY for calibrant files (FAMES or SRFA) - NOT for regular samples, regular QCs, or external standards
+- **""** (empty string) - Files that cannot be mapped to any biosample (QC samples, blanks, method blanks, etc.)
+
+CRITICAL:
+For files that don't match biosamples, use empty string "" in match_confidence column.
+Use "calibrant" ONLY for known calibrant/quality control standards (FAMES, SRFA) unless additional context specifies others.
+Rows with a non-empty biosample_id MUST use only "high", "medium", or "low" (never "calibrant" and never empty).
+Do NOT force calibrant assignment from filename alone; if additional context indicates a FAME/FAMES/SRFA-named file is a biosample, map it to that biosample with high/medium/low confidence instead of "calibrant".
+
+# OUTPUT CSV FORMAT - EXACT REQUIREMENTS
+The output CSV MUST have these exact column names:
+- **"raw_data_identifier"** - The raw file name (NOT "raw_file_name", "filename", "file_name", etc.)
+- **"biosample_id"** - NMDC biosample ID (e.g., "nmdc:bsm-11-abc123") or empty string
+- **"biosample_name"** - Biosample name or empty string
+- **"match_confidence"** - One of: "high", "medium", "low", "calibrant", or "" (empty string)
+- **"processedsample_placeholder"** - ProcessedSample placeholder from YAML or empty string
+- **"material_processing_protocol_id"** - Protocol ID from YAML or empty string
+
+CRITICAL PLACEHOLDER RULE:
+- processedsample_placeholder MUST be the ProcessedSample ID key from the processedsamples list under the selected material_processing_protocol_id.
+- Example pattern: if material_processing_protocol_id is "<protocol_id>", select one key listed under that protocol's processedsamples (for example, "ProcessedSample1_<protocol_id>").
+- Never use the nested ProcessedSample.name value as processedsample_placeholder.
+
+CRITICAL DATA QUALITY RULES:
+- If match_confidence is "high", "medium", "low", or "calibrant", then BOTH processedsample_placeholder and material_processing_protocol_id must be non-empty and valid in the YAML.
+- Do not output values like "exact"; use only the allowed values above.
+
+CRITICAL: The first column MUST be named "raw_data_identifier" (not "raw_file_name").
 
 # OUTPUT REQUIREMENTS
 Provide ONLY the Python script code. No markdown blocks, no explanations outside script comments.

@@ -108,12 +108,16 @@ def validate_biosample_mapping_csv(
         yaml_data = yaml.safe_load(material_processing_yaml)
         protocol_names = set(yaml_data.keys())
         
-        # Extract all ProcessedSample IDs from the YAML
+        # Extract all ProcessedSample IDs from the YAML and track by protocol
         processed_samples = set()
+        protocol_processed_samples = {}
         for protocol_name, protocol_data in yaml_data.items():
+            protocol_processed_samples[protocol_name] = set()
             if 'processedsamples' in protocol_data:
                 for ps_item in protocol_data['processedsamples']:
-                    processed_samples.update(ps_item.keys())
+                    ps_keys = set(ps_item.keys())
+                    processed_samples.update(ps_keys)
+                    protocol_processed_samples[protocol_name].update(ps_keys)
     except Exception as e:
         return {
             'valid': False,
@@ -122,6 +126,7 @@ def validate_biosample_mapping_csv(
     
     # Validate each row
     mapped_raw_files = set()
+    mapped_to_biosample_count = 0
     nmdc_biosample_id_pattern = re.compile(r'^nmdc:bsm-\d+-[a-z0-9]+$')
     
     for i, row in enumerate(generated_rows, start=2):  # Start at 2 to account for header
@@ -139,6 +144,7 @@ def validate_biosample_mapping_csv(
         # Check biosample_id
         biosample_id = row.get('biosample_id', '').strip()
         if biosample_id:  # Allow empty for QC/control samples
+            mapped_to_biosample_count += 1
             if not nmdc_biosample_id_pattern.match(biosample_id):
                 errors.append(f"{row_num}: biosample_id '{biosample_id}' does not match NMDC format (nmdc:bsm-XX-XXXXXXXX)")
             elif biosample_id not in biosample_map:
@@ -152,22 +158,38 @@ def validate_biosample_mapping_csv(
         
         # Check match_confidence
         match_confidence = row.get('match_confidence', '').strip()
-        if match_confidence not in ['high', 'medium', 'low', '']:
-            errors.append(f"{row_num}: match_confidence must be 'high', 'medium', 'low', or empty (got '{match_confidence}')")
+        if match_confidence not in ['high', 'medium', 'low', 'calibrant', '']:
+            errors.append(f"{row_num}: match_confidence must be 'high', 'medium', 'low', 'calibrant', or empty (got '{match_confidence}')")
+
+        if biosample_id and match_confidence not in ['high', 'medium', 'low']:
+            errors.append(f"{row_num}: rows with biosample_id must use match_confidence 'high', 'medium', or 'low'")
+        if not biosample_id and match_confidence in ['high', 'medium', 'low']:
+            errors.append(f"{row_num}: match_confidence '{match_confidence}' requires a biosample_id")
         
         # Check processedsample_placeholder
         ps_placeholder = row.get('processedsample_placeholder', '').strip()
+        if match_confidence in ['high', 'medium', 'low'] and not ps_placeholder:
+            errors.append(f"{row_num}: processedsample_placeholder is required when match_confidence is '{match_confidence}'")
         if ps_placeholder and ps_placeholder not in processed_samples:
             errors.append(f"{row_num}: processedsample_placeholder '{ps_placeholder}' not found in material processing YAML")
         
         # Check material_processing_protocol_id
         protocol_id = row.get('material_processing_protocol_id', '').strip()
+        if match_confidence in ['high', 'medium', 'low'] and not protocol_id:
+            errors.append(f"{row_num}: material_processing_protocol_id is required when match_confidence is '{match_confidence}'")
         if protocol_id and protocol_id not in protocol_names:
             errors.append(f"{row_num}: material_processing_protocol_id '{protocol_id}' not found in material processing YAML (available: {', '.join(protocol_names)})")
+        if ps_placeholder and protocol_id in protocol_processed_samples and ps_placeholder not in protocol_processed_samples[protocol_id]:
+            errors.append(
+                f"{row_num}: processedsample_placeholder '{ps_placeholder}' is not defined under protocol '{protocol_id}'. "
+                f"Use a ProcessedSample ID key from that protocol's processedsamples list (for example, 'ProcessedSample1_{protocol_id}')."
+            )
     
     # Check that all raw files are mapped (warning only, not an error)
     unmapped_files = raw_file_names - mapped_raw_files
     warnings = []
+    if mapped_to_biosample_count == 0:
+        errors.append("No raw files were mapped to any biosample. At least one biosample mapping is required.")
     if unmapped_files:
         warnings.append(f"Unmapped raw files ({len(unmapped_files)}): These files could not be mapped to biosamples (may be QC, blanks, standards, etc.)")
     

@@ -44,7 +44,7 @@ class TestWorkflowMetadataManagerIntegration:
         test_data_dir = Path(__file__).parent / "test_data"
         shutil.copy(
             test_data_dir / "metadata" / "lcms_biosample_mapping.csv",
-            metadata_dir / "mapped_raw_file_biosample_mapping.csv"
+            metadata_dir / "llm_biosample_raw_file_mapper.csv"
         )
         shutil.copy(
             test_data_dir / "raw_file_info" / "lcms_inspection_results.csv",
@@ -53,13 +53,13 @@ class TestWorkflowMetadataManagerIntegration:
         
         # Create mock material processing workflowreference CSV
         # This simulates the output from generate_material_processing_metadata()
-        biosample_mapping = pd.read_csv(metadata_dir / "mapped_raw_file_biosample_mapping.csv")
+        biosample_mapping = pd.read_csv(metadata_dir / "llm_biosample_raw_file_mapper.csv")
         workflowref_data = []
         for _, row in biosample_mapping.iterrows():
             if row["match_confidence"] == "high":
                 workflowref_data.append({
                     "biosample_id": row["biosample_id"],
-                    "raw_data_identifier": row["raw_file_name"],
+                    "raw_data_identifier": row["raw_data_identifier"],
                     "last_processed_sample": f"nmdc:procsm-99-test{len(workflowref_data):03d}"
                 })
         workflowref_df = pd.DataFrame(workflowref_data)
@@ -73,12 +73,10 @@ class TestWorkflowMetadataManagerIntegration:
         manual_mapping = biosample_mapping[biosample_mapping["match_confidence"] == "high"].copy()
         manual_mapping = manual_mapping.merge(
             workflowref_df[["raw_data_identifier", "last_processed_sample"]],
-            left_on="raw_file_name",
+            left_on="raw_data_identifier",
             right_on="raw_data_identifier",
             how="left"
         )
-        # Keep raw_data_identifier as the filename (drop the duplicate from merge)
-        manual_mapping["raw_data_identifier"] = manual_mapping["raw_file_name"]
         manual_mapping.to_csv(
             metadata_dir / "mapped_raw_files_wprocessed_MANUAL.csv",
             index=False
@@ -176,7 +174,7 @@ class TestWorkflowMetadataManagerIntegration:
         test_data_dir = Path(__file__).parent / "test_data"
         shutil.copy(
             test_data_dir / "metadata" / "gcms_biosample_mapping.csv",
-            metadata_dir / "mapped_raw_file_biosample_mapping.csv"
+            metadata_dir / "llm_biosample_raw_file_mapper.csv"
         )
         shutil.copy(
             test_data_dir / "raw_file_info" / "gcms_inspection_results.csv",
@@ -185,13 +183,13 @@ class TestWorkflowMetadataManagerIntegration:
         
         # Create mock material processing workflowreference CSV
         # This simulates the output from generate_material_processing_metadata()
-        biosample_mapping = pd.read_csv(metadata_dir / "mapped_raw_file_biosample_mapping.csv")
+        biosample_mapping = pd.read_csv(metadata_dir / "llm_biosample_raw_file_mapper.csv")
         workflowref_data = []
         for _, row in biosample_mapping.iterrows():
             if row["match_confidence"] == "high":
                 workflowref_data.append({
                     "biosample_id": row["biosample_id"],
-                    "raw_data_identifier": row["raw_file_name"],
+                    "raw_data_identifier": row["raw_data_identifier"],
                     "last_processed_sample": f"nmdc:procsm-99-test{len(workflowref_data):03d}"
                 })
         workflowref_df = pd.DataFrame(workflowref_data)
@@ -205,12 +203,10 @@ class TestWorkflowMetadataManagerIntegration:
         manual_mapping = biosample_mapping[biosample_mapping["match_confidence"] == "high"].copy()
         manual_mapping = manual_mapping.merge(
             workflowref_df[["raw_data_identifier", "last_processed_sample"]],
-            left_on="raw_file_name",
+            left_on="raw_data_identifier",
             right_on="raw_data_identifier",
             how="left"
         )
-        # Keep raw_data_identifier as the filename (drop the duplicate from merge)
-        manual_mapping["raw_data_identifier"] = manual_mapping["raw_file_name"]
         manual_mapping.to_csv(
             metadata_dir / "mapped_raw_files_wprocessed_MANUAL.csv",
             index=False
@@ -225,12 +221,14 @@ class TestWorkflowMetadataManagerIntegration:
         manager = NMDCWorkflowManager(str(config_file))
         
         # Verify prerequisites exist
-        biosample_mapping_path = manager.workflow_path / "metadata" / "mapped_raw_file_biosample_mapping.csv"
+        biosample_mapping_path = manager.workflow_path / "metadata" / "llm_biosample_raw_file_mapper.csv"
         assert biosample_mapping_path.exists(), f"Biosample mapping not found at {biosample_mapping_path}"
         
         # Verify calibration file exists in mapping
         mapping_df = pd.read_csv(biosample_mapping_path)
-        calibration_files = mapping_df[mapping_df["raw_file_type"] == "calibration"]
+        calibration_files = mapping_df[
+            mapping_df["match_confidence"].fillna("").astype(str).str.strip().str.lower() == "calibrant"
+        ]
         assert len(calibration_files) > 0, "No calibration files found in biosample mapping"
         
         # Generate CSV metadata mappings (now includes processed_sample_id mapping)
@@ -339,11 +337,11 @@ class TestWorkflowMetadataManagerIntegration:
         metadata_dir.mkdir(parents=True, exist_ok=True)
         
         mapping_df = pd.DataFrame({
-            "raw_file_name": ["test1.raw", "test2.raw"],
+            "raw_data_identifier": ["test1.raw", "test2.raw"],
             "biosample_id": ["nmdc:bsm-11-001", "nmdc:bsm-11-002"],
             "match_confidence": ["high", "high"]
         })
-        mapping_df.to_csv(metadata_dir / "mapped_raw_file_biosample_mapping.csv", index=False)
+        mapping_df.to_csv(metadata_dir / "llm_biosample_raw_file_mapper.csv", index=False)
         
         result = manager.generate_workflow_metadata_generation_inputs()
         assert result is False, "Should fail with missing raw inspection results"
@@ -361,11 +359,11 @@ class TestWorkflowMetadataManagerIntegration:
         
         # Update mapping to have no high-confidence matches
         mapping_df = pd.DataFrame({
-            "raw_file_name": ["test1.raw", "test2.raw"],
+            "raw_data_identifier": ["test1.raw", "test2.raw"],
             "biosample_id": ["", ""],
             "match_confidence": ["low", "low"]
         })
-        mapping_df.to_csv(metadata_dir / "mapped_raw_file_biosample_mapping.csv", index=False)
+        mapping_df.to_csv(metadata_dir / "llm_biosample_raw_file_mapper.csv", index=False)
         
         result = manager.generate_workflow_metadata_generation_inputs()
         assert result is False, "Should fail with no high-confidence matches"
@@ -424,7 +422,7 @@ class TestWorkflowMetadataManagerIntegration:
         test_data_dir = Path(__file__).parent / "test_data"
         shutil.copy(
             test_data_dir / "metadata" / "massive_biosample_mapping.csv",
-            metadata_dir / "mapped_raw_file_biosample_mapping.csv"
+            metadata_dir / "llm_biosample_raw_file_mapper.csv"
         )
         shutil.copy(
             test_data_dir / "raw_file_info" / "massive_inspection_results.csv",
@@ -437,13 +435,13 @@ class TestWorkflowMetadataManagerIntegration:
         
         # Create mock material processing workflowreference CSV
         # This simulates the output from generate_material_processing_metadata()
-        biosample_mapping = pd.read_csv(metadata_dir / "mapped_raw_file_biosample_mapping.csv")
+        biosample_mapping = pd.read_csv(metadata_dir / "llm_biosample_raw_file_mapper.csv")
         workflowref_data = []
         for _, row in biosample_mapping.iterrows():
             if row["match_confidence"] == "high":
                 workflowref_data.append({
                     "biosample_id": row["biosample_id"],
-                    "raw_data_identifier": row["raw_file_name"],
+                    "raw_data_identifier": row["raw_data_identifier"],
                     "last_processed_sample": f"nmdc:procsm-99-test{len(workflowref_data):03d}"
                 })
         workflowref_df = pd.DataFrame(workflowref_data)
@@ -457,12 +455,10 @@ class TestWorkflowMetadataManagerIntegration:
         manual_mapping = biosample_mapping[biosample_mapping["match_confidence"] == "high"].copy()
         manual_mapping = manual_mapping.merge(
             workflowref_df[["raw_data_identifier", "last_processed_sample"]],
-            left_on="raw_file_name",
+            left_on="raw_data_identifier",
             right_on="raw_data_identifier",
             how="left"
         )
-        # Keep raw_data_identifier as the filename (drop the duplicate from merge)
-        manual_mapping["raw_data_identifier"] = manual_mapping["raw_file_name"]
         manual_mapping.to_csv(
             metadata_dir / "mapped_raw_files_wprocessed_MANUAL.csv",
             index=False
@@ -628,7 +624,7 @@ class TestWorkflowMetadataManagerIntegration:
             f.write(yaml_content)
         
         # Create input CSV with biosample to raw file mapping and protocol ID
-        input_csv_path = metadata_dir / "mapped_raw_files_wprocessed_MANUAL.csv"
+        input_csv_path = metadata_dir / "llm_biosample_raw_file_mapper.csv"
         test_data_dir = Path(__file__).parent / "test_data"
         biosample_mapping = pd.read_csv(test_data_dir / "metadata" / "lcms_biosample_mapping.csv")
         
@@ -637,7 +633,7 @@ class TestWorkflowMetadataManagerIntegration:
         for idx, row in biosample_mapping.iterrows():
             if row["match_confidence"] == "high":
                 mapping_rows.append({
-                    "raw_data_identifier": row["raw_file_name"],
+                    "raw_data_identifier": row["raw_data_identifier"],
                     "biosample_id": row["biosample_id"],
                     "biosample_name": f"Test Sample {idx}",
                     "match_confidence": "high",

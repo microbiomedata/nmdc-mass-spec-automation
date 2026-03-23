@@ -1,0 +1,106 @@
+{
+  "data_generation_set": [
+    {
+      "id": "nmdc:dgms-00-u2ldxvii",
+      "type": "nmdc:MassSpectrometry",
+      "name": "20210915_JGI-AK_MK_506588_SoilWaterRep_final_QE-HF_C18_USDAY63680_POS_MSMS_13_S17-D45_A_Rg80to1200-CE102040-soil-S1_Run44",
+      "description": "Generation of mass spectrometry data for the analysis of lipids.",
+      "has_input": [
+        "nmdc:procsm-00-aanj3izd"
+      ],
+      "has_output": [
+        "nmdc:dobj-00-yzrcx6wl"
+      ],
+      "processing_institution": "JGI",
+      "end_date": "2021-09-15T21:33:16Z",
+      "analyte_category": "lipidome",
+      "associated_studies": [
+        "nmdc:sty-11-dwsv7q78"
+      ],
+      "add_date": "2026-03-20",
+      "instrument_used": [
+        "nmdc:inst-14-kw06tx33"
+      ],
+      "eluent_introduction_category": "liquid_chromatography",
+      "has_mass_spectrometry_configuration": "nmdc:mscon-11-5ddz6z46",
+      "has_chromatography_configuration": "nmdc:chrcon-11-hzemwh45"
+    }
+  ],
+  "data_object_set": [
+    {
+      "id": "nmdc:dobj-00-33u0ghdx",
+      "type": "nmdc:DataObject",
+      "name": "20210915_JGI-AK_MK_506588_SoilWaterRep_final_QE-HF_C18_USDAY63680_POS_MSMS_13_S17-D45_A_Rg80to1200-CE102040-soil-S1_Run44.toml",
+      "description": "CoreMS parameters used for Lipidomics workflow.",
+      "data_category": "workflow_parameter_data",
+      "data_object_type": "Configuration toml",
+      "file_size_bytes": 9301,
+      "md5_checksum": "0b9d28baaa2930512f5956fd1f32fc87",
+      "url": "https://nmdcdemo.emsl.pnnl.gov/lipidomics/kroeger_11_dwsv7q78/processed_20260309/20210915_JGI-AK_MK_506588_SoilWaterRep_final_QE-HF_C18_USDAY63680_POS_MSMS_13_S17-D45_A_Rg80to1200-CE102040-soil-S1_Run44.corems/20210915_JGI-AK_MK_506588_SoilWaterRep_final_QE-HF_C18_USDAY63680_POS_MSMS_13_S17-D45_A_Rg80to1200-CE102040-soil-S1_Run44.toml",
+      "was_generated_by": "nmdc:wfmb-00-htmxc88b.1"
+    },
+    {
+      "id": "nmdc:dobj-00-v7nej7wi",
+      "type": "nmdc:DataObject",
+      "name": "20210915_JGI-AK_MK_506588_SoilWaterRep_final_QE-HF_C18_USDAY63680_POS_MSMS_13_S17-D45_A_Rg80to1200-CE102040-soil-S1_Run44.csv",
+      "description": "Lipid annotations as a result of a lipidomics workflow activity.",
+      "data_category": "processed_data",
+      "data_object_type": "LC-MS Lipidomics Results",
+      "file_size_bytes": 5179351,
+      "md5_checksum": "837cb206ba9dc9bb49c6687bfb070268",
+      "url": "https://nmdcdemo.emsl.pnnl.gov/lipidomics/kroeger_11_dwsv7q78/processed_20260309/20210915_JGI-AK_MK_506588_SoilWaterRep_final_QE-HF_C18_USDAY63680_POS_MSMS_13_S17-D45_A_Rg80to1200-CE102040-soil-S1_Run44.corems/20210915_JGI-AK_MK_506588_SoilWaterRep_final_QE-HF_C18_USDAY63680_POS_MSMS_13_S17-D45_A_Rg80to1200-CE102040-soil-S1_Run44.csv",
+      "was_generated_by": "nmdc:wfmb-00-htmxc88b.1"
+    },
+    {
+      "id": "nmdc:dobj-00-993t1yg2",
+      "type": "nmdc:DataObject",
+      "name": "20210915_JGI-AK_MK_506588_SoilWaterRep_final_QE-HF_C18_USDAY63680_POS_MSMS_13_S17-D45_A_Rg80to1200-CE102040-soil-S1_Run44.hdf5",
+      "description": "CoreMS hdf5 file representing a lipidomics data file including annotations.",
+      "data_category": "processed_data",
+      "data_object_type": "LC-MS Lipidomics Processed Data",
+      "file_size_bytes": 1123717020,
+      "md5_checksum": "89168c8e5d7d6a1dc653f02a63d53db4",
+      "url": "https://nmdcdemo.emsl.pnnl.gov/lipidomics/kroeger_11_dwsv7q78/processed_20260309/20210915_JGI-AK_MK_506588_SoilWaterRep_final_QE-HF_C18_USDAY63680_POS_MSMS_13_S17-D45_A_Rg80to1200-CE102040-soil-S1_Run44.corems/20210915_JGI-AK_MK_506588_SoilWaterRep_final_QE-HF_C18_USDAY63680_POS_MSMS_13_S17-D45_A_Rg80to1200-CE102040-soil-S1_Run44.hdf5",
+      "was_generated_by": "nmdc:wfmb-00-htmxc88b.1"
+    },
+    {
+      "id": "nmdc:dobj-00-yzrcx6wl",
+      "type": "nmdc:DataObject",
+      "name": "20210915_JGI-AK_MK_506588_SoilWaterRep_final_QE-HF_C18_USDAY63680_POS_MSMS_13_S17-D45_A_Rg80to1200-CE102040-soil-S1_Run44.raw",
+      "description": "LC-DDA-MS/MS raw data for lipidomics data acquisition.",
+      "data_category": "instrument_data",
+      "data_object_type": "LC-DDA-MS/MS Raw Data",
+      "file_size_bytes": 88472552,
+      "md5_checksum": "37142c1b9e65f703a7c92157b9c2b206",
+      "url": "https://massive.ucsd.edu/ProteoSAFe/DownloadResultFile?file=f.MSV000094090%2Fraw%2F20210915_JGI-AK_MK_506588_SoilWaterRep_final_QE-HF_C18_USDAY63680%2Frawdata%2F20210915_JGI-AK_MK_506588_SoilWaterRep_final_QE-HF_C18_USDAY63680_POS_MSMS_13_S17-D45_A_Rg80to1200-CE102040-soil-S1_Run44.raw&forceDownload=true",
+      "was_generated_by": "nmdc:dgms-00-u2ldxvii"
+    }
+  ],
+  "workflow_execution_set": [
+    {
+      "id": "nmdc:wfmb-00-htmxc88b.1",
+      "type": "nmdc:MetabolomicsAnalysis",
+      "name": "Lipidomics analysis for 20210915_JGI-AK_MK_506588_SoilWaterRep_final_QE-HF_C18_USDAY63680_POS_MSMS_13_S17-D45_A_Rg80to1200-CE102040-soil-S1_Run44.raw",
+      "description": "Analysis of raw mass spectrometry data for the annotation of lipids.",
+      "has_input": [
+        "nmdc:dobj-00-33u0ghdx",
+        "nmdc:dobj-00-yzrcx6wl",
+        "nmdc:dobj-11-7kab3m51"
+      ],
+      "has_output": [
+        "nmdc:dobj-00-993t1yg2",
+        "nmdc:dobj-00-v7nej7wi"
+      ],
+      "processing_institution": "NMDC",
+      "git_url": "https://github.com/microbiomedata/metaMS/wdl/metaMS_lipidomics.wdl",
+      "started_at_time": "2026-03-10 12:36:26",
+      "was_informed_by": [
+        "nmdc:dgms-00-u2ldxvii"
+      ],
+      "ended_at_time": "2026-03-10 12:36:26",
+      "version": "1.3.1",
+      "metabolomics_analysis_category": "lc_ms_lipidomics"
+    }
+  ],
+  "@type": "Database"
+}

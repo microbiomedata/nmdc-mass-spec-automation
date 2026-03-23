@@ -175,7 +175,7 @@ class TestValidateAndFixScript:
     def test_script_execution_failure_triggers_fix(self, tmp_path):
         """Test that script execution failure triggers LLM fix."""
         biosample_file = tmp_path / "biosamples.csv"
-        biosample_file.write_text("id\ntest")
+        biosample_file.write_text("id,name\nnmdc:bsm-12-abc123,Sample A")
         files_file = tmp_path / "files.csv"
         files_file.write_text("file_name\ntest.raw")
         yaml_file = tmp_path / "protocol.yaml"
@@ -201,7 +201,7 @@ class TestValidateAndFixScript:
                 output_file.write_text(
                     "raw_data_identifier,biosample_id,biosample_name,match_confidence,"
                     "processedsample_placeholder,material_processing_protocol_id\n"
-                    "test.raw,,,medium,PS,TEST"
+                    "test.raw,nmdc:bsm-12-abc123,Sample A,high,PS,TEST"
                 )
                 return Mock(returncode=0, stdout="", stderr="")
         
@@ -259,7 +259,7 @@ class TestValidateAndFixScript:
     def test_cleans_markdown_from_llm_response(self, tmp_path):
         """Test that markdown code blocks are cleaned from LLM response."""
         biosample_file = tmp_path / "biosamples.csv"
-        biosample_file.write_text("id\ntest")
+        biosample_file.write_text("id,name\nnmdc:bsm-12-abc123,Sample A")
         files_file = tmp_path / "files.csv"
         files_file.write_text("file_name\ntest.raw")
         yaml_file = tmp_path / "protocol.yaml"
@@ -284,7 +284,7 @@ class TestValidateAndFixScript:
                 output_file.write_text(
                     "raw_data_identifier,biosample_id,biosample_name,match_confidence,"
                     "processedsample_placeholder,material_processing_protocol_id\n"
-                    "test.raw,,,medium,PS,TEST"
+                    "test.raw,nmdc:bsm-12-abc123,Sample A,high,PS,TEST"
                 )
                 return Mock(returncode=0, stdout="", stderr="")
         

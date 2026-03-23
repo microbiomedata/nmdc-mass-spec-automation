@@ -179,7 +179,7 @@ sample1.raw,nmdc:bsm-12-abc123,Sample A,high,PS,UNKNOWN_PROTOCOL"""
         
         csv_with_empty_id = """raw_data_identifier,biosample_id,biosample_name,match_confidence,processedsample_placeholder,material_processing_protocol_id
 sample1.raw,nmdc:bsm-12-abc123,Sample A,high,PS,LCMS
-blank_01.raw,,,low,,"""
+    blank_01.raw,,,,,"""
         
         result = validate_biosample_mapping_csv(
             csv_content=csv_with_empty_id,
