@@ -136,7 +136,7 @@ class WorkflowDataMovementManager:
         Note:
             This method can take several minutes for large datasets.
             Progress is reported every 100 files discovered.
-            File type is determined by config['study']['file_type'] (e.g., '.raw', '.mzml', '.d')
+            File type is determined by config['workflow']['file_type'] (e.g., '.raw', '.mzml', '.d')
         """
         import ftplib
 
@@ -195,10 +195,9 @@ class WorkflowDataMovementManager:
                             else:
                                 # It's a file, check if it matches the configured file type
                                 file_type = (
-                                    self.config["study"]
-                                    .get("file_type", ".raw")
-                                    .lower()
-                                )
+                                    self.config.get("workflow", {}).get("file_type")
+                                    or self.config.get("study", {}).get("file_type", ".raw")
+                                ).lower()
                                 if filename.lower().endswith(file_type):
                                     current_path = (
                                         f"{massive_id}/{relative_path}"
@@ -227,7 +226,10 @@ class WorkflowDataMovementManager:
                 for url in ftp_urls:
                     f.write(f"{url}\n")
 
-            file_type = self.config["study"].get("file_type", ".raw").lower()
+            file_type = (
+                self.config.get("workflow", {}).get("file_type")
+                or self.config.get("study", {}).get("file_type", ".raw")
+            ).lower()
             self.logger.info(f"Found {len(ftp_urls)} {file_type} files")
 
             return str(log_file)
@@ -287,7 +289,10 @@ class WorkflowDataMovementManager:
 
         try:
             # Get the configured file type
-            file_type = self.config["study"].get("file_type", ".raw").lower()
+            file_type = (
+                self.config.get("workflow", {}).get("file_type")
+                or self.config.get("study", {}).get("file_type", ".raw")
+            ).lower()
 
             with open(log_file, "r") as f:
                 for line in f:
@@ -304,7 +309,12 @@ class WorkflowDataMovementManager:
 
             # Extract filename from URL - use configured file type for pattern
             file_type = (
-                self.config["study"].get("file_type", ".raw").lower().lstrip(".")
+                (
+                    self.config.get("workflow", {}).get("file_type")
+                    or self.config.get("study", {}).get("file_type", ".raw")
+                )
+                .lower()
+                .lstrip(".")
             )
             pattern = rf"([^/]+\.{file_type})$"
             ftp_df["raw_data_file_short"] = ftp_df["ftp_location"].str.extract(
@@ -401,8 +411,14 @@ class WorkflowDataMovementManager:
             filtered_df = self.parse_massive_ftp_log(log_file)
 
             # Step 3: Report filtering results with sample files
-            file_type = self.config["study"].get("file_type", ".raw")
-            file_filters = self.config["study"].get("file_filters", [])
+            file_type = (
+                self.config.get("workflow", {}).get("file_type")
+                or self.config.get("study", {}).get("file_type", ".raw")
+            )
+            file_filters = (
+                self.config.get("workflow", {}).get("file_filters")
+                or self.config.get("study", {}).get("file_filters", [])
+            )
 
             if len(filtered_df) > 0:
                 self.logger.info(
@@ -4016,6 +4032,7 @@ class WorkflowMetadataManager:
         import urllib.request
         import urllib.error
         import ssl
+        import time
 
         # Create SSL context that ignores certificate verification for MASSIVE
         ssl_context = ssl.create_default_context()
@@ -4026,6 +4043,9 @@ class WorkflowMetadataManager:
         total_tested = min(len(urls), max_attempts)
 
         for i, url in enumerate(urls[:max_attempts]):
+            # Add delay between requests to avoid rate limiting (except for first request)
+            if i > 0:
+                time.sleep(3)
             try:
                 # Use HEAD request to check accessibility without downloading
                 req = urllib.request.Request(url, method="HEAD")

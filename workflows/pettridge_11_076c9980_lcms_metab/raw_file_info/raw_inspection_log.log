@@ -1,0 +1,9 @@
+2026-03-20 20:57:11,614 - INFO - Found 16 files to inspect
+2026-03-20 20:57:11,614 - INFO - Results will be written to: /mnt/Users/heal742/LOCAL/05_NMDC/07_automation/nmdc_mass_spec_automation/workflows/pettridge_11_076c9980_lcms_metab/raw_file_info/raw_file_inspection_results.csv
+2026-03-20 20:57:11,614 - INFO - Errors will be logged to: /mnt/Users/heal742/LOCAL/05_NMDC/07_automation/nmdc_mass_spec_automation/workflows/pettridge_11_076c9980_lcms_metab/raw_file_info/raw_file_inspection_errors.csv
+2026-03-20 20:57:11,614 - INFO - CoreMS available: True
+2026-03-20 20:57:31,787 - INFO - Inspection complete!
+2026-03-20 20:57:31,787 - INFO - Successfully processed: 16 files
+2026-03-20 20:57:31,787 - INFO - Failed to process: 0 files
+2026-03-20 20:57:31,788 - INFO - Results saved to: /mnt/Users/heal742/LOCAL/05_NMDC/07_automation/nmdc_mass_spec_automation/workflows/pettridge_11_076c9980_lcms_metab/raw_file_info/raw_file_inspection_results.csv
+2026-03-20 20:57:31,788 - INFO - Processing log saved to: /mnt/Users/heal742/LOCAL/05_NMDC/07_automation/nmdc_mass_spec_automation/workflows/pettridge_11_076c9980_lcms_metab/raw_file_info/raw_inspection_log.log

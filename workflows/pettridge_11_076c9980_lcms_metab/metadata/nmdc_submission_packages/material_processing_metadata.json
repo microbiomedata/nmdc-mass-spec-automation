@@ -1,0 +1,839 @@
+{
+  "material_processing_set": [
+    {
+      "id": "nmdc:subspr-11-3mm8s826",
+      "type": "nmdc:SubSamplingProcess",
+      "name": "Subsample soil for metabolomics",
+      "description": "A 0.5 g portion of soil taken from Biosample for LC-MS metabolomics extraction.",
+      "has_input": [
+        "nmdc:bsm-11-ac8q3p77"
+      ],
+      "has_output": [
+        "nmdc:procsm-11-5st86z87"
+      ],
+      "processing_institution": "JGI",
+      "mass": {
+        "type": "nmdc:QuantityValue",
+        "has_raw_value": "0.5 g",
+        "has_unit": "g",
+        "has_numeric_value": 0.5
+      }
+    },
+    {
+      "id": "nmdc:extrp-11-7arbk172",
+      "type": "nmdc:Extraction",
+      "name": "Double water extraction of soil",
+      "description": "Two sequential water extractions of nmdc:procsm-11-5st86z87 with combined supernatants, vortexed and sonicated for 15 min in an iced water bath.",
+      "has_input": [
+        "nmdc:procsm-11-5st86z87"
+      ],
+      "has_output": [
+        "nmdc:procsm-11-kygtp517"
+      ],
+      "processing_institution": "JGI",
+      "substances_used": [
+        {
+          "type": "nmdc:PortionOfSubstance",
+          "known_as": "water",
+          "substance_role": "solvent",
+          "volume": {
+            "type": "nmdc:QuantityValue",
+            "has_raw_value": "4 mL",
+            "has_unit": "mL",
+            "has_numeric_value": 4
+          }
+        }
+      ],
+      "extraction_targets": [
+        "metabolite"
+      ],
+      "temperature": {
+        "type": "nmdc:QuantityValue",
+        "has_raw_value": "0 Cel",
+        "has_unit": "Cel",
+        "has_numeric_value": 0
+      }
+    },
+    {
+      "id": "nmdc:dispro-11-g6p1at74",
+      "type": "nmdc:DissolvingProcess",
+      "name": "Resuspend dried extract",
+      "description": "Dried extract from nmdc:procsm-11-kygtp517 (which was frozen and lyophilized) resuspended in methanol with internal standards for LC-MS.",
+      "has_input": [
+        "nmdc:procsm-11-kygtp517"
+      ],
+      "has_output": [
+        "nmdc:procsm-11-dcxryk36"
+      ],
+      "processing_institution": "JGI",
+      "substances_used": [
+        {
+          "type": "nmdc:PortionOfSubstance",
+          "known_as": "methanol",
+          "substance_role": "solvent",
+          "volume": {
+            "type": "nmdc:QuantityValue",
+            "has_raw_value": "200 uL",
+            "has_unit": "uL",
+            "has_numeric_value": 200
+          }
+        }
+      ]
+    },
+    {
+      "id": "nmdc:subspr-11-5s6qay76",
+      "type": "nmdc:SubSamplingProcess",
+      "name": "Subsample soil for metabolomics",
+      "description": "A 0.5 g portion of soil taken from Biosample for LC-MS metabolomics extraction.",
+      "has_input": [
+        "nmdc:bsm-11-92xxdg53"
+      ],
+      "has_output": [
+        "nmdc:procsm-11-dpkzf164"
+      ],
+      "processing_institution": "JGI",
+      "mass": {
+        "type": "nmdc:QuantityValue",
+        "has_raw_value": "0.5 g",
+        "has_unit": "g",
+        "has_numeric_value": 0.5
+      }
+    },
+    {
+      "id": "nmdc:extrp-11-n1d7d854",
+      "type": "nmdc:Extraction",
+      "name": "Double water extraction of soil",
+      "description": "Two sequential water extractions of nmdc:procsm-11-dpkzf164 with combined supernatants, vortexed and sonicated for 15 min in an iced water bath.",
+      "has_input": [
+        "nmdc:procsm-11-dpkzf164"
+      ],
+      "has_output": [
+        "nmdc:procsm-11-cs32wd32"
+      ],
+      "processing_institution": "JGI",
+      "substances_used": [
+        {
+          "type": "nmdc:PortionOfSubstance",
+          "known_as": "water",
+          "substance_role": "solvent",
+          "volume": {
+            "type": "nmdc:QuantityValue",
+            "has_raw_value": "4 mL",
+            "has_unit": "mL",
+            "has_numeric_value": 4
+          }
+        }
+      ],
+      "extraction_targets": [
+        "metabolite"
+      ],
+      "temperature": {
+        "type": "nmdc:QuantityValue",
+        "has_raw_value": "0 Cel",
+        "has_unit": "Cel",
+        "has_numeric_value": 0
+      }
+    },
+    {
+      "id": "nmdc:dispro-11-wwmzrz19",
+      "type": "nmdc:DissolvingProcess",
+      "name": "Resuspend dried extract",
+      "description": "Dried extract from nmdc:procsm-11-cs32wd32 (which was frozen and lyophilized) resuspended in methanol with internal standards for LC-MS.",
+      "has_input": [
+        "nmdc:procsm-11-cs32wd32"
+      ],
+      "has_output": [
+        "nmdc:procsm-11-065f3h13"
+      ],
+      "processing_institution": "JGI",
+      "substances_used": [
+        {
+          "type": "nmdc:PortionOfSubstance",
+          "known_as": "methanol",
+          "substance_role": "solvent",
+          "volume": {
+            "type": "nmdc:QuantityValue",
+            "has_raw_value": "200 uL",
+            "has_unit": "uL",
+            "has_numeric_value": 200
+          }
+        }
+      ]
+    },
+    {
+      "id": "nmdc:subspr-11-adcqc059",
+      "type": "nmdc:SubSamplingProcess",
+      "name": "Subsample soil for metabolomics",
+      "description": "A 0.5 g portion of soil taken from Biosample for LC-MS metabolomics extraction.",
+      "has_input": [
+        "nmdc:bsm-11-xttvcf02"
+      ],
+      "has_output": [
+        "nmdc:procsm-11-hyh9bz08"
+      ],
+      "processing_institution": "JGI",
+      "mass": {
+        "type": "nmdc:QuantityValue",
+        "has_raw_value": "0.5 g",
+        "has_unit": "g",
+        "has_numeric_value": 0.5
+      }
+    },
+    {
+      "id": "nmdc:extrp-11-tv8yn211",
+      "type": "nmdc:Extraction",
+      "name": "Double water extraction of soil",
+      "description": "Two sequential water extractions of nmdc:procsm-11-hyh9bz08 with combined supernatants, vortexed and sonicated for 15 min in an iced water bath.",
+      "has_input": [
+        "nmdc:procsm-11-hyh9bz08"
+      ],
+      "has_output": [
+        "nmdc:procsm-11-8e3crq07"
+      ],
+      "processing_institution": "JGI",
+      "substances_used": [
+        {
+          "type": "nmdc:PortionOfSubstance",
+          "known_as": "water",
+          "substance_role": "solvent",
+          "volume": {
+            "type": "nmdc:QuantityValue",
+            "has_raw_value": "4 mL",
+            "has_unit": "mL",
+            "has_numeric_value": 4
+          }
+        }
+      ],
+      "extraction_targets": [
+        "metabolite"
+      ],
+      "temperature": {
+        "type": "nmdc:QuantityValue",
+        "has_raw_value": "0 Cel",
+        "has_unit": "Cel",
+        "has_numeric_value": 0
+      }
+    },
+    {
+      "id": "nmdc:dispro-11-9j5zdj79",
+      "type": "nmdc:DissolvingProcess",
+      "name": "Resuspend dried extract",
+      "description": "Dried extract from nmdc:procsm-11-8e3crq07 (which was frozen and lyophilized) resuspended in methanol with internal standards for LC-MS.",
+      "has_input": [
+        "nmdc:procsm-11-8e3crq07"
+      ],
+      "has_output": [
+        "nmdc:procsm-11-jshta934"
+      ],
+      "processing_institution": "JGI",
+      "substances_used": [
+        {
+          "type": "nmdc:PortionOfSubstance",
+          "known_as": "methanol",
+          "substance_role": "solvent",
+          "volume": {
+            "type": "nmdc:QuantityValue",
+            "has_raw_value": "200 uL",
+            "has_unit": "uL",
+            "has_numeric_value": 200
+          }
+        }
+      ]
+    },
+    {
+      "id": "nmdc:subspr-11-b4qvjc46",
+      "type": "nmdc:SubSamplingProcess",
+      "name": "Subsample soil for metabolomics",
+      "description": "A 0.5 g portion of soil taken from Biosample for LC-MS metabolomics extraction.",
+      "has_input": [
+        "nmdc:bsm-11-jyswqd53"
+      ],
+      "has_output": [
+        "nmdc:procsm-11-rkapn098"
+      ],
+      "processing_institution": "JGI",
+      "mass": {
+        "type": "nmdc:QuantityValue",
+        "has_raw_value": "0.5 g",
+        "has_unit": "g",
+        "has_numeric_value": 0.5
+      }
+    },
+    {
+      "id": "nmdc:extrp-11-v61x9t95",
+      "type": "nmdc:Extraction",
+      "name": "Double water extraction of soil",
+      "description": "Two sequential water extractions of nmdc:procsm-11-rkapn098 with combined supernatants, vortexed and sonicated for 15 min in an iced water bath.",
+      "has_input": [
+        "nmdc:procsm-11-rkapn098"
+      ],
+      "has_output": [
+        "nmdc:procsm-11-ky8pvs81"
+      ],
+      "processing_institution": "JGI",
+      "substances_used": [
+        {
+          "type": "nmdc:PortionOfSubstance",
+          "known_as": "water",
+          "substance_role": "solvent",
+          "volume": {
+            "type": "nmdc:QuantityValue",
+            "has_raw_value": "4 mL",
+            "has_unit": "mL",
+            "has_numeric_value": 4
+          }
+        }
+      ],
+      "extraction_targets": [
+        "metabolite"
+      ],
+      "temperature": {
+        "type": "nmdc:QuantityValue",
+        "has_raw_value": "0 Cel",
+        "has_unit": "Cel",
+        "has_numeric_value": 0
+      }
+    },
+    {
+      "id": "nmdc:dispro-11-jjrazc38",
+      "type": "nmdc:DissolvingProcess",
+      "name": "Resuspend dried extract",
+      "description": "Dried extract from nmdc:procsm-11-ky8pvs81 (which was frozen and lyophilized) resuspended in methanol with internal standards for LC-MS.",
+      "has_input": [
+        "nmdc:procsm-11-ky8pvs81"
+      ],
+      "has_output": [
+        "nmdc:procsm-11-k7rqf969"
+      ],
+      "processing_institution": "JGI",
+      "substances_used": [
+        {
+          "type": "nmdc:PortionOfSubstance",
+          "known_as": "methanol",
+          "substance_role": "solvent",
+          "volume": {
+            "type": "nmdc:QuantityValue",
+            "has_raw_value": "200 uL",
+            "has_unit": "uL",
+            "has_numeric_value": 200
+          }
+        }
+      ]
+    },
+    {
+      "id": "nmdc:subspr-11-qhfk8677",
+      "type": "nmdc:SubSamplingProcess",
+      "name": "Subsample soil for metabolomics",
+      "description": "A 0.5 g portion of soil taken from Biosample for LC-MS metabolomics extraction.",
+      "has_input": [
+        "nmdc:bsm-11-xm24hr93"
+      ],
+      "has_output": [
+        "nmdc:procsm-11-k1n9ve49"
+      ],
+      "processing_institution": "JGI",
+      "mass": {
+        "type": "nmdc:QuantityValue",
+        "has_raw_value": "0.5 g",
+        "has_unit": "g",
+        "has_numeric_value": 0.5
+      }
+    },
+    {
+      "id": "nmdc:extrp-11-tv31yx02",
+      "type": "nmdc:Extraction",
+      "name": "Double water extraction of soil",
+      "description": "Two sequential water extractions of nmdc:procsm-11-k1n9ve49 with combined supernatants, vortexed and sonicated for 15 min in an iced water bath.",
+      "has_input": [
+        "nmdc:procsm-11-k1n9ve49"
+      ],
+      "has_output": [
+        "nmdc:procsm-11-daexbd03"
+      ],
+      "processing_institution": "JGI",
+      "substances_used": [
+        {
+          "type": "nmdc:PortionOfSubstance",
+          "known_as": "water",
+          "substance_role": "solvent",
+          "volume": {
+            "type": "nmdc:QuantityValue",
+            "has_raw_value": "4 mL",
+            "has_unit": "mL",
+            "has_numeric_value": 4
+          }
+        }
+      ],
+      "extraction_targets": [
+        "metabolite"
+      ],
+      "temperature": {
+        "type": "nmdc:QuantityValue",
+        "has_raw_value": "0 Cel",
+        "has_unit": "Cel",
+        "has_numeric_value": 0
+      }
+    },
+    {
+      "id": "nmdc:dispro-11-zmgvyt52",
+      "type": "nmdc:DissolvingProcess",
+      "name": "Resuspend dried extract",
+      "description": "Dried extract from nmdc:procsm-11-daexbd03 (which was frozen and lyophilized) resuspended in methanol with internal standards for LC-MS.",
+      "has_input": [
+        "nmdc:procsm-11-daexbd03"
+      ],
+      "has_output": [
+        "nmdc:procsm-11-xqtc0g46"
+      ],
+      "processing_institution": "JGI",
+      "substances_used": [
+        {
+          "type": "nmdc:PortionOfSubstance",
+          "known_as": "methanol",
+          "substance_role": "solvent",
+          "volume": {
+            "type": "nmdc:QuantityValue",
+            "has_raw_value": "200 uL",
+            "has_unit": "uL",
+            "has_numeric_value": 200
+          }
+        }
+      ]
+    },
+    {
+      "id": "nmdc:subspr-11-bxt4gc87",
+      "type": "nmdc:SubSamplingProcess",
+      "name": "Subsample soil for metabolomics",
+      "description": "A 0.5 g portion of soil taken from Biosample for LC-MS metabolomics extraction.",
+      "has_input": [
+        "nmdc:bsm-11-rz68jz92"
+      ],
+      "has_output": [
+        "nmdc:procsm-11-cv4q8d23"
+      ],
+      "processing_institution": "JGI",
+      "mass": {
+        "type": "nmdc:QuantityValue",
+        "has_raw_value": "0.5 g",
+        "has_unit": "g",
+        "has_numeric_value": 0.5
+      }
+    },
+    {
+      "id": "nmdc:extrp-11-6d32sm91",
+      "type": "nmdc:Extraction",
+      "name": "Double water extraction of soil",
+      "description": "Two sequential water extractions of nmdc:procsm-11-cv4q8d23 with combined supernatants, vortexed and sonicated for 15 min in an iced water bath.",
+      "has_input": [
+        "nmdc:procsm-11-cv4q8d23"
+      ],
+      "has_output": [
+        "nmdc:procsm-11-yhm3xs35"
+      ],
+      "processing_institution": "JGI",
+      "substances_used": [
+        {
+          "type": "nmdc:PortionOfSubstance",
+          "known_as": "water",
+          "substance_role": "solvent",
+          "volume": {
+            "type": "nmdc:QuantityValue",
+            "has_raw_value": "4 mL",
+            "has_unit": "mL",
+            "has_numeric_value": 4
+          }
+        }
+      ],
+      "extraction_targets": [
+        "metabolite"
+      ],
+      "temperature": {
+        "type": "nmdc:QuantityValue",
+        "has_raw_value": "0 Cel",
+        "has_unit": "Cel",
+        "has_numeric_value": 0
+      }
+    },
+    {
+      "id": "nmdc:dispro-11-njdd5247",
+      "type": "nmdc:DissolvingProcess",
+      "name": "Resuspend dried extract",
+      "description": "Dried extract from nmdc:procsm-11-yhm3xs35 (which was frozen and lyophilized) resuspended in methanol with internal standards for LC-MS.",
+      "has_input": [
+        "nmdc:procsm-11-yhm3xs35"
+      ],
+      "has_output": [
+        "nmdc:procsm-11-t1a2mc48"
+      ],
+      "processing_institution": "JGI",
+      "substances_used": [
+        {
+          "type": "nmdc:PortionOfSubstance",
+          "known_as": "methanol",
+          "substance_role": "solvent",
+          "volume": {
+            "type": "nmdc:QuantityValue",
+            "has_raw_value": "200 uL",
+            "has_unit": "uL",
+            "has_numeric_value": 200
+          }
+        }
+      ]
+    },
+    {
+      "id": "nmdc:subspr-11-gramk961",
+      "type": "nmdc:SubSamplingProcess",
+      "name": "Subsample soil for metabolomics",
+      "description": "A 0.5 g portion of soil taken from Biosample for LC-MS metabolomics extraction.",
+      "has_input": [
+        "nmdc:bsm-11-302b5a66"
+      ],
+      "has_output": [
+        "nmdc:procsm-11-vvz5sm21"
+      ],
+      "processing_institution": "JGI",
+      "mass": {
+        "type": "nmdc:QuantityValue",
+        "has_raw_value": "0.5 g",
+        "has_unit": "g",
+        "has_numeric_value": 0.5
+      }
+    },
+    {
+      "id": "nmdc:extrp-11-mzd4gz25",
+      "type": "nmdc:Extraction",
+      "name": "Double water extraction of soil",
+      "description": "Two sequential water extractions of nmdc:procsm-11-vvz5sm21 with combined supernatants, vortexed and sonicated for 15 min in an iced water bath.",
+      "has_input": [
+        "nmdc:procsm-11-vvz5sm21"
+      ],
+      "has_output": [
+        "nmdc:procsm-11-5yebwc09"
+      ],
+      "processing_institution": "JGI",
+      "substances_used": [
+        {
+          "type": "nmdc:PortionOfSubstance",
+          "known_as": "water",
+          "substance_role": "solvent",
+          "volume": {
+            "type": "nmdc:QuantityValue",
+            "has_raw_value": "4 mL",
+            "has_unit": "mL",
+            "has_numeric_value": 4
+          }
+        }
+      ],
+      "extraction_targets": [
+        "metabolite"
+      ],
+      "temperature": {
+        "type": "nmdc:QuantityValue",
+        "has_raw_value": "0 Cel",
+        "has_unit": "Cel",
+        "has_numeric_value": 0
+      }
+    },
+    {
+      "id": "nmdc:dispro-11-avt9c503",
+      "type": "nmdc:DissolvingProcess",
+      "name": "Resuspend dried extract",
+      "description": "Dried extract from nmdc:procsm-11-5yebwc09 (which was frozen and lyophilized) resuspended in methanol with internal standards for LC-MS.",
+      "has_input": [
+        "nmdc:procsm-11-5yebwc09"
+      ],
+      "has_output": [
+        "nmdc:procsm-11-5n849319"
+      ],
+      "processing_institution": "JGI",
+      "substances_used": [
+        {
+          "type": "nmdc:PortionOfSubstance",
+          "known_as": "methanol",
+          "substance_role": "solvent",
+          "volume": {
+            "type": "nmdc:QuantityValue",
+            "has_raw_value": "200 uL",
+            "has_unit": "uL",
+            "has_numeric_value": 200
+          }
+        }
+      ]
+    },
+    {
+      "id": "nmdc:subspr-11-e116qx55",
+      "type": "nmdc:SubSamplingProcess",
+      "name": "Subsample soil for metabolomics",
+      "description": "A 0.5 g portion of soil taken from Biosample for LC-MS metabolomics extraction.",
+      "has_input": [
+        "nmdc:bsm-11-c6g7jb68"
+      ],
+      "has_output": [
+        "nmdc:procsm-11-q64w3s04"
+      ],
+      "processing_institution": "JGI",
+      "mass": {
+        "type": "nmdc:QuantityValue",
+        "has_raw_value": "0.5 g",
+        "has_unit": "g",
+        "has_numeric_value": 0.5
+      }
+    },
+    {
+      "id": "nmdc:extrp-11-4792wa59",
+      "type": "nmdc:Extraction",
+      "name": "Double water extraction of soil",
+      "description": "Two sequential water extractions of nmdc:procsm-11-q64w3s04 with combined supernatants, vortexed and sonicated for 15 min in an iced water bath.",
+      "has_input": [
+        "nmdc:procsm-11-q64w3s04"
+      ],
+      "has_output": [
+        "nmdc:procsm-11-qvsc4k73"
+      ],
+      "processing_institution": "JGI",
+      "substances_used": [
+        {
+          "type": "nmdc:PortionOfSubstance",
+          "known_as": "water",
+          "substance_role": "solvent",
+          "volume": {
+            "type": "nmdc:QuantityValue",
+            "has_raw_value": "4 mL",
+            "has_unit": "mL",
+            "has_numeric_value": 4
+          }
+        }
+      ],
+      "extraction_targets": [
+        "metabolite"
+      ],
+      "temperature": {
+        "type": "nmdc:QuantityValue",
+        "has_raw_value": "0 Cel",
+        "has_unit": "Cel",
+        "has_numeric_value": 0
+      }
+    },
+    {
+      "id": "nmdc:dispro-11-c96k3t89",
+      "type": "nmdc:DissolvingProcess",
+      "name": "Resuspend dried extract",
+      "description": "Dried extract from nmdc:procsm-11-qvsc4k73 (which was frozen and lyophilized) resuspended in methanol with internal standards for LC-MS.",
+      "has_input": [
+        "nmdc:procsm-11-qvsc4k73"
+      ],
+      "has_output": [
+        "nmdc:procsm-11-5jc62064"
+      ],
+      "processing_institution": "JGI",
+      "substances_used": [
+        {
+          "type": "nmdc:PortionOfSubstance",
+          "known_as": "methanol",
+          "substance_role": "solvent",
+          "volume": {
+            "type": "nmdc:QuantityValue",
+            "has_raw_value": "200 uL",
+            "has_unit": "uL",
+            "has_numeric_value": 200
+          }
+        }
+      ]
+    }
+  ],
+  "processed_sample_set": [
+    {
+      "id": "nmdc:procsm-11-5st86z87",
+      "type": "nmdc:ProcessedSample",
+      "name": "nmdc:bsm-11-ac8q3p77_subsample_for_LCMS",
+      "description": "A subsample of nmdc:bsm-11-ac8q3p77 for LC-MS metabolomics extraction."
+    },
+    {
+      "id": "nmdc:procsm-11-kygtp517",
+      "type": "nmdc:ProcessedSample",
+      "name": "nmdc:bsm-11-ac8q3p77_water_extract",
+      "description": "Combined water extract from double extraction of nmdc:procsm-11-5st86z87, which was subsequently frozen and lyophilized dry.",
+      "sampled_portion": [
+        "aqueous_layer"
+      ]
+    },
+    {
+      "id": "nmdc:procsm-11-dcxryk36",
+      "type": "nmdc:ProcessedSample",
+      "name": "nmdc:bsm-11-ac8q3p77_resuspended_extract",
+      "description": "Resuspended lyophilized extract from nmdc:procsm-11-kygtp517 ready for LC-MS analysis.",
+      "sampled_portion": [
+        "methanol_layer"
+      ]
+    },
+    {
+      "id": "nmdc:procsm-11-dpkzf164",
+      "type": "nmdc:ProcessedSample",
+      "name": "nmdc:bsm-11-92xxdg53_subsample_for_LCMS",
+      "description": "A subsample of nmdc:bsm-11-92xxdg53 for LC-MS metabolomics extraction."
+    },
+    {
+      "id": "nmdc:procsm-11-cs32wd32",
+      "type": "nmdc:ProcessedSample",
+      "name": "nmdc:bsm-11-92xxdg53_water_extract",
+      "description": "Combined water extract from double extraction of nmdc:procsm-11-dpkzf164, which was subsequently frozen and lyophilized dry.",
+      "sampled_portion": [
+        "aqueous_layer"
+      ]
+    },
+    {
+      "id": "nmdc:procsm-11-065f3h13",
+      "type": "nmdc:ProcessedSample",
+      "name": "nmdc:bsm-11-92xxdg53_resuspended_extract",
+      "description": "Resuspended lyophilized extract from nmdc:procsm-11-cs32wd32 ready for LC-MS analysis.",
+      "sampled_portion": [
+        "methanol_layer"
+      ]
+    },
+    {
+      "id": "nmdc:procsm-11-hyh9bz08",
+      "type": "nmdc:ProcessedSample",
+      "name": "nmdc:bsm-11-xttvcf02_subsample_for_LCMS",
+      "description": "A subsample of nmdc:bsm-11-xttvcf02 for LC-MS metabolomics extraction."
+    },
+    {
+      "id": "nmdc:procsm-11-8e3crq07",
+      "type": "nmdc:ProcessedSample",
+      "name": "nmdc:bsm-11-xttvcf02_water_extract",
+      "description": "Combined water extract from double extraction of nmdc:procsm-11-hyh9bz08, which was subsequently frozen and lyophilized dry.",
+      "sampled_portion": [
+        "aqueous_layer"
+      ]
+    },
+    {
+      "id": "nmdc:procsm-11-jshta934",
+      "type": "nmdc:ProcessedSample",
+      "name": "nmdc:bsm-11-xttvcf02_resuspended_extract",
+      "description": "Resuspended lyophilized extract from nmdc:procsm-11-8e3crq07 ready for LC-MS analysis.",
+      "sampled_portion": [
+        "methanol_layer"
+      ]
+    },
+    {
+      "id": "nmdc:procsm-11-rkapn098",
+      "type": "nmdc:ProcessedSample",
+      "name": "nmdc:bsm-11-jyswqd53_subsample_for_LCMS",
+      "description": "A subsample of nmdc:bsm-11-jyswqd53 for LC-MS metabolomics extraction."
+    },
+    {
+      "id": "nmdc:procsm-11-ky8pvs81",
+      "type": "nmdc:ProcessedSample",
+      "name": "nmdc:bsm-11-jyswqd53_water_extract",
+      "description": "Combined water extract from double extraction of nmdc:procsm-11-rkapn098, which was subsequently frozen and lyophilized dry.",
+      "sampled_portion": [
+        "aqueous_layer"
+      ]
+    },
+    {
+      "id": "nmdc:procsm-11-k7rqf969",
+      "type": "nmdc:ProcessedSample",
+      "name": "nmdc:bsm-11-jyswqd53_resuspended_extract",
+      "description": "Resuspended lyophilized extract from nmdc:procsm-11-ky8pvs81 ready for LC-MS analysis.",
+      "sampled_portion": [
+        "methanol_layer"
+      ]
+    },
+    {
+      "id": "nmdc:procsm-11-k1n9ve49",
+      "type": "nmdc:ProcessedSample",
+      "name": "nmdc:bsm-11-xm24hr93_subsample_for_LCMS",
+      "description": "A subsample of nmdc:bsm-11-xm24hr93 for LC-MS metabolomics extraction."
+    },
+    {
+      "id": "nmdc:procsm-11-daexbd03",
+      "type": "nmdc:ProcessedSample",
+      "name": "nmdc:bsm-11-xm24hr93_water_extract",
+      "description": "Combined water extract from double extraction of nmdc:procsm-11-k1n9ve49, which was subsequently frozen and lyophilized dry.",
+      "sampled_portion": [
+        "aqueous_layer"
+      ]
+    },
+    {
+      "id": "nmdc:procsm-11-xqtc0g46",
+      "type": "nmdc:ProcessedSample",
+      "name": "nmdc:bsm-11-xm24hr93_resuspended_extract",
+      "description": "Resuspended lyophilized extract from nmdc:procsm-11-daexbd03 ready for LC-MS analysis.",
+      "sampled_portion": [
+        "methanol_layer"
+      ]
+    },
+    {
+      "id": "nmdc:procsm-11-cv4q8d23",
+      "type": "nmdc:ProcessedSample",
+      "name": "nmdc:bsm-11-rz68jz92_subsample_for_LCMS",
+      "description": "A subsample of nmdc:bsm-11-rz68jz92 for LC-MS metabolomics extraction."
+    },
+    {
+      "id": "nmdc:procsm-11-yhm3xs35",
+      "type": "nmdc:ProcessedSample",
+      "name": "nmdc:bsm-11-rz68jz92_water_extract",
+      "description": "Combined water extract from double extraction of nmdc:procsm-11-cv4q8d23, which was subsequently frozen and lyophilized dry.",
+      "sampled_portion": [
+        "aqueous_layer"
+      ]
+    },
+    {
+      "id": "nmdc:procsm-11-t1a2mc48",
+      "type": "nmdc:ProcessedSample",
+      "name": "nmdc:bsm-11-rz68jz92_resuspended_extract",
+      "description": "Resuspended lyophilized extract from nmdc:procsm-11-yhm3xs35 ready for LC-MS analysis.",
+      "sampled_portion": [
+        "methanol_layer"
+      ]
+    },
+    {
+      "id": "nmdc:procsm-11-vvz5sm21",
+      "type": "nmdc:ProcessedSample",
+      "name": "nmdc:bsm-11-302b5a66_subsample_for_LCMS",
+      "description": "A subsample of nmdc:bsm-11-302b5a66 for LC-MS metabolomics extraction."
+    },
+    {
+      "id": "nmdc:procsm-11-5yebwc09",
+      "type": "nmdc:ProcessedSample",
+      "name": "nmdc:bsm-11-302b5a66_water_extract",
+      "description": "Combined water extract from double extraction of nmdc:procsm-11-vvz5sm21, which was subsequently frozen and lyophilized dry.",
+      "sampled_portion": [
+        "aqueous_layer"
+      ]
+    },
+    {
+      "id": "nmdc:procsm-11-5n849319",
+      "type": "nmdc:ProcessedSample",
+      "name": "nmdc:bsm-11-302b5a66_resuspended_extract",
+      "description": "Resuspended lyophilized extract from nmdc:procsm-11-5yebwc09 ready for LC-MS analysis.",
+      "sampled_portion": [
+        "methanol_layer"
+      ]
+    },
+    {
+      "id": "nmdc:procsm-11-q64w3s04",
+      "type": "nmdc:ProcessedSample",
+      "name": "nmdc:bsm-11-c6g7jb68_subsample_for_LCMS",
+      "description": "A subsample of nmdc:bsm-11-c6g7jb68 for LC-MS metabolomics extraction."
+    },
+    {
+      "id": "nmdc:procsm-11-qvsc4k73",
+      "type": "nmdc:ProcessedSample",
+      "name": "nmdc:bsm-11-c6g7jb68_water_extract",
+      "description": "Combined water extract from double extraction of nmdc:procsm-11-q64w3s04, which was subsequently frozen and lyophilized dry.",
+      "sampled_portion": [
+        "aqueous_layer"
+      ]
+    },
+    {
+      "id": "nmdc:procsm-11-5jc62064",
+      "type": "nmdc:ProcessedSample",
+      "name": "nmdc:bsm-11-c6g7jb68_resuspended_extract",
+      "description": "Resuspended lyophilized extract from nmdc:procsm-11-qvsc4k73 ready for LC-MS analysis.",
+      "sampled_portion": [
+        "methanol_layer"
+      ]
+    }
+  ],
+  "@type": "Database"
+}
