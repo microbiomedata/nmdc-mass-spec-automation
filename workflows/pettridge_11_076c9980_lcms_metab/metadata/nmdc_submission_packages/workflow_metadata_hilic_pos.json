@@ -1,15 +1,15 @@
 {
   "data_generation_set": [
     {
-      "id": "nmdc:dgms-00-wdwem2n8",
+      "id": "nmdc:dgms-11-6z8pvh09",
       "type": "nmdc:MassSpectrometry",
       "name": "20190103_KBL_JP_502924_Soil_13CFlux_QE-139_HILIC_USHGX01163_POS_MSMS_GRE-MB-111_statanox-12C-anox-44-000_5_Rg70to1050-CE102040-84-S1_Run392",
       "description": "Generation of mass spectrometry data for the analysis of metabolomics using liquid chromatography.",
       "has_input": [
-        "nmdc:procsm-11-zja0ep60"
+        "nmdc:procsm-11-065f3h13"
       ],
       "has_output": [
-        "nmdc:dobj-00-sk7mlaii"
+        "nmdc:dobj-11-xs6ceg11"
       ],
       "processing_institution": "JGI",
       "end_date": "2019-01-09T19:17:20Z",
@@ -21,20 +21,27 @@
       "instrument_used": [
         "nmdc:inst-14-kw06tx33"
       ],
+      "provenance_metadata": {
+        "type": "nmdc:ProvenanceMetadata",
+        "add_date": "2026-03-24T16:26:06+00:00",
+        "git_url": "https://github.com/microbiomedata/nmdc_mass_spectrometry_metadata_generation",
+        "version": "2.6.0",
+        "source_system_of_record": "custom"
+      },
       "eluent_introduction_category": "liquid_chromatography",
       "has_mass_spectrometry_configuration": "nmdc:mscon-11-5ddz6z46",
       "has_chromatography_configuration": "nmdc:chrcon-11-trmb8z05"
     },
     {
-      "id": "nmdc:dgms-00-4xv0sxs8",
+      "id": "nmdc:dgms-11-rvvjdb24",
       "type": "nmdc:MassSpectrometry",
       "name": "20190103_KBL_JP_502924_Soil_13CFlux_QE-139_HILIC_USHGX01163_POS_MSMS_GRE-MB-178_flux8day-12C-oxic-44-000_5_Rg70to1050-CE102040-116-S1_Run400",
       "description": "Generation of mass spectrometry data for the analysis of metabolomics using liquid chromatography.",
       "has_input": [
-        "nmdc:procsm-11-khe1j712"
+        "nmdc:procsm-11-xqtc0g46"
       ],
       "has_output": [
-        "nmdc:dobj-00-zh7sencn"
+        "nmdc:dobj-11-rqvqtj54"
       ],
       "processing_institution": "JGI",
       "end_date": "2019-01-09T22:13:45Z",
@@ -46,20 +53,27 @@
       "instrument_used": [
         "nmdc:inst-14-kw06tx33"
       ],
+      "provenance_metadata": {
+        "type": "nmdc:ProvenanceMetadata",
+        "add_date": "2026-03-24T16:26:06+00:00",
+        "git_url": "https://github.com/microbiomedata/nmdc_mass_spectrometry_metadata_generation",
+        "version": "2.6.0",
+        "source_system_of_record": "custom"
+      },
       "eluent_introduction_category": "liquid_chromatography",
       "has_mass_spectrometry_configuration": "nmdc:mscon-11-5ddz6z46",
       "has_chromatography_configuration": "nmdc:chrcon-11-trmb8z05"
     },
     {
-      "id": "nmdc:dgms-00-qzoy0non",
+      "id": "nmdc:dgms-11-2mf05t02",
       "type": "nmdc:MassSpectrometry",
       "name": "20190103_KBL_JP_502924_Soil_13CFlux_QE-139_HILIC_USHGX01163_POS_MSMS_GRE-MB-170_flux4day-12C-oxic-44-000_4_Rg70to1050-CE102040-108-S1_Run374",
       "description": "Generation of mass spectrometry data for the analysis of metabolomics using liquid chromatography.",
       "has_input": [
-        "nmdc:procsm-11-sn0ye359"
+        "nmdc:procsm-11-dcxryk36"
       ],
       "has_output": [
-        "nmdc:dobj-00-uvrlj5tm"
+        "nmdc:dobj-11-z75pj762"
       ],
       "processing_institution": "JGI",
       "end_date": "2019-01-09T12:40:29Z",
@@ -71,20 +85,27 @@
       "instrument_used": [
         "nmdc:inst-14-kw06tx33"
       ],
+      "provenance_metadata": {
+        "type": "nmdc:ProvenanceMetadata",
+        "add_date": "2026-03-24T16:26:06+00:00",
+        "git_url": "https://github.com/microbiomedata/nmdc_mass_spectrometry_metadata_generation",
+        "version": "2.6.0",
+        "source_system_of_record": "custom"
+      },
       "eluent_introduction_category": "liquid_chromatography",
       "has_mass_spectrometry_configuration": "nmdc:mscon-11-5ddz6z46",
       "has_chromatography_configuration": "nmdc:chrcon-11-trmb8z05"
     },
     {
-      "id": "nmdc:dgms-00-i08n31s0",
+      "id": "nmdc:dgms-11-azv65479",
       "type": "nmdc:MassSpectrometry",
       "name": "20190103_KBL_JP_502924_Soil_13CFlux_QE-139_HILIC_USHGX01163_POS_MSMS_GRE-MB-080_statoxic-12C-oxic-44-000_4_Rg70to1050-CE102040-62-S1_Run377",
       "description": "Generation of mass spectrometry data for the analysis of metabolomics using liquid chromatography.",
       "has_input": [
-        "nmdc:procsm-11-wf42tm48"
+        "nmdc:procsm-11-jshta934"
       ],
       "has_output": [
-        "nmdc:dobj-00-fvkjag55"
+        "nmdc:dobj-11-3ca2gb02"
       ],
       "processing_institution": "JGI",
       "end_date": "2019-01-09T13:46:39Z",
@@ -96,20 +117,27 @@
       "instrument_used": [
         "nmdc:inst-14-kw06tx33"
       ],
+      "provenance_metadata": {
+        "type": "nmdc:ProvenanceMetadata",
+        "add_date": "2026-03-24T16:26:06+00:00",
+        "git_url": "https://github.com/microbiomedata/nmdc_mass_spectrometry_metadata_generation",
+        "version": "2.6.0",
+        "source_system_of_record": "custom"
+      },
       "eluent_introduction_category": "liquid_chromatography",
       "has_mass_spectrometry_configuration": "nmdc:mscon-11-5ddz6z46",
       "has_chromatography_configuration": "nmdc:chrcon-11-trmb8z05"
     },
     {
-      "id": "nmdc:dgms-00-06yc9n6o",
+      "id": "nmdc:dgms-11-6wftxd98",
       "type": "nmdc:MassSpectrometry",
       "name": "20190103_KBL_JP_502924_Soil_13CFlux_QE-139_HILIC_USHGX01163_POS_MSMS_GRE-MB-172_flux4day-12C-oxic-44-000_5_Rg70to1050-CE102040-110-S1_Run403",
       "description": "Generation of mass spectrometry data for the analysis of metabolomics using liquid chromatography.",
       "has_input": [
-        "nmdc:procsm-11-zzdz8k13"
+        "nmdc:procsm-11-k7rqf969"
       ],
       "has_output": [
-        "nmdc:dobj-00-hyyzu27q"
+        "nmdc:dobj-11-bar8nm42"
       ],
       "processing_institution": "JGI",
       "end_date": "2019-01-09T23:19:54Z",
@@ -121,20 +149,27 @@
       "instrument_used": [
         "nmdc:inst-14-kw06tx33"
       ],
+      "provenance_metadata": {
+        "type": "nmdc:ProvenanceMetadata",
+        "add_date": "2026-03-24T16:26:06+00:00",
+        "git_url": "https://github.com/microbiomedata/nmdc_mass_spectrometry_metadata_generation",
+        "version": "2.6.0",
+        "source_system_of_record": "custom"
+      },
       "eluent_introduction_category": "liquid_chromatography",
       "has_mass_spectrometry_configuration": "nmdc:mscon-11-5ddz6z46",
       "has_chromatography_configuration": "nmdc:chrcon-11-trmb8z05"
     },
     {
-      "id": "nmdc:dgms-00-q4iz6kjm",
+      "id": "nmdc:dgms-11-yg5rp080",
       "type": "nmdc:MassSpectrometry",
       "name": "20190103_KBL_JP_502924_Soil_13CFlux_QE-139_HILIC_USHGX01163_POS_MSMS_GRE-MB-108_statanox-12C-anox-44-000_4_Rg70to1050-CE102040-81-S1_Run366",
       "description": "Generation of mass spectrometry data for the analysis of metabolomics using liquid chromatography.",
       "has_input": [
-        "nmdc:procsm-11-st5x9987"
+        "nmdc:procsm-11-5n849319"
       ],
       "has_output": [
-        "nmdc:dobj-00-hgrggii7"
+        "nmdc:dobj-11-p12p2r81"
       ],
       "processing_institution": "JGI",
       "end_date": "2019-01-09T08:20:48Z",
@@ -146,20 +181,27 @@
       "instrument_used": [
         "nmdc:inst-14-kw06tx33"
       ],
+      "provenance_metadata": {
+        "type": "nmdc:ProvenanceMetadata",
+        "add_date": "2026-03-24T16:26:06+00:00",
+        "git_url": "https://github.com/microbiomedata/nmdc_mass_spectrometry_metadata_generation",
+        "version": "2.6.0",
+        "source_system_of_record": "custom"
+      },
       "eluent_introduction_category": "liquid_chromatography",
       "has_mass_spectrometry_configuration": "nmdc:mscon-11-5ddz6z46",
       "has_chromatography_configuration": "nmdc:chrcon-11-trmb8z05"
     },
     {
-      "id": "nmdc:dgms-00-6q60nyf5",
+      "id": "nmdc:dgms-11-xadhkb63",
       "type": "nmdc:MassSpectrometry",
       "name": "20190103_KBL_JP_502924_Soil_13CFlux_QE-139_HILIC_USHGX01163_POS_MSMS_GRE-MB-082_statoxic-12C-oxic-44-000_5_Rg70to1050-CE102040-64-S1_Run406",
       "description": "Generation of mass spectrometry data for the analysis of metabolomics using liquid chromatography.",
       "has_input": [
-        "nmdc:procsm-11-a7ad7t44"
+        "nmdc:procsm-11-t1a2mc48"
       ],
       "has_output": [
-        "nmdc:dobj-00-rg9q8d47"
+        "nmdc:dobj-11-3xz4kn91"
       ],
       "processing_institution": "JGI",
       "end_date": "2019-01-10T00:26:01Z",
@@ -171,20 +213,27 @@
       "instrument_used": [
         "nmdc:inst-14-kw06tx33"
       ],
+      "provenance_metadata": {
+        "type": "nmdc:ProvenanceMetadata",
+        "add_date": "2026-03-24T16:26:06+00:00",
+        "git_url": "https://github.com/microbiomedata/nmdc_mass_spectrometry_metadata_generation",
+        "version": "2.6.0",
+        "source_system_of_record": "custom"
+      },
       "eluent_introduction_category": "liquid_chromatography",
       "has_mass_spectrometry_configuration": "nmdc:mscon-11-5ddz6z46",
       "has_chromatography_configuration": "nmdc:chrcon-11-trmb8z05"
     },
     {
-      "id": "nmdc:dgms-00-3h2icpm8",
+      "id": "nmdc:dgms-11-cx353v86",
       "type": "nmdc:MassSpectrometry",
       "name": "20190103_KBL_JP_502924_Soil_13CFlux_QE-139_HILIC_USHGX01163_POS_MSMS_GRE-MB-176_flux8day-12C-oxic-44-000_4_Rg70to1050-CE102040-114-S1_Run357",
       "description": "Generation of mass spectrometry data for the analysis of metabolomics using liquid chromatography.",
       "has_input": [
-        "nmdc:procsm-11-jk1f1w24"
+        "nmdc:procsm-11-5jc62064"
       ],
       "has_output": [
-        "nmdc:dobj-00-04ajppxl"
+        "nmdc:dobj-11-w2q2pq34"
       ],
       "processing_institution": "JGI",
       "end_date": "2019-01-09T05:02:19Z",
@@ -196,6 +245,13 @@
       "instrument_used": [
         "nmdc:inst-14-kw06tx33"
       ],
+      "provenance_metadata": {
+        "type": "nmdc:ProvenanceMetadata",
+        "add_date": "2026-03-24T16:26:06+00:00",
+        "git_url": "https://github.com/microbiomedata/nmdc_mass_spectrometry_metadata_generation",
+        "version": "2.6.0",
+        "source_system_of_record": "custom"
+      },
       "eluent_introduction_category": "liquid_chromatography",
       "has_mass_spectrometry_configuration": "nmdc:mscon-11-5ddz6z46",
       "has_chromatography_configuration": "nmdc:chrcon-11-trmb8z05"
@@ -203,7 +259,7 @@
   ],
   "data_object_set": [
     {
-      "id": "nmdc:dobj-00-cbe36ww4",
+      "id": "nmdc:dobj-11-5d84yh45",
       "type": "nmdc:DataObject",
       "name": "20190103_KBL_JP_502924_Soil_13CFlux_QE-139_HILIC_USHGX01163_POS_MSMS_GRE-MB-111_statanox-12C-anox-44-000_5_Rg70to1050-CE102040-84-S1_Run392.toml",
       "description": "CoreMS parameters used for metabolomics workflow.",
@@ -212,10 +268,10 @@
       "file_size_bytes": 9300,
       "md5_checksum": "dd375d1d87fb5e45c8b2de21d8d5adaf",
       "url": "https://nmdcdemo.emsl.pnnl.gov/metabolomics/pettridge_11_076c9980/processed_20260219/20190103_KBL_JP_502924_Soil_13CFlux_QE-139_HILIC_USHGX01163_POS_MSMS_GRE-MB-111_statanox-12C-anox-44-000_5_Rg70to1050-CE102040-84-S1_Run392.corems/20190103_KBL_JP_502924_Soil_13CFlux_QE-139_HILIC_USHGX01163_POS_MSMS_GRE-MB-111_statanox-12C-anox-44-000_5_Rg70to1050-CE102040-84-S1_Run392.toml",
-      "was_generated_by": "nmdc:wfmb-00-p2gxvna8.1"
+      "was_generated_by": "nmdc:wfmb-11-94f83b49.1"
     },
     {
-      "id": "nmdc:dobj-00-swbk8ql7",
+      "id": "nmdc:dobj-11-75t64k41",
       "type": "nmdc:DataObject",
       "name": "20190103_KBL_JP_502924_Soil_13CFlux_QE-139_HILIC_USHGX01163_POS_MSMS_GRE-MB-111_statanox-12C-anox-44-000_5_Rg70to1050-CE102040-84-S1_Run392.csv",
       "description": "Metabolite annotations as a result of a metabolomics workflow activity.",
@@ -224,10 +280,10 @@
       "file_size_bytes": 2335403,
       "md5_checksum": "c2946286a4e7dcecd0e57e2d1c55e9c4",
       "url": "https://nmdcdemo.emsl.pnnl.gov/metabolomics/pettridge_11_076c9980/processed_20260219/20190103_KBL_JP_502924_Soil_13CFlux_QE-139_HILIC_USHGX01163_POS_MSMS_GRE-MB-111_statanox-12C-anox-44-000_5_Rg70to1050-CE102040-84-S1_Run392.corems/20190103_KBL_JP_502924_Soil_13CFlux_QE-139_HILIC_USHGX01163_POS_MSMS_GRE-MB-111_statanox-12C-anox-44-000_5_Rg70to1050-CE102040-84-S1_Run392.csv",
-      "was_generated_by": "nmdc:wfmb-00-p2gxvna8.1"
+      "was_generated_by": "nmdc:wfmb-11-94f83b49.1"
     },
     {
-      "id": "nmdc:dobj-00-yeyvs6hj",
+      "id": "nmdc:dobj-11-kmmyz371",
       "type": "nmdc:DataObject",
       "name": "20190103_KBL_JP_502924_Soil_13CFlux_QE-139_HILIC_USHGX01163_POS_MSMS_GRE-MB-111_statanox-12C-anox-44-000_5_Rg70to1050-CE102040-84-S1_Run392.hdf5",
       "description": "CoreMS hdf5 file representing a metabolomics data file including annotations.",
@@ -236,10 +292,10 @@
       "file_size_bytes": 208862216,
       "md5_checksum": "dcdcf2cdb717699acf97cf9efcad2099",
       "url": "https://nmdcdemo.emsl.pnnl.gov/metabolomics/pettridge_11_076c9980/processed_20260219/20190103_KBL_JP_502924_Soil_13CFlux_QE-139_HILIC_USHGX01163_POS_MSMS_GRE-MB-111_statanox-12C-anox-44-000_5_Rg70to1050-CE102040-84-S1_Run392.corems/20190103_KBL_JP_502924_Soil_13CFlux_QE-139_HILIC_USHGX01163_POS_MSMS_GRE-MB-111_statanox-12C-anox-44-000_5_Rg70to1050-CE102040-84-S1_Run392.hdf5",
-      "was_generated_by": "nmdc:wfmb-00-p2gxvna8.1"
+      "was_generated_by": "nmdc:wfmb-11-94f83b49.1"
     },
     {
-      "id": "nmdc:dobj-00-sk7mlaii",
+      "id": "nmdc:dobj-11-xs6ceg11",
       "type": "nmdc:DataObject",
       "name": "20190103_KBL_JP_502924_Soil_13CFlux_QE-139_HILIC_USHGX01163_POS_MSMS_GRE-MB-111_statanox-12C-anox-44-000_5_Rg70to1050-CE102040-84-S1_Run392.mzML",
       "description": "LC-DDA-MS/MS raw data for metabolomics data acquisition.",
@@ -247,11 +303,11 @@
       "data_object_type": "LC-DDA-MS/MS Raw Data",
       "file_size_bytes": 62896916,
       "md5_checksum": "b168b1f932212e8b6885638c8547024b",
-      "url": "https://massive.ucsd.edu/ProteoSAFe/DownloadResultFile?file=f.MSV000093271%2Fraw%2F20190103_KBL_JP_502924_Soil_13CFlux_QE-139_HILIC_USHGX01163%2Frawdata%2F20190103_KBL_JP_502924_Soil_13CFlux_QE-139_HILIC_USHGX01163_POS_MSMS_GRE-MB-111_statanox-12C-anox-44-000_5_Rg70to1050-CE102040-84-S1_Run392.mzML&forceDownload=true",
-      "was_generated_by": "nmdc:dgms-00-wdwem2n8"
+      "url": "https://nmdcdemo.emsl.pnnl.gov/metabolomics/pettridge_11_076c9980/raw/20190103_KBL_JP_502924_Soil_13CFlux_QE-139_HILIC_USHGX01163_POS_MSMS_GRE-MB-111_statanox-12C-anox-44-000_5_Rg70to1050-CE102040-84-S1_Run392.mzML",
+      "was_generated_by": "nmdc:dgms-11-6z8pvh09"
     },
     {
-      "id": "nmdc:dobj-00-qkcwuo05",
+      "id": "nmdc:dobj-11-tj6sn105",
       "type": "nmdc:DataObject",
       "name": "20190103_KBL_JP_502924_Soil_13CFlux_QE-139_HILIC_USHGX01163_POS_MSMS_GRE-MB-178_flux8day-12C-oxic-44-000_5_Rg70to1050-CE102040-116-S1_Run400.toml",
       "description": "CoreMS parameters used for metabolomics workflow.",
@@ -260,10 +316,10 @@
       "file_size_bytes": 9300,
       "md5_checksum": "dd375d1d87fb5e45c8b2de21d8d5adaf",
       "url": "https://nmdcdemo.emsl.pnnl.gov/metabolomics/pettridge_11_076c9980/processed_20260219/20190103_KBL_JP_502924_Soil_13CFlux_QE-139_HILIC_USHGX01163_POS_MSMS_GRE-MB-178_flux8day-12C-oxic-44-000_5_Rg70to1050-CE102040-116-S1_Run400.corems/20190103_KBL_JP_502924_Soil_13CFlux_QE-139_HILIC_USHGX01163_POS_MSMS_GRE-MB-178_flux8day-12C-oxic-44-000_5_Rg70to1050-CE102040-116-S1_Run400.toml",
-      "was_generated_by": "nmdc:wfmb-00-06zcqjkv.1"
+      "was_generated_by": "nmdc:wfmb-11-gj5g8g30.1"
     },
     {
-      "id": "nmdc:dobj-00-i9gp345k",
+      "id": "nmdc:dobj-11-4v8g1096",
       "type": "nmdc:DataObject",
       "name": "20190103_KBL_JP_502924_Soil_13CFlux_QE-139_HILIC_USHGX01163_POS_MSMS_GRE-MB-178_flux8day-12C-oxic-44-000_5_Rg70to1050-CE102040-116-S1_Run400.csv",
       "description": "Metabolite annotations as a result of a metabolomics workflow activity.",
@@ -272,10 +328,10 @@
       "file_size_bytes": 2125224,
       "md5_checksum": "d8d76cd39c39a91dfd45cd401e686322",
       "url": "https://nmdcdemo.emsl.pnnl.gov/metabolomics/pettridge_11_076c9980/processed_20260219/20190103_KBL_JP_502924_Soil_13CFlux_QE-139_HILIC_USHGX01163_POS_MSMS_GRE-MB-178_flux8day-12C-oxic-44-000_5_Rg70to1050-CE102040-116-S1_Run400.corems/20190103_KBL_JP_502924_Soil_13CFlux_QE-139_HILIC_USHGX01163_POS_MSMS_GRE-MB-178_flux8day-12C-oxic-44-000_5_Rg70to1050-CE102040-116-S1_Run400.csv",
-      "was_generated_by": "nmdc:wfmb-00-06zcqjkv.1"
+      "was_generated_by": "nmdc:wfmb-11-gj5g8g30.1"
     },
     {
-      "id": "nmdc:dobj-00-mbof981r",
+      "id": "nmdc:dobj-11-s50bzs78",
       "type": "nmdc:DataObject",
       "name": "20190103_KBL_JP_502924_Soil_13CFlux_QE-139_HILIC_USHGX01163_POS_MSMS_GRE-MB-178_flux8day-12C-oxic-44-000_5_Rg70to1050-CE102040-116-S1_Run400.hdf5",
       "description": "CoreMS hdf5 file representing a metabolomics data file including annotations.",
@@ -284,10 +340,10 @@
       "file_size_bytes": 236651588,
       "md5_checksum": "911e31688e28d2c35c0ce7efbc424c94",
       "url": "https://nmdcdemo.emsl.pnnl.gov/metabolomics/pettridge_11_076c9980/processed_20260219/20190103_KBL_JP_502924_Soil_13CFlux_QE-139_HILIC_USHGX01163_POS_MSMS_GRE-MB-178_flux8day-12C-oxic-44-000_5_Rg70to1050-CE102040-116-S1_Run400.corems/20190103_KBL_JP_502924_Soil_13CFlux_QE-139_HILIC_USHGX01163_POS_MSMS_GRE-MB-178_flux8day-12C-oxic-44-000_5_Rg70to1050-CE102040-116-S1_Run400.hdf5",
-      "was_generated_by": "nmdc:wfmb-00-06zcqjkv.1"
+      "was_generated_by": "nmdc:wfmb-11-gj5g8g30.1"
     },
     {
-      "id": "nmdc:dobj-00-zh7sencn",
+      "id": "nmdc:dobj-11-rqvqtj54",
       "type": "nmdc:DataObject",
       "name": "20190103_KBL_JP_502924_Soil_13CFlux_QE-139_HILIC_USHGX01163_POS_MSMS_GRE-MB-178_flux8day-12C-oxic-44-000_5_Rg70to1050-CE102040-116-S1_Run400.mzML",
       "description": "LC-DDA-MS/MS raw data for metabolomics data acquisition.",
@@ -295,11 +351,11 @@
       "data_object_type": "LC-DDA-MS/MS Raw Data",
       "file_size_bytes": 64005789,
       "md5_checksum": "a4c7a67febdb5337af3d2371686f5dce",
-      "url": "https://massive.ucsd.edu/ProteoSAFe/DownloadResultFile?file=f.MSV000093271%2Fraw%2F20190103_KBL_JP_502924_Soil_13CFlux_QE-139_HILIC_USHGX01163%2Frawdata%2F20190103_KBL_JP_502924_Soil_13CFlux_QE-139_HILIC_USHGX01163_POS_MSMS_GRE-MB-178_flux8day-12C-oxic-44-000_5_Rg70to1050-CE102040-116-S1_Run400.mzML&forceDownload=true",
-      "was_generated_by": "nmdc:dgms-00-4xv0sxs8"
+      "url": "https://nmdcdemo.emsl.pnnl.gov/metabolomics/pettridge_11_076c9980/raw/20190103_KBL_JP_502924_Soil_13CFlux_QE-139_HILIC_USHGX01163_POS_MSMS_GRE-MB-178_flux8day-12C-oxic-44-000_5_Rg70to1050-CE102040-116-S1_Run400.mzML",
+      "was_generated_by": "nmdc:dgms-11-rvvjdb24"
     },
     {
-      "id": "nmdc:dobj-00-thlf2h2w",
+      "id": "nmdc:dobj-11-8687an59",
       "type": "nmdc:DataObject",
       "name": "20190103_KBL_JP_502924_Soil_13CFlux_QE-139_HILIC_USHGX01163_POS_MSMS_GRE-MB-170_flux4day-12C-oxic-44-000_4_Rg70to1050-CE102040-108-S1_Run374.toml",
       "description": "CoreMS parameters used for metabolomics workflow.",
@@ -308,10 +364,10 @@
       "file_size_bytes": 9300,
       "md5_checksum": "dd375d1d87fb5e45c8b2de21d8d5adaf",
       "url": "https://nmdcdemo.emsl.pnnl.gov/metabolomics/pettridge_11_076c9980/processed_20260219/20190103_KBL_JP_502924_Soil_13CFlux_QE-139_HILIC_USHGX01163_POS_MSMS_GRE-MB-170_flux4day-12C-oxic-44-000_4_Rg70to1050-CE102040-108-S1_Run374.corems/20190103_KBL_JP_502924_Soil_13CFlux_QE-139_HILIC_USHGX01163_POS_MSMS_GRE-MB-170_flux4day-12C-oxic-44-000_4_Rg70to1050-CE102040-108-S1_Run374.toml",
-      "was_generated_by": "nmdc:wfmb-00-k15hxf71.1"
+      "was_generated_by": "nmdc:wfmb-11-7a18y106.1"
     },
     {
-      "id": "nmdc:dobj-00-wvurc9vt",
+      "id": "nmdc:dobj-11-13xf3v78",
       "type": "nmdc:DataObject",
       "name": "20190103_KBL_JP_502924_Soil_13CFlux_QE-139_HILIC_USHGX01163_POS_MSMS_GRE-MB-170_flux4day-12C-oxic-44-000_4_Rg70to1050-CE102040-108-S1_Run374.csv",
       "description": "Metabolite annotations as a result of a metabolomics workflow activity.",
@@ -320,10 +376,10 @@
       "file_size_bytes": 2105659,
       "md5_checksum": "a8241389e9df63714a6141d869d9d87a",
       "url": "https://nmdcdemo.emsl.pnnl.gov/metabolomics/pettridge_11_076c9980/processed_20260219/20190103_KBL_JP_502924_Soil_13CFlux_QE-139_HILIC_USHGX01163_POS_MSMS_GRE-MB-170_flux4day-12C-oxic-44-000_4_Rg70to1050-CE102040-108-S1_Run374.corems/20190103_KBL_JP_502924_Soil_13CFlux_QE-139_HILIC_USHGX01163_POS_MSMS_GRE-MB-170_flux4day-12C-oxic-44-000_4_Rg70to1050-CE102040-108-S1_Run374.csv",
-      "was_generated_by": "nmdc:wfmb-00-k15hxf71.1"
+      "was_generated_by": "nmdc:wfmb-11-7a18y106.1"
     },
     {
-      "id": "nmdc:dobj-00-4kiygydv",
+      "id": "nmdc:dobj-11-czx7k645",
       "type": "nmdc:DataObject",
       "name": "20190103_KBL_JP_502924_Soil_13CFlux_QE-139_HILIC_USHGX01163_POS_MSMS_GRE-MB-170_flux4day-12C-oxic-44-000_4_Rg70to1050-CE102040-108-S1_Run374.hdf5",
       "description": "CoreMS hdf5 file representing a metabolomics data file including annotations.",
@@ -332,10 +388,10 @@
       "file_size_bytes": 206468610,
       "md5_checksum": "8a58fa5f948b060665b464ae544a54cb",
       "url": "https://nmdcdemo.emsl.pnnl.gov/metabolomics/pettridge_11_076c9980/processed_20260219/20190103_KBL_JP_502924_Soil_13CFlux_QE-139_HILIC_USHGX01163_POS_MSMS_GRE-MB-170_flux4day-12C-oxic-44-000_4_Rg70to1050-CE102040-108-S1_Run374.corems/20190103_KBL_JP_502924_Soil_13CFlux_QE-139_HILIC_USHGX01163_POS_MSMS_GRE-MB-170_flux4day-12C-oxic-44-000_4_Rg70to1050-CE102040-108-S1_Run374.hdf5",
-      "was_generated_by": "nmdc:wfmb-00-k15hxf71.1"
+      "was_generated_by": "nmdc:wfmb-11-7a18y106.1"
     },
     {
-      "id": "nmdc:dobj-00-uvrlj5tm",
+      "id": "nmdc:dobj-11-z75pj762",
       "type": "nmdc:DataObject",
       "name": "20190103_KBL_JP_502924_Soil_13CFlux_QE-139_HILIC_USHGX01163_POS_MSMS_GRE-MB-170_flux4day-12C-oxic-44-000_4_Rg70to1050-CE102040-108-S1_Run374.mzML",
       "description": "LC-DDA-MS/MS raw data for metabolomics data acquisition.",
@@ -343,11 +399,11 @@
       "data_object_type": "LC-DDA-MS/MS Raw Data",
       "file_size_bytes": 63080965,
       "md5_checksum": "5752a208dc5e39aace523136f09144bd",
-      "url": "https://massive.ucsd.edu/ProteoSAFe/DownloadResultFile?file=f.MSV000093271%2Fraw%2F20190103_KBL_JP_502924_Soil_13CFlux_QE-139_HILIC_USHGX01163%2Frawdata%2F20190103_KBL_JP_502924_Soil_13CFlux_QE-139_HILIC_USHGX01163_POS_MSMS_GRE-MB-170_flux4day-12C-oxic-44-000_4_Rg70to1050-CE102040-108-S1_Run374.mzML&forceDownload=true",
-      "was_generated_by": "nmdc:dgms-00-qzoy0non"
+      "url": "https://nmdcdemo.emsl.pnnl.gov/metabolomics/pettridge_11_076c9980/raw/20190103_KBL_JP_502924_Soil_13CFlux_QE-139_HILIC_USHGX01163_POS_MSMS_GRE-MB-170_flux4day-12C-oxic-44-000_4_Rg70to1050-CE102040-108-S1_Run374.mzML",
+      "was_generated_by": "nmdc:dgms-11-2mf05t02"
     },
     {
-      "id": "nmdc:dobj-00-ehgs8qu4",
+      "id": "nmdc:dobj-11-8hsxr881",
       "type": "nmdc:DataObject",
       "name": "20190103_KBL_JP_502924_Soil_13CFlux_QE-139_HILIC_USHGX01163_POS_MSMS_GRE-MB-080_statoxic-12C-oxic-44-000_4_Rg70to1050-CE102040-62-S1_Run377.toml",
       "description": "CoreMS parameters used for metabolomics workflow.",
@@ -356,10 +412,10 @@
       "file_size_bytes": 9300,
       "md5_checksum": "dd375d1d87fb5e45c8b2de21d8d5adaf",
       "url": "https://nmdcdemo.emsl.pnnl.gov/metabolomics/pettridge_11_076c9980/processed_20260219/20190103_KBL_JP_502924_Soil_13CFlux_QE-139_HILIC_USHGX01163_POS_MSMS_GRE-MB-080_statoxic-12C-oxic-44-000_4_Rg70to1050-CE102040-62-S1_Run377.corems/20190103_KBL_JP_502924_Soil_13CFlux_QE-139_HILIC_USHGX01163_POS_MSMS_GRE-MB-080_statoxic-12C-oxic-44-000_4_Rg70to1050-CE102040-62-S1_Run377.toml",
-      "was_generated_by": "nmdc:wfmb-00-nov5atp0.1"
+      "was_generated_by": "nmdc:wfmb-11-ybseym05.1"
     },
     {
-      "id": "nmdc:dobj-00-7dnbvlzu",
+      "id": "nmdc:dobj-11-9pbw1s08",
       "type": "nmdc:DataObject",
       "name": "20190103_KBL_JP_502924_Soil_13CFlux_QE-139_HILIC_USHGX01163_POS_MSMS_GRE-MB-080_statoxic-12C-oxic-44-000_4_Rg70to1050-CE102040-62-S1_Run377.csv",
       "description": "Metabolite annotations as a result of a metabolomics workflow activity.",
@@ -368,10 +424,10 @@
       "file_size_bytes": 2485503,
       "md5_checksum": "61566451d470d770e9fcadcc2dc0065d",
       "url": "https://nmdcdemo.emsl.pnnl.gov/metabolomics/pettridge_11_076c9980/processed_20260219/20190103_KBL_JP_502924_Soil_13CFlux_QE-139_HILIC_USHGX01163_POS_MSMS_GRE-MB-080_statoxic-12C-oxic-44-000_4_Rg70to1050-CE102040-62-S1_Run377.corems/20190103_KBL_JP_502924_Soil_13CFlux_QE-139_HILIC_USHGX01163_POS_MSMS_GRE-MB-080_statoxic-12C-oxic-44-000_4_Rg70to1050-CE102040-62-S1_Run377.csv",
-      "was_generated_by": "nmdc:wfmb-00-nov5atp0.1"
+      "was_generated_by": "nmdc:wfmb-11-ybseym05.1"
     },
     {
-      "id": "nmdc:dobj-00-lb63tz91",
+      "id": "nmdc:dobj-11-c6572k16",
       "type": "nmdc:DataObject",
       "name": "20190103_KBL_JP_502924_Soil_13CFlux_QE-139_HILIC_USHGX01163_POS_MSMS_GRE-MB-080_statoxic-12C-oxic-44-000_4_Rg70to1050-CE102040-62-S1_Run377.hdf5",
       "description": "CoreMS hdf5 file representing a metabolomics data file including annotations.",
@@ -380,10 +436,10 @@
       "file_size_bytes": 208971368,
       "md5_checksum": "c13f52b5dc20b856649a9e9c00cf27bb",
       "url": "https://nmdcdemo.emsl.pnnl.gov/metabolomics/pettridge_11_076c9980/processed_20260219/20190103_KBL_JP_502924_Soil_13CFlux_QE-139_HILIC_USHGX01163_POS_MSMS_GRE-MB-080_statoxic-12C-oxic-44-000_4_Rg70to1050-CE102040-62-S1_Run377.corems/20190103_KBL_JP_502924_Soil_13CFlux_QE-139_HILIC_USHGX01163_POS_MSMS_GRE-MB-080_statoxic-12C-oxic-44-000_4_Rg70to1050-CE102040-62-S1_Run377.hdf5",
-      "was_generated_by": "nmdc:wfmb-00-nov5atp0.1"
+      "was_generated_by": "nmdc:wfmb-11-ybseym05.1"
     },
     {
-      "id": "nmdc:dobj-00-fvkjag55",
+      "id": "nmdc:dobj-11-3ca2gb02",
       "type": "nmdc:DataObject",
       "name": "20190103_KBL_JP_502924_Soil_13CFlux_QE-139_HILIC_USHGX01163_POS_MSMS_GRE-MB-080_statoxic-12C-oxic-44-000_4_Rg70to1050-CE102040-62-S1_Run377.mzML",
       "description": "LC-DDA-MS/MS raw data for metabolomics data acquisition.",
@@ -391,11 +447,11 @@
       "data_object_type": "LC-DDA-MS/MS Raw Data",
       "file_size_bytes": 62750910,
       "md5_checksum": "b00179c559c74d4454b0d23ccf28aed0",
-      "url": "https://massive.ucsd.edu/ProteoSAFe/DownloadResultFile?file=f.MSV000093271%2Fraw%2F20190103_KBL_JP_502924_Soil_13CFlux_QE-139_HILIC_USHGX01163%2Frawdata%2F20190103_KBL_JP_502924_Soil_13CFlux_QE-139_HILIC_USHGX01163_POS_MSMS_GRE-MB-080_statoxic-12C-oxic-44-000_4_Rg70to1050-CE102040-62-S1_Run377.mzML&forceDownload=true",
-      "was_generated_by": "nmdc:dgms-00-i08n31s0"
+      "url": "https://nmdcdemo.emsl.pnnl.gov/metabolomics/pettridge_11_076c9980/raw/20190103_KBL_JP_502924_Soil_13CFlux_QE-139_HILIC_USHGX01163_POS_MSMS_GRE-MB-080_statoxic-12C-oxic-44-000_4_Rg70to1050-CE102040-62-S1_Run377.mzML",
+      "was_generated_by": "nmdc:dgms-11-azv65479"
     },
     {
-      "id": "nmdc:dobj-00-w4lnws65",
+      "id": "nmdc:dobj-11-j3npdb30",
       "type": "nmdc:DataObject",
       "name": "20190103_KBL_JP_502924_Soil_13CFlux_QE-139_HILIC_USHGX01163_POS_MSMS_GRE-MB-172_flux4day-12C-oxic-44-000_5_Rg70to1050-CE102040-110-S1_Run403.toml",
       "description": "CoreMS parameters used for metabolomics workflow.",
@@ -404,10 +460,10 @@
       "file_size_bytes": 9300,
       "md5_checksum": "dd375d1d87fb5e45c8b2de21d8d5adaf",
       "url": "https://nmdcdemo.emsl.pnnl.gov/metabolomics/pettridge_11_076c9980/processed_20260219/20190103_KBL_JP_502924_Soil_13CFlux_QE-139_HILIC_USHGX01163_POS_MSMS_GRE-MB-172_flux4day-12C-oxic-44-000_5_Rg70to1050-CE102040-110-S1_Run403.corems/20190103_KBL_JP_502924_Soil_13CFlux_QE-139_HILIC_USHGX01163_POS_MSMS_GRE-MB-172_flux4day-12C-oxic-44-000_5_Rg70to1050-CE102040-110-S1_Run403.toml",
-      "was_generated_by": "nmdc:wfmb-00-fhjhqes5.1"
+      "was_generated_by": "nmdc:wfmb-11-djd16p41.1"
     },
     {
-      "id": "nmdc:dobj-00-7zs3hqjq",
+      "id": "nmdc:dobj-11-ynwtn131",
       "type": "nmdc:DataObject",
       "name": "20190103_KBL_JP_502924_Soil_13CFlux_QE-139_HILIC_USHGX01163_POS_MSMS_GRE-MB-172_flux4day-12C-oxic-44-000_5_Rg70to1050-CE102040-110-S1_Run403.csv",
       "description": "Metabolite annotations as a result of a metabolomics workflow activity.",
@@ -416,10 +472,10 @@
       "file_size_bytes": 2289874,
       "md5_checksum": "e5d8e12d39938d6d8248d9dad6c9160f",
       "url": "https://nmdcdemo.emsl.pnnl.gov/metabolomics/pettridge_11_076c9980/processed_20260219/20190103_KBL_JP_502924_Soil_13CFlux_QE-139_HILIC_USHGX01163_POS_MSMS_GRE-MB-172_flux4day-12C-oxic-44-000_5_Rg70to1050-CE102040-110-S1_Run403.corems/20190103_KBL_JP_502924_Soil_13CFlux_QE-139_HILIC_USHGX01163_POS_MSMS_GRE-MB-172_flux4day-12C-oxic-44-000_5_Rg70to1050-CE102040-110-S1_Run403.csv",
-      "was_generated_by": "nmdc:wfmb-00-fhjhqes5.1"
+      "was_generated_by": "nmdc:wfmb-11-djd16p41.1"
     },
     {
-      "id": "nmdc:dobj-00-v6h0xux3",
+      "id": "nmdc:dobj-11-2prp1k09",
       "type": "nmdc:DataObject",
       "name": "20190103_KBL_JP_502924_Soil_13CFlux_QE-139_HILIC_USHGX01163_POS_MSMS_GRE-MB-172_flux4day-12C-oxic-44-000_5_Rg70to1050-CE102040-110-S1_Run403.hdf5",
       "description": "CoreMS hdf5 file representing a metabolomics data file including annotations.",
@@ -428,10 +484,10 @@
       "file_size_bytes": 223328852,
       "md5_checksum": "3a539532a84251bfcf8404348d811cb0",
       "url": "https://nmdcdemo.emsl.pnnl.gov/metabolomics/pettridge_11_076c9980/processed_20260219/20190103_KBL_JP_502924_Soil_13CFlux_QE-139_HILIC_USHGX01163_POS_MSMS_GRE-MB-172_flux4day-12C-oxic-44-000_5_Rg70to1050-CE102040-110-S1_Run403.corems/20190103_KBL_JP_502924_Soil_13CFlux_QE-139_HILIC_USHGX01163_POS_MSMS_GRE-MB-172_flux4day-12C-oxic-44-000_5_Rg70to1050-CE102040-110-S1_Run403.hdf5",
-      "was_generated_by": "nmdc:wfmb-00-fhjhqes5.1"
+      "was_generated_by": "nmdc:wfmb-11-djd16p41.1"
     },
     {
-      "id": "nmdc:dobj-00-hyyzu27q",
+      "id": "nmdc:dobj-11-bar8nm42",
       "type": "nmdc:DataObject",
       "name": "20190103_KBL_JP_502924_Soil_13CFlux_QE-139_HILIC_USHGX01163_POS_MSMS_GRE-MB-172_flux4day-12C-oxic-44-000_5_Rg70to1050-CE102040-110-S1_Run403.mzML",
       "description": "LC-DDA-MS/MS raw data for metabolomics data acquisition.",
@@ -439,11 +495,11 @@
       "data_object_type": "LC-DDA-MS/MS Raw Data",
       "file_size_bytes": 63324122,
       "md5_checksum": "01fadea508662761ea20149c96e101c3",
-      "url": "https://massive.ucsd.edu/ProteoSAFe/DownloadResultFile?file=f.MSV000093271%2Fraw%2F20190103_KBL_JP_502924_Soil_13CFlux_QE-139_HILIC_USHGX01163%2Frawdata%2F20190103_KBL_JP_502924_Soil_13CFlux_QE-139_HILIC_USHGX01163_POS_MSMS_GRE-MB-172_flux4day-12C-oxic-44-000_5_Rg70to1050-CE102040-110-S1_Run403.mzML&forceDownload=true",
-      "was_generated_by": "nmdc:dgms-00-06yc9n6o"
+      "url": "https://nmdcdemo.emsl.pnnl.gov/metabolomics/pettridge_11_076c9980/raw/20190103_KBL_JP_502924_Soil_13CFlux_QE-139_HILIC_USHGX01163_POS_MSMS_GRE-MB-172_flux4day-12C-oxic-44-000_5_Rg70to1050-CE102040-110-S1_Run403.mzML",
+      "was_generated_by": "nmdc:dgms-11-6wftxd98"
     },
     {
-      "id": "nmdc:dobj-00-tz8949gt",
+      "id": "nmdc:dobj-11-wp8sqk98",
       "type": "nmdc:DataObject",
       "name": "20190103_KBL_JP_502924_Soil_13CFlux_QE-139_HILIC_USHGX01163_POS_MSMS_GRE-MB-108_statanox-12C-anox-44-000_4_Rg70to1050-CE102040-81-S1_Run366.toml",
       "description": "CoreMS parameters used for metabolomics workflow.",
@@ -452,10 +508,10 @@
       "file_size_bytes": 9300,
       "md5_checksum": "dd375d1d87fb5e45c8b2de21d8d5adaf",
       "url": "https://nmdcdemo.emsl.pnnl.gov/metabolomics/pettridge_11_076c9980/processed_20260219/20190103_KBL_JP_502924_Soil_13CFlux_QE-139_HILIC_USHGX01163_POS_MSMS_GRE-MB-108_statanox-12C-anox-44-000_4_Rg70to1050-CE102040-81-S1_Run366.corems/20190103_KBL_JP_502924_Soil_13CFlux_QE-139_HILIC_USHGX01163_POS_MSMS_GRE-MB-108_statanox-12C-anox-44-000_4_Rg70to1050-CE102040-81-S1_Run366.toml",
-      "was_generated_by": "nmdc:wfmb-00-2xd81632.1"
+      "was_generated_by": "nmdc:wfmb-11-fp6he771.1"
     },
     {
-      "id": "nmdc:dobj-00-g6duhnxr",
+      "id": "nmdc:dobj-11-dnjb1x66",
       "type": "nmdc:DataObject",
       "name": "20190103_KBL_JP_502924_Soil_13CFlux_QE-139_HILIC_USHGX01163_POS_MSMS_GRE-MB-108_statanox-12C-anox-44-000_4_Rg70to1050-CE102040-81-S1_Run366.csv",
       "description": "Metabolite annotations as a result of a metabolomics workflow activity.",
@@ -464,10 +520,10 @@
       "file_size_bytes": 2478676,
       "md5_checksum": "56865b3c65640c61f5072ea93b1f8a12",
       "url": "https://nmdcdemo.emsl.pnnl.gov/metabolomics/pettridge_11_076c9980/processed_20260219/20190103_KBL_JP_502924_Soil_13CFlux_QE-139_HILIC_USHGX01163_POS_MSMS_GRE-MB-108_statanox-12C-anox-44-000_4_Rg70to1050-CE102040-81-S1_Run366.corems/20190103_KBL_JP_502924_Soil_13CFlux_QE-139_HILIC_USHGX01163_POS_MSMS_GRE-MB-108_statanox-12C-anox-44-000_4_Rg70to1050-CE102040-81-S1_Run366.csv",
-      "was_generated_by": "nmdc:wfmb-00-2xd81632.1"
+      "was_generated_by": "nmdc:wfmb-11-fp6he771.1"
     },
     {
-      "id": "nmdc:dobj-00-lm3zssgh",
+      "id": "nmdc:dobj-11-z0h7h667",
       "type": "nmdc:DataObject",
       "name": "20190103_KBL_JP_502924_Soil_13CFlux_QE-139_HILIC_USHGX01163_POS_MSMS_GRE-MB-108_statanox-12C-anox-44-000_4_Rg70to1050-CE102040-81-S1_Run366.hdf5",
       "description": "CoreMS hdf5 file representing a metabolomics data file including annotations.",
@@ -476,10 +532,10 @@
       "file_size_bytes": 226954269,
       "md5_checksum": "2b7a80abdc7d009cdf1b65c1a99a0b90",
       "url": "https://nmdcdemo.emsl.pnnl.gov/metabolomics/pettridge_11_076c9980/processed_20260219/20190103_KBL_JP_502924_Soil_13CFlux_QE-139_HILIC_USHGX01163_POS_MSMS_GRE-MB-108_statanox-12C-anox-44-000_4_Rg70to1050-CE102040-81-S1_Run366.corems/20190103_KBL_JP_502924_Soil_13CFlux_QE-139_HILIC_USHGX01163_POS_MSMS_GRE-MB-108_statanox-12C-anox-44-000_4_Rg70to1050-CE102040-81-S1_Run366.hdf5",
-      "was_generated_by": "nmdc:wfmb-00-2xd81632.1"
+      "was_generated_by": "nmdc:wfmb-11-fp6he771.1"
     },
     {
-      "id": "nmdc:dobj-00-hgrggii7",
+      "id": "nmdc:dobj-11-p12p2r81",
       "type": "nmdc:DataObject",
       "name": "20190103_KBL_JP_502924_Soil_13CFlux_QE-139_HILIC_USHGX01163_POS_MSMS_GRE-MB-108_statanox-12C-anox-44-000_4_Rg70to1050-CE102040-81-S1_Run366.mzML",
       "description": "LC-DDA-MS/MS raw data for metabolomics data acquisition.",
@@ -487,11 +543,11 @@
       "data_object_type": "LC-DDA-MS/MS Raw Data",
       "file_size_bytes": 63563425,
       "md5_checksum": "cf769fde3356835f0168594bb1e4dc2c",
-      "url": "https://massive.ucsd.edu/ProteoSAFe/DownloadResultFile?file=f.MSV000093271%2Fraw%2F20190103_KBL_JP_502924_Soil_13CFlux_QE-139_HILIC_USHGX01163%2Frawdata%2F20190103_KBL_JP_502924_Soil_13CFlux_QE-139_HILIC_USHGX01163_POS_MSMS_GRE-MB-108_statanox-12C-anox-44-000_4_Rg70to1050-CE102040-81-S1_Run366.mzML&forceDownload=true",
-      "was_generated_by": "nmdc:dgms-00-q4iz6kjm"
+      "url": "https://nmdcdemo.emsl.pnnl.gov/metabolomics/pettridge_11_076c9980/raw/20190103_KBL_JP_502924_Soil_13CFlux_QE-139_HILIC_USHGX01163_POS_MSMS_GRE-MB-108_statanox-12C-anox-44-000_4_Rg70to1050-CE102040-81-S1_Run366.mzML",
+      "was_generated_by": "nmdc:dgms-11-yg5rp080"
     },
     {
-      "id": "nmdc:dobj-00-40ej56fu",
+      "id": "nmdc:dobj-11-0286a696",
       "type": "nmdc:DataObject",
       "name": "20190103_KBL_JP_502924_Soil_13CFlux_QE-139_HILIC_USHGX01163_POS_MSMS_GRE-MB-082_statoxic-12C-oxic-44-000_5_Rg70to1050-CE102040-64-S1_Run406.toml",
       "description": "CoreMS parameters used for metabolomics workflow.",
@@ -500,10 +556,10 @@
       "file_size_bytes": 9300,
       "md5_checksum": "dd375d1d87fb5e45c8b2de21d8d5adaf",
       "url": "https://nmdcdemo.emsl.pnnl.gov/metabolomics/pettridge_11_076c9980/processed_20260219/20190103_KBL_JP_502924_Soil_13CFlux_QE-139_HILIC_USHGX01163_POS_MSMS_GRE-MB-082_statoxic-12C-oxic-44-000_5_Rg70to1050-CE102040-64-S1_Run406.corems/20190103_KBL_JP_502924_Soil_13CFlux_QE-139_HILIC_USHGX01163_POS_MSMS_GRE-MB-082_statoxic-12C-oxic-44-000_5_Rg70to1050-CE102040-64-S1_Run406.toml",
-      "was_generated_by": "nmdc:wfmb-00-7koo3nm8.1"
+      "was_generated_by": "nmdc:wfmb-11-x859ft41.1"
     },
     {
-      "id": "nmdc:dobj-00-1baymjas",
+      "id": "nmdc:dobj-11-a1ccz815",
       "type": "nmdc:DataObject",
       "name": "20190103_KBL_JP_502924_Soil_13CFlux_QE-139_HILIC_USHGX01163_POS_MSMS_GRE-MB-082_statoxic-12C-oxic-44-000_5_Rg70to1050-CE102040-64-S1_Run406.csv",
       "description": "Metabolite annotations as a result of a metabolomics workflow activity.",
@@ -512,10 +568,10 @@
       "file_size_bytes": 2603127,
       "md5_checksum": "b5d16f61f58cb99b4a0a255537ccaeea",
       "url": "https://nmdcdemo.emsl.pnnl.gov/metabolomics/pettridge_11_076c9980/processed_20260219/20190103_KBL_JP_502924_Soil_13CFlux_QE-139_HILIC_USHGX01163_POS_MSMS_GRE-MB-082_statoxic-12C-oxic-44-000_5_Rg70to1050-CE102040-64-S1_Run406.corems/20190103_KBL_JP_502924_Soil_13CFlux_QE-139_HILIC_USHGX01163_POS_MSMS_GRE-MB-082_statoxic-12C-oxic-44-000_5_Rg70to1050-CE102040-64-S1_Run406.csv",
-      "was_generated_by": "nmdc:wfmb-00-7koo3nm8.1"
+      "was_generated_by": "nmdc:wfmb-11-x859ft41.1"
     },
     {
-      "id": "nmdc:dobj-00-vig29uk3",
+      "id": "nmdc:dobj-11-6a0zps20",
       "type": "nmdc:DataObject",
       "name": "20190103_KBL_JP_502924_Soil_13CFlux_QE-139_HILIC_USHGX01163_POS_MSMS_GRE-MB-082_statoxic-12C-oxic-44-000_5_Rg70to1050-CE102040-64-S1_Run406.hdf5",
       "description": "CoreMS hdf5 file representing a metabolomics data file including annotations.",
@@ -524,10 +580,10 @@
       "file_size_bytes": 211749888,
       "md5_checksum": "1cc5f6c7d7988972396422ee2afe7341",
       "url": "https://nmdcdemo.emsl.pnnl.gov/metabolomics/pettridge_11_076c9980/processed_20260219/20190103_KBL_JP_502924_Soil_13CFlux_QE-139_HILIC_USHGX01163_POS_MSMS_GRE-MB-082_statoxic-12C-oxic-44-000_5_Rg70to1050-CE102040-64-S1_Run406.corems/20190103_KBL_JP_502924_Soil_13CFlux_QE-139_HILIC_USHGX01163_POS_MSMS_GRE-MB-082_statoxic-12C-oxic-44-000_5_Rg70to1050-CE102040-64-S1_Run406.hdf5",
-      "was_generated_by": "nmdc:wfmb-00-7koo3nm8.1"
+      "was_generated_by": "nmdc:wfmb-11-x859ft41.1"
     },
     {
-      "id": "nmdc:dobj-00-rg9q8d47",
+      "id": "nmdc:dobj-11-3xz4kn91",
       "type": "nmdc:DataObject",
       "name": "20190103_KBL_JP_502924_Soil_13CFlux_QE-139_HILIC_USHGX01163_POS_MSMS_GRE-MB-082_statoxic-12C-oxic-44-000_5_Rg70to1050-CE102040-64-S1_Run406.mzML",
       "description": "LC-DDA-MS/MS raw data for metabolomics data acquisition.",
@@ -535,11 +591,11 @@
       "data_object_type": "LC-DDA-MS/MS Raw Data",
       "file_size_bytes": 62579224,
       "md5_checksum": "0c8c2e5ad0371be6bba4326e6a041a41",
-      "url": "https://massive.ucsd.edu/ProteoSAFe/DownloadResultFile?file=f.MSV000093271%2Fraw%2F20190103_KBL_JP_502924_Soil_13CFlux_QE-139_HILIC_USHGX01163%2Frawdata%2F20190103_KBL_JP_502924_Soil_13CFlux_QE-139_HILIC_USHGX01163_POS_MSMS_GRE-MB-082_statoxic-12C-oxic-44-000_5_Rg70to1050-CE102040-64-S1_Run406.mzML&forceDownload=true",
-      "was_generated_by": "nmdc:dgms-00-6q60nyf5"
+      "url": "https://nmdcdemo.emsl.pnnl.gov/metabolomics/pettridge_11_076c9980/raw/20190103_KBL_JP_502924_Soil_13CFlux_QE-139_HILIC_USHGX01163_POS_MSMS_GRE-MB-082_statoxic-12C-oxic-44-000_5_Rg70to1050-CE102040-64-S1_Run406.mzML",
+      "was_generated_by": "nmdc:dgms-11-xadhkb63"
     },
     {
-      "id": "nmdc:dobj-00-tgh2nu4t",
+      "id": "nmdc:dobj-11-94pfs124",
       "type": "nmdc:DataObject",
       "name": "20190103_KBL_JP_502924_Soil_13CFlux_QE-139_HILIC_USHGX01163_POS_MSMS_GRE-MB-176_flux8day-12C-oxic-44-000_4_Rg70to1050-CE102040-114-S1_Run357.toml",
       "description": "CoreMS parameters used for metabolomics workflow.",
@@ -548,10 +604,10 @@
       "file_size_bytes": 9300,
       "md5_checksum": "dd375d1d87fb5e45c8b2de21d8d5adaf",
       "url": "https://nmdcdemo.emsl.pnnl.gov/metabolomics/pettridge_11_076c9980/processed_20260219/20190103_KBL_JP_502924_Soil_13CFlux_QE-139_HILIC_USHGX01163_POS_MSMS_GRE-MB-176_flux8day-12C-oxic-44-000_4_Rg70to1050-CE102040-114-S1_Run357.corems/20190103_KBL_JP_502924_Soil_13CFlux_QE-139_HILIC_USHGX01163_POS_MSMS_GRE-MB-176_flux8day-12C-oxic-44-000_4_Rg70to1050-CE102040-114-S1_Run357.toml",
-      "was_generated_by": "nmdc:wfmb-00-adhobezc.1"
+      "was_generated_by": "nmdc:wfmb-11-49ykhz75.1"
     },
     {
-      "id": "nmdc:dobj-00-xldfv7xk",
+      "id": "nmdc:dobj-11-pnpz0s17",
       "type": "nmdc:DataObject",
       "name": "20190103_KBL_JP_502924_Soil_13CFlux_QE-139_HILIC_USHGX01163_POS_MSMS_GRE-MB-176_flux8day-12C-oxic-44-000_4_Rg70to1050-CE102040-114-S1_Run357.csv",
       "description": "Metabolite annotations as a result of a metabolomics workflow activity.",
@@ -560,10 +616,10 @@
       "file_size_bytes": 2367740,
       "md5_checksum": "560970db0c149209d1c2e65f3c3ab12c",
       "url": "https://nmdcdemo.emsl.pnnl.gov/metabolomics/pettridge_11_076c9980/processed_20260219/20190103_KBL_JP_502924_Soil_13CFlux_QE-139_HILIC_USHGX01163_POS_MSMS_GRE-MB-176_flux8day-12C-oxic-44-000_4_Rg70to1050-CE102040-114-S1_Run357.corems/20190103_KBL_JP_502924_Soil_13CFlux_QE-139_HILIC_USHGX01163_POS_MSMS_GRE-MB-176_flux8day-12C-oxic-44-000_4_Rg70to1050-CE102040-114-S1_Run357.csv",
-      "was_generated_by": "nmdc:wfmb-00-adhobezc.1"
+      "was_generated_by": "nmdc:wfmb-11-49ykhz75.1"
     },
     {
-      "id": "nmdc:dobj-00-xfpet8tq",
+      "id": "nmdc:dobj-11-dq1yd983",
       "type": "nmdc:DataObject",
       "name": "20190103_KBL_JP_502924_Soil_13CFlux_QE-139_HILIC_USHGX01163_POS_MSMS_GRE-MB-176_flux8day-12C-oxic-44-000_4_Rg70to1050-CE102040-114-S1_Run357.hdf5",
       "description": "CoreMS hdf5 file representing a metabolomics data file including annotations.",
@@ -572,10 +628,10 @@
       "file_size_bytes": 226956816,
       "md5_checksum": "45e6078889bc6994f23dd5102209e94d",
       "url": "https://nmdcdemo.emsl.pnnl.gov/metabolomics/pettridge_11_076c9980/processed_20260219/20190103_KBL_JP_502924_Soil_13CFlux_QE-139_HILIC_USHGX01163_POS_MSMS_GRE-MB-176_flux8day-12C-oxic-44-000_4_Rg70to1050-CE102040-114-S1_Run357.corems/20190103_KBL_JP_502924_Soil_13CFlux_QE-139_HILIC_USHGX01163_POS_MSMS_GRE-MB-176_flux8day-12C-oxic-44-000_4_Rg70to1050-CE102040-114-S1_Run357.hdf5",
-      "was_generated_by": "nmdc:wfmb-00-adhobezc.1"
+      "was_generated_by": "nmdc:wfmb-11-49ykhz75.1"
     },
     {
-      "id": "nmdc:dobj-00-04ajppxl",
+      "id": "nmdc:dobj-11-w2q2pq34",
       "type": "nmdc:DataObject",
       "name": "20190103_KBL_JP_502924_Soil_13CFlux_QE-139_HILIC_USHGX01163_POS_MSMS_GRE-MB-176_flux8day-12C-oxic-44-000_4_Rg70to1050-CE102040-114-S1_Run357.mzML",
       "description": "LC-DDA-MS/MS raw data for metabolomics data acquisition.",
@@ -583,30 +639,30 @@
       "data_object_type": "LC-DDA-MS/MS Raw Data",
       "file_size_bytes": 64428717,
       "md5_checksum": "10aab5ed301b4cac34420a078478d528",
-      "url": "https://massive.ucsd.edu/ProteoSAFe/DownloadResultFile?file=f.MSV000093271%2Fraw%2F20190103_KBL_JP_502924_Soil_13CFlux_QE-139_HILIC_USHGX01163%2Frawdata%2F20190103_KBL_JP_502924_Soil_13CFlux_QE-139_HILIC_USHGX01163_POS_MSMS_GRE-MB-176_flux8day-12C-oxic-44-000_4_Rg70to1050-CE102040-114-S1_Run357.mzML&forceDownload=true",
-      "was_generated_by": "nmdc:dgms-00-3h2icpm8"
+      "url": "https://nmdcdemo.emsl.pnnl.gov/metabolomics/pettridge_11_076c9980/raw/20190103_KBL_JP_502924_Soil_13CFlux_QE-139_HILIC_USHGX01163_POS_MSMS_GRE-MB-176_flux8day-12C-oxic-44-000_4_Rg70to1050-CE102040-114-S1_Run357.mzML",
+      "was_generated_by": "nmdc:dgms-11-cx353v86"
     }
   ],
   "workflow_execution_set": [
     {
-      "id": "nmdc:wfmb-00-p2gxvna8.1",
+      "id": "nmdc:wfmb-11-94f83b49.1",
       "type": "nmdc:MetabolomicsAnalysis",
       "name": "Metabolomics analysis for 20190103_KBL_JP_502924_Soil_13CFlux_QE-139_HILIC_USHGX01163_POS_MSMS_GRE-MB-111_statanox-12C-anox-44-000_5_Rg70to1050-CE102040-84-S1_Run392.mzML",
       "description": "Analysis of raw mass spectrometry data for the annotation of metabolites.",
       "has_input": [
-        "nmdc:dobj-00-cbe36ww4",
-        "nmdc:dobj-00-sk7mlaii",
+        "nmdc:dobj-11-5d84yh45",
+        "nmdc:dobj-11-xs6ceg11",
         "nmdc:dobj-11-7kab3m51"
       ],
       "has_output": [
-        "nmdc:dobj-00-yeyvs6hj",
-        "nmdc:dobj-00-swbk8ql7"
+        "nmdc:dobj-11-kmmyz371",
+        "nmdc:dobj-11-75t64k41"
       ],
       "processing_institution": "NMDC",
       "git_url": "https://github.com/microbiomedata/metaMS/blob/master/wdl/metaMS_lcms_metabolomics.wdl",
       "started_at_time": "2026-03-20 13:44:39",
       "was_informed_by": [
-        "nmdc:dgms-00-wdwem2n8"
+        "nmdc:dgms-11-6z8pvh09"
       ],
       "ended_at_time": "2026-03-20 13:44:39",
       "version": "1.1.1",
@@ -1241,24 +1297,24 @@
       ]
     },
     {
-      "id": "nmdc:wfmb-00-06zcqjkv.1",
+      "id": "nmdc:wfmb-11-gj5g8g30.1",
       "type": "nmdc:MetabolomicsAnalysis",
       "name": "Metabolomics analysis for 20190103_KBL_JP_502924_Soil_13CFlux_QE-139_HILIC_USHGX01163_POS_MSMS_GRE-MB-178_flux8day-12C-oxic-44-000_5_Rg70to1050-CE102040-116-S1_Run400.mzML",
       "description": "Analysis of raw mass spectrometry data for the annotation of metabolites.",
       "has_input": [
-        "nmdc:dobj-00-qkcwuo05",
-        "nmdc:dobj-00-zh7sencn",
+        "nmdc:dobj-11-tj6sn105",
+        "nmdc:dobj-11-rqvqtj54",
         "nmdc:dobj-11-7kab3m51"
       ],
       "has_output": [
-        "nmdc:dobj-00-i9gp345k",
-        "nmdc:dobj-00-mbof981r"
+        "nmdc:dobj-11-4v8g1096",
+        "nmdc:dobj-11-s50bzs78"
       ],
       "processing_institution": "NMDC",
       "git_url": "https://github.com/microbiomedata/metaMS/blob/master/wdl/metaMS_lcms_metabolomics.wdl",
       "started_at_time": "2026-03-20 13:44:42",
       "was_informed_by": [
-        "nmdc:dgms-00-4xv0sxs8"
+        "nmdc:dgms-11-rvvjdb24"
       ],
       "ended_at_time": "2026-03-20 13:44:42",
       "version": "1.1.1",
@@ -1955,24 +2011,24 @@
       ]
     },
     {
-      "id": "nmdc:wfmb-00-k15hxf71.1",
+      "id": "nmdc:wfmb-11-7a18y106.1",
       "type": "nmdc:MetabolomicsAnalysis",
       "name": "Metabolomics analysis for 20190103_KBL_JP_502924_Soil_13CFlux_QE-139_HILIC_USHGX01163_POS_MSMS_GRE-MB-170_flux4day-12C-oxic-44-000_4_Rg70to1050-CE102040-108-S1_Run374.mzML",
       "description": "Analysis of raw mass spectrometry data for the annotation of metabolites.",
       "has_input": [
-        "nmdc:dobj-00-thlf2h2w",
-        "nmdc:dobj-00-uvrlj5tm",
+        "nmdc:dobj-11-8687an59",
+        "nmdc:dobj-11-z75pj762",
         "nmdc:dobj-11-7kab3m51"
       ],
       "has_output": [
-        "nmdc:dobj-00-wvurc9vt",
-        "nmdc:dobj-00-4kiygydv"
+        "nmdc:dobj-11-13xf3v78",
+        "nmdc:dobj-11-czx7k645"
       ],
       "processing_institution": "NMDC",
       "git_url": "https://github.com/microbiomedata/metaMS/blob/master/wdl/metaMS_lcms_metabolomics.wdl",
       "started_at_time": "2026-03-20 13:43:54",
       "was_informed_by": [
-        "nmdc:dgms-00-qzoy0non"
+        "nmdc:dgms-11-2mf05t02"
       ],
       "ended_at_time": "2026-03-20 13:43:54",
       "version": "1.1.1",
@@ -2711,24 +2767,24 @@
       ]
     },
     {
-      "id": "nmdc:wfmb-00-nov5atp0.1",
+      "id": "nmdc:wfmb-11-ybseym05.1",
       "type": "nmdc:MetabolomicsAnalysis",
       "name": "Metabolomics analysis for 20190103_KBL_JP_502924_Soil_13CFlux_QE-139_HILIC_USHGX01163_POS_MSMS_GRE-MB-080_statoxic-12C-oxic-44-000_4_Rg70to1050-CE102040-62-S1_Run377.mzML",
       "description": "Analysis of raw mass spectrometry data for the annotation of metabolites.",
       "has_input": [
-        "nmdc:dobj-00-ehgs8qu4",
-        "nmdc:dobj-00-fvkjag55",
+        "nmdc:dobj-11-8hsxr881",
+        "nmdc:dobj-11-3ca2gb02",
         "nmdc:dobj-11-7kab3m51"
       ],
       "has_output": [
-        "nmdc:dobj-00-7dnbvlzu",
-        "nmdc:dobj-00-lb63tz91"
+        "nmdc:dobj-11-9pbw1s08",
+        "nmdc:dobj-11-c6572k16"
       ],
       "processing_institution": "NMDC",
       "git_url": "https://github.com/microbiomedata/metaMS/blob/master/wdl/metaMS_lcms_metabolomics.wdl",
       "started_at_time": "2026-03-20 13:44:39",
       "was_informed_by": [
-        "nmdc:dgms-00-i08n31s0"
+        "nmdc:dgms-11-azv65479"
       ],
       "ended_at_time": "2026-03-20 13:44:39",
       "version": "1.1.1",
@@ -3342,24 +3398,24 @@
       ]
     },
     {
-      "id": "nmdc:wfmb-00-fhjhqes5.1",
+      "id": "nmdc:wfmb-11-djd16p41.1",
       "type": "nmdc:MetabolomicsAnalysis",
       "name": "Metabolomics analysis for 20190103_KBL_JP_502924_Soil_13CFlux_QE-139_HILIC_USHGX01163_POS_MSMS_GRE-MB-172_flux4day-12C-oxic-44-000_5_Rg70to1050-CE102040-110-S1_Run403.mzML",
       "description": "Analysis of raw mass spectrometry data for the annotation of metabolites.",
       "has_input": [
-        "nmdc:dobj-00-w4lnws65",
-        "nmdc:dobj-00-hyyzu27q",
+        "nmdc:dobj-11-j3npdb30",
+        "nmdc:dobj-11-bar8nm42",
         "nmdc:dobj-11-7kab3m51"
       ],
       "has_output": [
-        "nmdc:dobj-00-v6h0xux3",
-        "nmdc:dobj-00-7zs3hqjq"
+        "nmdc:dobj-11-2prp1k09",
+        "nmdc:dobj-11-ynwtn131"
       ],
       "processing_institution": "NMDC",
       "git_url": "https://github.com/microbiomedata/metaMS/blob/master/wdl/metaMS_lcms_metabolomics.wdl",
       "started_at_time": "2026-03-20 13:44:39",
       "was_informed_by": [
-        "nmdc:dgms-00-06yc9n6o"
+        "nmdc:dgms-11-6wftxd98"
       ],
       "ended_at_time": "2026-03-20 13:44:39",
       "version": "1.1.1",
@@ -4025,24 +4081,24 @@
       ]
     },
     {
-      "id": "nmdc:wfmb-00-2xd81632.1",
+      "id": "nmdc:wfmb-11-fp6he771.1",
       "type": "nmdc:MetabolomicsAnalysis",
       "name": "Metabolomics analysis for 20190103_KBL_JP_502924_Soil_13CFlux_QE-139_HILIC_USHGX01163_POS_MSMS_GRE-MB-108_statanox-12C-anox-44-000_4_Rg70to1050-CE102040-81-S1_Run366.mzML",
       "description": "Analysis of raw mass spectrometry data for the annotation of metabolites.",
       "has_input": [
-        "nmdc:dobj-00-tz8949gt",
-        "nmdc:dobj-00-hgrggii7",
+        "nmdc:dobj-11-wp8sqk98",
+        "nmdc:dobj-11-p12p2r81",
         "nmdc:dobj-11-7kab3m51"
       ],
       "has_output": [
-        "nmdc:dobj-00-lm3zssgh",
-        "nmdc:dobj-00-g6duhnxr"
+        "nmdc:dobj-11-z0h7h667",
+        "nmdc:dobj-11-dnjb1x66"
       ],
       "processing_institution": "NMDC",
       "git_url": "https://github.com/microbiomedata/metaMS/blob/master/wdl/metaMS_lcms_metabolomics.wdl",
       "started_at_time": "2026-03-20 13:47:15",
       "was_informed_by": [
-        "nmdc:dgms-00-q4iz6kjm"
+        "nmdc:dgms-11-yg5rp080"
       ],
       "ended_at_time": "2026-03-20 13:47:15",
       "version": "1.1.1",
@@ -4675,24 +4731,24 @@
       ]
     },
     {
-      "id": "nmdc:wfmb-00-7koo3nm8.1",
+      "id": "nmdc:wfmb-11-x859ft41.1",
       "type": "nmdc:MetabolomicsAnalysis",
       "name": "Metabolomics analysis for 20190103_KBL_JP_502924_Soil_13CFlux_QE-139_HILIC_USHGX01163_POS_MSMS_GRE-MB-082_statoxic-12C-oxic-44-000_5_Rg70to1050-CE102040-64-S1_Run406.mzML",
       "description": "Analysis of raw mass spectrometry data for the annotation of metabolites.",
       "has_input": [
-        "nmdc:dobj-00-40ej56fu",
-        "nmdc:dobj-00-rg9q8d47",
+        "nmdc:dobj-11-0286a696",
+        "nmdc:dobj-11-3xz4kn91",
         "nmdc:dobj-11-7kab3m51"
       ],
       "has_output": [
-        "nmdc:dobj-00-1baymjas",
-        "nmdc:dobj-00-vig29uk3"
+        "nmdc:dobj-11-a1ccz815",
+        "nmdc:dobj-11-6a0zps20"
       ],
       "processing_institution": "NMDC",
       "git_url": "https://github.com/microbiomedata/metaMS/blob/master/wdl/metaMS_lcms_metabolomics.wdl",
       "started_at_time": "2026-03-20 13:47:49",
       "was_informed_by": [
-        "nmdc:dgms-00-6q60nyf5"
+        "nmdc:dgms-11-xadhkb63"
       ],
       "ended_at_time": "2026-03-20 13:47:49",
       "version": "1.1.1",
@@ -5359,24 +5415,24 @@
       ]
     },
     {
-      "id": "nmdc:wfmb-00-adhobezc.1",
+      "id": "nmdc:wfmb-11-49ykhz75.1",
       "type": "nmdc:MetabolomicsAnalysis",
       "name": "Metabolomics analysis for 20190103_KBL_JP_502924_Soil_13CFlux_QE-139_HILIC_USHGX01163_POS_MSMS_GRE-MB-176_flux8day-12C-oxic-44-000_4_Rg70to1050-CE102040-114-S1_Run357.mzML",
       "description": "Analysis of raw mass spectrometry data for the annotation of metabolites.",
       "has_input": [
-        "nmdc:dobj-00-tgh2nu4t",
-        "nmdc:dobj-00-04ajppxl",
+        "nmdc:dobj-11-94pfs124",
+        "nmdc:dobj-11-w2q2pq34",
         "nmdc:dobj-11-7kab3m51"
       ],
       "has_output": [
-        "nmdc:dobj-00-xfpet8tq",
-        "nmdc:dobj-00-xldfv7xk"
+        "nmdc:dobj-11-dq1yd983",
+        "nmdc:dobj-11-pnpz0s17"
       ],
       "processing_institution": "NMDC",
       "git_url": "https://github.com/microbiomedata/metaMS/blob/master/wdl/metaMS_lcms_metabolomics.wdl",
       "started_at_time": "2026-03-20 13:47:54",
       "was_informed_by": [
-        "nmdc:dgms-00-3h2icpm8"
+        "nmdc:dgms-11-cx353v86"
       ],
       "ended_at_time": "2026-03-20 13:47:54",
       "version": "1.1.1",
