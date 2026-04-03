@@ -16,6 +16,7 @@ import os
 import json
 import logging
 import pandas as pd
+import requests
 from pathlib import Path
 from minio import Minio
 from typing import Dict, List, Optional
@@ -358,6 +359,32 @@ class NMDCWorkflowManager(
             "minio_enabled": self.minio_client is not None,
         }
         return info
+    
+    def gather_protocol_materials(submission_id:str) -> Dict:
+        """
+        Gather materials information from the protocol description.
+
+        This method parses the protocol description to extract information about
+        the materials used in the protocol, such as biosamples, reagents, and
+        other inputs. The extracted information is structured in a dictionary format
+        that can be used for further processing, such as generating YAML outlines
+        or mapping biosamples to raw files.
+
+        Returns:
+            A dictionary containing structured information about the materials used in the protocol.
+        """
+        # get the server bearer token
+        server_url = os.getenv("SERVER_API_URL")
+        refresh_token = os.getenv("SERVER_REFRESH_TOKEN")
+        # get the bearer token by calling the server API
+        requests.get(f"{server_url}/auth/refresh", headers={"Authorization": f"Bearer {refresh_token}"})
+        # call the submission portal API to get protocol description and materials info
+        response = requests.get(f"{server_url}/api/metadata_submission/{submission_id}", headers={"Authorization": f"Bearer {refresh_token}"})
+        if response.status_code != 200:
+            raise Exception(f"Failed to get protocol information from server API: {response.status_code} - {response.text}")
+        protocol_info = response.json()
+        # TODO: parse protocol info
+        return protocol_info
     
     async def generate_material_processing_yaml(self) -> str:
         """
