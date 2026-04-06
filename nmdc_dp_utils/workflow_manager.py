@@ -373,8 +373,62 @@ class NMDCWorkflowManager(
         Returns:
             A dictionary containing structured information about the materials used in the protocol.
         """
+        def get_submission_fields(submission_object: dict) -> dict:
+            """
+            Extract relevant fields from the submission object.
+            multiOmicsForm.dataGenerated (is there even data for us to work with yet?)
+            multiOmicsForm.omicsProcessingTypes
+            multiOmicsForm.mpProtocols, .mbProtocols, .lipProtocols, .nomProtocols
+            sampleData (which samples had which processing types, so we can figure out numbers of DataGenerations per biosample)
+
+            Parameters:
+                submission_object: Raw submission object containing NMDC metadata fields.
+            Returns:
+                A dict with the extracted fields.
+            """
+            metadata_submission = submission_object.get("metadata_submission", {})
+            study_form = metadata_submission.get("studyForm", {})
+            multiomics_form = metadata_submission.get("multiOmicsForm", {})
+
+            # study form fields
+            description = study_form.get("description", None)
+            notes = study_form.get("notes", None)
+
+            # get all protocol DOIs, descriptions, names from the multiomics form
+            # go from multiomics form-protocol->externalprotocol->doi, description, name
+            protocol_dois = []
+            protocol_descs = []
+            protocol_names = []
+            for protocol_section in [
+                "mpProtocols",
+                "mbProtocols",
+                "mbGcProtocols",
+                "lipProtocols",
+                "nomProtocols",
+                "nomLcProtocols",
+            ]:
+                protocols = multiomics_form.get(protocol_section) or {}
+                for protocol in protocols.values():
+                    if protocol and isinstance(protocol, dict):
+                        doi = protocol.get("doi")
+                        desc = protocol.get("description")
+                        name = protocol.get("name")
+                        if isinstance(doi, str) and doi.strip():
+                            protocol_dois.append({"value": doi.strip(), "provider": None})
+                        if isinstance(desc, str) and desc.strip():
+                            protocol_descs.append(desc.strip())
+                        if isinstance(name, str) and name.strip():
+                            protocol_names.append(name.strip())
+
+            return {
+                "description": description,
+                "notes": notes,
+                "protocol_descs": protocol_descs,
+                "protocol_names": protocol_names,
+            }
+
         # get the server bearer token
-        server_url = os.getenv("SERVER_API_URL")
+        server_url = os.getenv("SERVER_API_URL", "https://data.microbiomedata.org")
         refresh_token = os.getenv("SERVER_REFRESH_TOKEN")
         # get the bearer token by calling the server API
         requests.get(f"{server_url}/auth/refresh", headers={"Authorization": f"Bearer {refresh_token}"})
@@ -382,8 +436,7 @@ class NMDCWorkflowManager(
         response = requests.get(f"{server_url}/api/metadata_submission/{submission_id}", headers={"Authorization": f"Bearer {refresh_token}"})
         if response.status_code != 200:
             raise Exception(f"Failed to get protocol information from server API: {response.status_code} - {response.text}")
-        protocol_info = response.json()
-        # TODO: parse protocol info
+        protocol_info = get_submission_fields(protocol_info)
         return protocol_info
     
     async def generate_material_processing_yaml(self) -> str:
