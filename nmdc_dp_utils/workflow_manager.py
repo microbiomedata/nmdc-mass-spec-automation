@@ -360,7 +360,7 @@ class NMDCWorkflowManager(
         }
         return info
     
-    def gather_protocol_materials(submission_id:str) -> Dict:
+    def gather_protocol_materials(self, submission_id:str) -> Dict:
         """
         Gather materials information from the protocol description.
 
@@ -394,11 +394,8 @@ class NMDCWorkflowManager(
             description = study_form.get("description", None)
             notes = study_form.get("notes", None)
 
-            # get all protocol DOIs, descriptions, names from the multiomics form
-            # go from multiomics form-protocol->externalprotocol->doi, description, name
-            protocol_dois = []
-            protocol_descs = []
-            protocol_names = []
+            # get protocol descriptions, names from the multiomics form
+            protocol_mapping = {} 
             for protocol_section in [
                 "mpProtocols",
                 "mbProtocols",
@@ -406,25 +403,21 @@ class NMDCWorkflowManager(
                 "lipProtocols",
                 "nomProtocols",
                 "nomLcProtocols",
-            ]:
+            ]:  # TODO get the protocol link
                 protocols = multiomics_form.get(protocol_section) or {}
                 for protocol in protocols.values():
                     if protocol and isinstance(protocol, dict):
-                        doi = protocol.get("doi")
-                        desc = protocol.get("description")
-                        name = protocol.get("name")
-                        if isinstance(doi, str) and doi.strip():
-                            protocol_dois.append({"value": doi.strip(), "provider": None})
-                        if isinstance(desc, str) and desc.strip():
-                            protocol_descs.append(desc.strip())
-                        if isinstance(name, str) and name.strip():
-                            protocol_names.append(name.strip())
-
+                        protocol_mapping[protocol_section] = {
+                            "doi": protocol.get("doi"),
+                            "description": protocol.get("description"),
+                            "name": protocol.get("name"),
+                            "link": protocol.get("link")
+                        }
+    
             return {
                 "description": description,
                 "notes": notes,
-                "protocol_descs": protocol_descs,
-                "protocol_names": protocol_names,
+                "protocol_mapping": protocol_mapping,
             }
 
         # get the server bearer token
@@ -436,7 +429,11 @@ class NMDCWorkflowManager(
         response = requests.get(f"{server_url}/api/metadata_submission/{submission_id}", headers={"Authorization": f"Bearer {refresh_token}"})
         if response.status_code != 200:
             raise Exception(f"Failed to get protocol information from server API: {response.status_code} - {response.text}")
-        protocol_info = get_submission_fields(protocol_info)
+        protocol_info = get_submission_fields(response.json())
+
+        with open(self.workflow_path / "protocol_info" / "protocol_description.json", "w") as f:
+            json.dump(protocol_info, f, indent=4)
+
         return protocol_info
     
     async def generate_material_processing_yaml(self) -> str:
@@ -460,3 +457,5 @@ class NMDCWorkflowManager(
         # set skip trigger
         self.set_skip_trigger("protocol_outline_created", True)
         return outline
+
+# eeb5fc42-47f5-4a4a-bb95-dfe06837e8a6
