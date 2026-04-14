@@ -61,6 +61,9 @@ WORKFLOW_DICT = {
         "metadata_generator_class": GCMSMetabolomicsMetadataGenerator,
         "raw_data_inspector": "gcms_data_inspector",
     },
+    "FTICR NOM": {
+        
+    }
 }
 
 # Load environment variables from .env file
@@ -977,6 +980,9 @@ class WorkflowDataMovementManager:
                 except Exception as e:
                     self.logger.error(f"Failed to copy {csv_file.name}: {e}")
 
+        elif workflow_type=="FTICR NOM":
+            asdf
+
         if moved_count > 0:
             # Report total processed files in destination
             total_corems = len(list(processed_path.glob("*.corems")))
@@ -1143,6 +1149,9 @@ class NMDCWorkflowDataProcessManager:
                         "raw_file_name"
                     ].tolist()
                 )
+        
+        if workflow_type == "FTICR NOM":
+            asdf
 
         if processed_data_dir:
             processed_path = Path(processed_data_dir)
@@ -1253,10 +1262,11 @@ class NMDCWorkflowDataProcessManager:
                 self.logger.debug(f"  ... and {len(filtered_files) - sample_size} more")
 
             # Split files into batches
-            batches = [
-                filtered_files[i : i + batch_size]
-                for i in range(0, len(filtered_files), batch_size)
-            ]
+            if workflow_type != "FTICR NOM":
+                batches = [
+                    filtered_files[i : i + batch_size]
+                    for i in range(0, len(filtered_files), batch_size)
+                ]
 
             # Get the workflow type
             for batch_num, batch_files in enumerate(batches, 1):
@@ -1512,6 +1522,12 @@ class NMDCWorkflowDataProcessManager:
             # Generate single WDL JSON (batch size not exceeded)
             create_wdl_json(sample_file_paths, batch_num)
             return 1
+
+    def _generate_nom_wdl(
+        self, config: dict, batch_files: List[Path], batch_num: int
+    ) -> int:
+        """
+        """
 
     @skip_if_complete("data_processed", return_value=True)
     def generate_wdl_runner_script(self, script_name: Optional[str] = None) -> bool:

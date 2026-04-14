@@ -1,0 +1,165 @@
+{
+    "study": {
+        "name": "miesel_11_8bjf2432",
+        "id": "nmdc:sty-11-8bjf2432",
+        "description": "Example NMDC metabolomics study configuration demonstrating metadata override patterns"
+    },
+    "workflow": {
+        "name": "miesel_11_8bjf2432_nom",
+        "massive_id": "",
+        "file_type": ".d",
+        "file_filters": ["pos", "neg", "hilic", "rp"],
+        "processed_data_date_tag": "20251111",
+        "workflow_type": "NOM",
+        "batch_size": 25
+    },
+    "paths": {
+        "base_directory": "/path/to/base/directory",
+        "data_directory": "/path/to/data"
+    },
+    "docker": {
+        "raw_data_inspector_image": "microbiomedata/metams:3.3.3"
+    },
+    "minio": {
+        "endpoint": "admin.nmdcdemo.emsl.pnl.gov",
+        "secure": true,
+        "bucket": "nom",
+        "enabled": true,
+        "processed_data_folder": ""
+    },
+    "configurations": [
+        {
+            "name": "hilic_pos",
+            "file_filter": ["hilic", "pos"],
+            "corems_toml": "/path/to/hilic_pos_corems.toml",
+            "reference_db": "/path/to/database.msp",
+            "scan_translator": "/path/to/scan_translator.toml",
+            "cores": 5,
+            "chromat_configuration_name": "HILIC",
+            "mass_spec_configuration_name": "ESI Orbitrap MS/MS Positive",
+            "metadata_overrides": {
+                "mass_spec_configuration_name": {
+                    "CE102040": "JGI/LBNL Standard Metabolomics Method, positive @10,20,40CE",
+                    "CE205060": "JGI/LBNL Standard Metabolomics Method, positive @20,50,60CE"
+                }
+            }
+        },
+        {
+            "name": "hilic_neg",
+            "file_filter": ["hilic", "neg"],
+            "corems_toml": "/path/to/hilic_neg_corems.toml",
+            "reference_db": "/path/to/database.msp",
+            "scan_translator": "/path/to/scan_translator.toml",
+            "cores": 5,
+            "chromat_configuration_name": "HILIC",
+            "mass_spec_configuration_name": "ESI Orbitrap MS/MS Negative",
+            "metadata_overrides": {
+                "mass_spec_configuration_name": {
+                    "CE102040": "JGI/LBNL Standard Metabolomics Method, negative @10,20,40CE",
+                    "CE205060": "JGI/LBNL Standard Metabolomics Method, negative @20,50,60CE"
+                }
+            }
+        },
+        {
+            "name": "rp_pos",
+            "file_filter": ["rp", "pos"],
+            "corems_toml": "/path/to/rp_pos_corems.toml", 
+            "reference_db": "/path/to/database.msp",
+            "scan_translator": "/path/to/scan_translator.toml",
+            "cores": 5,
+            "chromat_configuration_name": "C18",
+            "mass_spec_configuration_name": "ESI Orbitrap MS/MS Positive",
+            "metadata_overrides": {
+                "mass_spec_configuration_name": {
+                    "CE102040": "JGI/LBNL Standard Metabolomics Method, positive @10,20,40CE",
+                    "CE205060": "JGI/LBNL Standard Metabolomics Method, positive @20,50,60CE"
+                }
+            }
+        },
+        {
+            "name": "multi_instrument_example",
+            "file_filter": ["multi"],
+            "corems_toml": "/path/to/multi_corems.toml",
+            "reference_db": "/path/to/database.msp",
+            "scan_translator": "/path/to/scan_translator.toml",
+            "cores": 5,
+            "instrument_used": "Default Instrument",
+            "chromat_configuration_name": "Default Chromatography",
+            "mass_spec_configuration_name": "Default Mass Spec",
+            "metadata_overrides": {
+                "instrument_used": {
+                    "QE_HF": "Q Exactive HF Orbitrap",
+                    "IDX": "Thermo Orbitrap IQ-X Tribrid",
+                    "QTOF": "Agilent Q-TOF"
+                },
+                "chromat_configuration_name": {
+                    "_HILIC_": "JGI/LBNL Metabolomics Standard LC Method - Polar HILIC-Z",
+                    "_C18_": "JGI/LBNL Metabolomics Standard LC Method - Nonpolar C18",
+                    "_PFPP_": "JGI/LBNL Metabolomics Standard LC Method - PFPP"
+                },
+                "mass_spec_configuration_name": {
+                    "CE102040_POS": "JGI/LBNL Standard Metabolomics Method, positive @10,20,40CE",
+                    "CE102040_NEG": "JGI/LBNL Standard Metabolomics Method, negative @10,20,40CE",
+                    "CE205060_POS": "JGI/LBNL Standard Metabolomics Method, positive @20,50,60CE",
+                    "CE205060_NEG": "JGI/LBNL Standard Metabolomics Method, negative @20,50,60CE"
+                }
+            }
+        },
+        {
+            "name": "soil_microbiome_example",
+            "file_filter": ["soil"],
+            "corems_toml": "/path/to/soil_corems.toml",
+            "reference_db": "/path/to/database.msp",
+            "scan_translator": "/path/to/scan_translator.toml",
+            "cores": 5,
+            "chromat_configuration_name": "C18",
+            "mass_spec_configuration_name": "ESI Orbitrap MS/MS",
+            "sample_type": "Unknown",
+            "processing_method": "Standard",
+            "extraction_method": "Default",
+            "metadata_overrides": {
+                "sample_type": {
+                    "bulk_soil": "Bulk Soil",
+                    "rhizosphere": "Rhizosphere Soil", 
+                    "root_endo": "Root Endosphere",
+                    "leaf_endo": "Leaf Endosphere"
+                },
+                "processing_method": {
+                    "freeze_dry": "Freeze Drying Protocol",
+                    "air_dry": "Air Drying Protocol",
+                    "fresh_proc": "Fresh Sample Processing"
+                },
+                "extraction_method": {
+                    "methanol_ext": "Methanol-Water Extraction",
+                    "chloroform_ext": "Chloroform-Methanol Extraction",
+                    "solid_phase": "Solid Phase Extraction"
+                }
+            }
+        }
+    ],
+    "metadata": {
+        "instrument_used": "Instrument Model Name",
+        "processing_institution_workflow": "Institution Name",
+        "processing_institution_generation": "Institution Name",
+        "chromat_configuration_name": "Chromatography Method",
+        "mass_spec_configuration_name": "Mass Spec Configuration",
+        "use_massive_urls": true,
+        "serial_numbers_to_remove": ["Unknown", "Generic Serial"]
+    },
+    "skip_triggers": {
+        "study_structure_created": false,
+        "raw_data_downloaded": false,
+        "protocol_outline_created": false,
+        "biosample_attributes_fetched": false,
+        "biosample_mapping_script_generated": false,
+        "biosample_mapping_completed": false,
+        "raw_data_inspected": false,
+        "material_processing_metadata_generated": false,
+        "metadata_mapping_generated": false,
+        "data_processed": false,
+        "processed_data_uploaded_to_minio": false,
+        "metadata_packages_generated": false,
+        "metadata_submitted_dev": false,
+        "metadata_submitted_prod": false
+    }
+}
