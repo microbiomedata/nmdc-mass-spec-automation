@@ -18,8 +18,11 @@ import logging
 import pandas as pd
 import requests
 from pathlib import Path
+from dotenv import load_dotenv
 from minio import Minio
 from typing import Dict, List, Optional
+
+load_dotenv()
 
 from nmdc_dp_utils.workflow_manager_mixins import (
     skip_if_complete,
@@ -423,10 +426,19 @@ class NMDCWorkflowManager(
         # get the server bearer token
         server_url = os.getenv("SERVER_API_URL", "https://data.microbiomedata.org")
         refresh_token = os.getenv("SERVER_REFRESH_TOKEN")
+
         # get the bearer token by calling the server API
-        requests.get(f"{server_url}/auth/refresh", headers={"Authorization": f"Bearer {refresh_token}"})
+        response = requests.post(
+            f"{server_url}/auth/refresh",
+            headers={"content-type": "application/json"},
+            json={"refresh_token": refresh_token}
+        )
+        if response.status_code != 200:
+            raise Exception(f"Failed to refresh access token from server API: {response.status_code} - {response.text}")
+        access_token = response.json().get("access_token")
+
         # call the submission portal API to get protocol description and materials info
-        response = requests.get(f"{server_url}/api/metadata_submission/{submission_id}", headers={"Authorization": f"Bearer {refresh_token}"})
+        response = requests.get(f"{server_url}/api/metadata_submission/{submission_id}", headers={"Authorization": f"Bearer {access_token}"})
         if response.status_code != 200:
             raise Exception(f"Failed to get protocol information from server API: {response.status_code} - {response.text}")
         protocol_info = get_submission_fields(response.json())
