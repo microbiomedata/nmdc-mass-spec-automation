@@ -1,7 +1,9 @@
 venv/
+.venv/
 .vscode/
 .DS_Store
 *.hdf5
+*.log
 
 __pycache__/
 .env
