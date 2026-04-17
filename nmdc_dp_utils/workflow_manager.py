@@ -469,5 +469,3 @@ class NMDCWorkflowManager(
         # set skip trigger
         self.set_skip_trigger("protocol_outline_created", True)
         return outline
-
-# eeb5fc42-47f5-4a4a-bb95-dfe06837e8a6
