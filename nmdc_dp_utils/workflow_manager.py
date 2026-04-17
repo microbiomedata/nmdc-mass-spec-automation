@@ -423,11 +423,11 @@ class NMDCWorkflowManager(
                 "protocol_mapping": protocol_mapping,
             }
 
-        # get the server bearer token
+        # get the refresh token from env
         server_url = os.getenv("SERVER_API_URL", "https://data.microbiomedata.org")
         refresh_token = os.getenv("SERVER_REFRESH_TOKEN")
 
-        # get the bearer token by calling the server API
+        # get the bearer token by calling the server API, using the refresh token
         response = requests.post(
             f"{server_url}/auth/refresh",
             headers={"content-type": "application/json"},
