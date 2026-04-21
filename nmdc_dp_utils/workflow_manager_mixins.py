@@ -20,6 +20,7 @@ from nmdc_dp_utils.llm.llm_conversation_manager import ConversationManager
 from nmdc_dp_utils.llm.llm_client import LLMClient
 
 # Import workflow mapping defined in workflow_manager (defined before mixins import)
+from nmdc_ms_metadata_gen.metadata_generator import NMDCMetadataGenerator
 from nmdc_ms_metadata_gen.lcms_metab_metadata_generator import (
     LCMSMetabolomicsMetadataGenerator,
 )
@@ -3654,8 +3655,6 @@ class WorkflowMetadataManager:
         self.logger.info("Adding associated_studies to metadata CSV files...")
 
         try:
-            from nmdc_api_utilities.nmdc_search import NMDCSearch
-
             # Get the input directory
             input_dir = self.workflow_path / "metadata" / "metadata_gen_input_csvs"
             if not input_dir.exists():
@@ -3670,8 +3669,6 @@ class WorkflowMetadataManager:
             updated_count = 0
             total_rows_updated = 0
 
-            # Initialize NMDC search client in the production database
-            search_obj = NMDCSearch()
 
             for csv_file in csv_files:
                 # Read the CSV
@@ -3699,9 +3696,8 @@ class WorkflowMetadataManager:
                 # Call find_associated_ids to get the associated studies
                 # This returns a dict mapping sample_id -> list of study IDs
                 try:
-                    associations = search_obj.get_linked_instances_and_associate_ids(
-                        ids=sample_ids, types="nmdc:Study"
-                    )
+                    gen = NMDCMetadataGenerator()
+                    associations = gen.find_associated_studies(ids=sample_ids)
                 except Exception as e:
                     self.logger.error(f"Error finding associated studies: {e}")
                     return False
