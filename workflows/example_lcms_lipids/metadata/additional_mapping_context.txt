@@ -1,0 +1,12 @@
+Only map files with "MSMS" in the file name (all others are of a different sort of file)
+
+HILICZ will be for polar metabolites.  POS and NEG go to same processed sample.
+C18 will be associated with nonpolar metabolites. POS and NEG go to same processed sample.
+If a biosample is mapped, it should have 4 associated raw files (HILICZ POS, HILICZ NEG, C18 POS, C18 NEG)
+
+Files with "pilot" in name (like 20201023_JGI-AK_MK_506588_SoilWaterRep_pilot_QE-139_C18_USDAY59430_POS_MSMS_0_QC_Post_Rg80to1200-CE102040--QC_Run51.raw), these are from a pilot study. These should not match to any biosamples.
+
+The "hydrophilic" and "hydrophobic" titles in the names of the biosamples (describing the soil) should not be confused with the polar/nonpolar aspects of the extractants.
+
+Examples
+20210819_JGI-AK_MK_506588_SoilWaterRep_final_QE-139_HILICZ_USHXG01490_NEG_MSMS_14_S17-D45_B_Rg70to1050-CE205060-soil-S1_Run99.raw maps to S29_A_D45 hydrophilic

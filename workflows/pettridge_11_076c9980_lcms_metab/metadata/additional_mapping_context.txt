@@ -1,0 +1,12 @@
+Any raw data files with "13C" in the name (excluding the 13CFlux label that is more an indication of the study) should not map to a biosample.
+
+For example, the file /Volumes/LaCie/nmdc_data/pettridge_11_076c9980/raw/20190103_KBL_JP_502924_Soil_13CFlux_QE-139_HILIC_USHGX01163_POS_MSMS_GRE-MB-166_flux4day-13C-oxic-44-000_3_Rg70to1050-CE102040-104-S1_Run316.mzML should not match.
+
+IMPORTANT: There are NO calibrants in this mapping.  No match_confidence should be "calibrant". File names with "ExCtrl" are NOT calibrants.
+
+If the number after GRE-MB- does not match the number at the end of the biosample name, that is not a match.  Only report high matches, there should only be a few, one positive and one negative per biosample that is mapped.  The biosamples that have "GRE.SIPMG." should not map to any raw files.
+
+Here's some examples
+Raw data file
+20190103_KBL_JP_502924_Soil_13CFlux_QE-139_HILIC_USHGX01163_POS_MSMS_GRE-MB-176_flux8day-12C-oxic-44-000_4_Rg70to1050-CE102040-114-S1_Run357.mzML should map to the biosample with the name "Lab enrichment of tropical soil microbial communities from Luquillo Experimental Forest, Puerto Rico - flux8day.12C.oxic.44.000.176"
+

@@ -1,13 +1,14 @@
 """
 NMDC Study Management Utilities
 
-A comprehensive system for managing NMDC metabolomics studies, providing:
+A comprehensive system for managing NMDC mass spectrometry workflows, providing:
 - Automated discovery and download of datasets from MASSIVE
 - MinIO object storage integration for processed data
 - WDL workflow JSON generation for batch processing
 - Standardized directory structures and configuration management
 
-This module enables reproducible workflows across different NMDC studies
+This module enables reproducible workflows across different data processing configurations 
+(e.g. LC-MS metabolomics, GC-MS, etc.) while maintaining flexibility for study-specific requirements.
 while maintaining flexibility for study-specific requirements.
 """
 
@@ -15,9 +16,13 @@ import os
 import json
 import logging
 import pandas as pd
+import requests
 from pathlib import Path
+from dotenv import load_dotenv
 from minio import Minio
 from typing import Dict, List, Optional
+
+load_dotenv()
 
 from nmdc_dp_utils.workflow_manager_mixins import (
     skip_if_complete,
@@ -79,7 +84,7 @@ class NMDCWorkflowManager(
         self.study_name = self.config["study"]["name"]
         self.study_id = self.config["study"]["id"]
         self.base_path = Path(self.config["paths"]["base_directory"])
-        self.workflow_path = self.base_path / "studies" / f"{self.workflow_name}"
+        self.workflow_path = self.base_path / "workflows" / f"{self.workflow_name}"
 
         # Initialize logger
         self.logger = logging.getLogger(f"nmdc.{self.workflow_name}")
@@ -184,7 +189,6 @@ class NMDCWorkflowManager(
             "raw_data_downloaded": False,
             "protocol_outline_created": False,
             "biosample_attributes_fetched": False,
-            "biosample_mapping_script_generated": False,
             "biosample_mapping_completed": False,
             "data_processed": False,
         }
@@ -358,6 +362,91 @@ class NMDCWorkflowManager(
             "minio_enabled": self.minio_client is not None,
         }
         return info
+    
+    def gather_protocol_materials(self, submission_id:str) -> Dict:
+        """
+        Gather materials information from the protocol description.
+
+        This method parses the protocol description to extract information about
+        the materials used in the protocol, such as biosamples, reagents, and
+        other inputs. The extracted information is structured in a dictionary format
+        that can be used for further processing, such as generating YAML outlines
+        or mapping biosamples to raw files.
+
+        Returns:
+            A dictionary containing structured information about the materials used in the protocol.
+        """
+        def get_submission_fields(submission_object: dict) -> dict:
+            """
+            Extract relevant fields from the submission object.
+            multiOmicsForm.dataGenerated (is there even data for us to work with yet?)
+            multiOmicsForm.omicsProcessingTypes
+            multiOmicsForm.mpProtocols, .mbProtocols, .lipProtocols, .nomProtocols
+            sampleData (which samples had which processing types, so we can figure out numbers of DataGenerations per biosample)
+
+            Parameters:
+                submission_object: Raw submission object containing NMDC metadata fields.
+            Returns:
+                A dict with the extracted fields.
+            """
+            metadata_submission = submission_object.get("metadata_submission", {})
+            study_form = metadata_submission.get("studyForm", {})
+            multiomics_form = metadata_submission.get("multiOmicsForm", {})
+
+            # study form fields
+            description = study_form.get("description", None)
+            notes = study_form.get("notes", None)
+
+            # get protocol descriptions, names from the multiomics form
+            protocol_mapping = {} 
+            for protocol_section in [
+                "mpProtocols",
+                "mbProtocols",
+                "mbGcProtocols",
+                "lipProtocols",
+                "nomProtocols",
+                "nomLcProtocols",
+            ]:  # TODO get the protocol link
+                protocols = multiomics_form.get(protocol_section) or {}
+                for protocol in protocols.values():
+                    if protocol and isinstance(protocol, dict):
+                        protocol_mapping[protocol_section] = {
+                            "doi": protocol.get("doi"),
+                            "description": protocol.get("description"),
+                            "name": protocol.get("name"),
+                            "link": protocol.get("link")
+                        }
+    
+            return {
+                "description": description,
+                "notes": notes,
+                "protocol_mapping": protocol_mapping,
+            }
+
+        # get the refresh token from env
+        server_url = os.getenv("SERVER_API_URL", "https://data.microbiomedata.org")
+        refresh_token = os.getenv("SERVER_REFRESH_TOKEN")
+
+        # get the bearer token by calling the server API, using the refresh token
+        response = requests.post(
+            f"{server_url}/auth/refresh",
+            headers={"content-type": "application/json"},
+            json={"refresh_token": refresh_token}
+        )
+        if response.status_code != 200:
+            raise Exception(f"Failed to refresh access token from server API: {response.status_code} - {response.text}")
+        access_token = response.json().get("access_token")
+
+        # call the submission portal API to get protocol description and materials info
+        response = requests.get(f"{server_url}/api/metadata_submission/{submission_id}", headers={"Authorization": f"Bearer {access_token}"})
+        if response.status_code != 200:
+            raise Exception(f"Failed to get protocol information from server API: {response.status_code} - {response.text}")
+        protocol_info = get_submission_fields(response.json())
+
+        with open(self.workflow_path / "protocol_info" / "protocol_description.json", "w") as f:
+            json.dump(protocol_info, f, indent=4)
+
+        return protocol_info
     
     async def generate_material_processing_yaml(self) -> str:
         """

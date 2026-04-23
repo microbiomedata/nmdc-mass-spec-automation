@@ -1,0 +1,17 @@
+{
+    "lcmsMetabolomics.runMetaMSLCMSMetabolomics.file_paths": [
+        "/Volumes/LaCie/nmdc_data/pettridge_11_076c9980/raw/20190103_KBL_JP_502924_Soil_13CFlux_QE-139_HILIC_USHGX01163_POS_MSMS_GRE-MB-111_statanox-12C-anox-44-000_5_Rg70to1050-CE102040-84-S1_Run392.mzML",
+        "/Volumes/LaCie/nmdc_data/pettridge_11_076c9980/raw/20190103_KBL_JP_502924_Soil_13CFlux_QE-139_HILIC_USHGX01163_POS_MSMS_GRE-MB-178_flux8day-12C-oxic-44-000_5_Rg70to1050-CE102040-116-S1_Run400.mzML",
+        "/Volumes/LaCie/nmdc_data/pettridge_11_076c9980/raw/20190103_KBL_JP_502924_Soil_13CFlux_QE-139_HILIC_USHGX01163_POS_MSMS_GRE-MB-170_flux4day-12C-oxic-44-000_4_Rg70to1050-CE102040-108-S1_Run374.mzML",
+        "/Volumes/LaCie/nmdc_data/pettridge_11_076c9980/raw/20190103_KBL_JP_502924_Soil_13CFlux_QE-139_HILIC_USHGX01163_POS_MSMS_GRE-MB-080_statoxic-12C-oxic-44-000_4_Rg70to1050-CE102040-62-S1_Run377.mzML",
+        "/Volumes/LaCie/nmdc_data/pettridge_11_076c9980/raw/20190103_KBL_JP_502924_Soil_13CFlux_QE-139_HILIC_USHGX01163_POS_MSMS_GRE-MB-172_flux4day-12C-oxic-44-000_5_Rg70to1050-CE102040-110-S1_Run403.mzML",
+        "/Volumes/LaCie/nmdc_data/pettridge_11_076c9980/raw/20190103_KBL_JP_502924_Soil_13CFlux_QE-139_HILIC_USHGX01163_POS_MSMS_GRE-MB-108_statanox-12C-anox-44-000_4_Rg70to1050-CE102040-81-S1_Run366.mzML",
+        "/Volumes/LaCie/nmdc_data/pettridge_11_076c9980/raw/20190103_KBL_JP_502924_Soil_13CFlux_QE-139_HILIC_USHGX01163_POS_MSMS_GRE-MB-082_statoxic-12C-oxic-44-000_5_Rg70to1050-CE102040-64-S1_Run406.mzML",
+        "/Volumes/LaCie/nmdc_data/pettridge_11_076c9980/raw/20190103_KBL_JP_502924_Soil_13CFlux_QE-139_HILIC_USHGX01163_POS_MSMS_GRE-MB-176_flux8day-12C-oxic-44-000_4_Rg70to1050-CE102040-114-S1_Run357.mzML"
+    ],
+    "lcmsMetabolomics.runMetaMSLCMSMetabolomics.output_directory": "output",
+    "lcmsMetabolomics.runMetaMSLCMSMetabolomics.corems_toml_path": "workflow_inputs/metams_hilic_corems.toml",
+    "lcmsMetabolomics.runMetaMSLCMSMetabolomics.msp_file_path": "workflow_inputs/20250407_database.msp",
+    "lcmsMetabolomics.runMetaMSLCMSMetabolomics.scan_translator_path": "workflow_inputs/metams_jgi_scan_translator.toml",
+    "lcmsMetabolomics.runMetaMSLCMSMetabolomics.cores": 5
+}

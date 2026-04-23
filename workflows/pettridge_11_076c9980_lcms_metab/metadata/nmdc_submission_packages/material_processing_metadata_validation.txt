@@ -1,0 +1,41 @@
+
+================================================================================
+VALIDATING GENERATED OUTPUT
+================================================================================
+Calculating expected counts...
+
+================================================================================
+PLACEHOLDER COMBINATIONS BY PROTOCOL:
+================================================================================
+
+LCMS_Metabolomics_Soil_Extraction:
+  Target placeholders: ['ProcessedSample3_LCMS_Metabolomics_Soil_Extraction']
+  Resulting samples: ['ProcessedSample1_LCMS_Metabolomics_Soil_Extraction', 'ProcessedSample2_LCMS_Metabolomics_Soil_Extraction', 'ProcessedSample3_LCMS_Metabolomics_Soil_Extraction']
+  Biosamples with this combination: 8
+  Steps required per biosample: 3
+  Processed samples required per biosample: 3
+  Total steps for this combination: 24
+  Total samples for this combination: 24
+
+================================================================================
+VALIDATION SUMMARY:
+================================================================================
+
+Biosamples:
+  Unique in mapping: 8
+
+Material Processing Steps:
+  Expected: 24
+  Actual:   24
+  ✓ MATCH
+
+Processed Samples:
+  Expected: 24
+  Actual:   24
+  ✓ MATCH
+
+Unique placeholder combinations: 1
+
+================================================================================
+✓ VALIDATION PASSED: All counts match!
+================================================================================

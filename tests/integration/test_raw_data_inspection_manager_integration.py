@@ -10,6 +10,7 @@ from pathlib import Path
 import pandas as pd
 import requests
 import subprocess
+import os
 
 
 class TestWorkflowRawDataInspectionManagerIntegration:
@@ -17,6 +18,10 @@ class TestWorkflowRawDataInspectionManagerIntegration:
 
     @pytest.mark.network
     @pytest.mark.slow
+    @pytest.mark.skipif(
+        "CI" in os.environ,
+        reason="Skip real file download test in CI environments (rate limits, large downloads)"
+    )
     def test_raw_data_inspector_real_file_download_and_inspection(
         self, integration_config_file, integration_test_raw_file
     ):

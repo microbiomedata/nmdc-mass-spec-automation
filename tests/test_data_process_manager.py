@@ -56,8 +56,8 @@ class TestWDLRunnerScriptLogic:
         config_file = tmp_path / "config.json"
         config_file.write_text(json.dumps(lcms_config))
         
-        # Create necessary directories with studies prefix
-        workflow_dir = tmp_path / "studies" / lcms_config["workflow"]["name"]
+        # Create necessary directories with workflows prefix
+        workflow_dir = tmp_path / "workflows" / lcms_config["workflow"]["name"]
         scripts_dir = workflow_dir / "scripts"
         scripts_dir.mkdir(parents=True)
         wdl_dir = workflow_dir / "wdl_jsons"
@@ -84,8 +84,8 @@ class TestWDLRunnerScriptLogic:
         config_file = tmp_path / "config.json"
         config_file.write_text(json.dumps(lcms_config))
         
-        # Create directories and multiple JSONs with studies prefix
-        workflow_dir = tmp_path / "studies" / lcms_config["workflow"]["name"]
+        # Create directories and multiple JSONs with workflows prefix
+        workflow_dir = tmp_path / "workflows" / lcms_config["workflow"]["name"]
         scripts_dir = workflow_dir / "scripts"
         scripts_dir.mkdir(parents=True)
         wdl_dir = workflow_dir / "wdl_jsons"

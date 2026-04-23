@@ -70,7 +70,7 @@ class TestNMDCWorkflowManager:
         manager = NMDCWorkflowManager(str(lcms_config_file))
         
         assert manager.base_path == temp_config_dir / "lcms_base"
-        assert manager.workflow_path == temp_config_dir / "lcms_base/studies/test_lcms_workflow"
+        assert manager.workflow_path == temp_config_dir / "lcms_base/workflows/test_lcms_workflow"
         assert manager.raw_data_directory == temp_config_dir / "lcms_data/test_lcms_study/raw"
 
     def test_processed_data_directory_with_date_tag(self, temp_config_dir, lcms_config):
@@ -190,8 +190,8 @@ processing_steps:
             f.write(yaml_content)
         
         # Create mock input CSV
-        input_csv_path = metadata_dir / "mapped_raw_files_wprocessed_MANUAL.csv"
-        input_csv_content = "biosample_id,raw_file_name,processed_sample_id\nnmdc:bsm-11-test,test_file.raw,nmdc:procsm-11-test\n"
+        input_csv_path = metadata_dir / "llm_biosample_raw_file_mapper.csv"
+        input_csv_content = "raw_data_identifier,biosample_id,biosample_name,match_confidence\ntest_file.raw,nmdc:bsm-11-test,Test Sample,high\n"
         with open(input_csv_path, "w") as f:
             f.write(input_csv_content)
         
@@ -218,7 +218,7 @@ processing_steps:
             assert call_args.kwargs["test"] is True
             assert call_args.kwargs["study_id"] == "nmdc:sty-11-test"
             assert "llm_generated_protocol_outline.yaml" in call_args.kwargs["yaml_outline_path"]
-            assert "mapped_raw_files_wprocessed_MANUAL.csv" in call_args.kwargs["sample_to_dg_mapping_path"]
+            assert "biosample_mapping_for_mp_metadata_generation.csv" in call_args.kwargs["sample_to_dg_mapping_path"]
             
             # Verify skip trigger was set
             assert manager.should_skip("material_processing_metadata_generated") is True

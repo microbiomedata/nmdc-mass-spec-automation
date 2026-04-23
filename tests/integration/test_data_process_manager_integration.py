@@ -32,7 +32,7 @@ class TestWDLGenerationEndToEnd:
         
         # Create directory structure
         workflow_name = integration_lcms_config["workflow"]["name"]
-        workflow_dir = tmp_path / "studies" / workflow_name
+        workflow_dir = tmp_path / "workflows" / workflow_name
         metadata_dir = workflow_dir / "metadata"
         metadata_dir.mkdir(parents=True)
         raw_info_dir = workflow_dir / "raw_file_info"
@@ -105,7 +105,7 @@ class TestWDLGenerationEndToEnd:
         
         # Create structure
         workflow_name = integration_gcms_config["workflow"]["name"]
-        workflow_dir = tmp_path / "studies" / workflow_name
+        workflow_dir = tmp_path / "workflows" / workflow_name
         metadata_dir = workflow_dir / "metadata"
         raw_info_dir = workflow_dir / "raw_file_info"
         metadata_dir.mkdir(parents=True)
@@ -135,7 +135,7 @@ class TestWDLGenerationEndToEnd:
         # Copy biosample mapping from test data
         shutil.copy(
             TEST_DATA_DIR / "metadata" / "gcms_biosample_mapping.csv",
-            metadata_dir / "mapped_raw_file_biosample_mapping.csv"
+            metadata_dir / "llm_biosample_raw_file_mapper.csv"
         )
         
         # Generate JSONs

@@ -1,0 +1,123 @@
+{
+  "material_processing_set": [
+    {
+      "id": "nmdc:subspr-00-iny98zz9",
+      "type": "nmdc:SubSamplingProcess",
+      "name": "Subsample soil for nonpolar metabolites",
+      "description": "A 2 g soil sample is subsampled from nmdc:bsm-11-pdcjjc38 for nonpolar metabolite extraction.",
+      "has_input": [
+        "nmdc:bsm-11-pdcjjc38"
+      ],
+      "has_output": [
+        "nmdc:procsm-00-73uezwzw"
+      ],
+      "processing_institution": "JGI",
+      "protocol_link": {
+        "type": "nmdc:Protocol",
+        "url": "https://doi.org/10.1093/ismeco/ycaf084",
+        "name": "Emily N Boak et al 2025, Bacterial and fungal composition and exometabolites control the development and persistence of soil water repellency"
+      },
+      "mass": {
+        "type": "nmdc:QuantityValue",
+        "has_raw_value": "2 g",
+        "has_unit": "g",
+        "has_numeric_value": 2
+      }
+    },
+    {
+      "id": "nmdc:extrp-00-qqv9i4sd",
+      "type": "nmdc:Extraction",
+      "name": "Nonpolar metabolite extraction",
+      "description": "Nonpolar metabolites extracted from nmdc:procsm-00-73uezwzw using methanol, followed by vortexing, sonication in an iced water bath, and centrifugation. The supernatant containing extracted nonpolar metabolites is then dried in a SpeedVac.",
+      "has_input": [
+        "nmdc:procsm-00-73uezwzw"
+      ],
+      "has_output": [
+        "nmdc:procsm-00-gpqfes2b"
+      ],
+      "processing_institution": "JGI",
+      "protocol_link": {
+        "type": "nmdc:Protocol",
+        "url": "https://doi.org/10.1093/ismeco/ycaf084",
+        "name": "Emily N Boak et al 2025, Bacterial and fungal composition and exometabolites control the development and persistence of soil water repellency"
+      },
+      "substances_used": [
+        {
+          "type": "nmdc:PortionOfSubstance",
+          "known_as": "methanol",
+          "substance_role": "solvent",
+          "volume": {
+            "type": "nmdc:QuantityValue",
+            "has_raw_value": "1 mL",
+            "has_unit": "mL",
+            "has_numeric_value": 1
+          }
+        }
+      ],
+      "extraction_targets": [
+        "metabolite"
+      ],
+      "temperature": {
+        "type": "nmdc:QuantityValue",
+        "has_raw_value": "0 Cel",
+        "has_unit": "Cel",
+        "has_numeric_value": 0
+      }
+    },
+    {
+      "id": "nmdc:dispro-00-nossh02c",
+      "type": "nmdc:DissolvingProcess",
+      "name": "Resuspension of nonpolar extract",
+      "description": "Dried nonpolar metabolite extract from nmdc:procsm-00-gpqfes2b resuspended in methanol with internal standards for LC-MS.",
+      "has_input": [
+        "nmdc:procsm-00-gpqfes2b"
+      ],
+      "has_output": [
+        "nmdc:procsm-00-aanj3izd"
+      ],
+      "processing_institution": "JGI",
+      "protocol_link": {
+        "type": "nmdc:Protocol",
+        "url": "https://doi.org/10.1093/ismeco/ycaf084",
+        "name": "Emily N Boak et al 2025, Bacterial and fungal composition and exometabolites control the development and persistence of soil water repellency"
+      },
+      "substances_used": [
+        {
+          "type": "nmdc:PortionOfSubstance",
+          "known_as": "methanol",
+          "substance_role": "solvent",
+          "volume": {
+            "type": "nmdc:QuantityValue",
+            "has_raw_value": "120 uL",
+            "has_unit": "uL",
+            "has_numeric_value": 120
+          }
+        }
+      ]
+    }
+  ],
+  "processed_sample_set": [
+    {
+      "id": "nmdc:procsm-00-73uezwzw",
+      "type": "nmdc:ProcessedSample",
+      "name": "nmdc:bsm-11-pdcjjc38_subsample_nonpolar",
+      "description": "Subsample of nmdc:bsm-11-pdcjjc38 for nonpolar metabolite extraction."
+    },
+    {
+      "id": "nmdc:procsm-00-gpqfes2b",
+      "type": "nmdc:ProcessedSample",
+      "name": "nmdc:bsm-11-pdcjjc38_nonpolar_extract_supernatant_dried",
+      "description": "Supernatant containing extracted nonpolar metabolites from nmdc:procsm-00-73uezwzw, dried in a SpeedVac.",
+      "sampled_portion": [
+        "supernatant"
+      ]
+    },
+    {
+      "id": "nmdc:procsm-00-aanj3izd",
+      "type": "nmdc:ProcessedSample",
+      "name": "nmdc:bsm-11-pdcjjc38_nonpolar_extract_resuspended",
+      "description": "Resuspended nonpolar metabolite extract from nmdc:procsm-00-gpqfes2b for LC-MS analysis."
+    }
+  ],
+  "@type": "Database"
+}

@@ -1,0 +1,2 @@
+All processing at JGI. Extractions for lcms metabolomics samples are described below.
+Briefly 0.5 g soil samples were each extracted twice. Here, 2 mL 100% water was added to each samples, vortexed, sonicated 15 min in iced water bath, centrifgued, then super transferred to a 5 mL tube. The same procedure was repeated, with the super extract transferred to the same 5 mL tube. Extract was frozen and lyophilized dry. In preparation for LC-MS, samples were resuspended in 200 uL of 100% MeOH containing internal standards.

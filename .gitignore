@@ -3,6 +3,7 @@ venv/
 .vscode/
 .DS_Store
 *.hdf5
+*.log
 
 __pycache__/
 .env
@@ -14,6 +15,7 @@ __pycache__/
 
 *.xlsx
 *.msp
+*.sqlite
 !tests/integration/test_data/test_database.msp
 
 # Testing and coverage reports
