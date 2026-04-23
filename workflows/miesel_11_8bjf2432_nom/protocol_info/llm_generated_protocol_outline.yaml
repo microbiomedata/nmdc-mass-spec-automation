@@ -670,7 +670,7 @@ Proteomics:
         type: nmdc:ChromatographicSeparationProcess
         name: <ProcessedSample16_Prot>_extracellular_fractionation_KCl
         description: >-
-          Fractionation of extracellular peptides extracted from <Biosample>. Separations were performed using 10 mM ammonium formate (pH 7.5) as mobile phase A and 100% acetonitrile as mobile phase B. 48 µL of peptide mixtures (0.1 µg/µL) were loaded onto the column and separated using a binary gradient of 1 % B for 35 min, 1-10 % B in 2 min, 10-15 % B in 5 min, and 15-25 % B in 35 min, 25-32 % B in 25min, 32-40 % B in 13 min, 40-90 % B in 43 min, held at 90 % B for 2 min (column washed and equilibrated from 90-50 % B in 2 min, 50-95% B in 2 min, held at 95 % B for 2 min and 95-1 % in 4 min).
+          Fractionation of extracellular peptides extracted from <Biosample>. Separations were performed using strong cation exchange.
         has_input:
           - ProcessedSample16_Prot
         has_output:
@@ -687,23 +687,7 @@ Proteomics:
           - type: nmdc:MobilePhaseSegment
             substances_used:
               - type: nmdc:PortionOfSubstance
-                known_as: ammonium formate
-                final_concentration:
-                  type: nmdc:QuantityValue
-                  has_raw_value: 10 mmol/L
-                  has_unit: mmol/L
-                  has_numeric_value: 10
-              - type: nmdc:PortionOfSubstance
-                known_as: water
-          - type: nmdc:MobilePhaseSegment
-            substances_used:
-              - type: nmdc:PortionOfSubstance
-                known_as: acetonitrile
-                final_concentration:
-                  type: nmdc:QuantityValue
-                  has_raw_value: 100 %
-                  has_unit: '%'
-                  has_numeric_value: 100
+                known_as: potassium chloride
 
   processedsamples:
   - ProcessedSample1_Prot:
