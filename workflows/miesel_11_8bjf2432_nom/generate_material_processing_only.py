@@ -10,7 +10,7 @@ from nmdc_dp_utils.workflow_manager import NMDCWorkflowManager
 
 def main():
 
-    config_path = "/home/bmeluch/NMDC/nmdc-mass-spec-automation/studies/miesel_11_8bjf2432_nom/miesel_nom_config.json"
+    config_path = "/home/bmeluch/NMDC/nmdc-mass-spec-automation/workflows/miesel_11_8bjf2432_nom/miesel_nom_config.json"
     manager = NMDCWorkflowManager(str(config_path))
 
     print(sys.path)
