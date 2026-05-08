@@ -26,6 +26,7 @@ from tqdm import tqdm
 try:
     from corems.mass_spectra.input.mzml import MZMLSpectraParser
     from corems.mass_spectra.input.rawFileReader import ImportMassSpectraThermoMSFileReader
+    from corems.transient.input.brukerSolarix import ReadBrukerSolarix
     COREMS_AVAILABLE = True
 except ImportError:
     COREMS_AVAILABLE = False
@@ -142,6 +143,9 @@ def _extract_file_metadata(file_path: Path) -> Dict:
         parser = ImportMassSpectraThermoMSFileReader(file_path)
     elif file_path.suffix.lower() == ".mzml":
         parser = MZMLSpectraParser(file_path)
+    elif file_path.suffix.lower() == ".d":
+        parser = ReadBrukerSolarix(file_path)
+        return get_dotd_file_info(parser, file_path)
     else:
         raise ValueError(f"Unsupported file format: {file_path.suffix}")
     
@@ -216,7 +220,45 @@ def _extract_file_metadata(file_path: Path) -> Dict:
         "total_scans": len(lcms_obj.scan_df),
         "creation_time": datetime.fromtimestamp(file_path.stat().st_ctime).isoformat(),
     }
-    
+
+    def get_dotd_file_info(parser, file_path):
+        scan_info = parser.get_scan_attr()
+        if scan_info:
+            rt_min = scan_info['list_rt'][0].min()
+            rt_max = scan_info['list_rt'][0].max()
+
+        transient = parser.get_transient()
+        sp = transient.get_mass_spectrum(plot_result=False, auto_process=False)
+        scan_types = "centroid" if sp.is_centroid else "profile"
+
+        instrument_model = "placeholder"
+        instrument_name = "placeholder"
+        serial_number = "placeholder"
+
+        # Compile metadata
+        file_info = {
+            "file_name": file_path.name,
+            "file_path": str(file_path),
+            "file_size_bytes": file_path.stat().st_size,
+            "file_extension": file_path.suffix.lower(),
+            "instrument_model": instrument_model,
+            "instrument_name": instrument_name,
+            "instrument_serial_number": serial_number,
+            "scan_types": str(scan_types),
+            "scan_levels": str(1),
+            "collision_energies": None,
+            "ms2_types": None,
+            "polarity": "negative" if transient.polarity == 0 else "positive",
+            "mz_min": sp._mz_exp.min(),
+            "mz_max": sp._mz_exp.max(),
+            "rt_min": float(rt_min) if rt_min else None,
+            "rt_max": float(rt_max) if rt_max else None,
+            "write_time": datetime.fromtimestamp(file_path.stat().st_ctime).isoformat(), # how is this different from creation time
+            "total_scans": len(scan_info['list_rt']),
+            "creation_time": datetime.fromtimestamp(file_path.stat().st_ctime).isoformat(),
+        }
+        return file_info
+
     return file_info
 
 

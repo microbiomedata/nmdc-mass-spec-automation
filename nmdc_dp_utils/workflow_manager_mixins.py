@@ -30,6 +30,9 @@ from nmdc_ms_metadata_gen.lcms_lipid_metadata_generator import (
 from nmdc_ms_metadata_gen.gcms_metab_metadata_generator import (
     GCMSMetabolomicsMetadataGenerator,
 )
+from nmdc_ms_metadata_gen.di_nom_metadata_generator import (
+    DINOMMetaDataGenerator,
+)
 from nmdc_ms_metadata_gen.material_processing_generator import (
     MaterialProcessingMetadataGenerator,
 )
@@ -62,8 +65,12 @@ WORKFLOW_DICT = {
         "metadata_generator_class": GCMSMetabolomicsMetadataGenerator,
         "raw_data_inspector": "gcms_data_inspector",
     },
-    "FTICR NOM": {
-        
+    "DI FTICR NOM": {
+        "wdl_workflow_name": "di_fticr_ms",
+        "wdl_download_location": "https://raw.githubusercontent.com/microbiomedata/enviroMS/refs/heads/master/wdl/di_fticr_ms.wdl",
+        "generator_method": "_generate_di_nom_wdl",
+        "workflow_metadata_input_generator": "_generate_di_nom_workflow_metadata_inputs",
+        "metadata_generator_class": DINOMMetaDataGenerator,
     }
 }
 
@@ -1554,7 +1561,7 @@ class NMDCWorkflowDataProcessManager:
             create_wdl_json(sample_file_paths, batch_num)
             return 1
 
-    def _generate_nom_wdl(
+    def _generate_di_nom_wdl(
         self, config: dict, batch_files: List[Path], batch_num: int
     ) -> int:
         """
@@ -3475,6 +3482,47 @@ class WorkflowMetadataManager:
             return merged_df, final_columns
 
         return self._generate_workflow_metadata_inputs_common(gcms_processor)
+    
+    def _generate_di_nom_workflow_metadata_inputs(self) -> bool:
+        """Generate metadata inputs specific to DI-NOM workflows.
+
+        Returns:
+            bool: True if metadata generation is successful, False otherwise
+        """
+
+        def di_nom_processor(merged_df, raw_inspection_results, include_raw_data_url):
+            # Add processed_data_file for DI-NOM (CSV files)
+            processed_data_dir = str(self.processed_data_directory)
+            if not processed_data_dir.endswith("/"):
+                processed_data_dir += "/"
+            merged_df["processed_data_file"] = processed_data_dir + merged_df[
+                "raw_data_file_short"
+            ].str.replace(r"(?i)\.(cdf|mzml)$", ".csv", regex=True)
+
+            # Match samples to calibration files
+            merged_df = self._assign_calibration_files_to_samples(
+                merged_df, raw_inspection_results
+            )
+
+            # Define final columns for GCMS
+            final_columns = [
+                "sample_id",
+                "raw_data_file",
+                "processed_data_file",
+                "calibration_file",
+                "mass_spec_configuration_name",
+                "instrument_used",
+                "processing_institution_workflow",
+                "processing_institution_generation",
+                "instrument_analysis_end_date",
+                "instrument_instance_specifier",
+            ]
+            if include_raw_data_url:
+                final_columns.append("raw_data_url")
+
+            return merged_df, final_columns
+
+        return self._generate_workflow_metadata_inputs_common(di_nom_processor)
 
     def _assign_calibration_files_to_samples(
         self, merged_df: pd.DataFrame, raw_inspection_results: str
