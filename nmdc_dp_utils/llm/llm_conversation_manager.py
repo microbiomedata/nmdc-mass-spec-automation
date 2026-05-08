@@ -19,7 +19,7 @@ class ConversationManager:
     def __init__(self, interaction_type: str):
         if interaction_type not in ['protocol_conversion', 'biosample_mapping']:
             raise ValueError("`interaction_type` not one of ('protocol_conversion', 'biosample_mapping')")
-        self.messages = [{}]  # List to store the conversation messages
+        self.messages = []  # List to store the conversation messages
         # add the system prompt as the first message
         if interaction_type == "protocol_conversion":
             self.add_message(role="system", content=PROTOCOL_SYSTEM_PROMPT)
@@ -36,7 +36,9 @@ class ConversationManager:
         role (str): The role of the message sender must be one of ('user', 'assistant', 'system').
         content (str): The content of the message.
         """
-        self.messages.append({"role": role, "content": content})
+        # Some model/tool responses can be None in edge cases; keep message payload valid.
+        safe_content = "" if content is None else str(content)
+        self.messages.append({"role": role, "content": safe_content})
 
     def add_protocol_description(self, description: str):
         """
