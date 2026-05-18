@@ -12,8 +12,8 @@
         "batch_size": 25
     },
     "paths": {
-        "base_directory": "/Users/ober845/github_repos/nmdc-mass-spec-automation",
-        "data_directory": "/Users/ober845/github_repos/nmdc-mass-spec-automation/data"
+        "base_directory": "/Users/heal742/LOCAL/05_NMDC/07_automation/nmdc_mass_spec_automation",
+        "data_directory": "/Volumes/LaCie/nmdc_data"
     },
     "docker": {
         "raw_data_inspector_image": "microbiomedata/metams:3.3.3"
