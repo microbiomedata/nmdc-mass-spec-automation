@@ -4952,7 +4952,6 @@ class LLMWorkflowManagerMixin:
             self._conversation_obj = ConversationManager(interaction_type=self._interaction_type)
         return self._conversation_obj
         
-    @skip_if_complete("protocol_outline_created", return_value=None)
     def load_protocol_description_to_context(self, protocol_description_path: str) -> None:
         """
         Load protocol description from a text file to the LLM conversation context.
@@ -4970,7 +4969,6 @@ class LLMWorkflowManagerMixin:
             protocol_description = f.read()
         self.conversation_obj.add_protocol_description(description=protocol_description)
     
-    @skip_if_complete("protocol_outline_created", return_value=None)
     def save_yaml_to_file(self, output_path: str, content: str) -> None:
         """
         Save content to a specified file.
@@ -5001,10 +4999,10 @@ class LLMWorkflowManagerMixin:
         try:
             with open(output_path_obj, "w") as f:
                 f.write(content)
+                self.logger.info(f"Draft protocol outline saved to: {output_path}")
         except OSError as e:
             raise RuntimeError(f"Failed to write YAML content to '{output_path}': {e}") from e
     
-    @skip_if_complete("protocol_outline_created", return_value=None)
     async def get_llm_generated_yaml_outline(self) -> str:
         """
         Get the LLM generated YAML outline for the loaded protocol description.
@@ -5018,45 +5016,40 @@ class LLMWorkflowManagerMixin:
         response = await get_llm_yaml_outline(llm_client=self.llm_client, conversation_obj=self.conversation_obj)
         return response
 
-    @skip_if_complete("protocol_outline_created", return_value=None)
-    async def request_protocol_outline_approval(self, outline: str) -> Optional[str]:
+    async def request_approval(self, approval_material: str) -> bool:
         """
-        Prompt user to approve the generated protocol outline.
+        Prompt user to approve the generated material.
 
         Sets protocol_outline_created trigger on approval. On re-run with
         trigger already true, skips the prompt entirely.
 
         Parameters
         ----------
-        outline : str
-            The generated YAML outline to present for approval.
+        approval_material : str
+            The element being presented for approval (i.e. protocol outline or biosample mapping).
 
         Returns
         -------
-        Optional[str]
-            The outline if approved, None if rejected.
+        bool
+            True if the material is approved, False if rejected.
         """
-        self.logger.info(f"Generated protocol outline:\n{outline}")
         user_input = (
-            await asyncio.to_thread(input, "Do you approve this protocol outline? (yes/no): ")
+            await asyncio.to_thread(input, f"Do you approve this {approval_material}? (yes/no): ")
         ).strip().lower()
         if user_input != "yes":
             self.logger.info(
-                "Protocol outline not approved. Draft saved for review/editing. "
-                "Edit the protocol_description.txt and rerun OR edit the draft outline and set protocol_outline_created=true in config."
+                f"{approval_material.capitalize()} not approved. Draft saved for review/editing."
             )
-            return None
+            return False
 
-        self.set_skip_trigger("protocol_outline_created", True)
-        return outline
+        return True
 
-    @skip_if_complete("biosample_mapping_completed", return_value=None)
-    async def generate_llm_biosample_mapping(
+    async def get_llm_biosample_mapping(
         self, 
         max_iterations: int = 6
     ) -> bool:
         """
-        Generate biosample mapping using LLM code generation approach.
+        Get biosample mapping using LLM code generation approach.
         
         This method:
         1. Creates a new conversation context for biosample mapping
@@ -5182,9 +5175,6 @@ class LLMWorkflowManagerMixin:
                 
                 # Generate filtered file list for WDL processing
                 self._generate_mapped_files_list()
-                
-                # Set skip trigger
-                self.set_skip_trigger("biosample_mapping_completed", True)
                 return True
             else:
                 self.logger.error(f"Failed to generate valid mapping after {max_iterations} iterations")
@@ -5196,5 +5186,3 @@ class LLMWorkflowManagerMixin:
             import traceback
             traceback.print_exc()
             return False
-
-
