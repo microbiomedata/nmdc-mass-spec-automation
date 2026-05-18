@@ -12,8 +12,8 @@
         "batch_size": 25
     },
     "paths": {
-        "base_directory": "/Users/heal742/LOCAL/05_NMDC/07_automation/nmdc_mass_spec_automation",
-        "data_directory": "/Volumes/LaCie/nmdc_data"
+        "base_directory": "/Users/ober845/github_repos/nmdc-mass-spec-automation",
+        "data_directory": "/Users/ober845/github_repos/nmdc-mass-spec-automation/data"
     },
     "docker": {
         "raw_data_inspector_image": "microbiomedata/metams:3.3.3"
@@ -48,15 +48,15 @@
         "study_structure_created": true,
         "raw_data_downloaded": true,
         "biosample_attributes_fetched": true,
-        "biosample_mapping_completed": true,
-        "raw_data_inspected": true,
-        "material_processing_metadata_generated": true,
-        "metadata_mapping_generated": true,
-        "data_processed": true,
-        "processed_data_uploaded_to_minio": true,
-        "metadata_packages_generated": true,
+        "biosample_mapping_completed": false,
+        "raw_data_inspected": false,
+        "material_processing_metadata_generated": false,
+        "metadata_mapping_generated": false,
+        "data_processed": false,
+        "processed_data_uploaded_to_minio": false,
+        "metadata_packages_generated": false,
         "metadata_submitted_dev": false,
         "metadata_submitted_prod": false,
-        "protocol_outline_created": true
+        "protocol_outline_created": false
     }
 }

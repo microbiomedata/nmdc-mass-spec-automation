@@ -5004,7 +5004,7 @@ class LLMWorkflowManagerMixin:
         except OSError as e:
             raise RuntimeError(f"Failed to write YAML content to '{output_path}': {e}") from e
     
-    @skip_if_complete("protocol_outline_created", return_value=True)
+    @skip_if_complete("protocol_outline_created", return_value=None)
     async def get_llm_generated_yaml_outline(self) -> str:
         """
         Get the LLM generated YAML outline for the loaded protocol description.
@@ -5017,8 +5017,40 @@ class LLMWorkflowManagerMixin:
         
         response = await get_llm_yaml_outline(llm_client=self.llm_client, conversation_obj=self.conversation_obj)
         return response
-    
-    @skip_if_complete("biosample_mapping_completed", return_value=True)
+
+    @skip_if_complete("protocol_outline_created", return_value=None)
+    async def request_protocol_outline_approval(self, outline: str) -> Optional[str]:
+        """
+        Prompt user to approve the generated protocol outline.
+
+        Sets protocol_outline_created trigger on approval. On re-run with
+        trigger already true, skips the prompt entirely.
+
+        Parameters
+        ----------
+        outline : str
+            The generated YAML outline to present for approval.
+
+        Returns
+        -------
+        Optional[str]
+            The outline if approved, None if rejected.
+        """
+        self.logger.info(f"Generated protocol outline:\n{outline}")
+        user_input = (
+            await asyncio.to_thread(input, "Do you approve this protocol outline? (yes/no): ")
+        ).strip().lower()
+        if user_input != "yes":
+            self.logger.info(
+                "Protocol outline not approved. Draft saved for review/editing. "
+                "Edit the protocol_description.txt and rerun OR edit the draft outline and set protocol_outline_created=true in config."
+            )
+            return None
+
+        self.set_skip_trigger("protocol_outline_created", True)
+        return outline
+
+    @skip_if_complete("biosample_mapping_completed", return_value=None)
     async def generate_llm_biosample_mapping(
         self, 
         max_iterations: int = 6

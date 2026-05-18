@@ -465,7 +465,10 @@ class NMDCWorkflowManager(
         # Generate protocol outline from LLM
         outline = await self.get_llm_generated_yaml_outline()
         output_path = self.workflow_path / "protocol_info" / "llm_generated_protocol_outline.yaml"
+
+        # Save draft to disk so user can inspect/edit before approving
         self.save_yaml_to_file(output_path=output_path, content=outline)
-        # set skip trigger
-        self.set_skip_trigger("protocol_outline_created", True)
-        return outline
+        self.logger.info(f"Draft protocol outline saved to: {output_path}")
+
+        # Prompt user for approval — skipped on re-run if already approved
+        return await self.request_protocol_outline_approval(outline)
