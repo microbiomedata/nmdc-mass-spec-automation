@@ -123,9 +123,9 @@ class WorkflowDataMovementManager:
         """
         Crawl MASSIVE FTP directory to discover all data files recursively.
 
-        Uses Python's ftplib to connect to massive-ftp.ucsd.edu and recursively
-        traverse the dataset directory structure, collecting URLs for files
-        matching the configured file type extension.
+        Uses Python's ftplib with explicit TLS to connect to massive-ftp.ucsd.edu
+        and recursively traverse the dataset directory structure, collecting URLs
+        for files matching the configured file type extension.
 
         Args:
             massive_id: MASSIVE dataset identifier including version path
@@ -148,9 +148,11 @@ class WorkflowDataMovementManager:
         ftp_urls = []
 
         try:
-            # Connect to MASSIVE FTP server
-            ftp = ftplib.FTP("massive-ftp.ucsd.edu")
+            # MASSIVE requires explicit TLS for both control and data channels.
+            ftp = ftplib.FTP_TLS(timeout=60)
+            ftp.connect("massive-ftp.ucsd.edu")
             ftp.login()  # Anonymous login
+            ftp.prot_p()
 
             # Navigate to the study directory (massive_id should include version path)
             try:
