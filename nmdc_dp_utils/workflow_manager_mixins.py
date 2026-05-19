@@ -149,8 +149,7 @@ class WorkflowDataMovementManager:
 
         try:
             # MASSIVE requires explicit TLS for both control and data channels.
-            ftp = ftplib.FTP_TLS(timeout=60)
-            ftp.connect("massive-ftp.ucsd.edu")
+            ftp = ftplib.FTP_TLS("massive-ftp.ucsd.edu")
             ftp.login()  # Anonymous login
             ftp.prot_p()
 
