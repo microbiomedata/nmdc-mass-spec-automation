@@ -145,7 +145,8 @@ def _extract_file_metadata(file_path: Path) -> Dict:
         parser = MZMLSpectraParser(file_path)
     elif file_path.suffix.lower() == ".d":
         parser = ReadBrukerSolarix(file_path)
-        return get_dotd_file_info(parser, file_path)
+        file_info = get_dotd_file_info(parser, file_path)
+        return file_info
     else:
         raise ValueError(f"Unsupported file format: {file_path.suffix}")
     
@@ -221,44 +222,73 @@ def _extract_file_metadata(file_path: Path) -> Dict:
         "creation_time": datetime.fromtimestamp(file_path.stat().st_ctime).isoformat(),
     }
 
-    def get_dotd_file_info(parser, file_path):
-        scan_info = parser.get_scan_attr()
-        if scan_info:
-            rt_min = scan_info['list_rt'][0].min()
-            rt_max = scan_info['list_rt'][0].max()
+    return file_info
 
-        transient = parser.get_transient()
-        sp = transient.get_mass_spectrum(plot_result=False, auto_process=False)
-        scan_types = "centroid" if sp.is_centroid else "profile"
+def get_dotd_file_info(parser, file_path: Path) -> dict:
 
-        instrument_model = "placeholder"
-        instrument_name = "placeholder"
-        serial_number = "placeholder"
+    logging.info(f"Extracting metadata from Bruker .d file: {file_path.name}")
 
-        # Compile metadata
-        file_info = {
-            "file_name": file_path.name,
-            "file_path": str(file_path),
-            "file_size_bytes": file_path.stat().st_size,
-            "file_extension": file_path.suffix.lower(),
-            "instrument_model": instrument_model,
-            "instrument_name": instrument_name,
-            "instrument_serial_number": serial_number,
-            "scan_types": str(scan_types),
-            "scan_levels": str(1),
-            "collision_energies": None,
-            "ms2_types": None,
-            "polarity": "negative" if transient.polarity == 0 else "positive",
-            "mz_min": sp._mz_exp.min(),
-            "mz_max": sp._mz_exp.max(),
-            "rt_min": float(rt_min) if rt_min else None,
-            "rt_max": float(rt_max) if rt_max else None,
-            "write_time": datetime.fromtimestamp(file_path.stat().st_ctime).isoformat(), # how is this different from creation time
-            "total_scans": len(scan_info['list_rt']),
-            "creation_time": datetime.fromtimestamp(file_path.stat().st_ctime).isoformat(),
-        }
-        return file_info
+    scan_info = parser.get_scan_attr()
+    if scan_info:
+        # get a list of all retention times from a dictionary where keys are the scan number and rt and tic are tupled values
+        rt_values = [rt for _, (rt, _) in scan_info.items()]
+        rt_min = min(rt_values) if rt_values else None
+        rt_max = max(rt_values) if rt_values else None
 
+    transient = parser.get_transient()
+    sp = transient.get_mass_spectrum(plot_result=False, auto_process=False)
+    scan_types = "centroid" if sp.is_centroid else "profile"
+
+    instrument_model = "placeholder"
+    instrument_name = "placeholder"
+    serial_number = "placeholder"
+
+    # ParseSampleInfo.xml using beautifulsoup (corems dependency so it should already be there) and extract the value for CreationDateTime
+    sample_info_path = file_path / "SampleInfo.xml"
+    write_time = None
+    try:
+        from bs4 import BeautifulSoup
+        # Bruker files are typically UTF-16, try that first
+        with open(sample_info_path, 'r', encoding='utf-16') as f:
+            soup = BeautifulSoup(f, 'xml')
+            write_time = soup.find('AnalysisHeader').get('CreationDateTime')
+
+    except UnicodeDecodeError:
+        # Fall back to UTF-8 with BOM
+        try:
+            with open(sample_info_path, 'r', encoding='utf-8-sig') as f:
+                soup = BeautifulSoup(f, 'xml')
+                write_time = soup.find('AnalysisHeader').get('CreationDateTime')
+        except Exception as e:
+            logging.error(f"Failed to parse SampleInfo.xml: {e}")
+            write_time = None
+
+    # Validate that we got a write_time - this is critical for metadata generation
+    if write_time is None: 
+        raise ValueError(f"Failed to extract write_time from {file_path.name} - file may be corrupted or unsupported format")
+    
+    # Compile metadata
+    file_info = {
+        "file_name": file_path.name,
+        "file_path": str(file_path),
+        "file_size_bytes": file_path.stat().st_size,
+        "file_extension": file_path.suffix.lower(),
+        "instrument_model": instrument_model,
+        "instrument_name": instrument_name,
+        "instrument_serial_number": serial_number,
+        "scan_types": str(scan_types),
+        "scan_levels": str(1),
+        "collision_energies": None,
+        "ms2_types": None,
+        "polarity": "negative" if transient.polarity == 0 else "positive",
+        "mz_min": sp._mz_exp.min(),
+        "mz_max": sp._mz_exp.max(),
+        "rt_min": float(rt_min) if rt_min else None,
+        "rt_max": float(rt_max) if rt_max else None,
+        "write_time": write_time,
+        "total_scans": len(scan_info),
+        "creation_time": datetime.fromtimestamp(file_path.stat().st_ctime).isoformat(),
+    }
     return file_info
 
 
@@ -266,7 +296,7 @@ def process_file_wrapper(args) -> Optional[Dict]:
     """Wrapper function for parallel processing"""
     file_path, output_file, error_file, max_retries, retry_delay = args
     
-    if not file_path.is_file():
+    if not file_path.is_file() and not (file_path.is_dir() and file_path.suffix.lower() == ".d"):
         print(f"⚠️  File not found: {file_path.name}")
         return None
     
@@ -366,7 +396,7 @@ def inspect_raw_files(
     file_list = []
     for fp in file_paths:
         path = Path(fp)
-        if path.exists() and path.suffix.lower() in ['.raw', '.mzml']:
+        if path.exists() and path.suffix.lower() in ['.raw', '.mzml', '.d']:
             file_list.append(path)
     
     if limit is not None:
