@@ -1,3 +1,8 @@
+# This outline was created manually since it is complicated with the different omics types branching from each other
+# and because it's the first time we have modelled fractionated proteomics data
+# and because Bea didn't have the LLM working yet.
+# This outline is what was used for the metadata generation for Miesel study,
+# the LLM output when I eventually got it working was NOT used. BJM 20 May 2026
 ALL:
   steps:
     - Step 1_NOM:
