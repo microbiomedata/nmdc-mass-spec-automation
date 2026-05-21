@@ -448,6 +448,7 @@ class NMDCWorkflowManager(
 
         return protocol_info
     
+    @skip_if_complete("protocol_outline_created", return_value=True)
     async def generate_material_processing_yaml(self) -> str:
         """
         Generate material processing YAML using LLM.
@@ -457,15 +458,38 @@ class NMDCWorkflowManager(
         str
             The generated material processing YAML.
         """
-        
         # load protocol description into LLM conversation context
         self.load_protocol_description_to_context(
             protocol_description_path=self.workflow_path / "protocol_info" / "protocol_description.txt"
         )
+        
         # Generate protocol outline from LLM
         outline = await self.get_llm_generated_yaml_outline()
         output_path = self.workflow_path / "protocol_info" / "llm_generated_protocol_outline.yaml"
+
+        # Save draft to disk so user can inspect/edit before approving
         self.save_yaml_to_file(output_path=output_path, content=outline)
-        # set skip trigger
-        self.set_skip_trigger("protocol_outline_created", True)
-        return outline
+
+        # Prompt user for approval
+        approved_outline =  await self.request_approval("protocol outline")
+        if approved_outline:
+            self.set_skip_trigger("protocol_outline_created", True)
+    
+    @skip_if_complete("biosample_mapping_completed", return_value=True)
+    async def generate_llm_biosample_mapping(self, max_iterations: int = 6) -> bool:
+        """
+        Generate biosample mappings using LLM.
+
+        Returns
+        -------
+        bool
+            True if mapping completed successfully, False otherwise
+        """
+        # Generate mapping from LLM
+        mapping_success = await self.get_llm_biosample_mapping(max_iterations=max_iterations)
+
+        # Prompt user for approval if mappings generated
+        if mapping_success:
+            approved_outline =  await self.request_approval("biosample mapping")
+            if approved_outline:
+                self.set_skip_trigger("biosample_mapping_completed", True)
