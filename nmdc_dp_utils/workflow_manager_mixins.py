@@ -123,9 +123,9 @@ class WorkflowDataMovementManager:
         """
         Crawl MASSIVE FTP directory to discover all data files recursively.
 
-        Uses Python's ftplib to connect to massive-ftp.ucsd.edu and recursively
-        traverse the dataset directory structure, collecting URLs for files
-        matching the configured file type extension.
+        Uses Python's ftplib with explicit TLS to connect to massive-ftp.ucsd.edu
+        and recursively traverse the dataset directory structure, collecting URLs
+        for files matching the configured file type extension.
 
         Args:
             massive_id: MASSIVE dataset identifier including version path
@@ -148,9 +148,10 @@ class WorkflowDataMovementManager:
         ftp_urls = []
 
         try:
-            # Connect to MASSIVE FTP server
-            ftp = ftplib.FTP("massive-ftp.ucsd.edu")
+            # MASSIVE requires explicit TLS for both control and data channels.
+            ftp = ftplib.FTP_TLS("massive-ftp.ucsd.edu")
             ftp.login()  # Anonymous login
+            ftp.prot_p()
 
             # Navigate to the study directory (massive_id should include version path)
             try:
@@ -4952,7 +4953,6 @@ class LLMWorkflowManagerMixin:
             self._conversation_obj = ConversationManager(interaction_type=self._interaction_type)
         return self._conversation_obj
         
-    @skip_if_complete("protocol_outline_created", return_value=None)
     def load_protocol_description_to_context(self, protocol_description_path: str) -> None:
         """
         Load protocol description from a text file to the LLM conversation context.
@@ -4970,7 +4970,6 @@ class LLMWorkflowManagerMixin:
             protocol_description = f.read()
         self.conversation_obj.add_protocol_description(description=protocol_description)
     
-    @skip_if_complete("protocol_outline_created", return_value=None)
     def save_yaml_to_file(self, output_path: str, content: str) -> None:
         """
         Save content to a specified file.
@@ -5001,10 +5000,10 @@ class LLMWorkflowManagerMixin:
         try:
             with open(output_path_obj, "w") as f:
                 f.write(content)
+                self.logger.info(f"Draft protocol outline saved to: {output_path}")
         except OSError as e:
             raise RuntimeError(f"Failed to write YAML content to '{output_path}': {e}") from e
     
-    @skip_if_complete("protocol_outline_created", return_value=True)
     async def get_llm_generated_yaml_outline(self) -> str:
         """
         Get the LLM generated YAML outline for the loaded protocol description.
@@ -5017,14 +5016,41 @@ class LLMWorkflowManagerMixin:
         
         response = await get_llm_yaml_outline(llm_client=self.llm_client, conversation_obj=self.conversation_obj)
         return response
-    
-    @skip_if_complete("biosample_mapping_completed", return_value=True)
-    async def generate_llm_biosample_mapping(
+
+    async def request_approval(self, approval_material: str) -> bool:
+        """
+        Prompt user to approve the generated material.
+
+        Sets associated trigger on approval. On re-run with
+        trigger already true, skips the prompt entirely.
+
+        Parameters
+        ----------
+        approval_material : str
+            The element being presented for approval (i.e. protocol outline or biosample mapping).
+
+        Returns
+        -------
+        bool
+            True if the material is approved, False if rejected.
+        """
+        user_input = (
+            await asyncio.to_thread(input, f"Do you approve this {approval_material}? (yes/no): ")
+        ).strip().lower()
+        if user_input != "yes":
+            self.logger.info(
+                f"{approval_material.capitalize()} not approved. Draft saved for review/editing."
+            )
+            return False
+
+        return True
+
+    async def get_llm_biosample_mapping(
         self, 
         max_iterations: int = 6
     ) -> bool:
         """
-        Generate biosample mapping using LLM code generation approach.
+        Get biosample mapping using LLM code generation approach.
         
         This method:
         1. Creates a new conversation context for biosample mapping
@@ -5150,9 +5176,6 @@ class LLMWorkflowManagerMixin:
                 
                 # Generate filtered file list for WDL processing
                 self._generate_mapped_files_list()
-                
-                # Set skip trigger
-                self.set_skip_trigger("biosample_mapping_completed", True)
                 return True
             else:
                 self.logger.error(f"Failed to generate valid mapping after {max_iterations} iterations")
@@ -5164,5 +5187,3 @@ class LLMWorkflowManagerMixin:
             import traceback
             traceback.print_exc()
             return False
-
-
