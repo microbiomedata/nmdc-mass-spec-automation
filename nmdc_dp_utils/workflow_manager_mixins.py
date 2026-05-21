@@ -5021,7 +5021,7 @@ class LLMWorkflowManagerMixin:
         """
         Prompt user to approve the generated material.
 
-        Sets protocol_outline_created trigger on approval. On re-run with
+        Sets associated trigger on approval. On re-run with
         trigger already true, skips the prompt entirely.
 
         Parameters
