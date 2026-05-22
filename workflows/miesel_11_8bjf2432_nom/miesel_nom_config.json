@@ -64,10 +64,7 @@
         "serial_numbers_to_remove": [
             "Unknown"
         ],
-        "raw_data_location": "minio",
-        "existing_data_objects": [
-            "nmdc:dobj-14-1e9qeq49"
-        ]
+        "raw_data_location": "minio"
     },
     "skip_triggers": {
         "study_structure_created": true,
