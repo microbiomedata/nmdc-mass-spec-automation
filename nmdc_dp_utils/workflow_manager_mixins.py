@@ -18,6 +18,7 @@ from minio.error import S3Error
 from nmdc_dp_utils.llm.protocol_conversion.pipeline import get_llm_yaml_outline
 from nmdc_dp_utils.llm.llm_conversation_manager import ConversationManager
 from nmdc_dp_utils.llm.llm_client import LLMClient
+from nmdc_api_utilities.calibration_search import CalibrationSearch
 
 # Import workflow mapping defined in workflow_manager (defined before mixins import)
 from nmdc_ms_metadata_gen.metadata_generator import NMDCMetadataGenerator
@@ -3778,12 +3779,37 @@ class WorkflowMetadataManager:
             # rename calibration_file column to "srfa_calib_path"
             merged_df = merged_df.rename(columns={"calibration_file": "srfa_calib_path"})
 
+            # Add reference calibration ID
+            calibration_ref_file_path = self.config["configurations"][0].get("calibration_ref_file_path")
+            if "Hawkes_neg.ref" in calibration_ref_file_path:
+                merged_df["calibration_id"] = "nmdc:calib-14-hhn3qb47"
+            else:
+                calib_ref_stem = Path(calibration_ref_file_path).stem
+                cs_client = CalibrationSearch()
+                try:
+                    c = cs_client.get_record_by_attribute(
+                        attribute_name="name",
+                        attribute_value=calib_ref_stem,
+                        fields="id",
+                        exact_match=True,
+                    )[0]["id"]
+                    merged_df["calibration_id"] = c
+                except ValueError as e:
+                    raise ValueError(
+                        f"Calibration object does not exist for file {calibration_ref_file_path}: {e}"
+                    ) 
+                except Exception as e:
+                    raise RuntimeError(
+                        f"An error occurred while looking up calibration for file {calibration_ref_file_path}: {e}"
+                    )
+
             # Define final columns for DI FTICR NOM
             final_columns = [
                 "sample_id",
                 "raw_data_file",
                 "processed_data_directory",
                 "srfa_calib_path",
+                "calibration_id",
                 "mass_spec_configuration_name",
                 "instrument_used",
                 "processing_institution_workflow",
