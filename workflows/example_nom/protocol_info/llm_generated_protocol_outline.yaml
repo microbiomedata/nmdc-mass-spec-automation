@@ -1,0 +1,915 @@
+ALL:
+  steps:
+    - Step 1_NOM:
+        SubSamplingProcess:
+          id: # nmdc:subspr-{shoulder}-{blade}
+          type: nmdc:SubSamplingProcess
+          name: subsample_soil
+          description: Subsampling <Biosample> for sequential methanol-water extraction
+          has_input: # list of nmdc:bsm or nmdc:procsm id
+            - Biosample
+          has_output: # list of nmdc:procsm id
+            - ProcessedSample1_NOM
+          processing_institution: EMSL
+          mass:
+            type: nmdc:QuantityValue
+            has_raw_value: 0.3 g
+            has_unit: g
+            has_numeric_value: 0.3
+
+    - Step 2_NOM:
+        Extraction:
+          id: # nmdc:extrp-{shoulder}-{blade}
+          type: nmdc:Extraction
+          name: nom_water_extract
+          description: Water extraction of <ProcessedSample1_NOM>
+          has_input:
+          - ProcessedSample1_NOM
+          has_output:
+          - ProcessedSample2_NOM # goes down to Step 4 for SPE
+          - ProcessedSample3_NOM # soil for next step in sequential extraction
+          processing_institution: EMSL
+          extraction_targets:
+          - natural organic matter
+          input_mass:
+            type: nmdc:QuantityValue
+            has_raw_value: 0.3 g # from subsampling process
+            has_unit: g
+            has_numeric_value: 0.3 # from subsampling process
+          substances_used:
+          - type: nmdc:PortionOfSubstance
+            known_as: water
+            substance_role: solvent
+            volume:
+              type: nmdc:QuantityValue
+              has_raw_value: 1 mL
+              has_unit: mL
+              has_numeric_value: 1
+
+    - Step 3_NOM:
+        Extraction:
+          id: # nmdc:extrp-{shoulder}-{blade}
+          type: nmdc:Extraction
+          name: nom_methanol_extract
+          description: Methanol extraction of <ProcessedSample3_NOM>
+          has_input:
+          - ProcessedSample3_NOM # from first extraction step
+          has_output:
+          - ProcessedSample4_NOM # input to methanol SPE
+          - ProcessedSample5_NOM # soil that has been extracted with water and methanol
+          processing_institution: EMSL
+          extraction_targets:
+          - natural organic matter
+          substances_used:
+          - type: nmdc:PortionOfSubstance
+            known_as: methanol
+            substance_role: solvent
+            volume:
+              type: nmdc:QuantityValue
+              has_raw_value: 1 mL
+              has_unit: mL
+              has_numeric_value: 1
+
+    - Step 4_NOM:
+        ChromatographicSeparationProcess:
+          id: # nmdc:cspro-{shoulder}-{blade}
+          type: nmdc:ChromatographicSeparationProcess
+          name: water_extract_SPE
+          description: Solid phase extraction of dissolved organic matter from <ProcessedSample2_NOM>
+          has_input:
+          - ProcessedSample2_NOM # water extracts from earlier
+          has_output:
+          - ProcessedSample6_NOM # input to water DataGeneration records
+          processing_institution: EMSL
+          protocol_link:
+            url: https://doi.org/10.4319/lom.2008.6.230
+            name: Dittmar et al 2008. A simple and efficient method for the solid-phase extraction of dissolved organic matter (SPE-DOM) from seawater
+            type: nmdc:Protocol
+          chromatographic_category: solid_phase_extraction
+          ordered_mobile_phases:
+          - type: nmdc:MobilePhaseSegment   # "Load the acidified sample onto the cartridge"
+            substances_used:
+            - type: nmdc:PortionOfSubstance
+              known_as: hydrochloric_acid
+              substance_role: acid
+              source_concentration:
+                type: nmdc:QuantityValue
+                has_raw_value: 37 %
+                has_unit: '%'
+                has_numeric_value: 37
+              volume:
+                type: nmdc:QuantityValue
+                has_raw_value: 2 uL
+                has_unit: uL
+                has_numeric_value: 2
+            - type: nmdc:PortionOfSubstance
+              known_as: water     # containing sample
+              substance_role: solvent
+              volume:
+                type: nmdc:QuantityValue
+                has_raw_value: 5 mL
+                has_unit: mL
+                has_numeric_value: 5
+          - type: nmdc:MobilePhaseSegment   # Wash the cartridge 17+x with HCl"
+            substances_used:
+            - type: nmdc:PortionOfSubstance
+              known_as: hydrochloric_acid
+              substance_role: acid
+              source_concentration:
+                type: nmdc:QuantityValue
+                has_raw_value: 10 mmol/L
+                has_unit: mmol/L
+                has_numeric_value: 10
+              volume:
+                type: nmdc:QuantityValue
+                has_raw_value: 3 mL
+                has_unit: mL
+                has_numeric_value: 3
+          - type: nmdc:MobilePhaseSegment   # "Elute with 1.5 mL methanol"
+            substances_used:
+            - type: nmdc:PortionOfSubstance
+              known_as: methanol
+              substance_role: solvent
+              volume:
+                type: nmdc:QuantityValue
+                has_raw_value: 1.5 mL
+                has_unit: mL
+                has_numeric_value: 1.5
+          stationary_phase: PS-DVB
+
+    - Step 5_NOM:
+        ChromatographicSeparationProcess:
+          id: # nmdc:cspro-{shoulder}-{blade}
+          type: nmdc:ChromatographicSeparationProcess
+          name: methanol_extract_SPE
+          description: Solid phase extraction of dissolved organic matter from <ProcessedSample2_NOM>
+          has_input:
+          - ProcessedSample4_NOM # methanol extracts from earlier
+          has_output:
+          - ProcessedSample7_NOM # input to methanol DataGeneration records
+          processing_institution: EMSL
+          protocol_link:
+            url: https://doi.org/10.4319/lom.2008.6.230
+            name: Dittmar et al 2008. A simple and efficient method for the solid-phase extraction of dissolved organic matter (SPE-DOM) from seawater
+            type: nmdc:Protocol
+          chromatographic_category: solid_phase_extraction
+          ordered_mobile_phases:
+          - type: nmdc:MobilePhaseSegment   # "Load the acidified sample onto the cartridge"
+            substances_used:
+            - type: nmdc:PortionOfSubstance
+              known_as: hydrochloric_acid
+              substance_role: acid
+              source_concentration:
+                type: nmdc:QuantityValue
+                has_raw_value: 37 %
+                has_unit: '%'
+                has_numeric_value: 37
+              volume:
+                type: nmdc:QuantityValue
+                has_raw_value: 2 uL
+                has_unit: uL
+                has_numeric_value: 2
+            - type: nmdc:PortionOfSubstance
+              known_as: water     # containing sample
+              substance_role: solvent
+              volume:
+                type: nmdc:QuantityValue
+                has_raw_value: 5 mL
+                has_unit: mL
+                has_numeric_value: 5
+          - type: nmdc:MobilePhaseSegment   # Wash the cartridge 17+x with HCl"
+            substances_used:
+            - type: nmdc:PortionOfSubstance
+              known_as: hydrochloric_acid
+              substance_role: acid
+              source_concentration:
+                type: nmdc:QuantityValue
+                has_raw_value: 10 mmol/L
+                has_unit: mmol/L
+                has_numeric_value: 10
+              volume:
+                type: nmdc:QuantityValue
+                has_raw_value: 3 mL
+                has_unit: mL
+                has_numeric_value: 3
+          - type: nmdc:MobilePhaseSegment   # "Elute with 1.5 mL methanol"
+            substances_used:
+            - type: nmdc:PortionOfSubstance
+              known_as: methanol
+              substance_role: solvent
+              volume:
+                type: nmdc:QuantityValue
+                has_raw_value: 1.5 mL
+                has_unit: mL
+                has_numeric_value: 1.5
+          stationary_phase: PS-DVB
+
+    # processedsamples:
+
+
+    # GCMSmetab:
+    #   steps:
+    - Step 1_GCMS:
+        Pooling:
+          id: # nmdc:poolp-{shoulder}-{blade}
+          type: nmdc:Pooling
+          name: methanol_water_recomb
+          description: >-
+            Recombination of methanol and water extracts of <Biosample>
+            for GC-MS metabolomics analysis.
+          has_input:
+            - ProcessedSample2_NOM
+            - ProcessedSample4_NOM
+          has_output:
+            - ProcessedSample1_GCMS
+          processing_institution: EMSL
+    
+    # dried - but we don't have a way to model that
+
+    - Step 2_GCMS:
+        DissolvingProcess:
+          id: # nmdc:dispro-{shoulder}-{blade}
+          type: nmdc:DissolvingProcess
+          name: methanol_water_reconstitute
+          description: >- 
+            Reconstitution of dried combined MeOH/water extracts of <Biosample>
+            for GC-MS metabolomics analysis.
+          has_input:
+            - ProcessedSample1_GCMS
+          has_output:
+            - ProcessedSample2_GCMS
+          processing_institution: EMSL
+          substances_used:
+            - type: nmdc:PortionOfSubstance
+              known_as: water
+              substance_role: solvent
+              volume:
+                type: nmdc:QuantityValue
+                has_raw_value: 400 uL
+                has_unit: uL
+                has_numeric_value: 400
+
+      # processedsamples:
+
+
+      # Proteomics:
+      #   steps:
+    - Step 1_prot:
+        SubSamplingProcess:
+          id: # nmdc:subspr-{shoulder}-{blade}
+          type: nmdc:SubSamplingProcess
+          name: <Biosample>_protein_subsample
+          description: Subsampling of <Biosample> for protein extraction after sequential water/methanol extraction
+          has_input:
+            - ProcessedSample5_NOM
+          has_output:
+            - ProcessedSample1_Prot # intracellular
+            - ProcessedSample2_Prot # extracellular
+          processing_institution: EMSL
+          mass:
+            type: nmdc:QuantityValue
+            has_raw_value: 10 g
+            has_unit: g
+            has_numeric_value: 10
+
+    - Step 2_prot: # intracellular - extraction
+        Extraction:
+          id: # nmdc:extrp-{shoulder}-{blade}
+          type: nmdc:Extraction
+          name: <Biosample>_intracellular_protein_extraction
+          description: TCA/acetone precipitation of proteins after lysis of <ProcessedSample1_Prot>
+          has_input:
+            - ProcessedSample1_Prot
+          has_output:
+            - ProcessedSample3_Prot
+          processing_institution: EMSL
+          substances_used:
+            - type: nmdc:PortionOfSubstance
+              known_as: ammonium_bicarbonate
+              substance_role: buffer
+              source_concentration:
+                type: nmdc:QuantityValue
+                has_raw_value: 100 mmol/L
+                has_unit: mmol/L
+                has_numeric_value: 100
+              volume:
+                type: nmdc:QuantityValue
+                has_raw_value: 30 mL
+                has_unit: mL
+                has_numeric_value: 30
+            - type: nmdc:PortionOfSubstance
+              known_as: trichloroacetic_acid
+              substance_role: # precipitator
+              volume:
+                type: nmdc:QuantityValue
+                has_raw_value: 7.5 mL
+                has_unit: mL
+                has_numeric_value: 7.5
+              final_concentration:
+                type: nmdc:QuantityValue
+                has_raw_value: 20 %
+                has_unit: '%'
+                has_numeric_value: 20
+          extraction_targets:
+            - protein
+
+    - Step 3_prot: # intracellular - digestion
+        ChemicalConversionProcess:
+          id: # nmdc:chcpr-{shoulder}-{blade}
+          type: nmdc:ChemicalConversionProcess
+          name: Protein_digestion_trypsin
+          description: Trypsin digestion of proteins from <ProcessedSample3_Prot> for analysis
+          has_input:
+            - ProcessedSample3_Prot
+          has_output:
+            - ProcessedSample4_Prot
+          processing_institution: EMSL
+          chemical_conversion_category: protease_cleavage
+          substances_used:
+            - type: nmdc:PortionOfSubstance
+              known_as: trypsin
+              substance_role: ms_proteolytic_enzyme
+              volume: 
+                type: nmdc:QuantityValue
+                has_raw_value: 0.004 mL
+                has_unit: mL
+                has_numeric_value: 0.004
+          temperature:
+            type: nmdc:QuantityValue
+            has_raw_value: 37 C
+            has_unit: Cel
+            has_numeric_value: 37
+          duration:
+            type: nmdc:QuantityValue
+            has_raw_value: 3 h
+            has_unit: h
+            has_numeric_value: 3
+
+    - Step 4_prot:
+        DissolvingProcess: # intracellular - resuspend to same concentration
+          id:
+          type: nmdc:DissolvingProcess
+          description: >- 
+            Resuspension of extracted proteins from <ProcessedSample4_Prot> 
+            at a specific concentration
+          name: resuspend_proteins
+          processing_institution: EMSL
+          has_input: 
+          - ProcessedSample4_Prot
+          has_output: 
+          - ProcessedSample5_Prot
+          substances_used:
+            - type: nmdc:PortionOfSubstance
+              known_as: water
+              substance_role: solvent
+              final_concentration:
+                type: nmdc:QuantityValue
+                has_raw_value: 0.1 g/L # this is confusing since it's the concentration of the protein
+                has_unit: g/L
+                has_numeric_value: 0.1
+            - type: nmdc:PortionOfSubstance
+              known_as: ammonium_bicarbonate
+              substance_role: buffer
+              source_concentration:
+                type: nmdc:QuantityValue
+                has_raw_value: 50 mmol/L
+                has_unit: mmol/L
+                has_numeric_value: 50
+
+    - Step 5_prot: # intracellular - fractionation
+        SubSamplingProcess:
+          id: # nmdc:subspr-{shoulder}-{blade}
+          type: nmdc:SubSamplingProcess
+          name: <Biosample>_protein_fraction_subsample
+          description: Subsampling of resuspended proteins from <ProcessedSample5_Prot> for fractionation and LC-MS analysis
+          has_input:
+            - ProcessedSample5_Prot
+          has_output:
+            - ProcessedSample6_Prot
+          processing_institution: EMSL
+          volume:
+            type: nmdc:QuantityValue
+            has_raw_value: 48 uL
+            has_unit: uL
+            has_numeric_value: 48
+
+    - Step 6_prot: # intracellular - whole
+        SubSamplingProcess:
+          id: # nmdc:subspr-{shoulder}-{blade}
+          type: nmdc:SubSamplingProcess
+          name: <Biosample>_protein_whole_subsample
+          description: Subsampling of resuspended proteins from <ProcessedSample5_Prot> for unfractionated LC-MS proteomics
+          has_input:
+            - ProcessedSample5_Prot
+          has_output:
+            - ProcessedSample7_Prot
+          processing_institution: EMSL
+
+    - Step 7_prot: # intracellular - fractionation
+        ChromatographicSeparationProcess:
+          id: # nmdc:cspro-{shoulder}-{blade}
+          type: nmdc:ChromatographicSeparationProcess
+          name: <ProcessedSample4_Prot>_fractionation
+          description: >-
+            Fractionation of peptides extracted from <Biosample>. Separations were performed using 10 mM ammonium formate (pH 7.5) as mobile phase A and 100% acetonitrile as mobile phase B. 48 µL of peptide mixtures (0.1 µg/µL) were loaded onto the column and separated using a binary gradient of 1 % B for 35 min, 1-10 % B in 2 min, 10-15 % B in 5 min, and 15-25 % B in 35 min, 25-32 % B in 25min, 32-40 % B in 13 min, 40-90 % B in 43 min, held at 90 % B for 2 min (column washed and equilibrated from 90-50 % B in 2 min, 50-95% B in 2 min, held at 95 % B for 2 min and 95-1 % in 4 min).
+          has_input:
+            - ProcessedSample6_Prot
+          has_output:
+            - ProcessedSample8_Prot # inputs to DataGeneration
+            - ProcessedSample9_Prot
+            - ProcessedSample10_Prot
+            - ProcessedSample11_Prot
+            - ProcessedSample12_Prot
+            - ProcessedSample13_Prot
+          processing_institution: EMSL
+          stationary_phase: C18
+          chromatographic_category: liquid_chromatography
+          ordered_mobile_phases:
+            - type: nmdc:MobilePhaseSegment
+              substances_used:
+                - type: nmdc:PortionOfSubstance
+                  known_as: ammonium_formate
+                  final_concentration:
+                    type: nmdc:QuantityValue
+                    has_raw_value: 10 mmol/L
+                    has_unit: mmol/L
+                    has_numeric_value: 10
+                - type: nmdc:PortionOfSubstance
+                  known_as: water
+            - type: nmdc:MobilePhaseSegment
+              substances_used:
+                - type: nmdc:PortionOfSubstance
+                  known_as: acetonitrile
+                  final_concentration:
+                    type: nmdc:QuantityValue
+                    has_raw_value: 100 %
+                    has_unit: '%'
+                    has_numeric_value: 100
+
+    - Step 8_prot: # extracellular - extraction
+        Extraction:
+          id: # nmdc:extrp-{shoulder}-{blade}
+          type: nmdc:Extraction
+          name: <Biosample>_extracellular_protein_extraction
+          description: TCA/acetone precipitation of extracellular proteins from <ProcessedSample2_Prot>
+          has_input:
+            - ProcessedSample2_Prot
+          has_output:
+            - ProcessedSample14_Prot
+          processing_institution: EMSL
+          substances_used:
+            - type: nmdc:PortionOfSubstance
+              known_as: disodium_hydrogenphosphate_dihydrate
+              substance_role: buffer
+            - type: nmdc:PortionOfSubstance
+              known_as: potassium_dihydrogen_phosphate
+              substance_role: buffer
+            - type: nmdc:PortionOfSubstance
+              known_as: sodium_chloride
+              substance_role: buffer
+            - type: nmdc:PortionOfSubstance
+              known_as: potassium_chloride
+              substance_role: buffer
+            - type: nmdc:PortionOfSubstance
+              known_as: trichloroacetic_acid
+              substance_role: # precipitator
+              volume:
+                type: nmdc:QuantityValue
+                has_raw_value: 10 mL
+                has_unit: mL
+                has_numeric_value: 10
+              final_concentration:
+                type: nmdc:QuantityValue
+                has_raw_value: 20 %
+                has_unit: '%'
+                has_numeric_value: 20
+            - type: nmdc:PortionOfSubstance
+              known_as: acetone
+              substance_role: # precipitator
+              volume:
+                type: nmdc:QuantityValue
+                has_raw_value: 10 mL
+                has_unit: mL
+                has_numeric_value: 10
+              final_concentration:
+                type: nmdc:QuantityValue
+                has_raw_value: 100 %
+                has_unit: '%'
+                has_numeric_value: 100
+          extraction_targets:
+            - protein
+
+    - Step 9_prot: # extracellular - digestion
+        ChemicalConversionProcess:
+          id: # nmdc:chcpr-{shoulder}-{blade}
+          type: nmdc:ChemicalConversionProcess
+          name: Protein_digestion_trypsin
+          description: Trypsin digestion of proteins from <ProcessedSample14_Prot> for analysis
+          has_input:
+            - ProcessedSample14_Prot
+          has_output:
+            - ProcessedSample15_Prot
+          processing_institution: EMSL
+          chemical_conversion_category: protease_cleavage
+          substances_used:
+            - type: nmdc:PortionOfSubstance
+              known_as: trypsin
+              substance_role: ms_proteolytic_enzyme
+              volume: 
+                type: nmdc:QuantityValue
+                has_raw_value: 0.004 mL
+                has_unit: mL
+                has_numeric_value: 0.004
+          temperature:
+            type: nmdc:QuantityValue
+            has_raw_value: 37 C
+            has_unit: Cel
+            has_numeric_value: 37
+          duration:
+            type: nmdc:QuantityValue
+            has_raw_value: 3 h
+            has_unit: h
+            has_numeric_value: 3
+
+    - Step 10_prot: # extracellular - resuspend to same concentration
+        DissolvingProcess:
+          id: # nmdc:dispro-{shoulder}-{blade}
+          type: nmdc:DissolvingProcess
+          description: >- 
+            Resuspension of extracted proteins from <ProcessedSample14_Prot> 
+            at a specific concentration
+          name: resuspend_proteins
+          processing_institution: EMSL
+          has_input: 
+          - ProcessedSample15_Prot
+          has_output: 
+          - ProcessedSample16_Prot
+          substances_used:
+            - type: nmdc:PortionOfSubstance
+              known_as: water
+              substance_role: solvent
+              final_concentration:
+                type: nmdc:QuantityValue
+                has_raw_value: 0.1 g/L # this is confusing since it's the concentration of the protein
+                has_unit: g/L
+                has_numeric_value: 0.1
+            - type: nmdc:PortionOfSubstance
+              known_as: ammonium_bicarbonate
+              substance_role: buffer
+              source_concentration:
+                type: nmdc:QuantityValue
+                has_raw_value: 50 mmol/L
+                has_unit: mmol/L
+                has_numeric_value: 50
+
+    - Step 11_prot: # extracellular - fractionation 
+        ChromatographicSeparationProcess:
+          id: # nmdc:cspro-{shoulder}-{blade}
+          type: nmdc:ChromatographicSeparationProcess
+          name: <ProcessedSample16_Prot>_extracellular_fractionation
+          description: >-
+            Fractionation of extracellular peptides extracted from <Biosample>. Separations were performed using 10 mM ammonium formate (pH 7.5) as mobile phase A and 100% acetonitrile as mobile phase B. 48 µL of peptide mixtures (0.1 µg/µL) were loaded onto the column and separated using a binary gradient of 1 % B for 35 min, 1-10 % B in 2 min, 10-15 % B in 5 min, and 15-25 % B in 35 min, 25-32 % B in 25min, 32-40 % B in 13 min, 40-90 % B in 43 min, held at 90 % B for 2 min (column washed and equilibrated from 90-50 % B in 2 min, 50-95% B in 2 min, held at 95 % B for 2 min and 95-1 % in 4 min).
+          has_input:
+            - ProcessedSample16_Prot
+          has_output:
+            - ProcessedSample17_Prot # inputs to DataGeneration
+            - ProcessedSample18_Prot
+            - ProcessedSample19_Prot
+            - ProcessedSample20_Prot
+            - ProcessedSample21_Prot
+            - ProcessedSample22_Prot
+          processing_institution: EMSL
+          stationary_phase: C18
+          chromatographic_category: liquid_chromatography
+          ordered_mobile_phases:
+            - type: nmdc:MobilePhaseSegment
+              substances_used:
+                - type: nmdc:PortionOfSubstance
+                  known_as: ammonium_formate
+                  final_concentration:
+                    type: nmdc:QuantityValue
+                    has_raw_value: 10 mmol/L
+                    has_unit: mmol/L
+                    has_numeric_value: 10
+                - type: nmdc:PortionOfSubstance
+                  known_as: water
+            - type: nmdc:MobilePhaseSegment
+              substances_used:
+                - type: nmdc:PortionOfSubstance
+                  known_as: acetonitrile
+                  final_concentration:
+                    type: nmdc:QuantityValue
+                    has_raw_value: 100 %
+                    has_unit: '%'
+                    has_numeric_value: 100
+
+    - Step 12_prot: # extracellular - fractionation KCL
+        ChromatographicSeparationProcess:
+          id: # nmdc:cspro-{shoulder}-{blade}
+          type: nmdc:ChromatographicSeparationProcess
+          name: <ProcessedSample16_Prot>_extracellular_fractionation_KCl
+          description: >-
+            Fractionation of extracellular peptides extracted from <Biosample>. Separations were performed using strong cation exchange.
+          has_input:
+            - ProcessedSample16_Prot
+          has_output:
+            - ProcessedSample23_Prot # inputs to DataGeneration
+            - ProcessedSample24_Prot
+            - ProcessedSample25_Prot
+            - ProcessedSample26_Prot
+            - ProcessedSample27_Prot
+            - ProcessedSample28_Prot
+          processing_institution: EMSL
+          stationary_phase: C18
+          chromatographic_category: liquid_chromatography
+          ordered_mobile_phases:
+            - type: nmdc:MobilePhaseSegment
+              substances_used:
+                - type: nmdc:PortionOfSubstance
+                  known_as: potassium_chloride
+
+  processedsamples:
+    - ProcessedSample1_NOM:
+        ProcessedSample:
+          id: #nmdc:
+          type: nmdc:ProcessedSample
+          name: <Biosample>_subsample
+          description: The output from subsampling <Biosample> for extraction
+
+    - ProcessedSample2_NOM:
+        ProcessedSample:
+          id: #nmdc:
+          type: nmdc:ProcessedSample
+          name: <Biosample>_water_extract
+          description: Water extract from <Biosample>
+          sampled_portion:
+          - aqueous_layer
+
+    - ProcessedSample3_NOM:
+        ProcessedSample:
+          id: #nmdc:
+          type: nmdc:ProcessedSample
+          name: <Biosample>_water_extracted_soil
+          description: Water-extracted soil from <Biosample>
+
+    - ProcessedSample4_NOM:
+        ProcessedSample:
+          id: #nmdc:
+          type: nmdc:ProcessedSample
+          name: <Biosample>_methanol_extract
+          description: Methanol extract from <Biosample>
+          sampled_portion:
+          - methanol_layer
+
+    - ProcessedSample5_NOM:
+        ProcessedSample:
+          id: #nmdc:
+          type: nmdc:ProcessedSample
+          name: <Biosample>_methanol_extracted_soil
+          description: >-
+            Soil from <Biosample> after sequential water-methanol extraction
+
+    - ProcessedSample6_NOM:
+        ProcessedSample:
+          id: #nmdc:
+          type: nmdc:ProcessedSample
+          name: <Biosample>_water_SPE
+          description: >-
+            Water extract from <Biosample> that has been cleaned by solid phase extraction
+          sampled_portion:
+          - aqueous_layer
+
+    - ProcessedSample7_NOM:
+        ProcessedSample:
+          id: #nmdc:
+          type: nmdc:ProcessedSample
+          name: <Biosample>_methanol_SPE
+          description: >-
+            Methanol extract from <Biosample> that has been cleaned by solid phase extraction
+          sampled_portion:
+          - methanol_layer
+
+
+    - ProcessedSample1_GCMS:
+        ProcessedSample:
+          id: #nmdc:
+          type: nmdc:ProcessedSample
+          name: <Biosample>_water_methanol_combined
+          description: >-
+            Combined methanol and water extracts of <Biosample> 
+            for GC-MS metabolomics analysis
+          sampled_portion:
+          - aqueous_layer
+          - methanol_layer
+
+    - ProcessedSample2_GCMS:
+        ProcessedSample:
+          id: #nmdc:
+          type: nmdc:ProcessedSample
+          name: <Biosample>_reconstituted_GCMS
+          description: >-
+            Reconstituted combined methanol and water extracts of <Biosample> 
+            for GC-MS metabolomics analysis
+          sampled_portion:
+          - aqueous_layer
+          - methanol_layer
+
+    - ProcessedSample1_Prot:
+        ProcessedSample:
+          id: #nmdc:
+          type: nmdc:ProcessedSample
+          name: <Biosample>_intracellular_subsample
+          description: Subsampling of <Biosample> for intracellular protein extraction after sequential water/methanol extraction
+
+    - ProcessedSample2_Prot:
+        ProcessedSample:
+          id: #nmdc:
+          type: nmdc:ProcessedSample
+          name: <Biosample>_extracellular_subsample
+          description: Subsampling of <Biosample> for extracellular protein extraction after sequential water/methanol extraction
+
+    - ProcessedSample3_Prot:
+        ProcessedSample:
+          id: #nmdc:
+          type: nmdc:ProcessedSample
+          name: <Biosample>_intracellular_extracted_proteins
+          description: TCA/acetone precipitated intracellular proteins from <Biosample>
+          sampled_portion:
+          - pellet
+
+    - ProcessedSample4_Prot:
+        ProcessedSample:
+          id: #nmdc:
+          type: nmdc:ProcessedSample
+          name: <Biosample>_intracellular_digested_proteins
+          description: Trypsin digested intracellular proteins from <Biosample>
+
+    - ProcessedSample5_Prot:
+        ProcessedSample:
+          id: #nmdc:
+          type: nmdc:ProcessedSample
+          name: <Biosample>_intracellular_resuspended_proteins
+          description: Resuspended digested intracellular proteins from <Biosample>
+
+    - ProcessedSample6_Prot:
+        ProcessedSample:
+          id: #nmdc:
+          type: nmdc:ProcessedSample
+          name: <Biosample>_intracellular_fractionation_subsample
+          description: Subsampled resuspended intracellular proteins for fractionation
+
+    - ProcessedSample7_Prot:
+        ProcessedSample:
+          id: #nmdc:
+          type: nmdc:ProcessedSample
+          name: <Biosample>_intracellular_whole_proteins
+          description: Unfractionated resuspended intracellular proteins for LC-MS
+
+    - ProcessedSample8_Prot:
+        ProcessedSample:
+          id: #nmdc:
+          type: nmdc:ProcessedSample
+          name: <Biosample>_intracellular_fraction_1
+          description: Fraction 1 from intracellular peptide fractionation
+
+    - ProcessedSample9_Prot:
+        ProcessedSample:
+          id: #nmdc:
+          type: nmdc:ProcessedSample
+          name: <Biosample>_intracellular_fraction_2
+          description: Fraction 2 from intracellular peptide fractionation
+
+    - ProcessedSample10_Prot:
+        ProcessedSample:
+          id: #nmdc:
+          type: nmdc:ProcessedSample
+          name: <Biosample>_intracellular_fraction_3
+          description: Fraction 3 from intracellular peptide fractionation
+
+    - ProcessedSample11_Prot:
+        ProcessedSample:
+          id: #nmdc:
+          type: nmdc:ProcessedSample
+          name: <Biosample>_intracellular_fraction_4
+          description: Fraction 4 from intracellular peptide fractionation
+
+    - ProcessedSample12_Prot:
+        ProcessedSample:
+          id: #nmdc:
+          type: nmdc:ProcessedSample
+          name: <Biosample>_intracellular_fraction_5
+          description: Fraction 5 from intracellular peptide fractionation
+
+    - ProcessedSample13_Prot:
+        ProcessedSample:
+          id: #nmdc:
+          type: nmdc:ProcessedSample
+          name: <Biosample>_intracellular_fraction_6
+          description: Fraction 6 from intracellular peptide fractionation
+
+    - ProcessedSample14_Prot:
+        ProcessedSample:
+          id: #nmdc:
+          type: nmdc:ProcessedSample
+          name: <Biosample>_extracellular_extracted_proteins
+          description: TCA/acetone precipitated extracellular proteins from <Biosample>
+          sampled_portion:
+          - pellet
+
+    - ProcessedSample15_Prot:
+        ProcessedSample:
+          id: #nmdc:
+          type: nmdc:ProcessedSample
+          name: <Biosample>_extracellular_digested_proteins
+          description: Trypsin digested extracellular proteins from <Biosample>
+
+    - ProcessedSample16_Prot:
+        ProcessedSample:
+          id: #nmdc:
+          type: nmdc:ProcessedSample
+          name: <Biosample>_extracellular_resuspended_proteins
+          description: Resuspended digested extracellular proteins from <Biosample>
+
+    - ProcessedSample17_Prot:
+        ProcessedSample:
+          id: #nmdc:
+          type: nmdc:ProcessedSample
+          name: <Biosample>_extracellular_fraction_1
+          description: Fraction 1 from extracellular peptide fractionation
+
+    - ProcessedSample18_Prot:
+        ProcessedSample:
+          id: #nmdc:
+          type: nmdc:ProcessedSample
+          name: <Biosample>_extracellular_fraction_2
+          description: Fraction 2 from extracellular peptide fractionation
+
+    - ProcessedSample19_Prot:
+        ProcessedSample:
+          id: #nmdc:
+          type: nmdc:ProcessedSample
+          name: <Biosample>_extracellular_fraction_3
+          description: Fraction 3 from extracellular peptide fractionation
+
+    - ProcessedSample20_Prot:
+        ProcessedSample:
+          id: #nmdc:
+          type: nmdc:ProcessedSample
+          name: <Biosample>_extracellular_fraction_4
+          description: Fraction 4 from extracellular peptide fractionation
+
+    - ProcessedSample21_Prot:
+        ProcessedSample:
+          id: #nmdc:
+          type: nmdc:ProcessedSample
+          name: <Biosample>_extracellular_fraction_5
+          description: Fraction 5 from extracellular peptide fractionation
+
+    - ProcessedSample22_Prot:
+        ProcessedSample:
+          id: #nmdc:
+          type: nmdc:ProcessedSample
+          name: <Biosample>_extracellular_fraction_6
+          description: Fraction 6 from extracellular peptide fractionation
+
+    - ProcessedSample23_Prot:
+        ProcessedSample:
+          id: #nmdc:
+          type: nmdc:ProcessedSample
+          name: <Biosample>_extracellular_KCl_fraction_1
+          description: Fraction 1 from extracellular peptide fractionation with KCl
+
+    - ProcessedSample24_Prot:
+        ProcessedSample:
+          id: #nmdc:
+          type: nmdc:ProcessedSample
+          name: <Biosample>_extracellular_KCl_fraction_2
+          description: Fraction 2 from extracellular peptide fractionation with KCl
+
+    - ProcessedSample25_Prot:
+        ProcessedSample:
+          id: #nmdc:
+          type: nmdc:ProcessedSample
+          name: <Biosample>_extracellular_KCl_fraction_3
+          description: Fraction 3 from extracellular peptide fractionation with KCl
+
+    - ProcessedSample26_Prot:
+        ProcessedSample:
+          id: #nmdc:
+          type: nmdc:ProcessedSample
+          name: <Biosample>_extracellular_KCl_fraction_4
+          description: Fraction 4 from extracellular peptide fractionation with KCl
+
+    - ProcessedSample27_Prot:
+        ProcessedSample:
+          id: #nmdc:
+          type: nmdc:ProcessedSample
+          name: <Biosample>_extracellular_KCl_fraction_5
+          description: Fraction 5 from extracellular peptide fractionation with KCl
+
+    - ProcessedSample28_Prot:
+        ProcessedSample:
+          id: #nmdc:
+          type: nmdc:ProcessedSample
+          name: <Biosample>_extracellular_KCl_fraction_6
+          description: Fraction 6 from extracellular peptide fractionation with KCl
