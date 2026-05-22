@@ -313,6 +313,9 @@ def process_file_wrapper(args) -> Optional[Dict]:
             print(f"✅ {file_path.name}: {result.get('total_scans', 'N/A')} scans, {result.get('instrument_model', 'Unknown')} instrument")
         return result
     else:
+        # Initialize error file only if you somehow get here
+        initialize_error_log(error_file)
+        
         print(f"❌ {file_path.name}: Processing failed completely")
         # Log error
         with open(error_file, 'a', newline='') as f:
@@ -388,9 +391,6 @@ def inspect_raw_files(
         output_file.unlink()
     if error_file.exists():
         error_file.unlink()
-    
-    # Initialize error log
-    initialize_error_log(error_file)
     
     # Process file paths and filter by supported extensions
     file_list = []
