@@ -41,7 +41,7 @@ class TestMASSIVEOperations:
         
         mock_ftp.retrlines.side_effect = mock_retrlines
         
-        with patch('ftplib.FTP', return_value=mock_ftp):
+        with patch('ftplib.FTP_TLS', return_value=mock_ftp):
             log_file = manager._crawl_massive_ftp("v07/MSV000094090")
             assert Path(log_file).exists()
             
@@ -52,6 +52,7 @@ class TestMASSIVEOperations:
             assert len(result_df) == 2
             assert all('HILICZ' in name for name in result_df['raw_data_file_short'])
             mock_ftp.login.assert_called_once()
+            mock_ftp.prot_p.assert_called_once()
 
     def test_ftp_crawl_error_handling(self, lcms_config_file):
         """Test handling of FTP errors."""
@@ -63,7 +64,7 @@ class TestMASSIVEOperations:
         mock_ftp = MagicMock()
         mock_ftp.cwd.side_effect = ftplib.error_perm("550 Permission denied")
         
-        with patch('ftplib.FTP', return_value=mock_ftp):
+        with patch('ftplib.FTP_TLS', return_value=mock_ftp):
             log_file = manager._crawl_massive_ftp("invalid/path")
             assert log_file == []  # Returns empty list on error
 
