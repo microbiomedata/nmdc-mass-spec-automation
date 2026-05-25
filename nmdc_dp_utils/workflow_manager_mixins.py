@@ -2649,8 +2649,14 @@ class WorkflowRawDataInspectionManager:
     def _run_lcms_data_inspector(
         self, file_paths, cores, limit, max_retries, retry_delay
     ):
-        """Run LCMS raw data inspector using Docker container."""
-        self.logger.info("Starting LCMS RAW DATA INSPECTION (Docker)")
+        """Run LCMS raw data inspector using Docker container.
+        Includes options for FT-ICR raw data inspection."""
+
+        workflow_type = self.config["workflow"]["workflow_type"]
+        if workflow_type == "DI FTICR NOM":
+            self.logger.info("Starting FT-ICR RAW DATA INSPECTION (Docker)")
+        else:
+            self.logger.info("Starting LCMS RAW DATA INSPECTION (Docker)")
 
         try:
             # Get file paths to inspect
@@ -2670,6 +2676,7 @@ class WorkflowRawDataInspectionManager:
                         "*.mzML",
                         "*.raw",
                         "*.mzml",
+                        "*.d"
                     ]:  # Include lowercase variants
                         file_paths.extend([str(f) for f in raw_data_dir.rglob(ext)])
 

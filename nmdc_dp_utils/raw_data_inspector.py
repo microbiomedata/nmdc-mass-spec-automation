@@ -2,7 +2,7 @@
 """
 Raw Data Inspector for NMDC Studies
 
-Extracts metadata from raw MS data files (mzML or raw formats) including:
+Extracts metadata from raw MS data files (mzML, raw, or .d formats) including:
 - Instrument information (model, serial number, name)
 - Scan parameters (levels, types, collision energies)
 - Data range information (m/z, retention time)
@@ -57,7 +57,7 @@ def get_raw_file_info_single(file_path: Path, max_retries: int = 3, retry_delay:
     Extract metadata from a single mass spectrometry file using CoreMS with retry logic.
 
     Args:
-        file_path: Path to the mass spectrometry file (.raw or .mzML)
+        file_path: Path to the mass spectrometry file (.raw or .mzML or .d)
         max_retries: Maximum number of retry attempts for transient errors
         retry_delay: Delay in seconds between retry attempts
 
