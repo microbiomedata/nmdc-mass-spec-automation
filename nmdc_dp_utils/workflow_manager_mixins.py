@@ -2735,8 +2735,6 @@ class WorkflowRawDataInspectionManager:
             if not docker_image:
                 self.logger.error("Docker image not configured.")
 
-                return None
-
             # Check for .raw files and force single core processing to prevent crashes
             has_raw_files = any(
                 str(fp).lower().endswith(".raw") for fp in files_to_inspect
@@ -2829,7 +2827,10 @@ class WorkflowRawDataInspectionManager:
                     traceback.print_exc()
 
             # Set the skip trigger on successful completion
-            if result is not None and combined_df['error'].isna().all():
+            if (
+                result is not None and 
+                pd.read_csv(existing_results_file).get('error', pd.Series(pd.NA)).isna().all()
+            ):
                 self.logger.info("Raw data inspection completed successfully")
                 self.set_skip_trigger("raw_data_inspected", True)
                 return True
@@ -2842,6 +2843,7 @@ class WorkflowRawDataInspectionManager:
             import traceback
 
             traceback.print_exc()
+            print("now i am here")
             return False
 
     def _run_raw_data_inspector_docker(
@@ -4189,7 +4191,8 @@ class WorkflowMetadataManager:
                     continue
 
                 # Extract raw data filename from the full path
-                df["raw_data_file_short"] = df["raw_data_file"].apply(lambda x: Path(x).stem) # this is leaving .d on the end of the filename
+                df["raw_data_file_short"] = df["raw_data_file"].apply(lambda x: Path(x).name)
+                # this leaves the file extension which works for lcms and gcms but not di fticr for some reason
                 
                 # Store original row count for reporting
                 original_row_count = len(df)

@@ -28,8 +28,7 @@ def test_protocol_conversion_init_adds_system_prompt(monkeypatch):
 
     manager = ConversationManager(interaction_type="protocol_conversion")
 
-    assert manager.messages[0] == {}
-    assert manager.messages[1] == {"role": "system", "content": PROTOCOL_SYSTEM_PROMPT}
+    assert manager.messages[0] == {"role": "system", "content": PROTOCOL_SYSTEM_PROMPT}
     assert tracker["called"] is True
 
 

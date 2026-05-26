@@ -262,7 +262,8 @@ class TestWorkflowRawDataInspectionManager:
         
         # Use config without Docker settings
         manager = NMDCWorkflowManager(str(lcms_config_file))
-        
+        manager.config["docker"] = None
+
         # Create a dummy raw file
         raw_dir = manager.workflow_path.parent / "test_data" / "raw"
         raw_dir.mkdir(parents=True, exist_ok=True)
