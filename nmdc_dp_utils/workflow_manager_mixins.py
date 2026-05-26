@@ -4192,20 +4192,32 @@ class WorkflowMetadataManager:
 
                 # Extract raw data filename from the full path
                 df["raw_data_file_short"] = df["raw_data_file"].apply(lambda x: Path(x).name)
-                # this leaves the file extension which works for lcms and gcms but not di fticr for some reason
                 
                 # Store original row count for reporting
                 original_row_count = len(df)
-                
+
                 # Merge with mapping to get processed_sample_id based on raw data filename
                 # Left merge to keep all rows from df, adding processed_sample_id column
-                df_merged = df.merge(
-                    mapping_df,
-                    left_on="raw_data_file_short",
-                    right_on="raw_data_identifier",
-                    how="left"
-                )
                 
+                # FOR SOME REASON deep in mass-spec-metadata-gen the file extensions on NOM files are getting removed
+                # IF raw_data_identifier does not include file extension, merge on raw_data_file_short.stem()
+                if not mapping_df["raw_data_identifier"].str.contains(r"\.").any():
+                    df["raw_data_file_short_stem"] = df["raw_data_file_short"].apply(lambda x: Path(x).stem)
+                    mapping_df["raw_data_identifier_stem"] = mapping_df["raw_data_identifier"].apply(lambda x: Path(x).stem)
+                    df_merged = df.merge(
+                        mapping_df,
+                        left_on="raw_data_file_short_stem",
+                        right_on="raw_data_identifier_stem",
+                        how="left"
+                    )
+                else:
+                    df_merged = df.merge(
+                        mapping_df,
+                        left_on="raw_data_file_short",
+                        right_on="raw_data_identifier",
+                        how="left"
+                    )
+
                 # Check for any unmapped raw data files (would have NaN in processed_sample_id)
                 unmapped_mask = df_merged["processed_sample_id"].isna()
                 if unmapped_mask.any():
@@ -4224,8 +4236,9 @@ class WorkflowMetadataManager:
                 # Replace sample_id with processed_sample_id
                 df_merged["sample_id"] = df_merged["processed_sample_id"]
                 
-                # Drop the temporary columns from the merge
-                df_merged = df_merged.drop(columns=["raw_data_file_short", "raw_data_identifier", "processed_sample_id"])
+                # Drop the temporary columns from the merge if they exist
+                columns_to_drop = ["raw_data_file_short", "raw_data_identifier", "processed_sample_id", "raw_data_file_short_stem", "raw_data_identifier_stem"]
+                df_merged = df_merged.drop(columns=[col for col in columns_to_drop if col in df_merged.columns])
 
                 # Write updated CSV back to file
                 df_merged.to_csv(csv_file, index=False)
