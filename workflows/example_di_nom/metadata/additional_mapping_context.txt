@@ -1,0 +1,13 @@
+Samples with "SRFA" in the name are calibrants. They should only have a raw_data_identifier and match_confidence = "calibrant" in the output. They should not map to any existing biosamples.
+
+"H2O" refers to water extracts. "Met" refers to methanol extracts. 
+All files with extension ".d" are natural organic matter (NOM) data.
+
+Mapping examples for NOM data:
+Biosample "EMSL 13 KONZ_A1_PRE_NotGr_NA_NA" maps to raw data file "Miesel_60009_13_KONZ_A1_PRE_H2O_SPE_r2_28Jan23_Alder_300SA_IATp03_9091.d"
+Biosample "EMSL 76 KONZ_A1_POST_NotGr_MST+5_33" maps to raw data file "Miesel_60009_76_KONZ_A1_POST_MSTplus5_33_H2O_SPE_r2_300SA_IATp03_9101.d"
+Biosample "EMSL 89 UNDE_A_POST_NotGr_MST+5_33" maps to raw data file "Miesel_60009_89_UNDE_A_POST_MSTplus5_33_H2O_SPE_r1_300SA_IATp03_9063.d"
+Biosample "EMSL 11 HEAL_Oae_PRE_NotGr_NA_NA" maps to raw data file "Miesel_60009_11_HEAL_Oae_PRE_H2O_SPE_r1_26Jan23_Alder_300SA_IATp03_8999.d"
+Biosample "EMSL 1 ABBY_A_PRE_NotGr_NA_NA" maps to raw data file "Miesel_60009_01_ABBY_A_PRE_H2O_SPE_r2_28Jan23_Fir_300SA_IATp03_9113.d"
+Biosample "EMSL 7 DCFS_A1_PRE_NotGr_NA_NA" maps to raw data file "Miesel_60009_07_DCFS_A1_PRE_Met_SPE_r1_300SA_IATp03_9255.d"
+
