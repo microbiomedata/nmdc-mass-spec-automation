@@ -71,7 +71,6 @@
         "raw_data_downloaded": true,
         "protocol_outline_created": true,
         "biosample_attributes_fetched": true,
-        "biosample_mapping_script_generated": false,
         "biosample_mapping_completed": true,
         "raw_data_inspected": true,
         "material_processing_metadata_generated": true,
