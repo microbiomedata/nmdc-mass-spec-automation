@@ -253,6 +253,55 @@ ALL:
                 has_raw_value: 400 uL
                 has_unit: uL
                 has_numeric_value: 400
+      
+    - Step 3_GCMS:
+        ChemicalConversionProcess:
+          id: # nmdc:chcpr-{shoulder}-{blade}
+          type: nmdc:ChemicalConversionProcess
+          name: methoximation_for_GCMS
+          description: Methoximation of <ProcessedSample2_GCMS>, part of derivatization for GCMS analysis
+          has_input:
+            - ProcessedSample2_GCMS
+          has_output:
+            - ProcessedSample3_GCMS
+          processing_institution: EMSL
+          chemical_conversion_category: substitution
+          substances_used:
+            - type: nmdc:PortionOfSubstance
+              known_as: methoxyamine
+              volume:
+                type: nmdc:QuantityValue
+                has_raw_value: 0.02 mL
+                has_unit: mL
+                has_numeric_value: 0.02
+
+    - Step 4_GCMS:
+        ChemicalConversionProcess:
+          id: # nmdc:chcpr-{shoulder}-{blade}
+          type: nmdc:ChemicalConversionProcess
+          name: derivatization_for_GCMS
+          description: Silylation of <ProcessedSample3_GCMS>, part of derivatization for GCMS analysis
+          has_input:
+            - ProcessedSample3_GCMS
+          has_output:
+            - ProcessedSample4_GCMS # DG GCMS input
+          processing_institution: EMSL
+          chemical_conversion_category: addition
+          substances_used:
+            - type: nmdc:PortionOfSubstance
+              known_as: N-methyl-N-trimethylsilyltrifluoroacetamide
+              volume:
+                type: nmdc:QuantityValue
+                has_numeric_value: 0.0792
+                has_raw_value: 0.0792 mL
+                has_unit: mL
+            - type: nmdc:PortionOfSubstance
+              known_as: trimethylchlorosilane
+              volume:
+                type: nmdc:QuantityValue
+                has_numeric_value: 0.0008
+                has_raw_value: 0.0008 mL
+                has_unit: mL
 
       # processedsamples:
 
@@ -694,7 +743,6 @@ ALL:
           sampled_portion:
           - methanol_layer
 
-
     - ProcessedSample1_GCMS:
         ProcessedSample:
           id: #nmdc:
@@ -714,6 +762,30 @@ ALL:
           name: <Biosample>_reconstituted_GCMS
           description: >-
             Reconstituted combined methanol and water extracts of <Biosample> 
+            for GC-MS metabolomics analysis
+          sampled_portion:
+          - aqueous_layer
+          - methanol_layer
+    
+    - ProcessedSample3_GCMS:
+        ProcessedSample:
+          id: #nmdc:
+          type: nmdc:ProcessedSample
+          name: <Biosample>_methoximated_GCMS
+          description: >-
+            Methoximated combined methanol and water extracts of <Biosample> 
+            for GC-MS metabolomics analysis
+          sampled_portion:
+          - aqueous_layer
+          - methanol_layer
+
+    - ProcessedSample4_GCMS:
+        ProcessedSample:
+          id: #nmdc:
+          type: nmdc:ProcessedSample
+          name: <Biosample>_derivatized_GCMS
+          description: >-
+            Derivatized combined methanol and water extracts of <Biosample> 
             for GC-MS metabolomics analysis
           sampled_portion:
           - aqueous_layer

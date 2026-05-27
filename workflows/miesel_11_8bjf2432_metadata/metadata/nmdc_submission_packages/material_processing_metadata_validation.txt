@@ -1,0 +1,68 @@
+
+================================================================================
+VALIDATING GENERATED OUTPUT
+================================================================================
+Calculating expected counts...
+
+================================================================================
+PLACEHOLDER COMBINATIONS BY PROTOCOL:
+================================================================================
+
+ALL:
+  Target placeholders: ['ProcessedSample10_Prot', 'ProcessedSample11_Prot', 'ProcessedSample12_Prot', 'ProcessedSample13_Prot', 'ProcessedSample17_Prot', 'ProcessedSample18_Prot', 'ProcessedSample19_Prot', 'ProcessedSample20_Prot', 'ProcessedSample21_Prot', 'ProcessedSample22_Prot', 'ProcessedSample23_Prot', 'ProcessedSample24_Prot', 'ProcessedSample25_Prot', 'ProcessedSample26_Prot', 'ProcessedSample27_Prot', 'ProcessedSample28_Prot', 'ProcessedSample4_GCMS', 'ProcessedSample6_NOM', 'ProcessedSample7_NOM', 'ProcessedSample7_Prot', 'ProcessedSample8_Prot', 'ProcessedSample9_Prot']
+  Resulting samples: ['ProcessedSample1_NOM', 'ProcessedSample2_NOM', 'ProcessedSample3_NOM', 'ProcessedSample4_NOM', 'ProcessedSample5_NOM', 'ProcessedSample6_NOM', 'ProcessedSample7_NOM', 'ProcessedSample1_GCMS', 'ProcessedSample2_GCMS', 'ProcessedSample3_GCMS', 'ProcessedSample4_GCMS', 'ProcessedSample1_Prot', 'ProcessedSample2_Prot', 'ProcessedSample3_Prot', 'ProcessedSample4_Prot', 'ProcessedSample5_Prot', 'ProcessedSample6_Prot', 'ProcessedSample7_Prot', 'ProcessedSample8_Prot', 'ProcessedSample9_Prot', 'ProcessedSample10_Prot', 'ProcessedSample11_Prot', 'ProcessedSample12_Prot', 'ProcessedSample13_Prot', 'ProcessedSample14_Prot', 'ProcessedSample15_Prot', 'ProcessedSample16_Prot', 'ProcessedSample17_Prot', 'ProcessedSample18_Prot', 'ProcessedSample19_Prot', 'ProcessedSample20_Prot', 'ProcessedSample21_Prot', 'ProcessedSample22_Prot', 'ProcessedSample23_Prot', 'ProcessedSample24_Prot', 'ProcessedSample25_Prot', 'ProcessedSample26_Prot', 'ProcessedSample27_Prot', 'ProcessedSample28_Prot']
+  Biosamples with this combination: 4
+  Steps required per biosample: 21
+  Processed samples required per biosample: 39
+  Total steps for this combination: 84
+  Total samples for this combination: 156
+
+ALL:
+  Target placeholders: ['ProcessedSample10_Prot', 'ProcessedSample11_Prot', 'ProcessedSample12_Prot', 'ProcessedSample13_Prot', 'ProcessedSample23_Prot', 'ProcessedSample24_Prot', 'ProcessedSample25_Prot', 'ProcessedSample26_Prot', 'ProcessedSample27_Prot', 'ProcessedSample28_Prot', 'ProcessedSample4_GCMS', 'ProcessedSample6_NOM', 'ProcessedSample7_NOM', 'ProcessedSample7_Prot', 'ProcessedSample8_Prot', 'ProcessedSample9_Prot']
+  Resulting samples: ['ProcessedSample1_NOM', 'ProcessedSample2_NOM', 'ProcessedSample3_NOM', 'ProcessedSample4_NOM', 'ProcessedSample5_NOM', 'ProcessedSample6_NOM', 'ProcessedSample7_NOM', 'ProcessedSample1_GCMS', 'ProcessedSample2_GCMS', 'ProcessedSample3_GCMS', 'ProcessedSample4_GCMS', 'ProcessedSample1_Prot', 'ProcessedSample2_Prot', 'ProcessedSample3_Prot', 'ProcessedSample4_Prot', 'ProcessedSample5_Prot', 'ProcessedSample6_Prot', 'ProcessedSample7_Prot', 'ProcessedSample8_Prot', 'ProcessedSample9_Prot', 'ProcessedSample10_Prot', 'ProcessedSample11_Prot', 'ProcessedSample12_Prot', 'ProcessedSample13_Prot', 'ProcessedSample14_Prot', 'ProcessedSample15_Prot', 'ProcessedSample16_Prot', 'ProcessedSample23_Prot', 'ProcessedSample24_Prot', 'ProcessedSample25_Prot', 'ProcessedSample26_Prot', 'ProcessedSample27_Prot', 'ProcessedSample28_Prot']
+  Biosamples with this combination: 1
+  Steps required per biosample: 20
+  Processed samples required per biosample: 33
+  Total steps for this combination: 20
+  Total samples for this combination: 33
+
+ALL:
+  Target placeholders: ['ProcessedSample10_Prot', 'ProcessedSample11_Prot', 'ProcessedSample12_Prot', 'ProcessedSample13_Prot', 'ProcessedSample4_GCMS', 'ProcessedSample6_NOM', 'ProcessedSample7_NOM', 'ProcessedSample7_Prot', 'ProcessedSample8_Prot', 'ProcessedSample9_Prot']
+  Resulting samples: ['ProcessedSample1_NOM', 'ProcessedSample2_NOM', 'ProcessedSample3_NOM', 'ProcessedSample4_NOM', 'ProcessedSample5_NOM', 'ProcessedSample6_NOM', 'ProcessedSample7_NOM', 'ProcessedSample1_GCMS', 'ProcessedSample2_GCMS', 'ProcessedSample3_GCMS', 'ProcessedSample4_GCMS', 'ProcessedSample1_Prot', 'ProcessedSample3_Prot', 'ProcessedSample4_Prot', 'ProcessedSample5_Prot', 'ProcessedSample6_Prot', 'ProcessedSample7_Prot', 'ProcessedSample8_Prot', 'ProcessedSample9_Prot', 'ProcessedSample10_Prot', 'ProcessedSample11_Prot', 'ProcessedSample12_Prot', 'ProcessedSample13_Prot']
+  Biosamples with this combination: 22
+  Steps required per biosample: 16
+  Processed samples required per biosample: 23
+  Total steps for this combination: 352
+  Total samples for this combination: 506
+
+ALL:
+  Target placeholders: ['ProcessedSample4_GCMS', 'ProcessedSample6_NOM', 'ProcessedSample7_NOM']
+  Resulting samples: ['ProcessedSample1_NOM', 'ProcessedSample2_NOM', 'ProcessedSample3_NOM', 'ProcessedSample4_NOM', 'ProcessedSample6_NOM', 'ProcessedSample7_NOM', 'ProcessedSample1_GCMS', 'ProcessedSample2_GCMS', 'ProcessedSample3_GCMS', 'ProcessedSample4_GCMS']
+  Biosamples with this combination: 54
+  Steps required per biosample: 9
+  Processed samples required per biosample: 10
+  Total steps for this combination: 486
+  Total samples for this combination: 540
+
+================================================================================
+VALIDATION SUMMARY:
+================================================================================
+
+Biosamples:
+  Unique in mapping: 81
+
+Material Processing Steps:
+  Expected: 942
+  Actual:   942
+  ✓ MATCH
+
+Processed Samples:
+  Expected: 1235
+  Actual:   1235
+  ✓ MATCH
+
+Unique placeholder combinations: 4
+
+================================================================================
+✓ VALIDATION PASSED: All counts match!
+================================================================================
