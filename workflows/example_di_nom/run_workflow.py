@@ -70,9 +70,6 @@ async def main():
     manager.process_data(execute=True)
     assert manager.should_skip('data_processed'), "WDL workflows must complete successfully to proceed"
 
-    # debugging file transfer
-    manager._move_processed_files(working_dir="/home/bmeluch/NMDC/nmdc-mass-spec-automation/workflows/miesel_11_8bjf2432_nom/wdl_execution", clean_up=False)
-
     # Step 7: Upload processed data to MinIO
     logger.info("7. Uploading processed data to MinIO...")
     manager.upload_processed_data_to_minio()

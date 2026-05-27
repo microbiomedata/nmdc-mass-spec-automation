@@ -15,8 +15,8 @@
         "batch_size": 30
     },
     "paths": {
-        "base_directory": "/home/bmeluch/NMDC/nmdc-mass-spec-automation/",
-        "data_directory": "/home/bmeluch/NMDC/nom_processing/"
+        "base_directory": "/path/to/nmdc-mass-spec-automation/",
+        "data_directory": "/path/to/rawdata/basedir/"
     },
     "docker": {
         "raw_data_inspector_image": "microbiomedata/metams:3.3.3"

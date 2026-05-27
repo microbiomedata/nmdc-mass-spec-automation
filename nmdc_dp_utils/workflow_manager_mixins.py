@@ -693,7 +693,12 @@ class WorkflowDataMovementManager:
                 self.logger.info(f"Skipping {d_dir} as {zip_path} already exists")
                 continue
             try:
-                shutil.make_archive(zip_path.with_suffix(""), "zip", root_dir=d_dir)
+                shutil.make_archive(
+                    zip_path.with_suffix(""),
+                    "zip",
+                    root_dir=d_dir.parent,
+                    base_dir=d_dir.name,
+                    )
                 zipped_count += 1
             except Exception as e:
                 self.logger.error(f"Failed to zip {d_dir}: {e}")
@@ -1705,9 +1710,13 @@ class NMDCWorkflowDataProcessManager:
         # Build DataFrame for batch files with their metadata
         sample_rows = []
         for f in batch_files:
-            write_time = inspection_df[
-                inspection_df["file_name"] == f.name
-            ].iloc[0]["write_time"]
+            inspection_matches = inspection_df[inspection_df["file_name"] == f.name]
+            if inspection_matches.empty:
+                raise ValueError(
+                    f"Batch file '{f.name}' is missing from raw file inspection results: "
+                    f"{inspection_results_path}"
+                    )
+            write_time = inspection_matches.iloc[0]["write_time"]
             sample_rows.append(
                 {
                     "raw_data_file_short": f.name,
@@ -2598,8 +2607,7 @@ class WorkflowRawDataInspectionManager:
         Uses workflow-specific inspector based on WORKFLOW_DICT configuration:
         - LCMS workflows: Docker-based raw_data_inspector.py (for .mzML/.raw files)
         - GCMS workflows: Docker-based gcms_data_inspector.py (for .cdf files)
-        - FTICR workflows: non-docker based raw_data_inspector.py (for .d files)
-            or the LCMS inspector for .raw files
+        - FTICR workflows: Docker-based raw_data_inspector.py (for .raw/.d files)
 
         Both workflows require the same Docker image specified in configuration.
 
@@ -2733,7 +2741,9 @@ class WorkflowRawDataInspectionManager:
             # Now check Docker configuration since we have files to inspect
             docker_image = self.config.get("docker", {}).get("raw_data_inspector_image")
             if not docker_image:
-                self.logger.error("Docker image not configured.")
+                raise ValueError(
+                    "Docker configuration required: config['docker']['raw_data_inspector_image'] not found"
+                )
 
             # Check for .raw files and force single core processing to prevent crashes
             has_raw_files = any(
@@ -2841,9 +2851,7 @@ class WorkflowRawDataInspectionManager:
         except Exception as e:
             self.logger.error(f"Error during raw data inspection: {e}")
             import traceback
-
             traceback.print_exc()
-            print("now i am here")
             return False
 
     def _run_raw_data_inspector_docker(
@@ -4602,15 +4610,16 @@ class WorkflowMetadataManager:
             config_name = csv_file.stem.replace("_metadata", "")
             output_file = output_dir / f"workflow_metadata_{config_name}.json"
 
-            # Change all '.d' file extensions to '.zip' in raw_data_file, raw_data_url, and srfa_calib_path columns, if column exists
+            # Change trailing '.d' file extensions to '.zip' in raw_data_file, 
+            # raw_data_url, and srfa_calib_path columns, if the column exists.
             # This requires a bunch of zip files to be in the raw folder, which I'm deciding is fine because that had to happen to get them on minio anyway.
             df = pd.read_csv(csv_file)
             if "raw_data_file" in df.columns:
-                df["raw_data_file"] = df["raw_data_file"].str.replace(".d", ".zip")
+                df["raw_data_file"] = df["raw_data_file"].str.replace(r"\.d$", ".zip", regex=True)
             if "raw_data_url" in df.columns:
-                df["raw_data_url"] = df["raw_data_url"].str.replace(".d", ".zip")
+                df["raw_data_url"] = df["raw_data_url"].str.replace(r"\.d$", ".zip", regex=True)
             if "srfa_calib_path" in df.columns:
-                df["srfa_calib_path"] = df["srfa_calib_path"].str.replace(".d", ".zip")
+                df["srfa_calib_path"] = df["srfa_calib_path"].str.replace(r"\.d$", ".zip", regex=True)
             df.to_csv(csv_file, index=False)
 
             try:

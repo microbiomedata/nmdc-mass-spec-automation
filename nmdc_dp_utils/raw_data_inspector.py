@@ -229,6 +229,8 @@ def get_dotd_file_info(parser, file_path: Path) -> dict:
     logging.info(f"Extracting metadata from Bruker .d file: {file_path.name}")
 
     scan_info = parser.get_scan_attr()
+    rt_min = None
+    rt_max = None
     if scan_info:
         # get a list of all retention times from a dictionary where keys are the scan number and rt and tic are tupled values
         rt_values = [rt for _, (rt, _) in scan_info.items()]
@@ -288,6 +290,7 @@ def get_dotd_file_info(parser, file_path: Path) -> dict:
         "write_time": write_time,
         "total_scans": len(scan_info),
         "creation_time": datetime.fromtimestamp(file_path.stat().st_ctime).isoformat(),
+        "error": None
     }
     return file_info
 
