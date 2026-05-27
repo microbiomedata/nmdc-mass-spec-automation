@@ -817,6 +817,12 @@ class WorkflowDataMovementManager:
         )
 
         all_objects = [obj for obj in objects if not obj.object_name.endswith("/")]
+
+        # Don't download objects if their names don't meet file filters
+        file_filters = self.config['workflow'].get('file_filters', [])
+        if file_filters:
+            all_objects = [obj for obj in all_objects if all(filt in obj.object_name for filt in file_filters)]
+
         downloaded_count = 0
 
         for obj in tqdm(all_objects, desc="Downloading files"):
@@ -3442,10 +3448,6 @@ class WorkflowMetadataManager:
             raw_data_dir += "/"
         mapped_df["raw_data_file"] = raw_data_dir + mapped_df["raw_data_file_short"]
 
-        # Print panda df without truncation for debugging
-        with pd.option_context('display.max_rows', None, 'display.max_columns', None, 'max_colwidth', None):
-            print(mapped_df.head())
-
         # Load and filter inspection results
         file_info_df = pd.read_csv(raw_inspection_results)
         initial_count = len(file_info_df)
@@ -3495,10 +3497,6 @@ class WorkflowMetadataManager:
         ).dt.strftime("%Y-%m-%dT%H:%M:%SZ")
         file_info_df["raw_data_file_short"] = file_info_df["file_name"]
 
-        # Print panda df without truncation for debugging
-        with pd.option_context('display.max_rows', None, 'display.max_columns', None, 'max_colwidth', None):
-            print(file_info_df.head())
-
         serial_numbers_to_remove = self.config.get("metadata", {}).get(
             "serial_numbers_to_remove", []
         )
@@ -3535,11 +3533,6 @@ class WorkflowMetadataManager:
                 f"Merge error: expected {len(mapped_df)} rows, got {len(merged_df)}"
             )
             return False
-        
-        # Print panda df without truncation for debugging
-        with pd.option_context('display.max_rows', None, 'display.max_columns', None, 'max_colwidth', None):
-            print("im here merged df")
-            print(merged_df.head())
 
         # Check for missing metadata
         missing_metadata = merged_df["instrument_analysis_end_date"].isna().sum()

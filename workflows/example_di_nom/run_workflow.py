@@ -16,10 +16,10 @@ if str(PROJECT_ROOT) not in sys.path:
 from nmdc_dp_utils.workflow_manager import NMDCWorkflowManager
 
 async def main():
-    """Run the Miesel study workflow."""
+    """Run the example study workflow."""
 
     # Initialize study manager
-    config_path = "workflows/miesel_11_8bjf2432_nom/miesel_nom_config.json"
+    config_path = "workflows/example_di_nom/example_nom_config.json"
     manager = NMDCWorkflowManager(str(config_path))
 
     logger = manager.logger
@@ -70,33 +70,33 @@ async def main():
     manager.process_data(execute=True)
     assert manager.should_skip('data_processed'), "WDL workflows must complete successfully to proceed"
 
-    # Step 7: Upload processed data to MinIO
-    logger.info("7. Uploading processed data to MinIO...")
-    manager.upload_processed_data_to_minio()
-    assert manager.should_skip('processed_data_uploaded_to_minio'), "Processed data upload to MinIO must complete successfully to proceed"
+    # # Step 7: Upload processed data to MinIO
+    # logger.info("7. Uploading processed data to MinIO...")
+    # manager.upload_processed_data_to_minio()
+    # assert manager.should_skip('processed_data_uploaded_to_minio'), "Processed data upload to MinIO must complete successfully to proceed"
 
     # Step 8: Generate and submit NMDC metadata packages
     logger.info("8. Generating NMDC metadata packages...")
     manager.generate_nmdc_metadata_for_workflow() # Set test to FALSE for actual run.
     assert manager.should_skip('metadata_packages_generated'), "NMDC metadata package generation must complete successfully to proceed"
 
-    # Step 9: Submit metadata packages to dev environment
-    logger.info("9. Submitting metadata packages to dev environment...")
-    dev_success = manager.submit_metadata_packages_to_dev()
-    if not dev_success:
-        logger.error("Failed to submit metadata packages to dev environment")
-        logger.error("Please fix the issues and re-run. Skipping production submission.")
-        return  # Exit without proceeding to prod
-    else:
-        logger.info("Successfully submitted metadata packages to dev environment")
+    # # Step 9: Submit metadata packages to dev environment
+    # logger.info("9. Submitting metadata packages to dev environment...")
+    # dev_success = manager.submit_metadata_packages_to_dev()
+    # if not dev_success:
+    #     logger.error("Failed to submit metadata packages to dev environment")
+    #     logger.error("Please fix the issues and re-run. Skipping production submission.")
+    #     return  # Exit without proceeding to prod
+    # else:
+    #     logger.info("Successfully submitted metadata packages to dev environment")
 
-    # Step 10: Submit metadata packages to prod environment (will only run if dev submission was successful)
-    logger.info("10. Submitting metadata packages to prod environment...")
-    prod_success = manager.submit_metadata_packages_to_prod()
-    if not prod_success:
-        logger.error("Failed to submit metadata packages to prod environment")
-    else:
-        logger.info("Successfully submitted metadata packages to prod environment")
+    # # Step 10: Submit metadata packages to prod environment (will only run if dev submission was successful)
+    # logger.info("10. Submitting metadata packages to prod environment...")
+    # prod_success = manager.submit_metadata_packages_to_prod()
+    # if not prod_success:
+    #     logger.error("Failed to submit metadata packages to prod environment")
+    # else:
+    #     logger.info("Successfully submitted metadata packages to prod environment")
 
 if __name__ == "__main__":
     asyncio.run(main())

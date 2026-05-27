@@ -1,149 +1,145 @@
 import pandas as pd
 import yaml
+import re
 
-# File paths
-BIOSAMPLE_ATTRIBUTES_PATH = '/home/bmeluch/NMDC/nmdc-mass-spec-automation/workflows/miesel_11_8bjf2432_nom/metadata/biosample_attributes.csv'
-DOWNLOADED_FILES_PATH = '/home/bmeluch/NMDC/nmdc-mass-spec-automation/workflows/miesel_11_8bjf2432_nom/metadata/downloaded_files.csv'
-MATERIAL_PROCESSING_YAML_PATH = '/home/bmeluch/NMDC/nmdc-mass-spec-automation/workflows/miesel_11_8bjf2432_nom/protocol_info/llm_generated_protocol_outline.yaml'
-OUTPUT_CSV_PATH = '/home/bmeluch/NMDC/nmdc-mass-spec-automation/workflows/miesel_11_8bjf2432_nom/metadata/llm_biosample_raw_file_mapper.csv'
+def generate_mapping_script():
+    biosample_file = "/home/bmeluch/NMDC/nmdc-mass-spec-automation/workflows/example_di_nom/metadata/biosample_attributes.csv"
+    raw_files_file = "/home/bmeluch/NMDC/nmdc-mass-spec-automation/workflows/example_di_nom/metadata/downloaded_files.csv"
+    yaml_file = "/home/bmeluch/NMDC/nmdc-mass-spec-automation/workflows/example_di_nom/protocol_info/llm_generated_protocol_outline.yaml"
+    output_file = "/home/bmeluch/NMDC/nmdc-mass-spec-automation/workflows/example_di_nom/metadata/llm_biosample_raw_file_mapper.csv"
 
-# Load biosample attributes
-biosample_df = pd.read_csv(BIOSAMPLE_ATTRIBUTES_PATH)
+    # --- 1. Load Biosamples ---
+    biosamples_df = pd.read_csv(biosample_file)
+    biosample_id_to_name = {}
+    biosample_fragment_to_id = {}
+    biosample_fragment_to_name = {}
 
-# Create a robust mapping for searching biosample parts in filenames to their biosample_id
-# This mapping will store patterns found in biosample names (after processing)
-# and link them to their original biosample_id.
-filename_pattern_to_biosample_id = {}
-for _, row in biosample_df.iterrows():
-    original_id = row['id']
-    original_name = row['name']
-    
-    # 1. Remove "EMSL <number> " prefix (e.g., "EMSL 13 KONZ_A1..." -> "KONZ_A1...")
-    name_without_prefix = original_name
-    if name_without_prefix.startswith('EMSL ') and ' ' in name_without_prefix[5:]:
-        second_space_idx = name_without_prefix.find(' ', name_without_prefix.find(' ') + 1)
-        if second_space_idx != -1:
-            name_without_prefix = name_without_prefix[second_space_idx + 1:]
-    
-    # 2. Replace '+' with 'plus' for filename compatibility
-    processed_name = name_without_prefix.replace('+', 'plus')
-    
-    # 3. Generate specific patterns based on known naming conventions
-    # These patterns will be used to search within the raw file names.
+    # Regex to extract common identifier from biosample name, like "13_KONZ_A1_PRE"
+    # This pattern targets biosample names that include 'EMSL <number> <SITE_ID>_<STATE>_PRE/POST' structure
+    biosample_name_pattern = re.compile(r"EMSL (\d+) ([A-Z]+(?:_[A-Za-z0-9]+)*)_(PRE|POST)")
 
-    # Pattern for PRE samples (e.g., "KONZ_A1_PRE_NotGr_NA_NA" -> "KONZ_A1_PRE")
-    if '_PRE_NotGr_NA_NA' in processed_name:
-        pattern = processed_name.replace('_NotGr_NA_NA', '')
-        filename_pattern_to_biosample_id[pattern] = original_id
-    
-    # Pattern for POST samples (e.g., "KONZ_A1_POST_NotGr_MST_33" -> "KONZ_A1_POST_MST_33")
-    # or "KONZ_A1_POST_NotGr_MSTplus5_33" -> "KONZ_A1_POST_MSTplus5_33"
-    elif '_POST_NotGr_MST' in processed_name:
-        pattern = processed_name.replace('_NotGr_', '_') # Remove 'NotGr_' only
-        filename_pattern_to_biosample_id[pattern] = original_id
-    
-    # Add the full processed name as a fallback pattern if not covered by specific PRE/POST logic
-    # This ensures that even biosamples with less common naming can still be matched if their full name appears.
-    if processed_name not in filename_pattern_to_biosample_id:
-        filename_pattern_to_biosample_id[processed_name] = original_id
+    for index, row in biosamples_df.iterrows():
+        biosample_id = row['id']
+        biosample_name = row['name']
+        biosample_id_to_name[biosample_id] = biosample_name
 
-# Load raw files
-raw_files_df = pd.read_csv(DOWNLOADED_FILES_PATH)
+        match = biosample_name_pattern.search(biosample_name)
+        if match:
+            # Construct a consistent fragment, e.g., "13_KONZ_A1_PRE"
+            fragment = f"{match.group(1)}_{match.group(2)}_{match.group(3)}"
+            biosample_fragment_to_id[fragment] = biosample_id
+            biosample_fragment_to_name[fragment] = biosample_name
 
-# Initialize results list
-results = []
+    # --- 2. Parse Material Processing YAML ---
+    with open(yaml_file, 'r') as f:
+        protocol_outline = yaml.safe_load(f)
 
-# Process each raw file
-for _, row in raw_files_df.iterrows():
-    raw_file_short = row['raw_data_file_short']
+    # Stores processed sample info. Key: (protocol_name, extract_type_key),
+    # Value: {'processed_sample_placeholder': ps_id, 'processed_sample_name_template': ps_name, 'material_processing_protocol_id': protocol_name}
+    processed_sample_map = {}
 
-    # Initialize all fields for each row with empty strings
-    biosample_id = ''
-    biosample_name = ''
-    material_processing_protocol_id = ''
-    processedsample_placeholder = ''
-    match_confidence = '' 
+    for protocol_name, protocol_data in protocol_outline.items():
+        if 'processedsamples' in protocol_data:
+            for ps_entry in protocol_data['processedsamples']:
+                ps_id = list(ps_entry.keys())[0] # e.g., 'ProcessedSample5_NOM'
+                ps_info = ps_entry[ps_id]['ProcessedSample']
+                ps_description = ps_info.get('description', '').lower()
+                ps_name = ps_info.get('name', '')
 
-    # 1. Handle calibrants first (SRFA)
-    if "SRFA" in raw_file_short:
-        match_confidence = 'calibrant'
-        # For calibrants, other fields should remain empty as they don't map to biosamples
-        results.append({
-            'biosample_id': biosample_id, # Should be empty for calibrants
-            'biosample_name': biosample_name, # Should be empty for calibrants
-            'material_processing_protocol_id': material_processing_protocol_id,
-            'processedsample_placeholder': processedsample_placeholder,
-            'raw_data_identifier': raw_file_short,
+                extract_type_key = None
+                # Determine a canonical type key for the processed sample based on description
+                # This needs to be precise to match raw file patterns later
+                if "nom from water extract and solid phase extraction" in ps_description: # e.g., from 'sequential_extraction' protocol
+                    extract_type_key = 'water_SPE'
+                elif "nom from methanol extract and solid phase extraction" in ps_description: # e.g., from 'sequential_extraction' protocol
+                    extract_type_key = 'methanol_SPE'
+                elif "nom from cold water and solid phase extraction" in ps_description: # e.g., from 'NOM' protocol
+                    extract_type_key = 'cold_water_SPE'
+                elif "nom from hot water and solid phase extraction" in ps_description: # e.g., from 'NOM' protocol
+                    extract_type_key = 'hot_water_SPE'
+                # Add other extract types as needed
+
+                if extract_type_key:
+                    processed_sample_map[(protocol_name, extract_type_key)] = {
+                        'processed_sample_placeholder': ps_id,
+                        'processed_sample_name_template': ps_name, # Template with <Biosample>
+                        'material_processing_protocol_id': protocol_name
+                    }
+
+    # --- 3. Process Raw Files ---
+    raw_files_df = pd.read_csv(raw_files_file)
+    mapping_results = []
+
+    # Regex to extract biosample-identifying fragment from raw file name
+    # e.g., "Miesel_60009_13_KONZ_A1_PRE_H2O_SPE_..." -> "13_KONZ_A1_PRE"
+    raw_file_fragment_pattern = re.compile(r"_(\d+)_([A-Z]+(?:_[A-Za-z0-9]+)*)_(PRE|POST)")
+
+    for index, row in raw_files_df.iterrows():
+        raw_data_identifier = row['raw_data_file_short']
+        biosample_id = None
+        biosample_name = None
+        processed_sample_placeholder_val = ""
+        material_processing_protocol_id_val = ""
+        match_confidence = "unmatched" # Default to unmatched
+
+        # Handle calibrant files first
+        if "SRFA" in raw_data_identifier:
+            match_confidence = "calibrant"
+            # Calibrants do not map to biosamples or processed samples
+        else:
+            match = raw_file_fragment_pattern.search(raw_data_identifier)
+            if match:
+                found_fragment = f"{match.group(1)}_{match.group(2)}_{match.group(3)}"
+                
+                if found_fragment in biosample_fragment_to_id:
+                    biosample_id = biosample_fragment_to_id[found_fragment]
+                    biosample_name = biosample_fragment_to_name[found_fragment]
+                    
+                    # Determine raw file extract type and implied protocol from filename
+                    file_extract_type_key = None
+                    current_protocol_id = None
+                    
+                    if "_H2O_SPE" in raw_data_identifier:
+                        file_extract_type_key = 'water_SPE'
+                        # Assuming H2O_SPE from Miesel files maps to sequential_extraction's general water SPE
+                        current_protocol_id = 'sequential_extraction' 
+                    elif "_Met_SPE" in raw_data_identifier:
+                        file_extract_type_key = 'methanol_SPE'
+                        # Assuming Met_SPE from Miesel files maps to sequential_extraction's methanol SPE
+                        current_protocol_id = 'sequential_extraction'
+                    # Add conditions for 'cold_water_SPE' or 'hot_water_SPE' if raw files contain these specific terms
+
+                    if current_protocol_id and file_extract_type_key:
+                        if (current_protocol_id, file_extract_type_key) in processed_sample_map:
+                            ps_details = processed_sample_map[(current_protocol_id, file_extract_type_key)]
+                            
+                            processed_sample_placeholder_val = ps_details['processed_sample_placeholder']
+                            material_processing_protocol_id_val = ps_details['material_processing_protocol_id']
+                            
+                            # Match confidence is high if both biosample and specific processed sample are found
+                            match_confidence = "high"
+                        else:
+                            # Biosample matched, but specific processed sample type from filename not found in the resolved protocol
+                            match_confidence = "medium" 
+                    else:
+                        # Biosample matched, but the raw file extract type or implied protocol could not be determined
+                        match_confidence = "low"
+                else:
+                    match_confidence = "unmatched" # Biosample fragment from raw file not found in biosample list
+            else:
+                match_confidence = "unmatched" # Raw file name pattern not recognized
+
+        mapping_results.append({
+            'raw_data_identifier': raw_data_identifier,
+            'biosample_id': biosample_id,
+            'biosample_name': biosample_name,
+            'processedsample_placeholder': processed_sample_placeholder_val,
+            'material_processing_protocol_id': material_processing_protocol_id_val,
             'match_confidence': match_confidence
         })
-        continue # Skip to the next raw file
 
-    # 2. Attempt to match biosample for non-calibrant files
-    found_biosample_id = None
-    found_biosample_original_name = ''
-    
-    filename_base = raw_file_short.split('.')[0] # Remove ".d" extension for easier matching
-    
-    # Search for the most specific (longest) biosample pattern in the filename
-    best_match_key_len = 0
-    # Sort patterns by length descending to find the longest, most specific match first
-    sorted_patterns = sorted(filename_pattern_to_biosample_id.keys(), key=len, reverse=True)
-    
-    for pattern, b_id in filename_pattern_to_biosample_id.items():
-        if pattern in filename_base:
-            if len(pattern) > best_match_key_len: # Prioritize longer, more specific matches
-                found_biosample_id = b_id
-                # Retrieve the original biosample name from the biosample_df using its ID
-                found_biosample_original_name = biosample_df[biosample_df['id'] == b_id]['name'].iloc[0]
-                best_match_key_len = len(pattern)
-    
-    # If a biosample ID was successfully identified from the filename
-    if found_biosample_id:
-        # Check for extraction type to map to specific processed samples and protocol
-        if 'H2O_SPE' in filename_base:
-            biosample_id = found_biosample_id
-            biosample_name = found_biosample_original_name
-            material_processing_protocol_id = 'ALL' # Consistent with example YAML and descriptions
-            processedsample_placeholder = 'ProcessedSample6_NOM' # Output of H2O SPE in ALL protocol
-            match_confidence = 'high' # Confident match of biosample and process
-        elif 'Met_SPE' in filename_base:
-            biosample_id = found_biosample_id
-            biosample_name = found_biosample_original_name
-            material_processing_protocol_id = 'ALL' # Consistent with example YAML and descriptions
-            processedsample_placeholder = 'ProcessedSample7_NOM' # Output of Met SPE in ALL protocol
-            match_confidence = 'high' # Confident match of biosample and process
-        else:
-            # If a biosample was found, but no specific SPE pattern could be matched to H2O_SPE or Met_SPE,
-            # this indicates an incomplete mapping for a known biosample.
-            # As per validation rules, if biosample_id is present, match_confidence must be 'high', 'medium', or 'low'.
-            # We set it to 'low' here as the specific processed sample couldn't be determined.
-            # However, the validation also states: "Rows with match_confidence high/medium/low/calibrant must include non-empty processedsample_placeholder and material_processing_protocol_id"
-            # This implies if we can't determine the placeholder, we shouldn't assign a confidence other than empty string.
-            # Given the previous error "No raw files were mapped to any biosample", we MUST map files.
-            # Let's adjust this: if we find the biosample but not the SPE type, we keep biosample_id and name,
-            # but leave protocol/placeholder empty, indicating an unmappable processed state, and match_confidence empty.
-            # This will result in validation errors for those specific rows, but it will map the biosample.
-            # For this particular problem "No raw files were mapped to any biosample", the primary goal is to establish ANY mapping.
-            # The stricter validation requires placeholder/protocol for non-empty confidence.
-            # Given the current strict validation rules and the provided examples, all non-calibrant files
-            # *must* match either H2O_SPE or Met_SPE and a biosample.
-            # If not, they are essentially unmappable as per the strict validation requirement of having a protocol/placeholder for 'high'/'medium'/'low' confidence.
-            # So, if a biosample is found but no SPE type, we leave it unmapped (empty protocol, empty placeholder, empty confidence).
-            # This will cause validation failures for those rows, but won't result in "no raw files were mapped".
-            pass # Keep biosample_id and biosample_name, but protocol and placeholder remain empty. match_confidence remains empty.
+    # --- 4. Write Output CSV ---
+    output_df = pd.DataFrame(mapping_results)
+    output_df.to_csv(output_file, index=False)
 
-    results.append({
-        'biosample_id': biosample_id,
-        'biosample_name': biosample_name,
-        'material_processing_protocol_id': material_processing_protocol_id,
-        'processedsample_placeholder': processedsample_placeholder,
-        'raw_data_identifier': raw_file_short,
-        'match_confidence': match_confidence
-    })
-
-# Create DataFrame from the results and save to CSV
-output_df = pd.DataFrame(results)
-
-output_df.to_csv(OUTPUT_CSV_PATH, index=False)
-
-print(f"Mapping saved to {OUTPUT_CSV_PATH}")
+generate_mapping_script()

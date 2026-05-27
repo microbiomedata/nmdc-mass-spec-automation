@@ -1,22 +1,21 @@
 {
     "study": {
-        "name": "miesel_11_8bjf2432",
+        "name": "example_di_nom",
         "id": "nmdc:sty-11-8bjf2432"
     },
     "workflow": {
-        "name": "miesel_11_8bjf2432_nom",
+        "name": "example_di_nom",
         "file_type": ".d",
         "file_filters": [
-            ".raw",
-            ".d"
+            "13_KONZ_A1_PRE"
         ],
-        "processed_data_date_tag": "20260513",
+        "processed_data_date_tag": "20260527",
         "workflow_type": "DI FTICR NOM",
         "batch_size": 30
     },
     "paths": {
-        "base_directory": "/path/to/nmdc-mass-spec-automation/",
-        "data_directory": "/path/to/rawdata/basedir/"
+        "base_directory": "/home/bmeluch/NMDC/nmdc-mass-spec-automation",
+        "data_directory": "/home/bmeluch/NMDC/nom_processing"
     },
     "docker": {
         "raw_data_inspector_image": "microbiomedata/metams:3.3.3"
@@ -80,14 +79,13 @@
         "raw_data_downloaded": true,
         "protocol_outline_created": true,
         "biosample_attributes_fetched": true,
-        "biosample_mapping_script_generated": false,
         "biosample_mapping_completed": true,
         "raw_data_inspected": true,
         "material_processing_metadata_generated": true,
-        "metadata_mapping_generated": true,
+        "metadata_mapping_generated": false,
         "data_processed": true,
         "processed_data_uploaded_to_minio": true,
-        "metadata_packages_generated": true,
+        "metadata_packages_generated": false,
         "metadata_submitted_dev": true,
         "metadata_submitted_prod": true
     }
