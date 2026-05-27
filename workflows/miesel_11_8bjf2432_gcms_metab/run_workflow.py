@@ -37,8 +37,8 @@ async def main():
     manager.create_workflow_structure()
 
     # Step 2: Generate protocol YAML outline using LLM
-    logger.info("2. Generating protocol YAML outline using LLM...")
-    await manager.generate_material_processing_yaml()
+    #logger.info("2. Generating protocol YAML outline using LLM...")
+    #await manager.generate_material_processing_yaml()
     
     # Step 3: Fetch raw data (MinIO or MASSIVE based on config)
     logger.info("3. Fetching raw data...")

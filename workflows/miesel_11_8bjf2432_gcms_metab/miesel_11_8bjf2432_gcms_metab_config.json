@@ -54,8 +54,8 @@
         "data_processed": true,
         "processed_data_uploaded_to_minio": true,
         "material_processing_metadata_generated": true,
-        "metadata_mapping_generated": false,
-        "metadata_packages_generated": false,
+        "metadata_mapping_generated": true,
+        "metadata_packages_generated": true,
         "metadata_submitted_dev": false,
         "metadata_submitted_prod": false
     }

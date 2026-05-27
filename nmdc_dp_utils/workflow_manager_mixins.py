@@ -3816,8 +3816,9 @@ class WorkflowMetadataManager:
                     self.logger.warning(f"Skipping {csv_file.name}: no raw_data_file column found")
                     continue
 
-                # Extract raw data filename from the full path
-                df["raw_data_file_short"] = df["raw_data_file"].apply(lambda x: Path(x).name)
+                # Get the stems of file names for more consistent merging
+                df["raw_data_file_stem"] = df["raw_data_file"].apply(lambda x: Path(x).stem)
+                mapping_df["raw_data_file_stem"] = mapping_df["raw_data_identifier"].apply(lambda x: Path(x).stem)
                 
                 # Store original row count for reporting
                 original_row_count = len(df)
@@ -3826,8 +3827,8 @@ class WorkflowMetadataManager:
                 # Left merge to keep all rows from df, adding processed_sample_id column
                 df_merged = df.merge(
                     mapping_df,
-                    left_on="raw_data_file_short",
-                    right_on="raw_data_identifier",
+                    left_on="raw_data_file_stem",
+                    right_on="raw_data_file_stem",
                     how="left"
                 )
                 
@@ -3850,7 +3851,7 @@ class WorkflowMetadataManager:
                 df_merged["sample_id"] = df_merged["processed_sample_id"]
                 
                 # Drop the temporary columns from the merge
-                df_merged = df_merged.drop(columns=["raw_data_file_short", "raw_data_identifier", "processed_sample_id"])
+                df_merged = df_merged.drop(columns=["raw_data_file_stem", "raw_data_identifier", "processed_sample_id"])
 
                 # Write updated CSV back to file
                 df_merged.to_csv(csv_file, index=False)
