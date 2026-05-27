@@ -3434,6 +3434,10 @@ class WorkflowMetadataManager:
             raw_data_dir += "/"
         mapped_df["raw_data_file"] = raw_data_dir + mapped_df["raw_data_file_short"]
 
+        # Print panda df without truncation for debugging
+        with pd.option_context('display.max_rows', None, 'display.max_columns', None, 'max_colwidth', None):
+            print(mapped_df.head())
+
         # Load and filter inspection results
         file_info_df = pd.read_csv(raw_inspection_results)
         initial_count = len(file_info_df)
@@ -3483,6 +3487,10 @@ class WorkflowMetadataManager:
         ).dt.strftime("%Y-%m-%dT%H:%M:%SZ")
         file_info_df["raw_data_file_short"] = file_info_df["file_name"]
 
+        # Print panda df without truncation for debugging
+        with pd.option_context('display.max_rows', None, 'display.max_columns', None, 'max_colwidth', None):
+            print(file_info_df.head())
+
         serial_numbers_to_remove = self.config.get("metadata", {}).get(
             "serial_numbers_to_remove", []
         )
@@ -3519,6 +3527,11 @@ class WorkflowMetadataManager:
                 f"Merge error: expected {len(mapped_df)} rows, got {len(merged_df)}"
             )
             return False
+        
+        # Print panda df without truncation for debugging
+        with pd.option_context('display.max_rows', None, 'display.max_columns', None, 'max_colwidth', None):
+            print("im here merged df")
+            print(merged_df.head())
 
         # Check for missing metadata
         missing_metadata = merged_df["instrument_analysis_end_date"].isna().sum()
@@ -3648,7 +3661,8 @@ class WorkflowMetadataManager:
         output_dir = self.workflow_path / "metadata" / "metadata_gen_input_csvs"
         output_dir.mkdir(parents=True, exist_ok=True)
         for f in output_dir.glob("*.csv"):
-            f.unlink()
+            if f.name != "biosample_mapping_for_mp_metadata_generation.csv":
+                f.unlink()
 
         # Write configuration-specific CSV files
         files_written = 0
@@ -3913,6 +3927,7 @@ class WorkflowMetadataManager:
                 # Use the most recent calibration before this sample
                 return valid_calibrations.iloc[-1]["raw_data_identifier"]
 
+
         # Assign calibration file to each sample
         merged_df["calibration_file_short"] = merged_df["write_time_dt"].apply(
             find_calibration_for_sample
@@ -4037,6 +4052,7 @@ class WorkflowMetadataManager:
                 return False
 
             csv_files = list(input_dir.glob("*.csv"))
+            csv_files = [f for f in csv_files if f.name != "biosample_mapping_for_mp_metadata_generation.csv"]
             if not csv_files:
                 self.logger.error(f"No CSV files found in {input_dir}")
                 return False
@@ -4176,6 +4192,8 @@ class WorkflowMetadataManager:
 
             updated_count = 0
             total_rows_updated = 0
+
+            csv_files = [f for f in csv_files if f.name != "biosample_mapping_for_mp_metadata_generation.csv"]
 
             for csv_file in csv_files:
                 # Read the CSV
@@ -4574,6 +4592,7 @@ class WorkflowMetadataManager:
 
         # Process each metadata mapping CSV file
         csv_files = list(input_csv_dir.glob("*.csv"))
+        csv_files = [f for f in csv_files if f.name != "biosample_mapping_for_mp_metadata_generation.csv"]
 
         success_count = 0
         failed_files = []
