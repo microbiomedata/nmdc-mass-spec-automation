@@ -34,7 +34,7 @@ a.	If top filter has moved during drying, tamp down gently with pipette tip.
 + Samples can be rinsed more than 17X depending on salt concentration
 
 
-For the GC-MS analysis, part of the water and methanol extracts were dried down, combining corresponding H2O and MeOH fractions for each sample. Dried samples we reconstituted in 400 uL of D2O.
+For the GC-MS analysis, part of the water and methanol extracts were dried down, combining corresponding H2O and MeOH fractions for each sample. Dried samples we reconstituted in 400 uL of D2O. Samples were methoximized and derivatized before GC-MS analysis.
 
 Separate subsamples of the soil remaining after sequential extraction were used for intracellular and extracellular proteomics analysis.
 
