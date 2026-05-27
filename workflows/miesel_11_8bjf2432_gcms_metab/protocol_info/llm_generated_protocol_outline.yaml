@@ -250,25 +250,25 @@ ALL:
                 has_numeric_value: 400
       
     - Step 3_GCMS:
-      ChemicalConversionProcess:
-        id: # nmdc:chcpr-{shoulder}-{blade}
-        type: nmdc:ChemicalConversionProcess
-        name: methoximation_for_GCMS
-        description: Methoximation of <ProcessedSample2_GCMS>, part of derivatization for GCMS analysis
-        has_input:
-        - ProcessedSample2_GCMS
-        has_output:
-        - ProcessedSample3_GCMS
-        processing_institution: EMSL
-        chemical_conversion_category: substitution
-        substances_used:
-        - type: nmdc:PortionOfSubstance
-          known_as: methoxyamine
-          volume:
-            type: nmdc:QuantityValue
-            has_raw_value: 0.02 mL
-            has_unit: mL
-            has_numeric_value: 0.02
+        ChemicalConversionProcess:
+          id: # nmdc:chcpr-{shoulder}-{blade}
+          type: nmdc:ChemicalConversionProcess
+          name: methoximation_for_GCMS
+          description: Methoximation of <ProcessedSample2_GCMS>, part of derivatization for GCMS analysis
+          has_input:
+          - ProcessedSample2_GCMS
+          has_output:
+          - ProcessedSample3_GCMS
+          processing_institution: EMSL
+          chemical_conversion_category: substitution
+          substances_used:
+          - type: nmdc:PortionOfSubstance
+            known_as: methoxyamine
+            volume:
+              type: nmdc:QuantityValue
+              has_raw_value: 0.02 mL
+              has_unit: mL
+              has_numeric_value: 0.02
 
     - Step 4_GCMS:
         ChemicalConversionProcess:
