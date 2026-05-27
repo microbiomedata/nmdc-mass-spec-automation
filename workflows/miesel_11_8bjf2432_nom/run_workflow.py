@@ -55,13 +55,33 @@ async def main():
     manager.process_data(execute=True)
     assert manager.should_skip('data_processed'), "WDL workflows must complete successfully to proceed"
 
-    # debugging file transfer
-    # manager._move_processed_files(working_dir="/home/bmeluch/NMDC/nmdc-mass-spec-automation/workflows/miesel_11_8bjf2432_nom/wdl_execution", clean_up=False)
-
     # Step 6: Upload processed data to MinIO
     logger.info("6. Uploading processed data to MinIO...")
     manager.upload_processed_data_to_minio()
     assert manager.should_skip('processed_data_uploaded_to_minio'), "Processed data upload to MinIO must complete successfully to proceed"
+
+    # Step 7: Generate NMDC metadata packages
+    logger.info("7. Generating NMDC metadata packages...")
+    manager.generate_nmdc_metadata_for_workflow() # Set test to FALSE for actual run.
+    assert manager.should_skip('metadata_packages_generated'), "NMDC metadata package generation must complete successfully to proceed"
+
+    # # Step 8: Submit metadata packages to dev environment
+    # logger.info("8. Submitting metadata packages to dev environment...")
+    # dev_success = manager.submit_metadata_packages_to_dev()
+    # if not dev_success:
+    #     logger.error("Failed to submit metadata packages to dev environment")
+    #     logger.error("Please fix the issues and re-run. Skipping production submission.")
+    #     return  # Exit without proceeding to prod
+    # else:
+    #     logger.info("Successfully submitted metadata packages to dev environment")
+
+    # # Step 9: Submit metadata packages to prod environment (will only run if dev submission was successful)
+    # logger.info("9. Submitting metadata packages to prod environment...")
+    # prod_success = manager.submit_metadata_packages_to_prod()
+    # if not prod_success:
+    #     logger.error("Failed to submit metadata packages to prod environment")
+    # else:
+    #     logger.info("Successfully submitted metadata packages to prod environment")
 
 if __name__ == "__main__":
     asyncio.run(main())

@@ -47,15 +47,11 @@ async def main():
         logger.warning("Biosample mapping failed - review logs and add additional context if needed")
     else:
         logger.info("Biosample mapping completed successfully")
-    
-    # Step 4: Inspect raw data files for metadata and QC
-    logger.info("4. Inspecting raw data files...")
-    manager.raw_data_inspector(cores=4)
 
-    # Step 5: Generate NMDC metadata packages
-    logger.info("5. Generating NMDC metadata packages...")
-    manager.generate_nmdc_metadata_for_workflow() # Set test to FALSE for actual run.
-    assert manager.should_skip('metadata_packages_generated'), "NMDC metadata package generation must complete successfully to proceed"
+    # Step 5: Generate material processing metadata
+    if not manager.generate_material_processing_metadata(test=False):
+        manager.logger.error("Failed to generate material processing metadata")
+        return # exit
 
     # # Step 6: Submit metadata packages to dev environment
     # logger.info("6. Submitting metadata packages to dev environment...")
