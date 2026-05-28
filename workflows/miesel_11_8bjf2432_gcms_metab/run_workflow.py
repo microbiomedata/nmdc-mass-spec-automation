@@ -37,8 +37,8 @@ async def main():
     manager.create_workflow_structure()
 
     # Step 2: Generate protocol YAML outline using LLM
-    #logger.info("2. Generating protocol YAML outline using LLM...")
-    #await manager.generate_material_processing_yaml()
+    logger.info("2. Generating protocol YAML outline using LLM...")
+    await manager.generate_material_processing_yaml()
     
     # Step 3: Fetch raw data (MinIO or MASSIVE based on config)
     logger.info("3. Fetching raw data...")
@@ -68,12 +68,26 @@ async def main():
 
     # Step 8: Generate and submit NMDC metadata packages
     logger.info("8. Generating NMDC metadata packages...")
-    manager.generate_nmdc_metadata_for_workflow(test=True)
+    manager.generate_nmdc_metadata_for_workflow(test=False)
     assert manager.should_skip('metadata_packages_generated'), "NMDC metadata package generation must complete successfully to proceed"
 
     # Step 9: Submit metadata packages to dev environment
     logger.info("9. Submitting metadata packages to dev environment...")
-    #dev_success = manager.submit_metadata_packages_to_dev()
+    dev_success = manager.submit_metadata_packages_to_dev()
+    if not dev_success:
+        logger.error("Failed to submit metadata packages to dev environment")
+        logger.error("Please fix the issues and re-run. Skipping production submission.")
+        return  # Exit without proceeding to prod
+    else:
+        logger.info("Successfully submitted metadata packages to dev environment")
+
+    # Step 10: Submit metadata packages to prod environment (will only run if dev submission was successful)
+    logger.info("10. Submitting metadata packages to prod environment...")
+    prod_success = manager.submit_metadata_packages_to_prod()
+    if not prod_success:
+        logger.error("Failed to submit metadata packages to prod environment")
+    else:
+        logger.info("Successfully submitted metadata packages to prod environment")
 
 
 if __name__ == "__main__":
