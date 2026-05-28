@@ -1,0 +1,30 @@
+{
+    "gcmsMetabolomics.runMetaMSGCMS.file_paths": [
+        "/Volumes/LaCie/nmdc_data/miesel_11_8bjf2432/raw/EMSL_86_STEI_A1_POST_NotGr_MSTplus5_33.cdf",
+        "/Volumes/LaCie/nmdc_data/miesel_11_8bjf2432/raw/EMSL_8_DELA_A_PRE_NotGr_NA_NA.cdf",
+        "/Volumes/LaCie/nmdc_data/miesel_11_8bjf2432/raw/EMSL_84_SJER_A_POST_NotGr_MSTplus5_33.cdf",
+        "/Volumes/LaCie/nmdc_data/miesel_11_8bjf2432/raw/EMSL_65_BARR_Oaf_POST_NotGr_MSTplus5_33.cdf",
+        "/Volumes/LaCie/nmdc_data/miesel_11_8bjf2432/raw/EMSL_7_DCFS_A1_PRE_NotGr_NA_NA.cdf",
+        "/Volumes/LaCie/nmdc_data/miesel_11_8bjf2432/raw/EMSL_81_OSBS_A_POST_NotGr_MSTplus5_33.cdf",
+        "/Volumes/LaCie/nmdc_data/miesel_11_8bjf2432/raw/EMSL_75_JORN_Ak_POST_NotGr_MSTplus5_33.cdf",
+        "/Volumes/LaCie/nmdc_data/miesel_11_8bjf2432/raw/EMSL_44_DELA_A_POST_NotGr_MST_33.cdf",
+        "/Volumes/LaCie/nmdc_data/miesel_11_8bjf2432/raw/EMSL_22_SOAP_A_PRE_NotGr_NA_NA.cdf",
+        "/Volumes/LaCie/nmdc_data/miesel_11_8bjf2432/raw/EMSL_76_KONZ_A1_POST_NotGr_MSTplus5_33.cdf",
+        "/Volumes/LaCie/nmdc_data/miesel_11_8bjf2432/raw/EMSL_58_SOAP_A_POST_NotGr_MST_33.cdf",
+        "/Volumes/LaCie/nmdc_data/miesel_11_8bjf2432/raw/EMSL_3_BLAN_Ap1_PRE_NotGr_NA_NA.cdf",
+        "/Volumes/LaCie/nmdc_data/miesel_11_8bjf2432/raw/EMSL_50_MLBS_A_POST_NotGr_MST_33.cdf",
+        "/Volumes/LaCie/nmdc_data/miesel_11_8bjf2432/raw/EMSL_52_NGPR_A_POST_NotGr_MST_33.cdf",
+        "/Volumes/LaCie/nmdc_data/miesel_11_8bjf2432/raw/EMSL_6_CPER_A1_PRE_NotGr_NA_NA.cdf",
+        "/Volumes/LaCie/nmdc_data/miesel_11_8bjf2432/raw/EMSL_12_JORN_Ak_PRE_NotGr_NA_NA.cdf",
+        "/Volumes/LaCie/nmdc_data/miesel_11_8bjf2432/raw/EMSL_78_MOAB_A_POST_NotGr_MSTplus5_33.cdf",
+        "/Volumes/LaCie/nmdc_data/miesel_11_8bjf2432/raw/EMSL_24_TALL_A1_PRE_NotGr_NA_NA.cdf",
+        "/Volumes/LaCie/nmdc_data/miesel_11_8bjf2432/raw/EMSL_69_CPER_A1_POST_NotGr_MSTplus5_33.cdf",
+        "/Volumes/LaCie/nmdc_data/miesel_11_8bjf2432/raw/EMSL_2_BARR_Oaf_PRE_NotGr_NA_NA.cdf"
+    ],
+    "gcmsMetabolomics.runMetaMSGCMS.calibration_file_path": "/Volumes/LaCie/nmdc_data/miesel_11_8bjf2432/raw/GCMS_FAMEs_01_GCMS03_2023Apr24.cdf",
+    "gcmsMetabolomics.runMetaMSGCMS.output_directory": "output_batch_1.2",
+    "gcmsMetabolomics.runMetaMSGCMS.output_type": "csv",
+    "gcmsMetabolomics.runMetaMSGCMS.corems_toml_path": "workflow_inputs/metams_gcms_corems.toml",
+    "gcmsMetabolomics.runMetaMSGCMS.jobs_count": 5,
+    "gcmsMetabolomics.runMetaMSGCMS.output_filename": "gcms_batch1.2"
+}

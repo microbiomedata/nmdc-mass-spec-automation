@@ -1,0 +1,7 @@
+All of these samples (GCMS) samples ALL protocol, and all of these samples will be associated with ProcessedSample4_GCMS.
+
+Files named like "GCMS_Blank" at the start of file should not map to any biosamples.
+
+Files with "GCMS_FAMEs" at the start of the file are the calibration files.  Retain all, but they will not map to a biosample.
+
+Biosamples with "EMSL" in name will map to these raw files, ignore other biosamples.
