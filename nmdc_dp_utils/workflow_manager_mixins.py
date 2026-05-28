@@ -4217,17 +4217,7 @@ class WorkflowMetadataManager:
                 original_row_count = len(df)
 
                 # Merge with mapping to get processed_sample_id based on raw data filename
-                # Left merge to keep all rows from df, adding processed_sample_id column
-<<<<<<< 1-add-nom-workflow-functionality-to-this-repo
-=======
-                df_merged = df.merge(
-                    mapping_df,
-                    left_on="raw_data_file_stem",
-                    right_on="raw_data_file_stem",
-                    how="left"
-                )
->>>>>>> main
-                
+                # Left merge to keep all rows from df, adding processed_sample_id column                
                 # FOR SOME REASON deep in mass-spec-metadata-gen the file extensions on NOM files are getting removed
                 # IF raw_data_identifier does not include file extension, merge on raw_data_file_short.stem()
                 if not mapping_df["raw_data_identifier"].str.contains(r"\.").any():
@@ -4265,15 +4255,10 @@ class WorkflowMetadataManager:
                 # Replace sample_id with processed_sample_id
                 df_merged["sample_id"] = df_merged["processed_sample_id"]
                 
-<<<<<<< 1-add-nom-workflow-functionality-to-this-repo
                 # Drop the temporary columns from the merge if they exist
                 columns_to_drop = ["raw_data_file_short", "raw_data_identifier", "processed_sample_id", "raw_data_file_short_stem", "raw_data_identifier_stem"]
                 df_merged = df_merged.drop(columns=[col for col in columns_to_drop if col in df_merged.columns])
-=======
-                # Drop the temporary columns from the merge
-                df_merged = df_merged.drop(columns=["raw_data_file_stem", "raw_data_identifier", "processed_sample_id"])
->>>>>>> main
-
+                
                 # Write updated CSV back to file
                 df_merged.to_csv(csv_file, index=False)
                 updated_count += 1
