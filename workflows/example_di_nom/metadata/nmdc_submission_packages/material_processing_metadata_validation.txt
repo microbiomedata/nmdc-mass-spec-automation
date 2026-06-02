@@ -1,0 +1,50 @@
+
+================================================================================
+VALIDATING GENERATED OUTPUT
+================================================================================
+Calculating expected counts...
+
+================================================================================
+PLACEHOLDER COMBINATIONS BY PROTOCOL:
+================================================================================
+
+sequential_extraction:
+  Target placeholders: ['ProcessedSample6_sequential_extraction']
+  Resulting samples: ['ProcessedSample1_sequential_extraction', 'ProcessedSample2_sequential_extraction', 'ProcessedSample6_sequential_extraction']
+  Biosamples with this combination: 1
+  Steps required per biosample: 3
+  Processed samples required per biosample: 3
+  Total steps for this combination: 3
+  Total samples for this combination: 3
+
+sequential_extraction:
+  Target placeholders: ['ProcessedSample6_sequential_extraction', 'ProcessedSample7_sequential_extraction']
+  Resulting samples: ['ProcessedSample1_sequential_extraction', 'ProcessedSample2_sequential_extraction', 'ProcessedSample3_sequential_extraction', 'ProcessedSample4_sequential_extraction', 'ProcessedSample6_sequential_extraction', 'ProcessedSample7_sequential_extraction']
+  Biosamples with this combination: 1
+  Steps required per biosample: 5
+  Processed samples required per biosample: 6
+  Total steps for this combination: 5
+  Total samples for this combination: 6
+
+================================================================================
+VALIDATION SUMMARY:
+================================================================================
+
+Biosamples:
+  Unique in mapping: 2
+
+Material Processing Steps:
+  Expected: 8
+  Actual:   8
+  ✓ MATCH
+
+Processed Samples:
+  Expected: 9
+  Actual:   9
+  ✓ MATCH
+
+Unique placeholder combinations: 2
+
+================================================================================
+✓ VALIDATION PASSED: All counts match!
+================================================================================

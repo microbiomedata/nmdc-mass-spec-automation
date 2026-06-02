@@ -1,0 +1,23 @@
+{
+    "fticrmsNOM.runDirectInfusion.file_paths": [
+        "/home/bmeluch/NMDC/nom_processing/miesel_11_8bjf2432/raw/Miesel_60009_QC_SRFAII_20ppm_30Jan23_Fir_300SA_IATp01_9360.d",
+        "/home/bmeluch/NMDC/nom_processing/miesel_11_8bjf2432/raw/Miesel_60009_77_MLBS_A_POST_MSTplus5_33_Met_SPE_r1_300SA_IATp03_9388.d"
+    ],
+    "fticrmsNOM.runDirectInfusion.output_directory": "output_batch_5",
+    "fticrmsNOM.runDirectInfusion.output_type": "csv",
+    "fticrmsNOM.runDirectInfusion.calibrate": true,
+    "fticrmsNOM.runDirectInfusion.batch_calibrate": true,
+    "fticrmsNOM.runDirectInfusion.calibration_ref_file_path": "workflow_inputs/Hawkes_neg.ref",
+    "fticrmsNOM.runDirectInfusion.corems_toml_path": "workflow_inputs/enviroms_nom_corems.toml",
+    "fticrmsNOM.runDirectInfusion.polarity": "negative",
+    "fticrmsNOM.runDirectInfusion.is_centroid": true,
+    "fticrmsNOM.runDirectInfusion.raw_file_start_scan": 1,
+    "fticrmsNOM.runDirectInfusion.raw_file_final_scan": 7,
+    "fticrmsNOM.runDirectInfusion.plot_mz_error": false,
+    "fticrmsNOM.runDirectInfusion.plot_ms_assigned_unassigned": false,
+    "fticrmsNOM.runDirectInfusion.plot_c_dbe": false,
+    "fticrmsNOM.runDirectInfusion.plot_van_krevelen": false,
+    "fticrmsNOM.runDirectInfusion.plot_ms_classes": false,
+    "fticrmsNOM.runDirectInfusion.plot_mz_error_classes": false,
+    "fticrmsNOM.runDirectInfusion.plot_qc": true
+}

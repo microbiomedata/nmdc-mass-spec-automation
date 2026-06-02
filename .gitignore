@@ -10,6 +10,7 @@ __pycache__/
 
 # WDL workflow execution artifacts
 */wdl_execution/
+**/wdl_execution/
 */_LAST/
 */202[0-9]*/
 

@@ -1,0 +1,6 @@
+raw_file_path,biosample_id,biosample_name,match_confidence
+/home/bmeluch/NMDC/nom_processing/example_di_nom/raw/Miesel_60009_13_KONZ_A1_PRE_H2O_SPE_r2_28Jan23_Alder_300SA_IATp03_9091.d,nmdc:bsm-11-czpa0a23,EMSL 13 KONZ_A1_PRE_NotGr_NA_NA,high
+/home/bmeluch/NMDC/nom_processing/example_di_nom/raw/Miesel_60009_14_MLBS_A_PRE_H2O_SPE_r1_26Jan23_Alder_300SA_IATp03_9071.d,nmdc:bsm-11-kypvs876,EMSL 14 MLBS_A_PRE_NotGr_NA_NA,high
+/home/bmeluch/NMDC/nom_processing/example_di_nom/raw/Miesel_60009_13_KONZ_A1_PRE_H2O_SPE_r1_26Jan23_Alder_300SA_IATp03_9070.d,nmdc:bsm-11-czpa0a23,EMSL 13 KONZ_A1_PRE_NotGr_NA_NA,high
+/home/bmeluch/NMDC/nom_processing/example_di_nom/raw/Miesel_60009_13_KONZ_A1_PRE_Met_SPE_r2_300SA_IATp03_9593.d,nmdc:bsm-11-czpa0a23,EMSL 13 KONZ_A1_PRE_NotGr_NA_NA,high
+/home/bmeluch/NMDC/nom_processing/example_di_nom/raw/Miesel_60009_13_KONZ_A1_PRE_Met_SPE_r1_300SA_IATp03_9289.d,nmdc:bsm-11-czpa0a23,EMSL 13 KONZ_A1_PRE_NotGr_NA_NA,high

@@ -18,6 +18,7 @@ As of now, the supported workflow types are:
 - LCMS Metabolomics
 - LCMS Lipidomics
 - GCMS Metabolomics
+- FT-ICR Natural Organic Matter
 
 ## Setup
 You need Python 3.8+ and Docker installed prior to using this system.

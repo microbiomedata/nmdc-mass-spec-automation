@@ -1,0 +1,157 @@
+Soil samples underwent sequential water and methanol extraction. No chloroform extraction was performed. Water and methanol extracts each underwent solid phase extraction before being FTICR NOM analysis.
+
+Sequential Extraction SOP
+
+1.	User will have weighed 300mg* of soil into a 2mL glass Microsolv vial (Microsolv, Cat# 9502S-WCV) with a non-slit cap (Microsolv, Cat# 9502S-10C-B-M).
+2.	1mL of MilliQ H2O is pipetted into each sample and shaken on a thermomixer (Eppendorf, Cat# 2231000667) at RT and 2000 RPM for 2 hours.
+3.	Centrifuge samples at 4500 RPM for 5 minutes on a plate spinner that accommodates 54 sample autosampler tray.
+4.	Pull off supernatant using 200uL micropipette while avoiding disturbing and pulling up sediment and place in a pre-labeled 2mL Sorensen tube (part no.) [Make sure that most of the supernatant is taken off or else this will affect the rest of the extraction]. Supernatants are then placed in a sample box and stored at -80oC.
+5.	1mL of Optima LC/MS-grade methanol is pipetted into each sample and shaken on a thermomixer at RT and 2000 RPM for 2 hours.
+6.	Centrifuge samples (Repeat Step 3)
+7.	Pull of supernatant using 200uL micropipette (Step 4) but instead place supernatant into a pre-labeled 2mL Microsolv vial and capped with a non-slit cap. Supernatants are then placed in a sample box and stored at -80oC.
+8.	1mL of ethanol-stabilized chloroform is pipetted into the sample using a glass syringe or a pre-marked Pasteur pipette in a fume hood (IF PLASTIC MICROPIPETTE TIPS ARE USED, SAMPLES WILL BE CONTAMINATED WITH PEG AND UNUSABLE). Samples are then shaken on a thermomixer at RT and 2000 RPM for 2 hours.
+9.	Centrifuge samples (Repeat Step 3)
+10.	In a fume hood, pull off supernatant using 5-3/4” glass Pasteur pipette and transfer supernatant to 2mL glass Microsolv vial and cap with non-slip cap. Supernatants are then placed in a sample box and stored at -80oC.
+
+Solid Phase Extraction (SPE) of DOM SOP
+
+Bond Elut PPL SPE:
+1.	Place labeled SPE cartridge (Agilent, Cat# 12105004) onto SPE vacuum manifold (Sigma-Aldrich (Supelco), Cat# 57250-U) with 15mL falcon tube underneath to collect waste.
+2.	Prepare 5mL* of H2O sample in a 15mL Olympus tube (Genesee Sci., Cat# 28-103) by acidifying the sample to at least pH2 with 2µL of 37% HCl.
+a.	Depending on sample volume, sample may need to be diluted to 5mL with MilliQ H2O.
+b.	Depending on sample alkalinity and natural buffers within the sample, more 37% HCl may be needed to acidify the sample to pH2. 
+c.	Test acidity with 0-6pH strip by pipetting 20µL of the sample on the pH strip.
+3.	Activate each SPE cartridge with 3mL of Optima LC/MS-grade methanol and let excess drain off into waste.
+4.	Equilibrate cartridge with 5mL 10mM HCl.
+5.	Load the acidified sample onto the cartridge and allow the sample to flow through the column#.
+6.	Wash the cartridge 17X+, # with 3mL of 10mM HCl, emptying waste tubes into a larger waste container once they are 80% full.
+7.	Dry each cartridge with N2(g) until packing material returns to original color (about 5 minutes)
+a.	If top filter has moved during drying, tamp down gently with pipette tip.
+8.	After cartridge is dry, expel any remaining HCl rinse in cartridge port and solvent guide needle by gently pushing N2(g) through the port.
+9.	Replace cartridge onto original port and elute with 1.5mL of Optima LC/MS-grade MeOH into a 2mL Microsolv vial (Microsolv, Cat# 9502S-WCV) and cap with a non-slit cap (Microsolv, Cat# 9502S-10C-B-M) until ready to run. Sample is then placed in a sample box and stored at -80oC
+*More than 5mL of sample can be used, especially if total volume of sample received is greater than 5mL and/or is of low concentration
+#If samples are having a hard time flowing through with gravity and capillary action, gently pull vacuum to pull the sample or solvent through the column
++ Samples can be rinsed more than 17X depending on salt concentration
+
+
+For the GC-MS analysis, part of the water and methanol extracts were dried down, combining corresponding H2O and MeOH fractions for each sample. Dried samples we reconstituted in 400 uL of D2O. Samples were methoximized and derivatized before GC-MS analysis.
+
+Separate subsamples of the soil remaining after sequential extraction were used for intracellular and extracellular proteomics analysis.
+
+Intracellular protein prep
+
+Protein solubilization buffer (4% SDS, 100mM DTT in 50mM Tris buffer, pH 8.0) Prepare the appropriate volume for the number of samples to be prepared, ~30mL protein solubilization buffer is needed per sample.  
+CRITICAL This buffer should be freshly prepared each day.  
+• For 60 mL of solubilization buffer, add 2.4 g of SDS, 0.93 g of DTT, 3 mL of 1 M Tris buffer, pH 8.0 to a media bottle and volume up to ~55 mL with Milli-Q water. Using a stir bar and stir plate, solubilize the solution and using a graduated cylinder bring up to 60 mL with Milli-Q water. Scale up as necessary.
+• For 180mL, add 7.2 g of SDS, 2.79 g of DTT, and 9mL of 1M Tris buffer, pH 8.0 to media bottle. Add 160mL of Milli-Q water and use a stir bar to solubilize the solution on a stir plate. With a graduated cylinder, bring up to 180mL
+• For 210mL add 8.4 g of SDS, 3.25 g of DTT, add 10.5mL of 1M Tris buffer, pH 8.0 to media bottle. Add 180mL of Mill - Q water and use a stir bar to solubilize the solution on a stir plate. With a graduated cylinder, bring up to 180mL
+• For 360mL, add 14.4 g SDS, 5.58 g DTT, and 18mL 1M Tris buffer, pH 8.0 to media bottle. Add 330mL of Milli-Q water and use a stir bar to solubilize the solution on a stir plate. With a graduated cylinder, bring up to 360mL.
+8 M urea in 50 mM NH4HCO3 Weigh 4.8 g and place in a media bottle or 15mL conical tube. Add 50 mM NH4HCO3 up to ~10 mL and vortex or rotate end over end for ~15 mins until in solution, adjust to pH 8 if needed and using a graduated cylinder bring up to 10 mL with 50 mM NH4HCO3. Used for FASP Digestion Steps
+Trypsin digestion buffer Grab a 1ug/uL tube of USB trypsin from 1206 or 1208. 4uL x Number of samples being digested is how much you will need. Used for FASP Digestion Steps
+1. Add 30 mL of protein solubilization buffer (4% SDS, 100mM DTT in 50mM Tris buffer, pH 8.0) to the protein interlayer tube.
+2. In the fume hood, probe sonicate the samples at 20% amplitude for 30 secs to bring the sample into solution
+3. Horizontally vortex for 15 min @ 4C. Briefly spin down @4500 x g for 2 min to bring down foam and repeat step 2 at 40% amplitude. Move to step 4 after.
+	1. If samples do not have beads, add 5 scoops of steel/garnet bead mix - ADDED STEEL/GARNET BEADS FOR THIS PREP
+4. Place the protein sample into a rotator in the oven for 30 mins at 50°C to solubilize the protein
+5. Centrifuge the samples at 4,500 g for 10 mins, RT and collect the supernatant from each tube per sample into one 50mL tube (Prot. Sol. Buffer Tubes).
+6. Add 30mL of 100 mM Ammonium Bicarbonate (ABC) buffer to the protein pellet and sonicate and horizontally vortex back into solution, sonicate, and centrifuge as before
+7. Transfer the supernatant from the ABC buffer into a new 50-mL tube (100mM ABC Tube) and discard the protein interlayer.
+8. Centrifuge the supernatant samples at 8,000 g for 10mins, RT in a fixed angle bucket rotor
+CRITICAL a final centrifugation is necessary to remove excessive contaminating humic substances
+9. Decant the supernatants into new 50mL tubes 
+	1. Decant the ABC supernatant into 'TCA/ABC' and Protein Sol. Buffer into 'TCA'
+10. Add sufficient TCA to obtain a 20% TCA concentration in each sample, vortex into solution 
+	1. 7.5mL of TCA for 30mL
+11. Place the samples in a -20°C freezer for at least 1 hr 
+	PAUSE POINT Proteins will typically precipitate within 1 hr but can be left overnight (up to 18hrs)
+CRITICAL do not let the TCA extraction go longer than 18 hrs. If the sample is frozen, thaw it on ice or the thawers (quicker than leaving on ice), do not let the sample warm up past thaw. KEEP SAMPLES ON ICE FOR THIS PART OF THE DIGESTION.
+12. Centrifuge the sample at 4,500 g for 10 mins, 4°C, discard supernatant
+	1. Supernatants can be discarded into bottles labeled 'Protein Solubilization Buffer, 20% TCA' and '100mM ABC, 20%TCA'
+13. Add 10 mL of 100% ice-cold acetone to each protein pellet, vortex and combine like pellets into one tube
+	1. Used two aliquots of 5mL and combine into one tube.
+14. Centrifuge at 4,500 g for 10 mins, 4°C, decant acetone to 'used acetone' bottle.
+15. Allow the pellet to dry inverted on a Kim wipe in a fume hood for ~20 mins or under a nitrogen stream until the pellet slightly begins to crack
+16. PAUSE POINT Snap freeze the sample in liquid nitrogen and store in the -80°C freezer until ready for protein digestion
+17. Add 100-200 µl of the protein solubilization buffer depending on the size of the pellet
+	1. Added 600uL to each pellet.
+CRITICAL keep the volume of solubilization buffer added to the sample as low as possible. Subsequent Filter Aided Sample Preparation (FASP) can only use up to 50 μl of solubilized sample per column, any more must be split into multiple columns. Used 2 columns for each sample to make sure we had enough peptides for anlaysis
+18. Sonicate and vortex the pellet into solution, note that the sample may be viscous due to humic substances precipitating along with the protein which will be removed with a subsequent centrifugation
+19. Shake the sample in an incubator/shaker for 5 mins at 300 rpm, 90°C to solubilize the protein into solution
+20. Centrifuge the sample at 5, 000 g for 10 mins, RT
+PAUSE POINT Transferred supernatant to 1.5 mL tubes, stored at -70C until needed for next step
+21. Filter-Aided-Sample-Preparation (FASP) will be performed for the digestion using Microcon - 0.5mL 30k Centrifugal Filters following a modified manufacturer’s instruction 
+22. Add 400 μl of 8 M urea buffer into a FASP column (500 μl 30K MWCO spin filter) within 1.5mL provided tube labeled 'FASP Digestion'
+23. Spin solubilized protein tubes @ 15,000 x g for 10min, RT before removing supernantant.Add up to 50 μl of sample to the 400 μl of 8 M urea in the column. Vortex before centrifuging.
+	1. Thawed samples previously frozen, transferred 50 uL into each appropriately labeled spin filter, put remaining sample back in the freezer. 
+CRITICAL Add only up to 50 μl of sample per column, if there is more than 50 μl, use another column with the same label, they will be combined after digestion
+	1. 2 Columns used for each sample. 100uL total.
+24. Centrifuge the sample at 14,000 g for 30 mins, RT
+25. Remove the flow-through into waste and add 400μl of 8 M urea to the column and centrifuge again
+26. Repeat one more time (3x urea rinses)
+CRITICAL make sure the sample goes close to dryness on the column, if there is any more than ~ 30 µl remaining on the filter after each spin, continue centrifuging
+27. Add 400 μl of 50 mM NH4HCO3 and centrifuge at 14,000 g for 20 mins, discard the waste and repeat once
+28. Transfer the columns to a clean 1.5 mL provided microcon, labeled 'Peptides,' centrifuge tube
+29. Add 71 μl of 50 mM NH4HCO3 and 4 uL of 1 ug/uL of trypsin to the columns and incubate at 37°C for 3 hrs in a thermomixer with a 2.0mL thermotop at 750 rpm
+	1. Added tape along the row of samples to keep the caps closed and any sample from evaporating.
+	2. Trypsin is 0.5ug/uL. Added 8uL of Trypsin (used Promega Trypsin)
+30. Add 40 µl of 50 mM NH4HCO3 to the columns
+31. Centrifuge the sample at 14,000 g for 15 mins to collect the peptides in the flow-through into the tube while keeping the high molecular weight contaminants on top of the column
+32. Add 40 μl of 50mM NH4HCO3 to the column and centrifuge again at 14,000 x g for 15min, RT
+33. Discard the column, transfer FILTRATE into a new Fisher sterile 1.5mL tube labeled 'Peptides', concentrate the peptides in the tube in a Speed Vac to ~30µl and BCA assay the peptides. Pause Point if needed: You can store the supernatant in -70C until ready to concentrate in speedvac
+	1. Store in -70C until you are ready for the BCA assay.
+34. Ran BCA assay at 5X dilution (2uL Sample, 8uL H2O)
+35. For soil extractions, the peptides were diluted to 0.1ug/uL in waters vials and then capped with pre-slit caps. 20uL total. Submitted for analysis in DMS and sent to EMSL. Batch: 9767
+
+
+
+Extracellular soil protein removal 05/30/2023
+1.	Add 20mL H2O to soil and shake for 1hr at 4C on vortexer, RPM 1500
+2.	Spin the samples at 6000rpm for 10 minutes on the fixed angle rotor
+3.	Pour of the supernatant into a new tube and store at 4C
+4.	Add 20mL PBS and homogenize with handheld homogenizer for 2x 30 seconds
+5.	shake again for another hour
+6.	Spin at 6000 rpm for 10 minutes and combine with the other sample (they will be different volumes due to the texture of the soil)
+7.	Bring all of the samples to the same approximate volume. (40mL)
+8.	Multiply the volume by 0.25 and that is the mL of TCA to add to each sample (10mL) using glass serological pipette, vortex and place in the -20C freezer overnight
+9.	.
+10.	Start the next 6 soil samples at step 1. 
+11.	Once the samples are thaw, centrifuge the sample at 4,500 g for 10 mins, 4°C with a swinging bucket rotor
+12.	Decant the supernatant into waste
+13.	Add 10 mL of 100% ice-cold acetone to each protein pellet, 
+14.	Centrifuge at 4,500 g for 10 mins, 4°C with a swinging bucket rotor
+15.	Decant the supernatant into waste
+16.	Repeat steps 13-15 one more time 
+17.	Allow the pellet to dry inverted on a Kim wipe in a fume hood for ~2 mins then lightly under a nitrogen stream until the pellet slightly begins to crack.
+18.	Store the protein pellet at -80C until ready for protein extraction.
+19.	Proceed with the next 6 samples until they are all done and the protein pellets are stored at -80C
+Protein solubilization 05/31/2023
+20.	Add 100-200 ul of the protein solubilization buffer  (4% SDS, 100mM DTT in 50mM tris buffer, pH 8.0) depending on the size of the pellet  
+21.	CRITICAL keep the volume of solubilization buffer added to the sample as low as possible. Subsequent Filter Aided Sample Preparation (FASP) can only use up to 50 μl of solubilized sample per column; any more must be split into multiple FASP columns
+22.	Sonicate and vortex the pellet into solution, note that the sample may be viscous due to humic substances precipitating along with the protein which will be removed with a subsequent centrifugation
+23.	Shake the sample in an incubator/shaker for 10 mins at 300 rpm,  95°C to solubilize the protein into solution, keep the caps loose
+24.	Allow to cool to RT
+25.	Centrifuge the sample at 4,500 g for 5 mins, RT and collect he supernatant into a 1.5mL centrifuge tube
+26.	PAUSE POINT Snap freeze the sample in liquid nitrogen and store in the -80°C freezer until ready for protein digestion
+Protein Digestion 06/06/2023
+27.	Filter-Aided-Sample-Preparation (FASP) will be performed for the digestion using expedeon FASP kits following a modified manufacturer’s instruction 
+28.	Add 400 μl of 8 M urea buffer into a FASP column (500 μl 30K MWCO spin filter) 
+29.	Once the sample has finished centrifuging, pipette off  the supernatant (discard the pellet) and add up to 100 μl of sample to the 400 μl of 8 M urea in the column
+30.	CRITICAL Add only up to 100 μl of sample per column, if there is more than 100 μl, use multiple columns and combine peptides after digestion
+31.	Place the column into the included 1.5 mL tube and centrifuge the sample at 14,000 g for 30 mins, RT
+32.	Remove the flow-through into waste and add 400μl of 8 M urea to the column and centrifuge again
+33.	Repeat one more time (3x urea rinses)
+34.	CRITICAL make sure the sample goes close to dryness on the column, if there is any more than ~ 30 ul remaining on the filter after each spin, continue centrifuging
+35.	Add 400 μl of 50 mM NH4HCO3 and centrifuge at 14,000 g for 20 mins, discard the waste and repeat once
+36.	Transfer the columns to a clean 1.5 mL centrifuge tube
+37.	Add 75 μl of trypsin digestion buffer to the columns and incubate at 37°C for 3 hrs in a thermomixer with a thermotop at 750 rpm or  (leave overnight adding 50 uL of 50mM NH4CO3 buffer)
+38.	Add 40 ul of 50 mM NH4HCO3 to the columns
+39.	Centrifuge the sample at 14,000 g for 15 mins to collect the peptides in the flow-through into the tube while keeping the high molecular weight contaminants on top of the column
+40.	Add 40 μl of 50mM NH4HCO3 to the column and centrifuge again
+41.	Discard the column, dry down the peptides in the tube in a Speed Vac to ~30 ul and BCA assay the peptides 
+42.	Dilute to 0.1 ug/uL and store at -20°C until LC-MS/MS analysis
+
+Intracellular peptides were separated into 6 fractions according to the following protocol:
+
+Peptide mixtures were separated by high resolution reversed phase UPLC using a nanoACQUITY UPLC® system (Waters Corporation, Milford, MA) equipped with an autosampler. Capillary columns, 200 µm i.d. × 65 cm long, were packed with 300Å 3.0 µm p.s. Jupiter C18 bonded particles (Phenomenex, Torrence, CA). Separations were performed at a flow rate of 2.2 µL/min on binary pump systems, using 10 mM ammonium formate (pH 7.5) as mobile phase A and 100% acetonitrile as mobile phase B. 48 µL of peptide mixtures (0.1 µg/µL) were loaded onto the column and separated using a binary gradient of 1 % B for 35 min, 1-10 % B in 2 min, 10-15 % B in 5 min, and 15-25 % B in 35 min, 25-32 % B in 25min, 32-40 % B in 13 min, 40-90 % B in 43 min, held at 90 % B for 2 min (column washed and equilibrated from 90-50 % B in 2 min, 50-95% B in 2 min, held at 95 % B for 2 min and 95-1 % in 4 min). The capillary column eluent was automatically deposited every minute into 12x32 mm polypropylene vials (Waters Corporation, Milford, MA) starting at minute 60 and ending at minute 170, over the course of the 180 min LC run. Fractions were concatenated by collecting fractions from vial 1 to vial 6 and then returning to vial 1 back to vial 6 (etc.). Prior to peptide fraction collection, 100 µL of water was added to each vial to aid the addition of small droplets into the vial.  Each vial was completely dried in a vacuum concentrator (Labconco, Kansas City, MO) and reconstituted in 20 µL 0.1% formic acid in water.
+
+Extracellular peptides were separated into 6 fractions according to the same protocol. Some of the extracellular peptides were also separated into six fractions using potassium chloride.

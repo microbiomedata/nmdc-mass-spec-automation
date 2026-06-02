@@ -1,0 +1,84 @@
+{
+    "study": {
+        "name": "miesel_11_8bjf2432",
+        "id": "nmdc:sty-11-8bjf2432"
+    },
+    "workflow": {
+        "name": "miesel_11_8bjf2432_metadata",
+        "file_type": ".d",
+        "file_filters": [
+            ".raw",
+            ".d"
+        ],
+        "processed_data_date_tag": "20260513",
+        "workflow_type": "DI FTICR NOM",
+        "batch_size": 30
+    },
+    "paths": {
+        "base_directory": "/home/bmeluch/NMDC/nmdc-mass-spec-automation/",
+        "data_directory": "/home/bmeluch/NMDC/nom_processing/"
+    },
+    "docker": {
+        "raw_data_inspector_image": "microbiomedata/metams:3.3.3"
+    },
+    "minio": {
+        "endpoint": "admin.nmdcdemo.emsl.pnl.gov",
+        "secure": true,
+        "bucket": "nom"
+    },
+    "configurations": [
+        {
+            "name": "di_nom",
+            "file_filter": [
+                ".d"
+            ],
+            "corems_toml": "workflow_inputs/enviroms_nom_corems.toml",
+            "calibration_ref_file_path": "workflow_inputs/Hawkes_neg.ref",
+            "reference_db": "/path/to/database.msp",
+            "scan_translator": "/path/to/scan_translator.toml",
+            "cores": 5,
+            "instrument_used": "Default Instrument",
+            "mass_spec_configuration_name": "Default Mass Spec",
+            "metadata_overrides": {
+                "instrument_used": {
+                    "60009": "12T FT-ICR MS",
+                    "not_in_this_study": "21T FT-ICR MS"
+                },
+                "instrument_instance_specifier": {
+                    "60009": "",
+                    "not_in_this_study": ""
+                },
+                "mass_spec_configuration_name": {
+                    ".raw": "EMSL NOM reduced profile mass spectrometry, negative",
+                    ".d": "EMSL NOM full profile mass spectrometry, negative"
+                }
+            }
+        }
+    ],
+    "metadata": {
+        "instrument_used": "12T FT-ICR MS",
+        "processing_institution_workflow": "EMSL",
+        "processing_institution_generation": "EMSL",
+        "mass_spec_configuration_name": "Mass Spec Configuration",
+        "use_massive_urls": false,
+        "serial_numbers_to_remove": [
+            "Unknown"
+        ],
+        "raw_data_location": "minio"
+    },
+    "skip_triggers": {
+        "study_structure_created": true,
+        "raw_data_downloaded": true,
+        "protocol_outline_created": true,
+        "biosample_attributes_fetched": true,
+        "biosample_mapping_completed": true,
+        "raw_data_inspected": true,
+        "material_processing_metadata_generated": true,
+        "metadata_mapping_generated": true,
+        "data_processed": true,
+        "processed_data_uploaded_to_minio": true,
+        "metadata_packages_generated": true,
+        "metadata_submitted_dev": false,
+        "metadata_submitted_prod": true
+    }
+}

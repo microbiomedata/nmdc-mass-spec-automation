@@ -261,8 +261,10 @@ class TestWorkflowRawDataInspectionManager:
         from nmdc_dp_utils.workflow_manager import NMDCWorkflowManager
         
         # Use config without Docker settings
+        # Hard coded config includes Docker settings though so set it to empty
         manager = NMDCWorkflowManager(str(lcms_config_file))
-        
+        manager.config["docker"] = ""
+
         # Create a dummy raw file
         raw_dir = manager.workflow_path.parent / "test_data" / "raw"
         raw_dir.mkdir(parents=True, exist_ok=True)

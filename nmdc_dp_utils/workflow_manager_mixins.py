@@ -18,6 +18,7 @@ from minio.error import S3Error
 from nmdc_dp_utils.llm.protocol_conversion.pipeline import get_llm_yaml_outline
 from nmdc_dp_utils.llm.llm_conversation_manager import ConversationManager
 from nmdc_dp_utils.llm.llm_client import LLMClient
+from nmdc_api_utilities.calibration_search import CalibrationSearch
 
 # Import workflow mapping defined in workflow_manager (defined before mixins import)
 from nmdc_ms_metadata_gen.metadata_generator import NMDCMetadataGenerator
@@ -29,6 +30,9 @@ from nmdc_ms_metadata_gen.lcms_lipid_metadata_generator import (
 )
 from nmdc_ms_metadata_gen.gcms_metab_metadata_generator import (
     GCMSMetabolomicsMetadataGenerator,
+)
+from nmdc_ms_metadata_gen.di_nom_metadata_generator import (
+    DINOMMetaDataGenerator,
 )
 from nmdc_ms_metadata_gen.material_processing_generator import (
     MaterialProcessingMetadataGenerator,
@@ -62,6 +66,14 @@ WORKFLOW_DICT = {
         "metadata_generator_class": GCMSMetabolomicsMetadataGenerator,
         "raw_data_inspector": "gcms_data_inspector",
     },
+    "DI FTICR NOM": {
+        "wdl_workflow_name": "enviroMS_di_nom",
+        "wdl_download_location": "https://raw.githubusercontent.com/microbiomedata/enviroMS/master/wdl/di_fticr_ms_bruker.wdl",
+        "generator_method": "_generate_di_nom_wdl",
+        "workflow_metadata_input_generator": "_generate_di_nom_workflow_metadata_inputs",
+        "metadata_generator_class": DINOMMetaDataGenerator,
+        "raw_data_inspector": "raw_data_inspector",
+    }
 }
 
 # Load environment variables from .env file
@@ -632,6 +644,68 @@ class WorkflowDataMovementManager:
                     )
         return pd.DataFrame(data)
 
+    def zip_bruker_files(
+        self,
+        local_directory: str,
+        file_pattern: str = "*",
+    ) -> int:
+
+        """
+        Zip Bruker .d directories in the local directory.
+
+        Recursively finds all .d directories matching the specified pattern and
+        creates zip archives for each, preserving the original directory structure.
+
+        Args:
+            local_directory: Local directory to search for .d directories
+            file_pattern: Glob pattern to match .d directories (default: "*")
+
+        Returns:
+            Number of .d directories successfully zipped
+
+        Raises:
+            ValueError: If local directory doesn't exist
+            Exception: If zipping fails for any directory
+
+        Example:
+            >>> manager.zip_bruker_files('/path/to/raw_data', file_pattern='*')
+        """
+        local_path = Path(local_directory)
+        if not local_path.exists():
+            raise ValueError(f"Local directory {local_directory} does not exist")
+
+        # Find all .d directories matching the pattern
+        # ONLY LOOK ONE LEVEL DOWN
+        d_dirs = list(local_path.glob(f"{file_pattern}.d"))
+        d_dirs = [d for d in d_dirs if d.is_dir()]
+
+        zipped_count = 0
+
+        self.logger.info(
+            f"Found {len(d_dirs)} Bruker .d directories to zip in {local_directory}"
+        )
+
+        # Zip and save files to local_directory
+        # Skip if resulting zipped file already exists
+        for d_dir in tqdm(d_dirs, desc="Zipping .d directories"):
+            zip_path = d_dir.with_suffix(".zip")
+            if zip_path.exists():
+                self.logger.info(f"Skipping {d_dir} as {zip_path} already exists")
+                continue
+            try:
+                shutil.make_archive(
+                    zip_path.with_suffix(""),
+                    "zip",
+                    root_dir=d_dir.parent,
+                    base_dir=d_dir.name,
+                    )
+                zipped_count += 1
+            except Exception as e:
+                self.logger.error(f"Failed to zip {d_dir}: {e}")
+
+        self.logger.info(f"Successfully zipped {zipped_count} .d directories")
+        return zipped_count
+
     def upload_to_minio(
         self,
         local_directory: str,
@@ -743,6 +817,12 @@ class WorkflowDataMovementManager:
         )
 
         all_objects = [obj for obj in objects if not obj.object_name.endswith("/")]
+
+        # Don't download objects if their names don't meet file filters
+        file_filters = self.config['workflow'].get('file_filters', [])
+        if file_filters:
+            all_objects = [obj for obj in all_objects if all(filt in obj.object_name for filt in file_filters)]
+
         downloaded_count = 0
 
         for obj in tqdm(all_objects, desc="Downloading files"):
@@ -889,6 +969,7 @@ class WorkflowDataMovementManager:
         Handles both LCMS and GCMS workflow outputs:
         - LCMS: Searches for .corems directories and moves them to processed directory
         - GCMS: Searches for CSV files in out/output_files/ structure and copies them directly to processed directory
+        - DI FTICR NOM: CSV, JSON, PNG files. Stores them in subfolders named by file stem because that's what the metadata generation repo expects because of how enviroMS structures outputs.
 
         After attempting to move files, optionally cleans up the WDL execution directory
         to keep the study directory clean and prevent accumulation of large temporary files.
@@ -994,6 +1075,37 @@ class WorkflowDataMovementManager:
                     moved_count += 1
                 except Exception as e:
                     self.logger.error(f"Failed to copy {csv_file.name}: {e}")
+        
+        elif workflow_type == "DI FTICR NOM":
+            # DI FTICR NOM: Search for CSV, JSON, PNG files in out/ directory
+            # <timestamp>_fticrmsNOM/out/output_files/<number>/<filename>.csv|json
+            # <timestamp>_fticrmsNOM/out/qc_plots/<number>/<filename>.png
+            for file in working_path.rglob("out/*/*/*.*"):
+                if file.is_file() and file.suffix.lower() in [".csv", ".json", ".png"]:
+                    # Get the base filename (without extension)
+                    # Remove "_qc" from the filename if it exists to match with raw file stems
+                    base_filename = file.stem.replace("_qc", "")
+
+                    # Validate this file belongs to our study
+                    if study_raw_files and base_filename not in study_raw_files:
+                        self.logger.warning(
+                            f"{file.name} does not match any raw files for study {self.study_name}, skipping."
+                        )
+                        continue
+
+                    # Move file directly to a NAMED SUBFOLDER in processed data directory
+                    destination_file = processed_path / base_filename / file.name
+                    os.makedirs(processed_path / base_filename, exist_ok=True)
+
+                    # Handle case where destination file already exists (silent skip)
+                    if destination_file.exists():
+                        continue
+
+                    try:
+                        shutil.copy2(str(file), str(destination_file))
+                        moved_count += 1
+                    except Exception as e:
+                        self.logger.error(f"Failed to copy {file.name}: {e}")
 
         if moved_count > 0:
             # Report total processed files in destination
@@ -1146,9 +1258,9 @@ class NMDCWorkflowDataProcessManager:
         processed_data_dir = self.processed_data_directory
         workflow_type = self.config["workflow"]["workflow_type"]
 
-        # Load biosample mapping to identify calibration files (for GCMS workflow)
+        # Load biosample mapping to identify calibration files (for GCMS or NOM workflow)
         calibration_files_set = set()
-        if workflow_type == "GCMS Metabolomics":
+        if workflow_type == "GCMS Metabolomics" or workflow_type == "DI FTICR NOM":
             mapping_file = (
                 self.workflow_path
                 / "metadata"
@@ -1195,8 +1307,8 @@ class NMDCWorkflowDataProcessManager:
                             if csv_files:
                                 continue  # Skip this file - already processed
 
-                    elif workflow_type == "GCMS Metabolomics":
-                        # GCMS: Check if corresponding CSV file exists directly in processed directory
+                    elif workflow_type == "GCMS Metabolomics" or workflow_type == "DI FTICR NOM":
+                        # GCMS or NOM: Check if corresponding CSV file exists directly in processed directory
                         csv_file = processed_path / f"{base_name}.csv"
 
                         if csv_file.exists() and csv_file.is_file():
@@ -1278,10 +1390,15 @@ class NMDCWorkflowDataProcessManager:
                 self.logger.debug(f"  ... and {len(filtered_files) - sample_size} more")
 
             # Split files into batches
-            batches = [
-                filtered_files[i : i + batch_size]
-                for i in range(0, len(filtered_files), batch_size)
-            ]
+            if workflow_type != "DI FTICR NOM":
+                batches = [
+                    filtered_files[i : i + batch_size]
+                    for i in range(0, len(filtered_files), batch_size)
+                ]
+            # for NOM, need to split batches by SRFAs in the next function
+            # so don't split here and just pass all the files in "batches" var
+            elif workflow_type == "DI FTICR NOM":
+                batches = [filtered_files]
 
             # Get the workflow type
             for batch_num, batch_files in enumerate(batches, 1):
@@ -1544,6 +1661,190 @@ class NMDCWorkflowDataProcessManager:
             # Generate single WDL JSON (batch size not exceeded)
             create_wdl_json(sample_file_paths, batch_num)
             return 1
+
+    def _generate_di_nom_wdl(
+        self, config: dict, batch_files: List[Path], batch_num: int
+    ) -> int:
+        """
+        Generate WDL JSON file(s) for DI FTICR natural organic matter workflow.
+
+        Matches sample files to calibration files based on chronological order (write_time).
+        Batches sample files by calibration file.
+        May create multiple JSON files if samples exceed configured batch_size.
+
+        Calibration Matching Logic:
+        - Samples are matched to the most recent calibration file before them
+        - If a sample was run before any calibration, it uses the first available calibration (with warning)
+        - Example: [Cal1, S1, S2, Cal2, S3] -> S1,S2 use Cal1; S3 uses Cal2
+
+        Args:
+            config: Configuration dictionary for the workflow
+            batch_files: List of raw data file paths for this batch (includes both samples and calibrations)
+            batch_num: Batch number for naming the output file
+
+        Returns:
+            Number of JSON files created (may be >1 if batch is split into sub-batches)
+        """
+        config_dir = self.workflow_path / "wdl_jsons" / config["name"]
+
+        # Get inspection results path
+        inspection_results_path = self.get_raw_inspection_results_path()
+        if not inspection_results_path:
+            raise FileNotFoundError(
+                "Raw file inspection results not found. Run raw_data_inspector() first."
+            )
+
+        # Load biosample mapping to identify file types
+        mapping_file = (
+            self.workflow_path / "metadata" / "llm_biosample_raw_file_mapper.csv"
+        )
+        if not mapping_file.exists():
+            raise FileNotFoundError(
+                f"Biosample mapping not found: {mapping_file}. Run biosample mapping first."
+            )
+
+        mapping_df = pd.read_csv(mapping_file)
+        inspection_df = pd.read_csv(inspection_results_path)
+
+        mapping_conf_lookup = {
+            str(row["raw_data_identifier"]): str(row.get("match_confidence", ""))
+            .strip()
+            .lower()
+            for _, row in mapping_df.iterrows()
+        }
+
+        # Build DataFrame for batch files with their metadata
+        sample_rows = []
+        for f in batch_files:
+            inspection_matches = inspection_df[inspection_df["file_name"] == f.name]
+            if inspection_matches.empty:
+                raise ValueError(
+                    f"Batch file '{f.name}' is missing from raw file inspection results: "
+                    f"{inspection_results_path}"
+                    )
+            write_time = inspection_matches.iloc[0]["write_time"]
+            sample_rows.append(
+                {
+                    "raw_data_file_short": f.name,
+                    "file_path": str(f),
+                    "is_calibration": mapping_conf_lookup.get(f.name, "")
+                    == "calibrant",
+                    "write_time": write_time,
+                }
+            )
+        sample_files_df = pd.DataFrame(sample_rows)
+
+        calibration_count = int(sample_files_df["is_calibration"].sum())
+
+        if calibration_count == 0:
+            raise ValueError(
+                f"No calibration files found. At least one calibration file is required."
+            )
+        else:
+            print(calibration_count, "calibration files found for DI NOM workflow")
+
+        if sum(~sample_files_df['is_calibration']) == 0:
+            raise ValueError(
+                f"No sample files found. At least one sample file is required."
+            )
+        else:
+            print(sum(~sample_files_df['is_calibration']), "sample files found for DI NOM workflow")
+
+        # Get batch size from workflow config (default to no limit if not specified)
+        max_batch_size = self.config["workflow"].get(
+            "batch_size", len(sample_files_df)
+        )
+
+        # Use helper function to assign calibration files to samples
+        sample_files_df = self._assign_calibration_files_to_samples(
+            sample_files_df, inspection_results_path
+        )
+        sample_files_df.to_csv(config_dir / f"sample_files_with_calibrations.csv", index=False)
+
+        # Helper function to create WDL JSON
+        # enviroMS DI NOM WDL expects the SRFA file to be included in the file_paths input along with the sample files
+        def create_wdl_json(samples, batch_id):
+            json_obj = {
+                "fticrmsNOM.runDirectInfusion.file_paths": samples,
+                "fticrmsNOM.runDirectInfusion.output_directory": f"output_batch_{batch_id}",
+                "fticrmsNOM.runDirectInfusion.output_type": config.get(
+                    "output_type", "csv"
+                ),
+                "fticrmsNOM.runDirectInfusion.calibrate": True,
+                "fticrmsNOM.runDirectInfusion.batch_calibrate": True,
+                "fticrmsNOM.runDirectInfusion.calibration_ref_file_path": config[
+                    "calibration_ref_file_path"
+                ],
+                "fticrmsNOM.runDirectInfusion.corems_toml_path": config[
+                    "corems_toml"
+                ],
+                "fticrmsNOM.runDirectInfusion.polarity": "negative",
+                "fticrmsNOM.runDirectInfusion.is_centroid": True,
+                "fticrmsNOM.runDirectInfusion.raw_file_start_scan": 1,
+                "fticrmsNOM.runDirectInfusion.raw_file_final_scan": 7,
+                
+                "fticrmsNOM.runDirectInfusion.plot_mz_error": False,
+                "fticrmsNOM.runDirectInfusion.plot_ms_assigned_unassigned": False,
+                "fticrmsNOM.runDirectInfusion.plot_c_dbe":  False,
+                "fticrmsNOM.runDirectInfusion.plot_van_krevelen": False,
+                "fticrmsNOM.runDirectInfusion.plot_ms_classes": False,
+                "fticrmsNOM.runDirectInfusion.plot_mz_error_classes": False,
+                "fticrmsNOM.runDirectInfusion.plot_qc": True
+            }
+            output_file = (
+                config_dir
+                / f"run_enviroMS_di_nom_{config['name']}_batch{batch_id}.json"
+            )
+            with open(output_file, "w") as f:
+                json.dump(json_obj, f, indent=4)
+            return output_file
+
+        # Group sample_files_df by calibration_file column
+        sample_files_df["calibration_file"] = sample_files_df["calibration_file"].astype(str)
+        calibration_groups = sample_files_df.groupby("calibration_file")
+
+        # for each group of sample files with the same calibration, print calibration file and number of sample files
+        calib_batch_num: int = 0
+        for calibration_file, group_df in calibration_groups:
+            print(f"Calibration file: {calibration_file}, number of sample files: {len(group_df)}")
+
+            # If all rows in this group_df have is_calibration = TRUE, skip this group
+            if all(group_df['is_calibration']):
+                print(f"No sample files for calibration {calibration_file}, skipping this group")
+                continue
+            
+            # Number this batch
+            calib_batch_num += 1
+
+            # Get list of sample file paths INCLUDING ASSOCIATED SRFA
+            sample_file_paths = group_df["file_path"].tolist()
+
+            # If sample files exceed batch size, split into sub-batches
+            if len(sample_file_paths) > max_batch_size:
+                num_sub_batches = (
+                    len(sample_file_paths) + max_batch_size - 1
+                ) // max_batch_size
+
+                for sub_batch_idx in range(num_sub_batches):
+                    start_idx = sub_batch_idx * max_batch_size
+                    end_idx = min(start_idx + max_batch_size, len(sample_file_paths))
+                    sub_batch_samples = sample_file_paths[start_idx:end_idx]
+
+                    # Retrieve the path that includes "SRFA" from sample_file_paths and add it to sub_batch_samples if it is not present
+                    srfa_path = next((p for p in sample_file_paths if "SRFA" in p), None)
+                    if srfa_path and srfa_path not in sub_batch_samples:
+                        sub_batch_samples.append(srfa_path)
+
+                    sub_batch_num = f"{calib_batch_num}.{sub_batch_idx + 1}"
+                    print(f"Creating sub-batch {sub_batch_num} with {len(sub_batch_samples)} samples")
+                    create_wdl_json(sub_batch_samples, sub_batch_num)
+
+                x = num_sub_batches
+            else:
+                # Generate single WDL JSON (batch size not exceeded)
+                create_wdl_json(sample_file_paths, calib_batch_num)
+                x = 1
+        return x
 
     @skip_if_complete("data_processed", return_value=True)
     def generate_wdl_runner_script(self, script_name: Optional[str] = None) -> bool:
@@ -1880,14 +2181,20 @@ fi
         venv_python = base_venv_dir / "bin" / "python"
 
         if not base_venv_dir.exists():
-            self.logger.error(f"Virtual environment not found at: {base_venv_dir}")
-            self.logger.error(
-                "Please ensure you have a virtual environment set up in the base directory"
-            )
-            self.logger.error(
-                "Run: python -m venv venv && source venv/bin/activate && pip install -r requirements.txt"
-            )
-            return 1
+            try:
+                base_venv_dir = self.base_path / ".venv"
+                venv_python = base_venv_dir / "bin" / "python"
+                base_venv_dir.exists()
+
+            except Exception:
+                self.logger.error(f"Virtual environment not found at: {base_venv_dir}")
+                self.logger.error(
+                    "Please ensure you have a virtual environment set up in the base directory"
+                )
+                self.logger.error(
+                    "Run: python -m venv venv && source venv/bin/activate && pip install -r requirements.txt"
+                )
+                return 1
 
         if not venv_python.exists():
             self.logger.error(f"Python executable not found in venv: {venv_python}")
@@ -1972,7 +2279,6 @@ fi
 
         # Store current directory
         original_dir = os.getcwd()
-
         try:
             os.chdir(working_dir)
 
@@ -2307,6 +2613,7 @@ class WorkflowRawDataInspectionManager:
         Uses workflow-specific inspector based on WORKFLOW_DICT configuration:
         - LCMS workflows: Docker-based raw_data_inspector.py (for .mzML/.raw files)
         - GCMS workflows: Docker-based gcms_data_inspector.py (for .cdf files)
+        - FTICR workflows: Docker-based raw_data_inspector.py (for .raw/.d files)
 
         Both workflows require the same Docker image specified in configuration.
 
@@ -2356,8 +2663,14 @@ class WorkflowRawDataInspectionManager:
     def _run_lcms_data_inspector(
         self, file_paths, cores, limit, max_retries, retry_delay
     ):
-        """Run LCMS raw data inspector using Docker container."""
-        self.logger.info("Starting LCMS RAW DATA INSPECTION (Docker)")
+        """Run LCMS raw data inspector using Docker container.
+        Includes options for FT-ICR raw data inspection."""
+
+        workflow_type = self.config["workflow"]["workflow_type"]
+        if workflow_type == "DI FTICR NOM":
+            self.logger.info("Starting FT-ICR RAW DATA INSPECTION (Docker)")
+        else:
+            self.logger.info("Starting LCMS RAW DATA INSPECTION (Docker)")
 
         try:
             # Get file paths to inspect
@@ -2377,12 +2690,15 @@ class WorkflowRawDataInspectionManager:
                         "*.mzML",
                         "*.raw",
                         "*.mzml",
+                        "*.d"
                     ]:  # Include lowercase variants
                         file_paths.extend([str(f) for f in raw_data_dir.rglob(ext)])
 
             if not file_paths:
                 self.logger.warning("No raw files found to inspect")
                 return None
+            
+            self.logger.info("Found {} files to inspect".format(len(file_paths)))
 
             # Check for previous inspection results and filter out successfully inspected files
             output_dir = self.workflow_path / "raw_file_info"
@@ -2431,9 +2747,9 @@ class WorkflowRawDataInspectionManager:
             # Now check Docker configuration since we have files to inspect
             docker_image = self.config.get("docker", {}).get("raw_data_inspector_image")
             if not docker_image:
-                self.logger.error("Docker image not configured.")
-
-                return None
+                raise ValueError(
+                    "Docker configuration required: config['docker']['raw_data_inspector_image'] not found"
+                )
 
             # Check for .raw files and force single core processing to prevent crashes
             has_raw_files = any(
@@ -2527,7 +2843,10 @@ class WorkflowRawDataInspectionManager:
                     traceback.print_exc()
 
             # Set the skip trigger on successful completion
-            if result is not None:
+            if (
+                result is not None and 
+                pd.read_csv(existing_results_file).get('error', pd.Series(pd.NA)).isna().all()
+            ):
                 self.logger.info("Raw data inspection completed successfully")
                 self.set_skip_trigger("raw_data_inspected", True)
                 return True
@@ -2538,7 +2857,6 @@ class WorkflowRawDataInspectionManager:
         except Exception as e:
             self.logger.error(f"Error during raw data inspection: {e}")
             import traceback
-
             traceback.print_exc()
             return False
 
@@ -3344,7 +3662,8 @@ class WorkflowMetadataManager:
         output_dir = self.workflow_path / "metadata" / "metadata_gen_input_csvs"
         output_dir.mkdir(parents=True, exist_ok=True)
         for f in output_dir.glob("*.csv"):
-            f.unlink()
+            if f.name != "biosample_mapping_for_mp_metadata_generation.csv":
+                f.unlink()
 
         # Write configuration-specific CSV files
         files_written = 0
@@ -3460,6 +3779,75 @@ class WorkflowMetadataManager:
             return merged_df, final_columns
 
         return self._generate_workflow_metadata_inputs_common(gcms_processor)
+    
+    def _generate_di_nom_workflow_metadata_inputs(self) -> bool:
+        """Generate metadata inputs specific to DI-NOM workflows.
+
+        Returns:
+            bool: True if metadata generation is successful, False otherwise
+        """
+
+        def di_nom_processor(merged_df, raw_inspection_results, include_raw_data_url):
+            # Add data directory for DI-NOM (CSV files)
+            processed_data_dir = str(self.processed_data_directory)
+            if not processed_data_dir.endswith("/"):
+                processed_data_dir += "/"
+            merged_df["processed_data_directory"] = processed_data_dir + merged_df[
+                "raw_data_file_short"
+            ].str.replace(r"(?i)\.(cdf|mzml|d)$", "", regex=True)
+
+            # Match samples to calibration files
+            merged_df = self._assign_calibration_files_to_samples(
+                merged_df, raw_inspection_results
+            )
+
+            # rename calibration_file column to "srfa_calib_path"
+            merged_df = merged_df.rename(columns={"calibration_file": "srfa_calib_path"})
+
+            # Add reference calibration ID
+            calibration_ref_file_path = self.config["configurations"][0].get("calibration_ref_file_path")
+            if "Hawkes_neg.ref" in calibration_ref_file_path:
+                merged_df["calibration_id"] = "nmdc:calib-14-hhn3qb47"
+            else:
+                calib_ref_stem = Path(calibration_ref_file_path).stem
+                cs_client = CalibrationSearch()
+                try:
+                    c = cs_client.get_record_by_attribute(
+                        attribute_name="name",
+                        attribute_value=calib_ref_stem,
+                        fields="id",
+                        exact_match=True,
+                    )[0]["id"]
+                    merged_df["calibration_id"] = c
+                except ValueError as e:
+                    raise ValueError(
+                        f"Calibration object does not exist for file {calibration_ref_file_path}: {e}"
+                    ) 
+                except Exception as e:
+                    raise RuntimeError(
+                        f"An error occurred while looking up calibration for file {calibration_ref_file_path}: {e}"
+                    )
+
+            # Define final columns for DI FTICR NOM
+            final_columns = [
+                "sample_id",
+                "raw_data_file",
+                "processed_data_directory",
+                "srfa_calib_path",
+                "calibration_id",
+                "mass_spec_configuration_name",
+                "instrument_used",
+                "processing_institution_workflow",
+                "processing_institution_generation",
+                "instrument_analysis_end_date",
+                "instrument_instance_specifier",
+            ]
+            if include_raw_data_url:
+                final_columns.append("raw_data_url")
+
+            return merged_df, final_columns
+
+        return self._generate_workflow_metadata_inputs_common(di_nom_processor)
 
     def _assign_calibration_files_to_samples(
         self, merged_df: pd.DataFrame, raw_inspection_results: str
@@ -3500,7 +3888,7 @@ class WorkflowMetadataManager:
 
         if len(calibration_files_df) == 0:
             raise ValueError(
-                "No calibration files found in biosample mapping. At least one calibration file is required for GCMS."
+                "No calibration files found in biosample mapping. At least one calibration file is required for GCMS and DI FTICR."
             )
 
         # Merge calibration files with their write_time from inspection results
@@ -3540,10 +3928,12 @@ class WorkflowMetadataManager:
                 # Use the most recent calibration before this sample
                 return valid_calibrations.iloc[-1]["raw_data_identifier"]
 
+
         # Assign calibration file to each sample
         merged_df["calibration_file_short"] = merged_df["write_time_dt"].apply(
             find_calibration_for_sample
         )
+        
         merged_df["calibration_file"] = (
             raw_data_dir + merged_df["calibration_file_short"]
         )
@@ -3663,6 +4053,7 @@ class WorkflowMetadataManager:
                 return False
 
             csv_files = list(input_dir.glob("*.csv"))
+            csv_files = [f for f in csv_files if f.name != "biosample_mapping_for_mp_metadata_generation.csv"]
             if not csv_files:
                 self.logger.error(f"No CSV files found in {input_dir}")
                 return False
@@ -3803,6 +4194,8 @@ class WorkflowMetadataManager:
             updated_count = 0
             total_rows_updated = 0
 
+            csv_files = [f for f in csv_files if f.name != "biosample_mapping_for_mp_metadata_generation.csv"]
+
             for csv_file in csv_files:
                 # Read the CSV
                 df = pd.read_csv(csv_file)
@@ -3822,16 +4215,16 @@ class WorkflowMetadataManager:
                 
                 # Store original row count for reporting
                 original_row_count = len(df)
-                
+
                 # Merge with mapping to get processed_sample_id based on raw data filename
-                # Left merge to keep all rows from df, adding processed_sample_id column
+                # Left merge to keep all rows from df, adding processed_sample_id column                
                 df_merged = df.merge(
                     mapping_df,
                     left_on="raw_data_file_stem",
                     right_on="raw_data_file_stem",
                     how="left"
                 )
-                
+
                 # Check for any unmapped raw data files (would have NaN in processed_sample_id)
                 unmapped_mask = df_merged["processed_sample_id"].isna()
                 if unmapped_mask.any():
@@ -3850,9 +4243,10 @@ class WorkflowMetadataManager:
                 # Replace sample_id with processed_sample_id
                 df_merged["sample_id"] = df_merged["processed_sample_id"]
                 
-                # Drop the temporary columns from the merge
-                df_merged = df_merged.drop(columns=["raw_data_file_stem", "raw_data_identifier", "processed_sample_id"])
-
+                # Drop the temporary columns from the merge if they exist
+                columns_to_drop = ["raw_data_file_short", "raw_data_identifier", "processed_sample_id", "raw_data_file_short_stem", "raw_data_identifier_stem"]
+                df_merged = df_merged.drop(columns=[col for col in columns_to_drop if col in df_merged.columns])
+                
                 # Write updated CSV back to file
                 df_merged.to_csv(csv_file, index=False)
                 updated_count += 1
@@ -4187,6 +4581,7 @@ class WorkflowMetadataManager:
 
         # Process each metadata mapping CSV file
         csv_files = list(input_csv_dir.glob("*.csv"))
+        csv_files = [f for f in csv_files if f.name != "biosample_mapping_for_mp_metadata_generation.csv"]
 
         success_count = 0
         failed_files = []
@@ -4195,6 +4590,18 @@ class WorkflowMetadataManager:
             # Derive output filename from input (e.g., hilic_pos_metadata.csv -> workflow_metadata_hilic_pos.json)
             config_name = csv_file.stem.replace("_metadata", "")
             output_file = output_dir / f"workflow_metadata_{config_name}.json"
+
+            # Change trailing '.d' file extensions to '.zip' in raw_data_file, 
+            # raw_data_url, and srfa_calib_path columns, if the column exists.
+            # This requires a bunch of zip files to be in the raw folder, which I'm deciding is fine because that had to happen to get them on minio anyway.
+            df = pd.read_csv(csv_file)
+            if "raw_data_file" in df.columns:
+                df["raw_data_file"] = df["raw_data_file"].str.replace(r"\.d$", ".zip", regex=True)
+            if "raw_data_url" in df.columns:
+                df["raw_data_url"] = df["raw_data_url"].str.replace(r"\.d$", ".zip", regex=True)
+            if "srfa_calib_path" in df.columns:
+                df["srfa_calib_path"] = df["srfa_calib_path"].str.replace(r"\.d$", ".zip", regex=True)
+            df.to_csv(csv_file, index=False)
 
             try:
                 # Build kwargs based on workflow type

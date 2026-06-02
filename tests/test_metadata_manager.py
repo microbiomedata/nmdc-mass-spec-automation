@@ -94,6 +94,10 @@ class TestWorkflowMetadataManager:
         assert hasattr(manager, '_generate_gcms_workflow_metadata_inputs')
         assert callable(manager._generate_gcms_workflow_metadata_inputs)
 
+        # verify DI-NOM methods exist
+        assert hasattr(manager, '_generate_di_nom_workflow_metadata_inputs')
+        assert callable(manager._generate_di_nom_workflow_metadata_inputs)
+
     def test_validate_massive_urls_success(self, lcms_config_file):
         """Test MASSIVE URL validation with successful HEAD request."""
         from nmdc_dp_utils.workflow_manager import NMDCWorkflowManager
