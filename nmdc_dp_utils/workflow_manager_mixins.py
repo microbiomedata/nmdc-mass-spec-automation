@@ -4218,24 +4218,12 @@ class WorkflowMetadataManager:
 
                 # Merge with mapping to get processed_sample_id based on raw data filename
                 # Left merge to keep all rows from df, adding processed_sample_id column                
-                # FOR SOME REASON deep in mass-spec-metadata-gen the file extensions on NOM files are getting removed
-                # IF raw_data_identifier does not include file extension, merge on raw_data_file_short.stem()
-                if not mapping_df["raw_data_identifier"].str.contains(r"\.").any():
-                    df["raw_data_file_short_stem"] = df["raw_data_file_short"].apply(lambda x: Path(x).stem)
-                    mapping_df["raw_data_identifier_stem"] = mapping_df["raw_data_identifier"].apply(lambda x: Path(x).stem)
-                    df_merged = df.merge(
-                        mapping_df,
-                        left_on="raw_data_file_short_stem",
-                        right_on="raw_data_identifier_stem",
-                        how="left"
-                    )
-                else:
-                    df_merged = df.merge(
-                        mapping_df,
-                        left_on="raw_data_file_short",
-                        right_on="raw_data_identifier",
-                        how="left"
-                    )
+                df_merged = df.merge(
+                    mapping_df,
+                    left_on="raw_data_file_stem",
+                    right_on="raw_data_file_stem",
+                    how="left"
+                )
 
                 # Check for any unmapped raw data files (would have NaN in processed_sample_id)
                 unmapped_mask = df_merged["processed_sample_id"].isna()
