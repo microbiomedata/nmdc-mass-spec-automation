@@ -3,7 +3,7 @@ Unit tests for submit_metadata_packages functionality.
 
 Tests the metadata submission workflow including:
 - Production ID verification (-11- tag)
-- JSON validation using nmdc_api_utilities
+- JSON validation using nmdc_client
 - JSON submission to dev/prod environments
 - Material processing submission before workflow metadata
 - Proper error handling
@@ -112,8 +112,8 @@ class TestMetadataSubmission:
         assert result is True
 
     @patch.dict(os.environ, {"NMDC_USERNAME": "test_user", "NMDC_PASSWORD": "test_pass"})
-    @patch('nmdc_api_utilities.metadata.Metadata')
-    @patch('nmdc_api_utilities.auth.NMDCAuth')
+    @patch('nmdc_client.metadata.Metadata')
+    @patch('nmdc_client.auth.NMDCAuth')
     def test_submit_metadata_packages_success(
         self, mock_auth_class, mock_metadata_class, lcms_config_file, 
         metadata_packages_dir, sample_metadata_with_production_ids
@@ -171,8 +171,8 @@ class TestMetadataSubmission:
         assert mock_metadata_instance.submit_json.call_count == 2
 
     @patch.dict(os.environ, {"NMDC_USERNAME": "test_user", "NMDC_PASSWORD": "test_pass"})
-    @patch('nmdc_api_utilities.metadata.Metadata')
-    @patch('nmdc_api_utilities.auth.NMDCAuth')
+    @patch('nmdc_client.metadata.Metadata')
+    @patch('nmdc_client.auth.NMDCAuth')
     def test_submit_metadata_packages_prod_environment(
         self, mock_auth_class, mock_metadata_class, lcms_config_file, 
         metadata_packages_dir, sample_metadata_with_production_ids
@@ -267,8 +267,8 @@ class TestMetadataSubmission:
         assert result is False
 
     @patch.dict(os.environ, {"NMDC_USERNAME": "test_user", "NMDC_PASSWORD": "test_pass"})
-    @patch('nmdc_api_utilities.metadata.Metadata')
-    @patch('nmdc_api_utilities.auth.NMDCAuth')
+    @patch('nmdc_client.metadata.Metadata')
+    @patch('nmdc_client.auth.NMDCAuth')
     def test_submit_metadata_packages_validation_failure(
         self, mock_auth_class, mock_metadata_class, lcms_config_file, 
         metadata_packages_dir, sample_metadata_with_production_ids
@@ -299,8 +299,8 @@ class TestMetadataSubmission:
         assert result is False
 
     @patch.dict(os.environ, {"NMDC_USERNAME": "test_user", "NMDC_PASSWORD": "test_pass"})
-    @patch('nmdc_api_utilities.metadata.Metadata')
-    @patch('nmdc_api_utilities.auth.NMDCAuth')
+    @patch('nmdc_client.metadata.Metadata')
+    @patch('nmdc_client.auth.NMDCAuth')
     def test_submit_metadata_packages_submission_failure(
         self, mock_auth_class, mock_metadata_class, lcms_config_file, 
         metadata_packages_dir, sample_metadata_with_production_ids
@@ -332,8 +332,8 @@ class TestMetadataSubmission:
         assert result is False
 
     @patch.dict(os.environ, {"NMDC_USERNAME": "test_user", "NMDC_PASSWORD": "test_pass"})
-    @patch('nmdc_api_utilities.metadata.Metadata')
-    @patch('nmdc_api_utilities.auth.NMDCAuth')
+    @patch('nmdc_client.metadata.Metadata')
+    @patch('nmdc_client.auth.NMDCAuth')
     @patch('time.sleep')
     def test_submit_metadata_packages_waits_after_material_processing(
         self, mock_sleep, mock_auth_class, mock_metadata_class, lcms_config_file, 
@@ -373,8 +373,8 @@ class TestMetadataSubmission:
         mock_sleep.assert_called_once_with(60)
 
     @patch.dict(os.environ, {"NMDC_USERNAME": "test_user", "NMDC_PASSWORD": "test_pass"})
-    @patch('nmdc_api_utilities.metadata.Metadata')
-    @patch('nmdc_api_utilities.auth.NMDCAuth')
+    @patch('nmdc_client.metadata.Metadata')
+    @patch('nmdc_client.auth.NMDCAuth')
     def test_submit_metadata_packages_to_dev_wrapper(
         self, mock_auth_class, mock_metadata_class, lcms_config_file, 
         metadata_packages_dir, sample_metadata_with_production_ids
@@ -409,8 +409,8 @@ class TestMetadataSubmission:
         assert manager.should_skip("metadata_submitted_dev") is True
 
     @patch.dict(os.environ, {"NMDC_USERNAME": "test_user", "NMDC_PASSWORD": "test_pass"})
-    @patch('nmdc_api_utilities.metadata.Metadata')
-    @patch('nmdc_api_utilities.auth.NMDCAuth')
+    @patch('nmdc_client.metadata.Metadata')
+    @patch('nmdc_client.auth.NMDCAuth')
     def test_submit_metadata_packages_to_prod_wrapper(
         self, mock_auth_class, mock_metadata_class, lcms_config_file, 
         metadata_packages_dir, sample_metadata_with_production_ids
