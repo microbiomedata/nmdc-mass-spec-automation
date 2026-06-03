@@ -2451,7 +2451,6 @@ class NMDCWorkflowBiosampleManager:
                     fields="id,name,samp_name,description,gold_biosample_identifiers,insdc_biosample_identifiers,submitter_id,analysis_type",
                     all_pages=True,
                 )
-
                 if not biosamples:
                     self.logger.warning(f"No biosamples found for study {study_id}")
                     # Warning instead of an error - don't error out unless the final dataframe is empty
@@ -2459,10 +2458,9 @@ class NMDCWorkflowBiosampleManager:
                 # Convert to DataFrame
                 biosample_dfs.append(pd.DataFrame(biosamples))
 
-            # Concatenate all biosample DataFrames if there are multiple
-            if biosample_dfs:
-                biosample_df = pd.concat(biosample_dfs, ignore_index=True)
-            else:
+            # Concatenate all biosample DataFrames
+            biosample_df = pd.concat(biosample_dfs, ignore_index=True)
+            if biosample_df.empty:
                 self.logger.error("No biosample data available to save.")
                 return False
 

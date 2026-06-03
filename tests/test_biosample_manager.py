@@ -217,3 +217,29 @@ class TestNMDCWorkflowBiosampleManager:
         manager.reset_all_triggers(save=False)
         assert manager.should_skip("biosample_attributes_fetched") is False
         assert manager.should_skip("biosample_mapping_completed") is False
+
+    def test_handling_multiple_study_ids(self, lcms_config_file):
+        """Test that biosample attributes are fetched correctly when multiple study IDs are provided."""
+        from nmdc_dp_utils.workflow_manager import NMDCWorkflowManager
+
+        manager = NMDCWorkflowManager(str(lcms_config_file))
+        
+        # Create metadata directory
+        metadata_dir = manager.workflow_path / "metadata"
+        metadata_dir.mkdir(parents=True, exist_ok=True)
+
+        # Using real MONet parent and child study IDs
+        # Test get_biosample_attributes with one study ID provided directly
+        assert manager.get_biosample_attributes(study_ids = ["nmdc:sty-11-ygdm6368"])
+        manager.set_skip_trigger("biosample_attributes_fetched", False)
+
+        # Test get_biosample_attributes with multiple study IDs
+        assert manager.get_biosample_attributes(
+            study_ids = ["nmdc:sty-11-nmtnj115", "nmdc:sty-11-ygdm6368"]
+        )
+        manager.set_skip_trigger("biosample_attributes_fetched", False)
+
+        # Test get_biosample_attributes with one parent study ID
+        assert manager.get_biosample_attributes(
+            study_ids = ["nmdc:sty-11-srtxhh77"], 
+            use_child_studies=True)
