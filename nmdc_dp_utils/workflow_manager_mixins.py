@@ -4974,7 +4974,7 @@ class WorkflowMetadataManager:
         self.logger.info(f"Checking if {len(primary_ids)} IDs already exist in {environment} database...")
         
         # Initialize NMDC search client
-        search = NMDCSearch(api_base_url=API_BASE_URL)
+        search = NMDCSearch(api_base_url=get_api_base_url(env=environment))
         
         # Check a random sample of IDs (4 IDs to avoid too many API calls)
         sample_size = min(4, len(primary_ids))
@@ -5293,8 +5293,9 @@ class WorkflowMetadataManager:
         """
         # Always use prod environment for ID minting to ensure consistency
         # across material processing and workflow metadata generation
+        # Hold current environment in case we need to restore it later
+        current_env = os.getenv("NMDC_ENV")
         os.environ["NMDC_ENV"] = "prod"
-        API_BASE_URL = os.getenv("API_BASE_URL", get_api_base_url(env=ENV))
         self.logger.info("Set NMDC_ENV=prod for ID minting across all metadata generation")
         
         # Clean up macOS metadata files before processing
@@ -5317,9 +5318,12 @@ class WorkflowMetadataManager:
             self.logger.error("Failed to generate NMDC metadata packages")
             return False
 
+        # Restore environment variable post minting, just in case?
+        if current_env is not None:
+            os.environ["NMDC_ENV"] = current_env
+
         self.logger.info("All metadata generation steps completed successfully")
         return True
-
 
 class LLMWorkflowManagerMixin:
     """
