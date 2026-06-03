@@ -2427,7 +2427,7 @@ class NMDCWorkflowBiosampleManager:
             child_studies = []
             for study_id in study_ids:
                 child_study_ids = study_searcher.get_record_by_filter(
-                    filter=f'{{"associated_studies":"{study_id}"}}',
+                    filter=f'{{"part_of":"{study_id}"}}',
                     max_page_size=1000,
                     fields="id,name",
                     all_pages=True,
@@ -2453,8 +2453,8 @@ class NMDCWorkflowBiosampleManager:
                 )
 
                 if not biosamples:
-                    self.logger.error(f"No biosamples found for study {study_id}")
-                    return False
+                    self.logger.warning(f"No biosamples found for study {study_id}")
+                    # Warning instead of an error - don't error out unless the final dataframe is empty
 
                 # Convert to DataFrame
                 biosample_dfs.append(pd.DataFrame(biosamples))
