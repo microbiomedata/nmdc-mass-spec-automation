@@ -2419,7 +2419,7 @@ class NMDCWorkflowBiosampleManager:
 
         try:
             # Use nmdc_client to fetch biosamples
-            biosample_search = BiosampleSearch(api_base_url=API_BASE_URL)
+            biosample_search = BiosampleSearch()
             biosamples = biosample_search.get_record_by_filter(
                 filter=f'{{"associated_studies":"{study_id}"}}',
                 max_page_size=1000,
@@ -3813,7 +3813,7 @@ class WorkflowMetadataManager:
                 merged_df["calibration_id"] = "nmdc:calib-14-hhn3qb47"
             else:
                 calib_ref_stem = Path(calibration_ref_file_path).stem
-                cs_client = CalibrationSearch(api_base_url=API_BASE_URL)
+                cs_client = CalibrationSearch()
                 try:
                     c = cs_client.get_record_by_attribute(
                         attribute_name="name",
