@@ -18,7 +18,8 @@ from minio.error import S3Error
 from nmdc_dp_utils.llm.protocol_conversion.pipeline import get_llm_yaml_outline
 from nmdc_dp_utils.llm.llm_conversation_manager import ConversationManager
 from nmdc_dp_utils.llm.llm_client import LLMClient
-from nmdc_api_utilities.calibration_search import CalibrationSearch
+from nmdc_client.calibration_search import CalibrationSearch
+from nmdc_client.api_client import get_api_base_url
 
 # Import workflow mapping defined in workflow_manager (defined before mixins import)
 from nmdc_ms_metadata_gen.metadata_generator import NMDCMetadataGenerator
@@ -78,6 +79,8 @@ WORKFLOW_DICT = {
 
 # Load environment variables from .env file
 load_dotenv()
+ENV = os.getenv("NMDC_ENV", "prod")
+API_BASE_URL = os.getenv("API_BASE_URL", get_api_base_url(env=ENV))
 
 
 def skip_if_complete(trigger_name: str, return_value=None):
@@ -2392,7 +2395,7 @@ class NMDCWorkflowBiosampleManager:
         """
         Fetch biosample attributes from NMDC API and save to CSV file.
 
-        Uses the nmdc_api_utilities package to query biosamples associated with
+        Uses the nmdc_client package to query biosamples associated with
         the study ID and saves the attributes to a CSV file in the study's
         metadata directory. Includes skip trigger to avoid re-downloading.
 
@@ -2407,7 +2410,7 @@ class NMDCWorkflowBiosampleManager:
             The CSV file is saved as 'biosample_attributes.csv' in the study's metadata directory.
             This method is automatically skipped if biosample_attributes_fetched trigger is set.
         """
-        from nmdc_api_utilities.biosample_search import BiosampleSearch
+        from nmdc_client.biosample_search import BiosampleSearch
 
         if study_id is None:
             study_id = self.config["study"]["id"]
@@ -2415,7 +2418,7 @@ class NMDCWorkflowBiosampleManager:
         self.logger.info(f"Fetching biosample attributes for study: {study_id}")
 
         try:
-            # Use nmdc_api_utilities to fetch biosamples
+            # Use nmdc_client to fetch biosamples
             biosample_search = BiosampleSearch()
             biosamples = biosample_search.get_record_by_filter(
                 filter=f'{{"associated_studies":"{study_id}"}}',
@@ -4735,8 +4738,8 @@ class WorkflowMetadataManager:
         This method:
         1. Loads .json metadata packages from nmdc_submission_packages directory
         2. Verifies all id fields have "-11-" tag (production minted IDs)
-        3. Validates JSON using validate_json from nmdc_api_utilities
-        4. Submits JSON using submit_json from nmdc_api_utilities
+        3. Validates JSON using validate_json from nmdc_client
+        4. Submits JSON using submit_json from nmdc_client
         5. Submits material processing metadata first, waits 1 minute, then submits workflow metadata
 
         Args:
@@ -4754,8 +4757,8 @@ class WorkflowMetadataManager:
             - 1 minute wait time after material processing before workflow metadata
             - Fails immediately on any error (does not try other files)
         """
-        from nmdc_api_utilities.metadata import Metadata
-        from nmdc_api_utilities.auth import NMDCAuth
+        from nmdc_client.metadata import Metadata
+        from nmdc_client.auth import NMDCAuth
         import time
 
         self.logger.info(f"Submitting metadata packages to {environment} environment...")
@@ -4957,7 +4960,7 @@ class WorkflowMetadataManager:
         Returns:
             True if IDs already exist (already submitted), False if new IDs
         """
-        from nmdc_api_utilities.nmdc_search import NMDCSearch
+        from nmdc_client.nmdc_search import NMDCSearch
         import random
         import logging
         
@@ -4971,15 +4974,15 @@ class WorkflowMetadataManager:
         self.logger.info(f"Checking if {len(primary_ids)} IDs already exist in {environment} database...")
         
         # Initialize NMDC search client
-        search = NMDCSearch(env=environment)
+        search = NMDCSearch(api_base_url=get_api_base_url(env=environment))
         
         # Check a random sample of IDs (4 IDs to avoid too many API calls)
         sample_size = min(4, len(primary_ids))
         sample_ids = random.sample(list(primary_ids), sample_size)
         
-        # Temporarily suppress error logging from nmdc_api_utilities
+        # Temporarily suppress error logging from nmdc_client
         # since 404s are expected for new IDs
-        nmdc_logger = logging.getLogger("nmdc_api_utilities")
+        nmdc_logger = logging.getLogger("nmdc_client")
         original_level = nmdc_logger.level
         nmdc_logger.setLevel(logging.CRITICAL)
         
@@ -5290,6 +5293,8 @@ class WorkflowMetadataManager:
         """
         # Always use prod environment for ID minting to ensure consistency
         # across material processing and workflow metadata generation
+        # Hold current environment in case we need to restore it later
+        current_env = os.getenv("NMDC_ENV")
         os.environ["NMDC_ENV"] = "prod"
         self.logger.info("Set NMDC_ENV=prod for ID minting across all metadata generation")
         
@@ -5313,9 +5318,12 @@ class WorkflowMetadataManager:
             self.logger.error("Failed to generate NMDC metadata packages")
             return False
 
+        # Restore environment variable post minting, just in case?
+        if current_env is not None:
+            os.environ["NMDC_ENV"] = current_env
+
         self.logger.info("All metadata generation steps completed successfully")
         return True
-
 
 class LLMWorkflowManagerMixin:
     """
