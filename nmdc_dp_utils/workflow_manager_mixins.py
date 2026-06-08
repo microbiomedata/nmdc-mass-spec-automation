@@ -2419,6 +2419,9 @@ class NMDCWorkflowBiosampleManager:
             study_ids = self.config["study"]["id"]
             if isinstance(study_ids, str):
                 study_ids = [study_ids]
+        
+        if use_child_studies is None:
+            use_child_studies = self.config["workflow"].get("use_child_studies", False)
 
         # If we want to use child studies (eg. campaign or consortium),
         # find all children for provided study IDs and add them
