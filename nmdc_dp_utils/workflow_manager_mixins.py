@@ -2417,8 +2417,8 @@ class NMDCWorkflowBiosampleManager:
             The CSV file is saved as 'biosample_attributes.csv' in the study's metadata directory.
             This method is automatically skipped if biosample_attributes_fetched trigger is set.
         """
-        from nmdc_api_utilities.biosample_search import BiosampleSearch
-        from nmdc_api_utilities.study_search import StudySearch
+        from nmdc-client.biosample_search import BiosampleSearch
+        from nmdc-client.study_search import StudySearch
 
         if study_ids is None:
             study_ids = self.config["study"]["id"]
