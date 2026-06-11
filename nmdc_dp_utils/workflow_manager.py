@@ -82,7 +82,10 @@ class NMDCWorkflowManager(
         self.config = self.load_config(config_path)
         self.workflow_name = self.config["workflow"]["name"]
         self.study_name = self.config["study"]["name"]
+        # Read in study ID, make it a list of strings if it's not already
         self.study_id = self.config["study"]["id"]
+        if isinstance(self.study_id, str):
+            self.study_id = [self.study_id]
         self.base_path = Path(self.config["paths"]["base_directory"])
         self.workflow_path = self.base_path / "workflows" / f"{self.workflow_name}"
 

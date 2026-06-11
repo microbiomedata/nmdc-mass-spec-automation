@@ -22,7 +22,7 @@ class TestNMDCWorkflowManager:
         # Verify basic attributes
         assert manager.workflow_name == "test_lcms_workflow"
         assert manager.study_name == "test_lcms_study"
-        assert manager.study_id == "nmdc:sty-11-test"
+        assert manager.study_id == ["nmdc:sty-11-test"]
         assert manager.config_path == str(lcms_config_file.resolve())
         
         # Verify config loaded correctly
@@ -97,7 +97,7 @@ class TestNMDCWorkflowManager:
         
         assert info["workflow_name"] == "test_lcms_workflow"
         assert info["study_name"] == "test_lcms_study"
-        assert info["study_id"] == "nmdc:sty-11-test"
+        assert info["study_id"] == ["nmdc:sty-11-test"]
         assert info["massive_id"] == "MSV000094090"
         assert info["file_type"] == ".raw"
         assert "hilic_pos" in info["configuration_names"]

@@ -2391,7 +2391,11 @@ class NMDCWorkflowBiosampleManager:
     """
 
     @skip_if_complete("biosample_attributes_fetched", return_value=True)
-    def get_biosample_attributes(self, study_id: Optional[str] = None) -> bool:
+    def get_biosample_attributes(
+        self, 
+        study_ids: Optional[list[str]] = None, 
+        use_child_studies: bool = None
+    ) -> bool:
         """
         Fetch biosample attributes from NMDC API and save to CSV file.
 
@@ -2400,8 +2404,11 @@ class NMDCWorkflowBiosampleManager:
         metadata directory. Includes skip trigger to avoid re-downloading.
 
         Args:
-            study_id: NMDC study ID (e.g., 'nmdc:sty-11-dwsv7q78').
+            study_id: List of NMDC study ID(s) (e.g., ['nmdc:sty-11-dwsv7q78']).
                      Uses config['study']['id'] if not provided.
+            use_child_studies: If True, also fetch biosamples from child 
+                    studies linked to the main study ID. 
+                    Uses config['workflow']['use_child_studies'] if not provided.
 
         Returns:
             True if biosample attributes fetched successfully, False otherwise
@@ -2411,28 +2418,59 @@ class NMDCWorkflowBiosampleManager:
             This method is automatically skipped if biosample_attributes_fetched trigger is set.
         """
         from nmdc_client.biosample_search import BiosampleSearch
+        from nmdc_client.study_search import StudySearch
 
-        if study_id is None:
-            study_id = self.config["study"]["id"]
+        if study_ids is None:
+            study_ids = self.config["study"]["id"]
+            if isinstance(study_ids, str):
+                study_ids = [study_ids]
+        
+        if use_child_studies is None:
+            use_child_studies = self.config["workflow"].get("use_child_studies", False)
 
-        self.logger.info(f"Fetching biosample attributes for study: {study_id}")
+        # If we want to use child studies (eg. campaign or consortium),
+        # find all children for provided study IDs and add them
+        if use_child_studies:
+            study_searcher = StudySearch()
+            child_studies = []
+            for study_id in study_ids:
+                child_study_ids = study_searcher.get_record_by_filter(
+                    filter=f'{{"part_of":"{study_id}"}}',
+                    max_page_size=1000,
+                    fields="id,name",
+                    all_pages=True,
+                )
+                child_studies.extend(child_study_ids)
+            study_ids = study_ids + [s["id"] for s in child_studies]
+            for s in child_studies:
+                self.logger.info(f"Added child study to list: {s['id']}, {s['name']}")
 
         try:
-            # Use nmdc_client to fetch biosamples
-            biosample_search = BiosampleSearch()
-            biosamples = biosample_search.get_record_by_filter(
-                filter=f'{{"associated_studies":"{study_id}"}}',
-                max_page_size=1000,
-                fields="id,name,samp_name,description,gold_biosample_identifiers,insdc_biosample_identifiers,submitter_id,analysis_type",
-                all_pages=True,
-            )
+            # Add biosample results to a dataframe for each study ID and concatenate if multiple
+            biosample_dfs = []
+            for study_id in study_ids:
+                self.logger.info(f"Fetching biosample attributes for study: {study_id}")
 
-            if not biosamples:
-                self.logger.error(f"No biosamples found for study {study_id}")
+                # Use nmdc_client to fetch biosamples
+                biosample_search = BiosampleSearch()
+                biosamples = biosample_search.get_record_by_filter(
+                    filter=f'{{"associated_studies":"{study_id}"}}',
+                    max_page_size=1000,
+                    fields="id,name,samp_name,description,gold_biosample_identifiers,insdc_biosample_identifiers,submitter_id,analysis_type",
+                    all_pages=True,
+                )
+                if not biosamples:
+                    self.logger.warning(f"No biosamples found for study {study_id}")
+                    # Warning instead of an error - don't error out unless the final dataframe is empty
+
+                # Convert to DataFrame
+                biosample_dfs.append(pd.DataFrame(biosamples))
+
+            # Concatenate all biosample DataFrames
+            biosample_df = pd.concat(biosample_dfs, ignore_index=True)
+            if biosample_df.empty:
+                self.logger.error("No biosample data available to save.")
                 return False
-
-            # Convert to DataFrame
-            biosample_df = pd.DataFrame(biosamples)
 
             # Create metadata directory if it doesn't exist
             metadata_dir = self.workflow_path / "metadata"
