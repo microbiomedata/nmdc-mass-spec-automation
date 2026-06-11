@@ -44,7 +44,7 @@ def mock_subprocess_run():
 @pytest.fixture
 def mock_biosample_search():
     """Mock NMDC API BiosampleSearch for biosample attribute tests."""
-    with patch('nmdc_api_utilities.biosample_search.BiosampleSearch') as mock_search:
+    with patch('nmdc_client.biosample_search.BiosampleSearch') as mock_search:
         yield mock_search
 
 
