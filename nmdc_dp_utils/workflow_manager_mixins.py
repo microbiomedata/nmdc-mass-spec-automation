@@ -2394,7 +2394,7 @@ class NMDCWorkflowBiosampleManager:
     def get_biosample_attributes(
         self, 
         study_ids: Optional[list[str]] = None, 
-        use_child_studies: bool = False
+        use_child_studies: bool = None
     ) -> bool:
         """
         Fetch biosample attributes from NMDC API and save to CSV file.

@@ -229,23 +229,53 @@ class TestNMDCWorkflowBiosampleManager:
         metadata_dir.mkdir(parents=True, exist_ok=True)
 
         # Using real MONet parent and child study IDs
-        # Test get_biosample_attributes with one study ID provided directly
+
+        ###### Test get_biosample_attributes with one study ID provided directly
         assert manager.get_biosample_attributes(study_ids = ["nmdc:sty-11-ygdm6368"])
+
+        # Verify CSV was created - we're going to check and overwrite it a few times
+        csv_path = manager.workflow_path / "metadata" / "biosample_attributes.csv"
+        assert csv_path.exists()
+
+        # Verify CSV contents
+        df = pd.read_csv(csv_path)
+        assert "nmdc:bsm-11-3s3gvn13" in df['id'].values # a known biosample ID
+        assert "nmdc:bsm-11-07spy989" not in df['id'].values # a biosample ID not in this study
+
         manager.set_skip_trigger("biosample_attributes_fetched", False)
 
-        # Test get_biosample_attributes with multiple study IDs
+        ###### Test get_biosample_attributes with multiple study IDs
         assert manager.get_biosample_attributes(
             study_ids = ["nmdc:sty-11-nmtnj115", "nmdc:sty-11-ygdm6368"]
         )
+
+        # Verify CSV contents
+        df = pd.read_csv(csv_path)
+        assert "nmdc:bsm-11-ajv68037" in df['id'].values # a known biosample ID in first study
+        assert "nmdc:bsm-11-3s3gvn13" in df['id'].values # a known biosample ID in second study
+        assert "nmdc:bsm-11-07spy989" not in df['id'].values # a biosample ID not in either study
+
         manager.set_skip_trigger("biosample_attributes_fetched", False)
 
-        # Test get_biosample_attributes with one parent study ID
+        ###### Test get_biosample_attributes with one parent study ID
         assert manager.get_biosample_attributes(
             study_ids = ["nmdc:sty-11-srtxhh77"], 
             use_child_studies=True)
+        
+        # Verify CSV contents
+        df = pd.read_csv(csv_path)
+        assert "nmdc:bsm-11-ajv68037" in df['id'].values # a known biosample ID in a monet child study
+        assert "nmdc:bsm-11-07spy989" not in df['id'].values # a biosample ID not in any monet study
 
-        # Test get_get_biosample_attributes with one parent study ID and 
-        # use_child_studies set in configuration rather than provided as argument
+        manager.set_skip_trigger("biosample_attributes_fetched", False)
+
+        ###### Test get_get_biosample_attributes with one parent study ID and 
+        ###### use_child_studies set in configuration rather than provided as argument
         manager.config["workflow"]["use_child_studies"] = True
         assert manager.get_biosample_attributes(
             study_ids = ["nmdc:sty-11-srtxhh77"])
+    
+        # Verify CSV contents
+        df = pd.read_csv(csv_path)
+        assert "nmdc:bsm-11-ajv68037" in df['id'].values # a known biosample ID in a monet child study
+        assert "nmdc:bsm-11-07spy989" not in df['id'].values # a biosample ID not in any monet study
