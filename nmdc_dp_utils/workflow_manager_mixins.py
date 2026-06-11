@@ -2403,7 +2403,9 @@ class NMDCWorkflowBiosampleManager:
         Args:
             study_id: List of NMDC study ID(s) (e.g., ['nmdc:sty-11-dwsv7q78']).
                      Uses config['study']['id'] if not provided.
-            use_child_studies: If True, also fetch biosamples from child studies linked to the main study ID.
+            use_child_studies: If True, also fetch biosamples from child 
+                    studies linked to the main study ID. 
+                    Uses config['workflow']['use_child_studies'] if not provided.
 
         Returns:
             True if biosample attributes fetched successfully, False otherwise

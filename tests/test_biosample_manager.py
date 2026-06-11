@@ -243,3 +243,9 @@ class TestNMDCWorkflowBiosampleManager:
         assert manager.get_biosample_attributes(
             study_ids = ["nmdc:sty-11-srtxhh77"], 
             use_child_studies=True)
+
+        # Test get_get_biosample_attributes with one parent study ID and 
+        # use_child_studies set in configuration rather than provided as argument
+        manager.config["workflow"]["use_child_studies"] = True
+        assert manager.get_biosample_attributes(
+            study_ids = ["nmdc:sty-11-srtxhh77"])
