@@ -333,11 +333,11 @@ class NMDCWorkflowManager(
                 directory.mkdir(parents=True, exist_ok=True)
 
             # If existing files are provided (for reusing generated metadata), create symlinks to preserve workflow structure
-            if self.config['workflow']['existing_material_processing_path'] or self.config['workflow']['existing_biosample_attributes_path'] or self.config['workflow']['existing_downloaded_files_path']:
+            if self.config['workflow']['existing_material_processing_path'] or self.config['workflow']['existing_biosample_attributes_path']: # or self.config['workflow']['existing_downloaded_files_path']:
                 symlinks_to_create: dict = {}
                 symlinks_to_create['material_processing_outline'] = [self.config['workflow'].get('existing_material_processing_path', None), "llm_generated_protocol_outline.yaml", "protocol_info", "protocol_outline_created"]
                 symlinks_to_create['biosample_attributes'] = [self.config['workflow'].get('existing_biosample_attributes_path', None), "biosample_attributes.csv", "metadata", "biosample_attributes_fetched"]
-                symlinks_to_create['downloaded_files'] = [self.config['workflow'].get('existing_downloaded_files_path', None), "downloaded_files.csv", "metadata", "raw_data_downloaded"]
+                #symlinks_to_create['downloaded_files'] = [self.config['workflow'].get('existing_downloaded_files_path', None), "downloaded_files.csv", "metadata", "raw_data_downloaded"]
 
                 for key, (existing_path_str, expected_name, folder_name, trigger_name) in symlinks_to_create.items():
                     if existing_path_str:

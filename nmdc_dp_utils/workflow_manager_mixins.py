@@ -19,10 +19,12 @@ from nmdc_dp_utils.llm.protocol_conversion.pipeline import get_llm_yaml_outline
 from nmdc_dp_utils.llm.llm_conversation_manager import ConversationManager
 from nmdc_dp_utils.llm.llm_client import LLMClient
 from nmdc_client.calibration_search import CalibrationSearch
+from nmdc_client.study_search import StudySearch
 from nmdc_client.api_client import get_api_base_url
 
 # Import workflow mapping defined in workflow_manager (defined before mixins import)
 from nmdc_ms_metadata_gen.metadata_generator import NMDCMetadataGenerator
+from nmdc_schema.nmdc import Database
 from nmdc_ms_metadata_gen.lcms_metab_metadata_generator import (
     LCMSMetabolomicsMetadataGenerator,
 )
@@ -2418,7 +2420,6 @@ class NMDCWorkflowBiosampleManager:
             This method is automatically skipped if biosample_attributes_fetched trigger is set.
         """
         from nmdc_client.biosample_search import BiosampleSearch
-        from nmdc_client.study_search import StudySearch
 
         if study_ids is None:
             study_ids = self.config["study"]["id"]
@@ -2456,7 +2457,7 @@ class NMDCWorkflowBiosampleManager:
                 biosamples = biosample_search.get_record_by_filter(
                     filter=f'{{"associated_studies":"{study_id}"}}',
                     max_page_size=1000,
-                    fields="id,name,samp_name,description,gold_biosample_identifiers,insdc_biosample_identifiers,submitter_id,analysis_type",
+                    fields="id,name,samp_name,description,gold_biosample_identifiers,insdc_biosample_identifiers,submitter_id,analysis_type,associated_studies",
                     all_pages=True,
                 )
                 if not biosamples:
@@ -5166,10 +5167,28 @@ class WorkflowMetadataManager:
             filtered_mapping_df.to_csv(filtered_input_csv_path, index=False)
 
             # Get study ID from config
-            study_id = self.config.get("study", {}).get("id")
-            if not study_id:
+            study_ids = self.config.get("study", {}).get("id")
+            if not study_ids:
                 self.logger.error("study_id not found in config['study']['id']")
                 return False
+            
+            # If study_id is a string, make it a list
+            if isinstance(study_ids, str):
+                study_ids = [study_ids]
+
+            # if using child studies, get all the child study IDs
+            if self.config.get("workflow", {}).get("use_child_studies", False):
+                study_searcher = StudySearch()
+                child_studies = []
+                for study_id in study_ids:
+                    child_study_ids = study_searcher.get_record_by_filter(
+                        filter=f'{{"part_of":"{study_id}"}}',
+                        max_page_size=1000,
+                        fields="id",
+                        all_pages=True,
+                    )
+                    child_studies.extend(child_study_ids)
+                study_ids = study_ids + [s["id"] for s in child_studies]
 
             # Outputs will be written into self.workflow_path / "metadata" / "nmdc_submission_packages"
             output_dir = self.workflow_path / "metadata" / "nmdc_submission_packages"
@@ -5179,9 +5198,10 @@ class WorkflowMetadataManager:
             # First attempt to generate and validate metadata in test mode 
             # Initialize MaterialProcessingMetadataGenerator in test mode
             # Note: Minting credentials are read from environment variables (CLIENT_ID, CLIENT_SECRET)
+            # Test mode does not depend on study id
             generator = MaterialProcessingMetadataGenerator(
                 database_dump_json_path=str(db_path),
-                study_id=study_id,
+                study_id=study_ids[0],  # Use first study ID for test mode since it doesn't mint real IDs
                 yaml_outline_path=str(yaml_path),
                 sample_to_dg_mapping_path=str(filtered_input_csv_path),
                 test=True,
@@ -5200,19 +5220,48 @@ class WorkflowMetadataManager:
                 return False
             
             # If test mode succeeded and test=False, run again in normal mode
+            # Note: Minting credentials are read from environment variables (CLIENT_ID, CLIENT_SECRET)
             if not test:
                 self.logger.info("Test mode succeeded, running MaterialProcessingMetadataGenerator in production mode...")
-                # Note: Minting credentials are read from environment variables (CLIENT_ID, CLIENT_SECRET)
-                generator = MaterialProcessingMetadataGenerator(
-                    database_dump_json_path=str(db_path),
-                    study_id=study_id,
-                    yaml_outline_path=str(yaml_path),
-                    sample_to_dg_mapping_path=str(filtered_input_csv_path),
-                    test=False,
-                )
-                # Run metadata generation
-                self.logger.info("Running MaterialProcessingMetadataGenerator in production mode...")
-                metadata = generator.run()
+                # Run metadata generation for each study_id in the list
+                # List should be one element if not using child studies
+                metadata = Database()
+                biosample_attributes = pd.read_csv(self.workflow_path / "metadata" / "biosample_attributes.csv")
+                biosample_attributes["associated_studies"] = biosample_attributes["associated_studies"].str.strip("[]").str.replace("'", "").str.split(", ")
+                biosample_attributes = biosample_attributes.explode("associated_studies")
+
+                for study_id in study_ids:
+                    print(study_id)
+                    # Read in filtered_input_csv
+                    temp_csv_path = filtered_input_csv_path.parent / f"temp_filtered_input.csv"
+                    f = pd.read_csv(filtered_input_csv_path)
+                    # Merge and retain only rows that have data
+                    f = f.merge(biosample_attributes, left_on="biosample_id", right_on="id", how="left", suffixes=("", "_attr"))
+                    # If no biosamples with data, skip metadata generation for this study
+                    if study_id not in f["associated_studies"].values:
+                        self.logger.warning(f"No biosamples found for study {study_id} in raw data mapper - skipping material processing metadata generation for this study")
+                        continue
+                    f = f[f["associated_studies"] == study_id]
+                    f.to_csv(temp_csv_path, index=False)
+
+                    generator = MaterialProcessingMetadataGenerator(
+                        database_dump_json_path=str(db_path),
+                        study_id=study_id,
+                        yaml_outline_path=str(yaml_path),
+                        sample_to_dg_mapping_path=str(temp_csv_path),
+                        test=False,
+                    )
+                    # Run metadata generation
+                    self.logger.info("Running MaterialProcessingMetadataGenerator in production mode...")
+                    m = generator.run()
+                    metadata.material_processing_set.extend(m['material_processing_set'])
+                    metadata.processed_sample_set.extend(m['processed_sample_set'])
+                
+                # Delete temp filtered file
+                temp_csv_path.unlink()
+
+                # Overwrite json dump with compiled metadata
+                generator.dump_nmdc_database(nmdc_database = metadata, json_path = str(db_path))
 
                 # Validate generated metadata
                 self.logger.info("Validating generated metadata...")
