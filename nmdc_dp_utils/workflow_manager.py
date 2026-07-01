@@ -354,7 +354,7 @@ class NMDCWorkflowManager(
                             raise ValueError(f"Invalid existing {key} path")
                     
                         # Create symlink in folder
-                        symlink_path = self.workflow_path / folder_name / "llm_generated_protocol_outline.yaml"
+                        symlink_path = self.workflow_path / folder_name / expected_name
                         if symlink_path.exists():
                             symlink_path.unlink()
                         symlink_path.symlink_to(existing_path.resolve())
