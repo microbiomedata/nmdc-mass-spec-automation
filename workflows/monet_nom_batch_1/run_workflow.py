@@ -30,41 +30,24 @@ async def main():
     logger.info("1. Creating workflow structure...")
     manager.create_workflow_structure()
 
-    # Step 2: Generate protocol YAML outline using LLM
-    logger.info("2. Generating protocol YAML outline using LLM...")
-    await manager.generate_material_processing_yaml()
+    # Step 2: upload local raw data to minio
+    # zip .d files first 
+    logger.info("2. Uploading local raw data to MinIO...")
+    manager.zip_bruker_files(
+        local_directory=str(manager.raw_data_directory)
+    )
+    manager.upload_to_minio(
+        local_directory=str(manager.raw_data_directory),
+        bucket_name=manager.config.get("minio", {}).get("bucket"),
+        folder_name=str(Path("monet_nom") / "raw"), # set static string here so we don't get a separate folder for each download batch
+        file_pattern="*.zip"
+    )
 
-    # # upload local raw data to minio
-    # # zip .d files first 
-    # logger.info("Uploading local raw data to MinIO...")
-    # manager.zip_bruker_files(
-    #     local_directory=str(manager.raw_data_directory)
-    # )
-    # manager.upload_to_minio(
-    #     local_directory=str(manager.raw_data_directory),
-    #     bucket_name=manager.config.get("minio", {}).get("bucket"),
-    #     folder_name=str(Path(manager.study_name) / "raw"),
-    #     file_pattern="*.zip"
-    # )
+    # downloaded_files.csv already exists because you made it manually. to list all the files we needed to generate metadata for. so don't use manager.fetch raw data
 
-    # Step 3: Fetch raw data from minio
-    # leave this in because it skips files that already exist and writes out a file list for mapping
-    logger.info("3. Fetching raw data...")
-    manager.fetch_raw_data()
-
-    # Step 4: Map raw data files to biosamples
-    logger.info("4. Mapping raw data files to biosamples using LLM...")
-    manager.get_biosample_attributes()
-    mapping_success = await manager.generate_llm_biosample_mapping()
-    
-    if not mapping_success:
-        logger.warning("Biosample mapping failed - review logs and add additional context if needed")
-    else:
-        logger.info("Biosample mapping completed successfully")
-
-    # # Step 5: Inspect raw data files for metadata and QC
-    # logger.info("5. Inspecting raw data files...")
-    # manager.raw_data_inspector(cores=4)
+    # Step 4: Inspect raw data files for metadata and QC
+    logger.info("4. Inspecting raw data files...")
+    manager.raw_data_inspector(cores=4)
 
     # # Step 6: Process data (generate WDL configs and execute workflows)
     # logger.info("6. Processing data with WDL workflows...")

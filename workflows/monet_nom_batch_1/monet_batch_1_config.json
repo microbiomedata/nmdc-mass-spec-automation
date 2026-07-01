@@ -15,8 +15,13 @@
         "workflow_type": "DI FTICR NOM",
         "batch_size": 30,
         "use_child_studies": true,
-        "existing_material_processing_path": "/home/bmeluch/NMDC/nmdc-mass-spec-automation/workflows/monet_nom_metadata/protocol_info/llm_generated_protocol_outline.yaml",
-        "existing_biosample_attributes_path": "/home/bmeluch/NMDC/nmdc-mass-spec-automation/workflows/monet_nom_metadata/metadata/biosample_attributes.csv"
+        "existing_file_paths": {
+            "protocol_outline": "/home/bmeluch/NMDC/nmdc-mass-spec-automation/workflows/monet_nom_metadata/protocol_info/llm_generated_protocol_outline.yaml",
+            "biosample_attributes": "/home/bmeluch/NMDC/nmdc-mass-spec-automation/workflows/monet_nom_metadata/metadata/biosample_attributes.csv",
+            "downloaded_files": "/home/bmeluch/NMDC/nmdc-mass-spec-automation/workflows/monet_nom_metadata/metadata/downloaded_files.csv",
+            "workflow_reference": "/home/bmeluch/NMDC/nmdc-mass-spec-automation/workflows/monet_nom_metadata/metadata/nmdc_submission_packages/material_processing_metadata_workflowreference.csv",
+            "biosample_mapper": "/home/bmeluch/NMDC/nmdc-mass-spec-automation/workflows/monet_nom_metadata/metadata/llm_biosample_raw_file_mapper.csv"
+        }
     },
     "paths": {
         "base_directory": "/home/bmeluch/NMDC/nmdc-mass-spec-automation",
@@ -62,7 +67,7 @@
         "raw_data_downloaded": true,
         "protocol_outline_created": true,
         "biosample_attributes_fetched": true,
-        "biosample_mapping_completed": false,
+        "biosample_mapping_completed": true,
         "raw_data_inspected": true,
         "material_processing_metadata_generated": true,
         "metadata_mapping_generated": false,
