@@ -1298,6 +1298,7 @@ class NMDCWorkflowDataProcessManager:
 
                     # ALWAYS include calibration files (they are reference files, not samples to be processed)
                     if raw_file.name in calibration_files_set:
+                        print("Skipping calibration file from processed check:", raw_file.name)
                         unprocessed_files.append(raw_file)
                         continue
 
@@ -1312,12 +1313,21 @@ class NMDCWorkflowDataProcessManager:
                             if csv_files:
                                 continue  # Skip this file - already processed
 
-                    elif workflow_type == "GCMS Metabolomics" or workflow_type == "DI FTICR NOM":
-                        # GCMS or NOM: Check if corresponding CSV file exists directly in processed directory
+                    elif workflow_type == "GCMS Metabolomics":
+                        # GCMS: Check if corresponding CSV file exists directly in processed directory
                         csv_file = processed_path / f"{base_name}.csv"
 
                         if csv_file.exists() and csv_file.is_file():
                             continue  # Skip this file - already processed
+                    
+                    elif workflow_type == "DI FTICR NOM":
+                        # NOM: Check if a subfolder exists for this base name and contains CSV, JSON, or PNG files
+                        nom_subfolder = processed_path / base_name
+                        if nom_subfolder.exists() and nom_subfolder.is_dir():
+                            if (nom_subfolder / f"{base_name}.csv").exists() and \
+                                (nom_subfolder / f"{base_name}.json").exists() and \
+                                (nom_subfolder / f"{base_name}_qc.png").exists():
+                                continue  # Skip this file - already processed
 
                     # File is not processed or processing incomplete
                     unprocessed_files.append(raw_file)
@@ -1842,11 +1852,24 @@ class NMDCWorkflowDataProcessManager:
 
                     sub_batch_num = f"{calib_batch_num}.{sub_batch_idx + 1}"
                     print(f"Creating sub-batch {sub_batch_num} with {len(sub_batch_samples)} samples")
+                    # Error if no sample file paths have srfa in the string
+                    if not any("SRFA" in p for p in sub_batch_samples):
+                        raise ValueError(
+                            f"No SRFA file found in file list for {calibration_file} batch {sub_batch_num}. "
+                            f"At least one SRFA file is required for DI NOM workflow."
+                        )
+
                     create_wdl_json(sub_batch_samples, sub_batch_num)
 
                 x = num_sub_batches
             else:
                 # Generate single WDL JSON (batch size not exceeded)
+                # Error if no sample file paths have srfa in the string
+                if not any("SRFA" in p for p in sample_file_paths):
+                    raise ValueError(
+                        f"No SRFA file found in file list for calibration {calibration_file}. "
+                        f"At least one SRFA file is required for DI NOM workflow."
+                    )
                 create_wdl_json(sample_file_paths, calib_batch_num)
                 x = 1
         return x
@@ -3535,7 +3558,8 @@ class WorkflowMetadataManager:
             "instrument_serial_number"
         ].astype(str)
         file_info_df["instrument_analysis_end_date"] = pd.to_datetime(
-            file_info_df["write_time"]
+            file_info_df["write_time"],
+            utc=True
         ).dt.strftime("%Y-%m-%dT%H:%M:%SZ")
         file_info_df["raw_data_file_short"] = file_info_df["file_name"]
 
@@ -4258,14 +4282,19 @@ class WorkflowMetadataManager:
                 # Store original row count for reporting
                 original_row_count = len(df)
 
+                print(df['raw_data_file_stem'].head().tolist())
+                print(mapping_df["raw_data_file_stem"].head().tolist())
+                print(any(df["raw_data_file_stem"].isin(mapping_df["raw_data_file_stem"])))  # Check if any stems match
                 # Merge with mapping to get processed_sample_id based on raw data filename
-                # Left merge to keep all rows from df, adding processed_sample_id column                
+                # Left merge to keep all rows from df, adding processed_sample_id column
                 df_merged = df.merge(
                     mapping_df,
                     left_on="raw_data_file_stem",
                     right_on="raw_data_file_stem",
                     how="left"
                 )
+
+                print(df_merged.head())
 
                 # Check for any unmapped raw data files (would have NaN in processed_sample_id)
                 unmapped_mask = df_merged["processed_sample_id"].isna()
@@ -5230,6 +5259,9 @@ class WorkflowMetadataManager:
                 biosample_attributes["associated_studies"] = biosample_attributes["associated_studies"].str.strip("[]").str.replace("'", "").str.split(", ")
                 biosample_attributes = biosample_attributes.explode("associated_studies")
 
+                workflow_reference_list = [None] * len(study_ids)
+                validation_list: list = [None] * len(study_ids)
+
                 for study_id in study_ids:
                     print(study_id)
                     # Read in filtered_input_csv
@@ -5256,6 +5288,25 @@ class WorkflowMetadataManager:
                     m = generator.run()
                     metadata.material_processing_set.extend(m['material_processing_set'])
                     metadata.processed_sample_set.extend(m['processed_sample_set'])
+
+                    # Save generated material_processing_metadata_workflowreference.csv to a list of dataframes
+                    workflow_reference_csv_path = output_dir / "material_processing_metadata_workflowreference.csv"
+                    if workflow_reference_csv_path.exists():
+                        workflow_reference_list[study_ids.index(study_id)] = pd.read_csv(workflow_reference_csv_path)
+                    else:
+                        Exception(f"no workflowreference output for {study_id}")
+                    validation_txt_path = output_dir / "material_processing_metadata_validation.txt"
+                    if validation_txt_path.exists():
+                        with open(validation_txt_path, "r") as f:
+                            validation_list[study_ids.index(study_id)] = f.read()
+                
+                # Concatenate workflow reference CSVs and write to output
+                workflow_reference_df = pd.concat([df for df in workflow_reference_list if df is not None], ignore_index=True)
+                workflow_reference_df.to_csv(workflow_reference_csv_path, index=False)
+                
+                # Concatenate validation txt files and write to output
+                with open(validation_txt_path, "w") as f:
+                    f.write(validation_list[0] if validation_list[0] is not None else "")
                 
                 # Delete temp filtered file
                 temp_csv_path.unlink()
