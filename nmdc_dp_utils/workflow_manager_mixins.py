@@ -4282,9 +4282,6 @@ class WorkflowMetadataManager:
                 # Store original row count for reporting
                 original_row_count = len(df)
 
-                print(df['raw_data_file_stem'].head().tolist())
-                print(mapping_df["raw_data_file_stem"].head().tolist())
-                print(any(df["raw_data_file_stem"].isin(mapping_df["raw_data_file_stem"])))  # Check if any stems match
                 # Merge with mapping to get processed_sample_id based on raw data filename
                 # Left merge to keep all rows from df, adding processed_sample_id column
                 df_merged = df.merge(
@@ -4293,8 +4290,6 @@ class WorkflowMetadataManager:
                     right_on="raw_data_file_stem",
                     how="left"
                 )
-
-                print(df_merged.head())
 
                 # Check for any unmapped raw data files (would have NaN in processed_sample_id)
                 unmapped_mask = df_merged["processed_sample_id"].isna()
@@ -5303,7 +5298,7 @@ class WorkflowMetadataManager:
                 # Concatenate workflow reference CSVs and write to output
                 workflow_reference_df = pd.concat([df for df in workflow_reference_list if df is not None], ignore_index=True)
                 workflow_reference_df.to_csv(workflow_reference_csv_path, index=False)
-                
+
                 # Concatenate validation txt files and write to output
                 with open(validation_txt_path, "w") as f:
                     f.write(validation_list[0] if validation_list[0] is not None else "")
