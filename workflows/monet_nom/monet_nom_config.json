@@ -1,12 +1,12 @@
 {
     "study": {
-        "name": "monet_nom_batch_1",
+        "name": "monet_nom",
         "id": [
             "nmdc:sty-11-srtxhh77"
         ]
     },
     "workflow": {
-        "name": "monet_nom_batch_1",
+        "name": "monet_nom",
         "file_type": ".d",
         "file_filters": [
             ""

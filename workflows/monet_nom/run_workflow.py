@@ -20,7 +20,7 @@ async def main():
     """Run the study workflow."""
 
     # Initialize study manager
-    config_path = "workflows/monet_nom_batch_1/monet_batch_1_config.json"
+    config_path = "workflows/monet_nom/monet_nom_config.json"
     manager = NMDCWorkflowManager(str(config_path))
 
     logger = manager.logger
@@ -30,18 +30,18 @@ async def main():
     logger.info("1. Creating workflow structure...")
     manager.create_workflow_structure()
 
-    # Step 2: upload local raw data to minio
-    # zip .d files first 
-    logger.info("2. Uploading local raw data to MinIO...")
-    manager.zip_bruker_files(
-        local_directory=str(manager.raw_data_directory)
-    )
-    manager.upload_to_minio(
-        local_directory=str(manager.raw_data_directory),
-        bucket_name=manager.config.get("minio", {}).get("bucket"),
-        folder_name=str(Path("monet_nom") / "raw"), # set static string here so we don't get a separate folder for each download batch
-        file_pattern="*.zip"
-    )
+    # # Step 2: upload local raw data to minio
+    # # zip .d files first 
+    # logger.info("2. Uploading local raw data to MinIO...")
+    # manager.zip_bruker_files(
+    #     local_directory=str(manager.raw_data_directory)
+    # )
+    # manager.upload_to_minio(
+    #     local_directory=str(manager.raw_data_directory),
+    #     bucket_name=manager.config.get("minio", {}).get("bucket"),
+    #     folder_name=str(Path("monet_nom") / "raw"), # set static string here so we don't get a separate folder for each download batch
+    #     file_pattern="*.zip"
+    # )
 
     # downloaded_files.csv already exists because you made it manually. to list all the files we needed to generate metadata for. so don't use manager.fetch raw data
 
@@ -49,20 +49,21 @@ async def main():
     logger.info("4. Inspecting raw data files...")
     manager.raw_data_inspector(cores=4)
 
-    # # Step 6: Process data (generate WDL configs and execute workflows)
-    # logger.info("6. Processing data with WDL workflows...")
-    # manager.process_data(execute=True)
-    # assert manager.should_skip('data_processed'), "WDL workflows must complete successfully to proceed"
+    # Step 6: Process data (generate WDL configs and execute workflows)
+    logger.info("6. Processing data with WDL workflows...")
+    manager._generate_mapped_files_list()
+    manager.process_data(execute=True)
+    assert manager.should_skip('data_processed'), "WDL workflows must complete successfully to proceed"
 
-    # # # Step 7: Upload processed data to MinIO
-    # # logger.info("7. Uploading processed data to MinIO...")
-    # # manager.upload_processed_data_to_minio()
-    # # assert manager.should_skip('processed_data_uploaded_to_minio'), "Processed data upload to MinIO must complete successfully to proceed"
+    # Step 7: Upload processed data to MinIO
+    logger.info("7. Uploading processed data to MinIO...")
+    manager.upload_processed_data_to_minio()
+    assert manager.should_skip('processed_data_uploaded_to_minio'), "Processed data upload to MinIO must complete successfully to proceed"
 
-    # # Step 8: Generate and submit NMDC metadata packages
-    # logger.info("8. Generating NMDC metadata packages...")
-    # manager.generate_nmdc_metadata_for_workflow() # Set test to FALSE for actual run.
-    # assert manager.should_skip('metadata_packages_generated'), "NMDC metadata package generation must complete successfully to proceed"
+    # Step 8: Generate and submit NMDC metadata packages
+    logger.info("8. Generating NMDC metadata packages...")
+    manager.generate_nmdc_metadata_for_workflow() # Set test to FALSE for actual run.
+    assert manager.should_skip('metadata_packages_generated'), "NMDC metadata package generation must complete successfully to proceed"
 
     # # Step 9: Submit metadata packages to dev environment
     # logger.info("9. Submitting metadata packages to dev environment...")
