@@ -760,9 +760,13 @@ class WorkflowDataMovementManager:
         )
 
         for file_path in tqdm(files_to_upload, desc="Uploading files"):
-            # Create object name preserving directory structure
-            relative_path = file_path.relative_to(local_path)
-            object_name = f"{folder_name}/{relative_path}"
+
+            if self.config['workflow']['workflow_type'] == "DI FTICR NOM":
+                object_name = f"{folder_name}/{file_path.name}"  # Use only filename for DI FTICR NOM
+            else:
+                # Create object name preserving directory structure
+                relative_path = file_path.relative_to(local_path)
+                object_name = f"{folder_name}/{relative_path}"
 
             try:
                 # Check if file already exists with same size
@@ -4721,6 +4725,10 @@ class WorkflowMetadataManager:
 
                     # Validate without API first (fast local validation)
                     self.logger.info(f"Validating {config_name} metadata (local, production mode)...")
+                    if "placeholder" in json.dumps(metadata).lower():
+                        self.logger.error(f"Metadata generation for {config_name} produced placeholder values. Check input CSV and configuration.")
+                        failed_files.append((csv_file.name, "Production mode metadata generation produced placeholder values"))
+                        continue
                     validate_local = generator.validate_nmdc_database(
                         json=metadata, use_api=False
                     )
