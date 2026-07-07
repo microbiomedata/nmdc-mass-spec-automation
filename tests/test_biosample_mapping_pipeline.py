@@ -453,23 +453,124 @@ class TestAddStudyDataToConversation:
         """Test handling of raw_data_file_name column."""
         biosample_file = tmp_path / "biosamples.csv"
         biosample_file.write_text("id\ntest")
-        
+
         files_file = tmp_path / "files.csv"
         files_file.write_text("raw_data_file_name\ntest.raw")
-        
+
         yaml_file = tmp_path / "protocol.yaml"
         yaml_file.write_text("TEST: {}")
-        
+
         conversation = DummyConversation()
-        
+
         asyncio.run(add_study_data_to_conversation(
             conversation_obj=conversation,
             biosample_attributes_path=str(biosample_file),
             raw_files_path=str(files_file),
             material_processing_yaml_path=str(yaml_file)
         ))
-        
+
         files_msg = [m for m in conversation.messages if 'Raw mass spectrometry files' in m['content']][0]
-        
+
         assert 'raw_data_file_name' in files_msg['content']
         assert 'test.raw' in files_msg['content']
+
+    def test_skip_material_processing_omits_yaml_message(self, tmp_path):
+        """When skip_material_processing=True, no YAML file is read and no MP system message is added."""
+        biosample_file = tmp_path / "biosamples.csv"
+        biosample_file.write_text("id,name\nnmdc:bsm-12-abc123,Sample A")
+        files_file = tmp_path / "files.csv"
+        files_file.write_text("file_name\ntest.raw")
+
+        conversation = DummyConversation()
+
+        # Pass yaml path as None; the function must not attempt to read it.
+        asyncio.run(add_study_data_to_conversation(
+            conversation_obj=conversation,
+            biosample_attributes_path=str(biosample_file),
+            raw_files_path=str(files_file),
+            material_processing_yaml_path=None,
+            skip_material_processing=True,
+        ))
+
+        # No YAML message
+        assert not any('Material processing protocol (YAML):' in m['content'] for m in conversation.messages)
+        # A four-column schema instruction is present
+        assert any(
+            'no processedsample_placeholder' in m['content']
+            and 'raw_data_identifier, biosample_id, biosample_name, match_confidence' in m['content']
+            for m in conversation.messages
+        )
+
+
+class TestSkipMaterialProcessingPipeline:
+    """Verify the skip_material_processing flag reshapes prompts and validation."""
+
+    def test_get_llm_generated_script_omits_yaml_when_skip(self, tmp_path):
+        """The user-facing prompt does not reference the YAML when the flag is set."""
+        biosample_file = tmp_path / "biosamples.csv"
+        biosample_file.write_text("id,name\nnmdc:bsm-12-abc123,Sample A")
+        files_file = tmp_path / "files.csv"
+        files_file.write_text("file_name\ntest.raw")
+
+        conversation = DummyConversation()
+        client = SimpleNamespace(get_response=AsyncMock(return_value="print('ok')"))
+
+        asyncio.run(get_llm_generated_script(
+            llm_client=client,
+            conversation_obj=conversation,
+            biosample_path=str(biosample_file),
+            files_path=str(files_file),
+            yaml_path=None,
+            output_path=str(tmp_path / "out.csv"),
+            skip_material_processing=True,
+        ))
+
+        assert len(conversation.messages) == 1
+        prompt = conversation.messages[0]['content']
+        # The prompt must not instruct the LLM to *read* a YAML.
+        assert 'Read material processing YAML' not in prompt
+        assert 'no material processing metadata' in prompt
+        # The four-column schema instruction must be present.
+        assert 'four columns' in prompt
+        assert 'raw_data_identifier, biosample_id, biosample_name, match_confidence' in prompt
+        # And the LLM must be told to leave out the MP columns.
+        assert 'Do NOT include processedsample_placeholder or material_processing_protocol_id' in prompt
+
+    def test_validate_and_fix_script_skips_yaml_read_when_skip(self, tmp_path):
+        """validate_and_fix_script does not attempt to open the YAML when skipping."""
+        biosample_file = tmp_path / "biosamples.csv"
+        biosample_file.write_text("id,name\nnmdc:bsm-12-abc123,Sample A")
+        files_file = tmp_path / "files.csv"
+        files_file.write_text("file_name\ntest.raw")
+        script_file = tmp_path / "script.py"
+        script_file.write_text("print('stub')")
+
+        # Pre-populate the output CSV with a valid 4-column mapping
+        output_file = tmp_path / "output.csv"
+        output_file.write_text(
+            "raw_data_identifier,biosample_id,biosample_name,match_confidence\n"
+            "test.raw,nmdc:bsm-12-abc123,Sample A,high"
+        )
+
+        conversation = DummyConversation()
+        client = SimpleNamespace(get_response=AsyncMock())
+
+        with patch('nmdc_dp_utils.llm.biosample_mapping.pipeline.subprocess.run') as mock_run:
+            mock_run.return_value = Mock(returncode=0, stdout="", stderr="")
+
+            # No yaml file exists on disk; passing None with skip flag must not raise.
+            result = asyncio.run(validate_and_fix_script(
+                llm_client=client,
+                conversation_obj=conversation,
+                script_path=str(script_file),
+                output_path=str(output_file),
+                biosample_path=str(biosample_file),
+                files_path=str(files_file),
+                yaml_path=None,
+                max_iterations=2,
+                skip_material_processing=True,
+            ))
+
+        assert result is True
+        # LLM should not need to fix anything.
+        assert client.get_response.await_count == 0

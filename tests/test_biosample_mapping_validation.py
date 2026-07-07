@@ -176,17 +176,95 @@ sample1.raw,nmdc:bsm-12-abc123,Sample A,high,PS,UNKNOWN_PROTOCOL"""
         biosample_csv = "id,name\nnmdc:bsm-12-abc123,Sample A"
         raw_files_csv = "file_name\nsample1.raw\nblank_01.raw"
         yaml_content = "LCMS:\n  processedsamples:\n    - PS: {}"
-        
+
         csv_with_empty_id = """raw_data_identifier,biosample_id,biosample_name,match_confidence,processedsample_placeholder,material_processing_protocol_id
 sample1.raw,nmdc:bsm-12-abc123,Sample A,high,PS,LCMS
     blank_01.raw,,,,,"""
-        
+
         result = validate_biosample_mapping_csv(
             csv_content=csv_with_empty_id,
             biosample_attributes_csv=biosample_csv,
             raw_files_csv=raw_files_csv,
             material_processing_yaml=yaml_content
         )
-        
+
         # Should be valid - empty biosample_id is allowed
         assert result['valid'] is True
+
+    def test_four_column_csv_valid_when_skip_flag(self):
+        """When skip_material_processing=True, a 4-column CSV validates cleanly."""
+        biosample_csv = "id,name\nnmdc:bsm-12-abc123,Sample A"
+        raw_files_csv = "file_name\nsample1.raw"
+
+        four_col_csv = """raw_data_identifier,biosample_id,biosample_name,match_confidence
+sample1.raw,nmdc:bsm-12-abc123,Sample A,high"""
+
+        result = validate_biosample_mapping_csv(
+            csv_content=four_col_csv,
+            biosample_attributes_csv=biosample_csv,
+            raw_files_csv=raw_files_csv,
+            material_processing_yaml="",
+            skip_material_processing=True,
+        )
+
+        assert result['valid'] is True
+        assert result['errors'] == []
+
+    def test_four_column_csv_fails_without_flag(self):
+        """Without the flag, a 4-column CSV is missing required columns."""
+        biosample_csv = "id,name\nnmdc:bsm-12-abc123,Sample A"
+        raw_files_csv = "file_name\nsample1.raw"
+
+        four_col_csv = """raw_data_identifier,biosample_id,biosample_name,match_confidence
+sample1.raw,nmdc:bsm-12-abc123,Sample A,high"""
+
+        result = validate_biosample_mapping_csv(
+            csv_content=four_col_csv,
+            biosample_attributes_csv=biosample_csv,
+            raw_files_csv=raw_files_csv,
+            material_processing_yaml="LCMS:\n  processedsamples:\n    - PS: {}",
+        )
+
+        assert result['valid'] is False
+        assert any('missing required columns' in error.lower() for error in result['errors'])
+
+    def test_ps_and_protocol_checks_bypassed_when_flag(self):
+        """The material-processing per-row checks are skipped when the flag is True."""
+        biosample_csv = "id,name\nnmdc:bsm-12-abc123,Sample A"
+        raw_files_csv = "file_name\nsample1.raw"
+
+        # A row that would fail without the flag: no processedsample_placeholder
+        # and no material_processing_protocol_id but match_confidence=high.
+        four_col_csv = """raw_data_identifier,biosample_id,biosample_name,match_confidence
+sample1.raw,nmdc:bsm-12-abc123,Sample A,high"""
+
+        result = validate_biosample_mapping_csv(
+            csv_content=four_col_csv,
+            biosample_attributes_csv=biosample_csv,
+            raw_files_csv=raw_files_csv,
+            material_processing_yaml="",
+            skip_material_processing=True,
+        )
+
+        assert result['valid'] is True
+        assert not any('processedsample_placeholder' in err for err in result['errors'])
+        assert not any('material_processing_protocol_id' in err for err in result['errors'])
+
+    def test_six_column_csv_rejected_when_skip_flag(self):
+        """Under the skip flag, extra MP columns are unexpected columns."""
+        biosample_csv = "id,name\nnmdc:bsm-12-abc123,Sample A"
+        raw_files_csv = "file_name\nsample1.raw"
+
+        six_col_csv = """raw_data_identifier,biosample_id,biosample_name,match_confidence,processedsample_placeholder,material_processing_protocol_id
+sample1.raw,nmdc:bsm-12-abc123,Sample A,high,PS,LCMS"""
+
+        result = validate_biosample_mapping_csv(
+            csv_content=six_col_csv,
+            biosample_attributes_csv=biosample_csv,
+            raw_files_csv=raw_files_csv,
+            material_processing_yaml="",
+            skip_material_processing=True,
+        )
+
+        assert result['valid'] is False
+        assert any('unexpected columns' in err.lower() for err in result['errors'])

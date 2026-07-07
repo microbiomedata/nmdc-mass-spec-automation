@@ -38,11 +38,12 @@ import subprocess
 logging.basicConfig(level=logging.INFO, format='%(levelname)s: %(message)s')
 
 
-async def get_llm_generated_script(llm_client: LLMClient, conversation_obj: ConversationManager, 
-                                   biosample_path: str, files_path: str, yaml_path: str, output_path: str):
+async def get_llm_generated_script(llm_client: LLMClient, conversation_obj: ConversationManager,
+                                   biosample_path: str, files_path: str, yaml_path: str, output_path: str,
+                                   skip_material_processing: bool = False):
     """
     Get LLM to generate a Python script that does the mapping.
-    
+
     Parameters
     ----------
     llm_client : LLMClient
@@ -54,10 +55,15 @@ async def get_llm_generated_script(llm_client: LLMClient, conversation_obj: Conv
     files_path : str
         Path to raw files CSV (for script to read)
     yaml_path : str
-        Path to material processing YAML (for script to read)
+        Path to material processing YAML (for script to read). May be None when
+        skip_material_processing is True.
     output_path : str
         Path where script should write output CSV
-    
+    skip_material_processing : bool
+        When True, the emitted script must write only the four base columns
+        (raw_data_identifier, biosample_id, biosample_name, match_confidence)
+        and must NOT read a material processing YAML. Default: False.
+
     Returns
     -------
     str : Python script code
@@ -71,8 +77,29 @@ async def get_llm_generated_script(llm_client: LLMClient, conversation_obj: Conv
         column_name = 'file_name'
     else:
         column_name = files_df.columns[0]
-    
-    prompt = f"""Generate a Python script that maps the raw files to biosamples and processed samples.
+
+    if skip_material_processing:
+        prompt = f"""Generate a Python script that maps the raw files to biosamples ONLY.
+
+This study has no material processing metadata, so DO NOT reference or read any
+material processing YAML file.
+
+The script should:
+- Read biosamples from: {biosample_path}
+- Read raw files from: {files_path} (column: {column_name})
+- Write output CSV to: {output_path}
+- Use the mapping logic we discussed (parse filenames, match to biosamples)
+
+The output CSV MUST have exactly these four columns (in this order):
+raw_data_identifier, biosample_id, biosample_name, match_confidence
+
+Do NOT include processedsample_placeholder or material_processing_protocol_id columns.
+
+IMPORTANT: Use these EXACT file paths in your script. Do not guess or change the paths.
+
+Provide ONLY the Python script code, no markdown blocks or explanations."""
+    else:
+        prompt = f"""Generate a Python script that maps the raw files to biosamples and processed samples.
 
 The script should:
 - Read biosamples from: {biosample_path}
@@ -84,7 +111,7 @@ The script should:
 IMPORTANT: Use these EXACT file paths in your script. Do not guess or change the paths.
 
 Provide ONLY the Python script code, no markdown blocks or explanations."""
-    
+
     conversation_obj.add_message(role="user", content=prompt)
     
     logging.info("Waiting for LLM to generate mapping script...")
@@ -97,12 +124,13 @@ Provide ONLY the Python script code, no markdown blocks or explanations."""
 
 
 async def validate_and_fix_script(llm_client: LLMClient, conversation_obj: ConversationManager,
-                                  script_path: str, output_path: str, 
+                                  script_path: str, output_path: str,
                                   biosample_path: str, files_path: str, yaml_path: str,
-                                  max_iterations: int = 6):
+                                  max_iterations: int = 6,
+                                  skip_material_processing: bool = False):
     """
     Execute script, validate output, and fix if needed.
-    
+
     Parameters
     ----------
     llm_client : LLMClient
@@ -118,10 +146,14 @@ async def validate_and_fix_script(llm_client: LLMClient, conversation_obj: Conve
     files_path : str
         Path to raw files CSV (for validation)
     yaml_path : str
-        Path to YAML file (for validation)
+        Path to YAML file (for validation). May be None when
+        skip_material_processing is True.
     max_iterations : int
         Max number of fix attempts
-    
+    skip_material_processing : bool
+        When True, expects a four-column output CSV and bypasses YAML loading
+        and material-processing validation checks. Default: False.
+
     Returns
     -------
     bool : True if validation passed
@@ -129,14 +161,17 @@ async def validate_and_fix_script(llm_client: LLMClient, conversation_obj: Conve
     # Import validation function
     from nmdc_dp_utils.llm.biosample_mapping.validation import validate_biosample_mapping_csv
     import os
-    
+
     # Load validation context
     with open(biosample_path, 'r') as f:
         biosample_content = f.read()
     with open(files_path, 'r') as f:
         files_content = f.read()
-    with open(yaml_path, 'r') as f:
-        yaml_content = f.read()
+    if skip_material_processing:
+        yaml_content = ""
+    else:
+        with open(yaml_path, 'r') as f:
+            yaml_content = f.read()
     
     for iteration in range(max_iterations):
         logging.info(f"Iteration {iteration + 1}/{max_iterations}")
@@ -217,7 +252,8 @@ async def validate_and_fix_script(llm_client: LLMClient, conversation_obj: Conve
                 csv_content=generated_csv,
                 biosample_attributes_csv=biosample_content,
                 raw_files_csv=files_content,
-                material_processing_yaml=yaml_content
+                material_processing_yaml=yaml_content,
+                skip_material_processing=skip_material_processing,
             )
             
             # Check validation result
@@ -289,14 +325,15 @@ Update the script accordingly and provide the complete corrected script."""
                 
                 # Ask LLM to fix the script
                 error_summary = '\n'.join(errors[:10])
-                conversation_obj.add_message(
-                    role="user",
-                    content=f"""The generated CSV failed validation with these errors:
-
-{error_summary}
-
-Fix the script to resolve these validation errors. The validation checks:
+                if skip_material_processing:
+                    checks_bullets = """- Output CSV has exactly these four columns: raw_data_identifier, biosample_id, biosample_name, match_confidence
 - Biosample IDs exist in biosample_attributes.csv and follow NMDC format
+- Biosample names match the biosample IDs
+- All raw files are mapped
+- Rows with biosample_id must use match_confidence high/medium/low (not empty, not calibrant)
+- Calibrant labeling must follow study context (including additional context), not filename-only heuristics"""
+                else:
+                    checks_bullets = """- Biosample IDs exist in biosample_attributes.csv and follow NMDC format
 - Biosample names match the biosample IDs
 - Processed sample placeholders exist in the YAML
 - Protocol IDs match top-level protocols in the YAML
@@ -304,7 +341,15 @@ Fix the script to resolve these validation errors. The validation checks:
 - All raw files are mapped
 - Rows with biosample_id must use match_confidence high/medium/low (not empty, not calibrant)
 - Calibrant labeling must follow study context (including additional context), not filename-only heuristics
-- Rows with match_confidence high/medium/low/calibrant must include non-empty processedsample_placeholder and material_processing_protocol_id
+- Rows with match_confidence high/medium/low/calibrant must include non-empty processedsample_placeholder and material_processing_protocol_id"""
+                conversation_obj.add_message(
+                    role="user",
+                    content=f"""The generated CSV failed validation with these errors:
+
+{error_summary}
+
+Fix the script to resolve these validation errors. The validation checks:
+{checks_bullets}
 
 Provide the complete corrected script."""
                 )
@@ -370,30 +415,35 @@ async def add_study_data_to_conversation(
     biosample_attributes_path: str,
     raw_files_path: str,
     material_processing_yaml_path: str,
-    additional_context_path: str = None
+    additional_context_path: str = None,
+    skip_material_processing: bool = False,
 ):
     """
     Add study-specific data to the conversation context.
     Applies token reduction by filtering to essential columns only.
-    
+
     Parameters
     ----------
     conversation_obj (ConversationManager) : conversation manager to add data to
     biosample_attributes_path (str) : path to biosample attributes CSV file
     raw_files_path (str) : path to raw files CSV file
-    material_processing_yaml_path (str) : path to material processing YAML file
+    material_processing_yaml_path (str) : path to material processing YAML file.
+        May be None when skip_material_processing is True.
     additional_context_path (str) : optional path to additional context text file with naming conventions or protocol details
+    skip_material_processing (bool) : when True, the YAML message is replaced
+        with a schema instruction for a four-column CSV (no processed sample or
+        protocol columns). Default: False.
     """
     import pandas as pd
     import yaml as yaml_lib
-    
+
     # Load and filter biosample attributes (only id and name)
     biosample_df = pd.read_csv(biosample_attributes_path)
     if 'id' in biosample_df.columns and 'name' in biosample_df.columns:
         biosample_minimal = biosample_df[['id', 'name']].to_csv(index=False)
     else:
         biosample_minimal = biosample_df[['id']].to_csv(index=False) if 'id' in biosample_df.columns else biosample_df.to_csv(index=False)
-    
+
     # Load and filter raw files (only file_name)
     files_df = pd.read_csv(raw_files_path)
     if 'file_name' in files_df.columns:
@@ -402,54 +452,65 @@ async def add_study_data_to_conversation(
         files_minimal = files_df[['raw_data_file_name']].to_csv(index=False)
     else:
         files_minimal = files_df.to_csv(index=False)
-    
-    # Load and simplify YAML (only description, has_input, has_output, processedsamples)
-    with open(material_processing_yaml_path, "r") as f:
-        yaml_full = yaml_lib.safe_load(f)
-    
-    yaml_minimal = {}
-    for protocol_name, protocol_data in yaml_full.items():
-        yaml_minimal[protocol_name] = {}
-        
-        # Simplify steps - keep only description, has_input, has_output
-        if 'steps' in protocol_data:
-            yaml_minimal[protocol_name]['steps'] = []
-            for step in protocol_data['steps']:
-                simplified_step = {}
-                for step_name, step_data in step.items():
-                    for process_type, process_details in step_data.items():
-                        simplified_process = {}
-                        if 'description' in process_details:
-                            simplified_process['description'] = process_details['description']
-                        if 'has_input' in process_details:
-                            simplified_process['has_input'] = process_details['has_input']
-                        if 'has_output' in process_details:
-                            simplified_process['has_output'] = process_details['has_output']
-                        simplified_step[step_name] = {process_type: simplified_process}
-                yaml_minimal[protocol_name]['steps'].append(simplified_step)
-        
-        # Keep processedsamples as-is (needed for validation)
-        if 'processedsamples' in protocol_data:
-            yaml_minimal[protocol_name]['processedsamples'] = protocol_data['processedsamples']
-    
-    yaml_minimal_str = yaml_lib.dump(yaml_minimal, default_flow_style=False, sort_keys=False)
-    
-    # Add to conversation
+
+    # Add biosample and raw file messages first (order preserved from prior version)
     conversation_obj.add_message(
         role="system",
         content=f"Biosample attributes for the study:\n{biosample_minimal}"
     )
-    
-    conversation_obj.add_message(
-        role="system",
-        content=f"Material processing protocol (YAML):\n{yaml_minimal_str}"
-    )
-    
+
+    if skip_material_processing:
+        conversation_obj.add_message(
+            role="system",
+            content=(
+                "This study has no material processing metadata. "
+                "The mapping CSV must have EXACTLY these four columns "
+                "(no processedsample_placeholder or material_processing_protocol_id): "
+                "raw_data_identifier, biosample_id, biosample_name, match_confidence."
+            )
+        )
+    else:
+        # Load and simplify YAML (only description, has_input, has_output, processedsamples)
+        with open(material_processing_yaml_path, "r") as f:
+            yaml_full = yaml_lib.safe_load(f)
+
+        yaml_minimal = {}
+        for protocol_name, protocol_data in yaml_full.items():
+            yaml_minimal[protocol_name] = {}
+
+            # Simplify steps - keep only description, has_input, has_output
+            if 'steps' in protocol_data:
+                yaml_minimal[protocol_name]['steps'] = []
+                for step in protocol_data['steps']:
+                    simplified_step = {}
+                    for step_name, step_data in step.items():
+                        for process_type, process_details in step_data.items():
+                            simplified_process = {}
+                            if 'description' in process_details:
+                                simplified_process['description'] = process_details['description']
+                            if 'has_input' in process_details:
+                                simplified_process['has_input'] = process_details['has_input']
+                            if 'has_output' in process_details:
+                                simplified_process['has_output'] = process_details['has_output']
+                            simplified_step[step_name] = {process_type: simplified_process}
+                    yaml_minimal[protocol_name]['steps'].append(simplified_step)
+
+            # Keep processedsamples as-is (needed for validation)
+            if 'processedsamples' in protocol_data:
+                yaml_minimal[protocol_name]['processedsamples'] = protocol_data['processedsamples']
+
+        yaml_minimal_str = yaml_lib.dump(yaml_minimal, default_flow_style=False, sort_keys=False)
+
+        conversation_obj.add_message(
+            role="system",
+            content=f"Material processing protocol (YAML):\n{yaml_minimal_str}"
+        )
+
     conversation_obj.add_message(
         role="system",
         content=f"Raw mass spectrometry files:\n{files_minimal}"
     )
-    
+
     if additional_context_path:
         with open(additional_context_path, "r") as f:
             additional_context = f.read()

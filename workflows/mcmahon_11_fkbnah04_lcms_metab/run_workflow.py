@@ -30,9 +30,10 @@ async def main():
     manager.create_workflow_structure()
 
     # Step 2: Generate protocol YAML outline using LLM
-    # Skipping - we do not have a protocol for this study
-    #logger.info("2. Generating protocol YAML outline using LLM...")
-    #await manager.generate_material_processing_yaml()
+    # This study has no protocol; the call is a no-op because
+    # workflow.skip_material_processing is set to true in the config.
+    logger.info("2. Generating protocol YAML outline using LLM...")
+    await manager.generate_material_processing_yaml()
 
     # Step 3: Fetch raw data (MinIO or MASSIVE based on config)
     logger.info("3. Fetching raw data...")

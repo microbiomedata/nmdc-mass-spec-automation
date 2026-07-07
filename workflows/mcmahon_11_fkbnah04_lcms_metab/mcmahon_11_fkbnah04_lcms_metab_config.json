@@ -13,7 +13,8 @@
         ],
         "processed_data_date_tag": "20260706",
         "workflow_type": "LCMS Metabolomics",
-        "batch_size": 25
+        "batch_size": 25,
+        "skip_material_processing": true
     },
     "paths": {
         "base_directory": "/Users/heal742/LOCAL/05_NMDC/07_automation/nmdc_mass_spec_automation",

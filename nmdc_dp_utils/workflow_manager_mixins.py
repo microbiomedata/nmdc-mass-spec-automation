@@ -4087,9 +4087,15 @@ class WorkflowMetadataManager:
             if success:
                 success = self._add_associated_studies_to_metadata_csvs()
 
-            # Replace biosample_id (sample_id) with processed_sample_id from material processing metadata
+            # Replace biosample_id (sample_id) with processed_sample_id from material processing metadata.
+            # Skip when the workflow has no material processing: sample_id stays as biosample_id.
             if success:
-                success = self._update_sample_ids_to_processed_sample_ids()
+                if self.skip_material_processing():
+                    self.logger.info(
+                        "Skipping sample_id -> processed_sample_id substitution (workflow.skip_material_processing=true)"
+                    )
+                else:
+                    success = self._update_sample_ids_to_processed_sample_ids()
             
             if success:
                 self.set_skip_trigger("metadata_mapping_generated", True)
@@ -5152,6 +5158,13 @@ class WorkflowMetadataManager:
             >>> # Later run with real ID minting
             >>> success = manager.generate_material_processing_metadata(test=False)
         """
+        if self.skip_material_processing():
+            self.logger.info(
+                "Skipping material processing metadata generation (workflow.skip_material_processing=true)"
+            )
+            self.set_skip_trigger("material_processing_metadata_generated", True)
+            return True
+
         self.logger.info("Generating material processing metadata...")
 
         try:
@@ -5535,12 +5548,13 @@ class LLMWorkflowManagerMixin:
         return True
 
     async def get_llm_biosample_mapping(
-        self, 
-        max_iterations: int = 6
+        self,
+        max_iterations: int = 6,
+        skip_material_processing: bool = False,
     ) -> bool:
         """
         Get biosample mapping using LLM code generation approach.
-        
+
         This method:
         1. Creates a new conversation context for biosample mapping
         2. Loads study data (biosamples, raw files, material processing YAML)
@@ -5548,12 +5562,16 @@ class LLMWorkflowManagerMixin:
         4. Asks LLM to generate a Python mapping script
         5. Executes and validates the script
         6. Iteratively fixes errors until validation passes
-        
+
         Parameters
         ----------
         max_iterations : int
             Maximum number of fix iterations (default: 6)
-        
+        skip_material_processing : bool
+            When True, the pipeline skips loading the material-processing YAML
+            and produces a four-column mapping CSV (no processedsample or
+            protocol columns). Default: False.
+
         Returns
         -------
         bool
@@ -5564,21 +5582,28 @@ class LLMWorkflowManagerMixin:
             get_llm_generated_script,
             validate_and_fix_script
         )
-        
+
         # Define file paths
         biosample_path = str(self.workflow_path / "metadata" / "biosample_attributes.csv")
-        raw_files_path = self.workflow_path / "metadata" / "downloaded_files.csv"        
-        yaml_path = str(self.workflow_path / "protocol_info" / "llm_generated_protocol_outline.yaml")
+        raw_files_path = self.workflow_path / "metadata" / "downloaded_files.csv"
+        yaml_path = (
+            None
+            if skip_material_processing
+            else str(self.workflow_path / "protocol_info" / "llm_generated_protocol_outline.yaml")
+        )
 
-        # Check that biosample_path, raw_files_path, and yaml_path exist before proceeding
-        if not Path(biosample_path).exists() or not Path(raw_files_path).exists() or not Path(yaml_path).exists():
+        # Check that biosample_path and raw_files_path (and yaml_path when in scope) exist before proceeding
+        missing = []
+        if not Path(biosample_path).exists():
+            missing.append(f" - Biosample attributes file missing: {biosample_path}")
+        if not Path(raw_files_path).exists():
+            missing.append(f" - Downloaded files metadata missing: {raw_files_path}")
+        if not skip_material_processing and not Path(yaml_path).exists():
+            missing.append(f" - Material processing YAML missing: {yaml_path}")
+        if missing:
             self.logger.error("Required files for biosample mapping not found:")
-            if not Path(biosample_path).exists():
-                self.logger.error(f" - Biosample attributes file missing: {biosample_path}")
-            if not Path(raw_files_path).exists():
-                self.logger.error(f" - Downloaded files metadata missing: {raw_files_path}")
-            if not Path(yaml_path).exists():
-                self.logger.error(f" - Material processing YAML missing: {yaml_path}")
+            for msg in missing:
+                self.logger.error(msg)
             return False
 
         output_path = str(self.workflow_path / "metadata" / "llm_biosample_raw_file_mapper.csv")
@@ -5598,9 +5623,10 @@ class LLMWorkflowManagerMixin:
             biosample_attributes_path=biosample_path,
             raw_files_path=raw_files_path,
             material_processing_yaml_path=yaml_path,
-            additional_context_path=additional_context_path
+            additional_context_path=additional_context_path,
+            skip_material_processing=skip_material_processing,
         )
-        
+
         # Generate mapping script
         self.logger.info("Generating biosample mapping script using LLM...")
         try:
@@ -5610,7 +5636,8 @@ class LLMWorkflowManagerMixin:
                 biosample_path=biosample_path,
                 files_path=raw_files_path,
                 yaml_path=yaml_path,
-                output_path=output_path
+                output_path=output_path,
+                skip_material_processing=skip_material_processing,
             )
             
             # Clean up markdown if present
@@ -5656,7 +5683,8 @@ class LLMWorkflowManagerMixin:
                 biosample_path=biosample_path,
                 files_path=raw_files_path,
                 yaml_path=yaml_path,
-                max_iterations=max_iterations
+                max_iterations=max_iterations,
+                skip_material_processing=skip_material_processing,
             )
             
             if success:
