@@ -562,7 +562,7 @@ class WorkflowDataMovementManager:
                 continue
 
             try:
-                self._download_file_wget(ftp_location, download_path)
+                self._download_file_ftps(ftp_location, download_path)
                 downloaded_files.append(download_path)
                 tqdm.write(f"Downloaded {file_name}")
             except Exception as e:
@@ -601,27 +601,62 @@ class WorkflowDataMovementManager:
 
         return True
 
-    def _download_file_wget(self, ftp_location: str, download_path: str):
+    def _download_file_ftps(self, ftp_location: str, download_path: str):
         """
-        Download a single file using Python's urllib.
+        Download a single file over explicit FTPS.
+
+        MASSIVE requires FTPS (server responds "421 TLS is required" to plain
+        FTP), so this uses ftplib.FTP_TLS with prot_p rather than urllib —
+        urllib's ftp handler does not support TLS.
 
         Args:
-            ftp_location: FTP URL of the file to download
+            ftp_location: FTP URL of the file to download (ftp://host/path/file)
             download_path: Local path where the file should be saved
 
         Raises:
             RuntimeError: If the download fails for any reason
         """
-        import urllib.request
-        import urllib.error
+        import ftplib
+        from urllib.parse import urlparse, unquote
 
+        parsed = urlparse(ftp_location)
+        if parsed.scheme not in ("ftp", "ftps") or not parsed.hostname:
+            raise RuntimeError(f"Invalid FTP URL: {ftp_location}")
+
+        host = parsed.hostname
+        # Collapse any accidental double slashes in the path (crawler emits some)
+        remote_path = re.sub(r"/+", "/", unquote(parsed.path))
+        remote_dir, _, remote_file = remote_path.rpartition("/")
+        if not remote_file:
+            raise RuntimeError(f"Could not parse filename from URL: {ftp_location}")
+
+        tmp_path = download_path + ".part"
         try:
-            # Download the file using urllib
-            urllib.request.urlretrieve(ftp_location, download_path)
-        except urllib.error.URLError as e:
-            raise RuntimeError(f"Failed to download {ftp_location}: {e}")
+            ftp = ftplib.FTP_TLS(host, timeout=120)
+            try:
+                ftp.login()  # Anonymous
+                ftp.prot_p()
+                if remote_dir:
+                    ftp.cwd(remote_dir)
+                with open(tmp_path, "wb") as f:
+                    ftp.retrbinary(f"RETR {remote_file}", f.write)
+            finally:
+                try:
+                    ftp.quit()
+                except Exception:
+                    ftp.close()
+            os.replace(tmp_path, download_path)
         except Exception as e:
-            raise RuntimeError(f"Unexpected error downloading {ftp_location}: {e}")
+            if os.path.exists(tmp_path):
+                try:
+                    os.remove(tmp_path)
+                except OSError:
+                    pass
+            raise RuntimeError(f"Failed to download {ftp_location}: {e}")
+
+    def _download_file_wget(self, ftp_location: str, download_path: str):
+        """Deprecated alias — kept for backwards compatibility. Use _download_file_ftps."""
+        return self._download_file_ftps(ftp_location, download_path)
 
     def _parse_ftp_file(self, lines: List[str]) -> pd.DataFrame:
         """
