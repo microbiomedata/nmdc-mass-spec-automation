@@ -79,6 +79,7 @@ Each study needs a configuration json. Use `nmdc_dp_utils/example_config.json` a
 - **`workflow.processed_data_date_tag`**: Date tag to append to processed data folder for the workflow batch (e.g., "20251027")
 - **`workflow.workflow_type`**: Type of workflow (currently only "LCMS Metabolomics" is supported)
 - **`workflow.batch_size`**: Number of files to process per WDL batch (e.g., 25)
+- **`workflow.skip_material_processing`**: Optional boolean (default `false`). When `true`, the workflow has no material processing protocol; downstream steps that depend on that protocol are adapted accordingly.
 - **`paths.base_directory`**: Path to base data processing directory
 - **`paths.data_directory`**: Path where raw and processed files are stored, the system will create a study-specific subdirectory here
 - **`minio.bucket`**: Bucket name for MinIO uploads/downloads
