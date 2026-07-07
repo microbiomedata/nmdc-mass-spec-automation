@@ -11,7 +11,7 @@
         "file_filters": [
             ""
         ],
-        "processed_data_date_tag": "20260701",
+        "processed_data_date_tag": "20260707",
         "workflow_type": "DI FTICR NOM",
         "batch_size": 30,
         "use_child_studies": true,
@@ -48,7 +48,12 @@
             "cores": 5,
             "instrument_used": "7T FT-ICR MS",
             "mass_spec_configuration_name": "EMSL NOM full profile mass spectrometry, negative",
-            "metadata_overrides": {}
+            "instrument_instance_specifier": "SciMax01",
+            "metadata_overrides": {
+                "instrument_instance_specifier": {
+                    "_": "SciMax01"
+                }
+            }
         }
     ],
     "metadata": {
@@ -60,21 +65,22 @@
         "serial_numbers_to_remove": [
             "Unknown"
         ],
-        "raw_data_location": "minio"
+        "raw_data_location": "minio",
+        "instrument_instance_specifier": "SciMax01"
     },
     "skip_triggers": {
-        "study_structure_created": true,
+        "study_structure_created": false,
         "raw_data_downloaded": true,
         "protocol_outline_created": true,
         "biosample_attributes_fetched": true,
         "biosample_mapping_completed": true,
-        "raw_data_inspected": true,
+        "raw_data_inspected": false,
         "material_processing_metadata_generated": true,
         "metadata_mapping_generated": false,
-        "data_processed": true,
-        "processed_data_uploaded_to_minio": true,
+        "data_processed": false,
+        "processed_data_uploaded_to_minio": false,
         "metadata_packages_generated": false,
-        "metadata_submitted_dev": true,
+        "metadata_submitted_dev": false,
         "metadata_submitted_prod": true
     }
 }
