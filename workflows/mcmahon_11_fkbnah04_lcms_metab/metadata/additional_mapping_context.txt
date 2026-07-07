@@ -1,0 +1,17 @@
+Use GEODES_NA_processing_book.csv as input to mapping script.  This is a better starting point than the raw file names and biosample attributes.
+
+Note to self - the Filter_ID column here corresponds to the samp_name on the biosample records in NMDC.
+
+Example MASSIVE data file:
+20180918_KBL_TM_Lakes_GEODES_All3_QE-HF_HILICZ-VF1_USHXG01161_NEG_MSMS_13_GEO-SP-0-UF_1_Rg70to1050-CE102040-0-4-S1_Run55.mzML
+
+GEO-SP-0 looks to be the sample identifier, corresponding to Sample_Name from lab mapping file of "GEODES_SP_0hr".
+Only one replicate per triplicate MetaT samples looks to be sampled for metabolomics.
+
+Each sample looks like it was injected 8 times - twice for HILIC Negative, twice for HILIC Positive, twice for RP Negative, twice for RP Positive. The only difference is if the sample identifier is "GEO-SP-0-UF" or "GEO-SP-0-F"
+
+Two examples of same biosample both HILIC Negative
+20180918_KBL_TM_Lakes_GEODES_All3_QE-HF_HILICZ-VF1_USHXG01161_NEG_MSMS_13_GEO-SP-0-UF_1_Rg70to1050-CE102040-0-4-S1_Run55.mzML
+
+20180918_KBL_TM_Lakes_GEODES_All3_QE-HF_HILICZ-VF1_USHXG01161_NEG_MSMS_49_GEO-SP-0-F_1_Rg70to1050-CE102040-0-4-S1_Run181.mzML
+
