@@ -43,7 +43,7 @@ jobs:
           latest="${{ steps.latest.outputs.latest }}"
 
           # Update only the ref portion of that specific line
-          perl -i -pe 's|(nmdc-mass-spectrometry-metadata-generation\s*\@\s*git\+https://github\.com/microbiomedata/nmdc_mass_spectrometry_metadata_generation\.git\@)[^\s]+|$1'"$latest"'|g' "$file"
+          perl -i -pe 's|(nmdc-mass-spectrometry-metadata-generation\s*\@\s*git\+https://github\.com/microbiomedata/nmdc_mass_spectrometry_metadata_generation\.git\@)\S+|${1}'"$latest"'|g' "$file"
 
           echo "Diff:"
           git diff -- "$file" || true
