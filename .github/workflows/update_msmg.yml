@@ -43,7 +43,7 @@ jobs:
           latest="${{ steps.latest.outputs.latest }}"
 
           # Update only the ref portion of that specific line
-          perl -i -pe 's|(nmdc-mass-spectrometry-metadata-generation\s*\@\s*git\+https://github\.com/microbiomedata/nmdc_mass_spectrometry_metadata_generation\.git\@)[^\s]+|$1'"$latest"'|g' "$file"
+          perl -i -pe 's|(nmdc-mass-spectrometry-metadata-generation\s*\@\s*git\+https://github\.com/microbiomedata/nmdc_mass_spectrometry_metadata_generation\.git\@)\S+|${1}'"$latest"'|g' "$file"
 
           echo "Diff:"
           git diff -- "$file" || true
@@ -57,6 +57,9 @@ jobs:
             echo "No changes to commit."
             exit 0
           fi
+
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
 
           branch="bot/bump-nmdc-ms-metadata-generation"
           git checkout -b "$branch"
