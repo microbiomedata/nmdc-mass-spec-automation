@@ -1,4 +1,4 @@
-nmdc-mass-spectrometry-metadata-generation @ git+https://github.com/microbiomedata/nmdc_mass_spectrometry_metadata_generation.git@2.8.2
+nmdc-mass-spectrometry-metadata-generation @ git+https://github.com/microbiomedata/nmdc_mass_spectrometry_metadata_generation.git@2.9.0
 minio==7.2.20
 miniwdl
 openai==2.44.0
