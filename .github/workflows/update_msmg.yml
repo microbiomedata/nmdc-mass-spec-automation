@@ -1,0 +1,71 @@
+name: Update git-pinned requirement
+
+on:
+  schedule:
+    - cron: "23 6 * * 1"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  bump:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Find latest upstream tag
+        id: latest
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          REPO="microbiomedata/nmdc_mass_spectrometry_metadata_generation"
+
+          # Fetch all tag names, filter to X.Y.Z, take highest by version sort
+          LATEST="$(gh api "repos/$REPO/tags" --paginate --jq '.[].name' \
+            | grep -E '^[0-9]+\.[0-9]+\.[0-9]+$' \
+            | sort -V \
+            | tail -n 1)"
+
+          if [ -z "$LATEST" ]; then
+            echo "No semver tags found on $REPO" >&2
+            exit 1
+          fi
+
+          echo "latest=$LATEST" >> "$GITHUB_OUTPUT"
+
+      - name: Update requirements.txt
+        run: |
+          set -euo pipefail
+          file="requirements.txt"
+          latest="${{ steps.latest.outputs.latest }}"
+
+          # Update only the ref portion of that specific line
+          perl -i -pe 's|(nmdc-mass-spectrometry-metadata-generation\s*\@\s*git\+https://github\.com/microbiomedata/nmdc_mass_spectrometry_metadata_generation\.git\@)[^\s]+|$1'"$latest"'|g' "$file"
+
+          echo "Diff:"
+          git diff -- "$file" || true
+
+      - name: Create PR if changed
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          if git diff --quiet; then
+            echo "No changes to commit."
+            exit 0
+          fi
+
+          branch="bot/bump-nmdc-ms-metadata-generation"
+          git checkout -b "$branch"
+          git add requirements.txt
+          git commit -m "Bump nmdc-mass-spectrometry-metadata-generation to ${{ steps.latest.outputs.latest }}"
+          git push -u origin "$branch" --force
+
+          gh pr create \
+            --title "Bump nmdc-mass-spectrometry-metadata-generation to ${{ steps.latest.outputs.latest }}" \
+            --body "Automated update of git-pinned dependency to latest upstream tag." \
+            --base "${{ github.event.repository.default_branch }}" \
+            --head "$branch"
