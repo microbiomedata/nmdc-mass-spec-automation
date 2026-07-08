@@ -21,7 +21,7 @@
         "data_directory": "/Volumes/LaCie/nmdc_data"
     },
     "docker": {
-        "raw_data_inspector_image": "microbiomedata/metams:3.3.3"
+        "raw_data_inspector_image": "microbiomedata/metams:3.4.0"
     },
     "minio": {
         "endpoint": "admin.nmdcdemo.emsl.pnl.gov",
