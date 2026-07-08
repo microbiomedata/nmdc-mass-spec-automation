@@ -271,6 +271,50 @@ class TestWorkflowMetadataManager:
         
         assert result is False
 
+    def test_update_sample_ids_skipped_when_flag_true(self, temp_config_dir, lcms_config):
+        """generate_workflow_metadata_generation_inputs skips MP ID substitution when flag is on."""
+        import json
+        from nmdc_dp_utils.workflow_manager import NMDCWorkflowManager
+
+        lcms_config["workflow"]["skip_material_processing"] = True
+        config_path = temp_config_dir / "config_skip_mp_update.json"
+        with open(config_path, "w") as f:
+            json.dump(lcms_config, f)
+
+        manager = NMDCWorkflowManager(str(config_path))
+
+        with patch.object(
+            manager, "_generate_lcms_workflow_metadata_inputs", return_value=True
+        ), patch.object(
+            manager, "_add_associated_studies_to_metadata_csvs", return_value=True
+        ), patch.object(
+            manager, "_update_sample_ids_to_processed_sample_ids"
+        ) as mock_update:
+            result = manager.generate_workflow_metadata_generation_inputs()
+
+        assert result is True
+        mock_update.assert_not_called()
+        assert manager.should_skip("metadata_mapping_generated") is True
+
+    def test_update_sample_ids_still_called_when_flag_false(self, lcms_config_file):
+        """Regression: without the flag, MP ID substitution is still invoked."""
+        from nmdc_dp_utils.workflow_manager import NMDCWorkflowManager
+
+        manager = NMDCWorkflowManager(str(lcms_config_file))
+        assert manager.skip_material_processing() is False
+
+        with patch.object(
+            manager, "_generate_lcms_workflow_metadata_inputs", return_value=True
+        ), patch.object(
+            manager, "_add_associated_studies_to_metadata_csvs", return_value=True
+        ), patch.object(
+            manager, "_update_sample_ids_to_processed_sample_ids", return_value=True
+        ) as mock_update:
+            result = manager.generate_workflow_metadata_generation_inputs()
+
+        assert result is True
+        mock_update.assert_called_once()
+
     def test_configuration_file_filtering(self, lcms_config_file):
         """Test configuration file filtering with multiple patterns."""
         from nmdc_dp_utils.workflow_manager import NMDCWorkflowManager

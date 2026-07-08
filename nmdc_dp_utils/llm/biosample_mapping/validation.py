@@ -11,11 +11,12 @@ def validate_biosample_mapping_csv(
     csv_content: str,
     biosample_attributes_csv: str,
     material_processing_yaml: str,
-    raw_files_csv: str
+    raw_files_csv: str,
+    skip_material_processing: bool = False,
 ) -> dict:
     """
     Validate the biosample mapping CSV against the input data.
-    
+
     Parameters
     ----------
     csv_content : str
@@ -23,10 +24,15 @@ def validate_biosample_mapping_csv(
     biosample_attributes_csv : str
         The biosample attributes CSV content
     material_processing_yaml : str
-        The material processing YAML content
+        The material processing YAML content. Ignored when skip_material_processing is True.
     raw_files_csv : str
         The raw files CSV content
-    
+    skip_material_processing : bool
+        When True, the CSV is expected to have four columns
+        (raw_data_identifier, biosample_id, biosample_name, match_confidence) and
+        material-processing-specific validation (YAML-derived processedsample and
+        protocol_id checks) is bypassed. Default: False.
+
     Returns
     -------
     dict
@@ -37,7 +43,7 @@ def validate_biosample_mapping_csv(
         - 'unmapped_files' (list of str): Raw files not mapped to biosamples
     """
     errors = []
-    
+
     # Parse the generated CSV
     try:
         csv_reader = csv.DictReader(io.StringIO(csv_content))
@@ -47,16 +53,24 @@ def validate_biosample_mapping_csv(
             'valid': False,
             'errors': [f"Failed to parse generated CSV: {str(e)}"]
         }
-    
+
     # Check required columns
-    required_columns = {
-        'raw_data_identifier',
-        'biosample_id',
-        'biosample_name',
-        'match_confidence',
-        'processedsample_placeholder',
-        'material_processing_protocol_id'
-    }
+    if skip_material_processing:
+        required_columns = {
+            'raw_data_identifier',
+            'biosample_id',
+            'biosample_name',
+            'match_confidence',
+        }
+    else:
+        required_columns = {
+            'raw_data_identifier',
+            'biosample_id',
+            'biosample_name',
+            'match_confidence',
+            'processedsample_placeholder',
+            'material_processing_protocol_id'
+        }
     
     if not generated_rows:
         errors.append("Generated CSV is empty (no data rows)")
@@ -103,26 +117,28 @@ def validate_biosample_mapping_csv(
             'errors': [f"Failed to parse raw files CSV: {str(e)}"]
         }
     
-    # Parse YAML
-    try:
-        yaml_data = yaml.safe_load(material_processing_yaml)
-        protocol_names = set(yaml_data.keys())
-        
-        # Extract all ProcessedSample IDs from the YAML and track by protocol
-        processed_samples = set()
-        protocol_processed_samples = {}
-        for protocol_name, protocol_data in yaml_data.items():
-            protocol_processed_samples[protocol_name] = set()
-            if 'processedsamples' in protocol_data:
-                for ps_item in protocol_data['processedsamples']:
-                    ps_keys = set(ps_item.keys())
-                    processed_samples.update(ps_keys)
-                    protocol_processed_samples[protocol_name].update(ps_keys)
-    except Exception as e:
-        return {
-            'valid': False,
-            'errors': [f"Failed to parse material processing YAML: {str(e)}"]
-        }
+    # Parse YAML (only when material processing is in scope)
+    protocol_names = set()
+    processed_samples = set()
+    protocol_processed_samples = {}
+    if not skip_material_processing:
+        try:
+            yaml_data = yaml.safe_load(material_processing_yaml)
+            protocol_names = set(yaml_data.keys())
+
+            # Extract all ProcessedSample IDs from the YAML and track by protocol
+            for protocol_name, protocol_data in yaml_data.items():
+                protocol_processed_samples[protocol_name] = set()
+                if 'processedsamples' in protocol_data:
+                    for ps_item in protocol_data['processedsamples']:
+                        ps_keys = set(ps_item.keys())
+                        processed_samples.update(ps_keys)
+                        protocol_processed_samples[protocol_name].update(ps_keys)
+        except Exception as e:
+            return {
+                'valid': False,
+                'errors': [f"Failed to parse material processing YAML: {str(e)}"]
+            }
     
     # Validate each row
     mapped_raw_files = set()
@@ -166,24 +182,25 @@ def validate_biosample_mapping_csv(
         if not biosample_id and match_confidence in ['high', 'medium', 'low']:
             errors.append(f"{row_num}: match_confidence '{match_confidence}' requires a biosample_id")
         
-        # Check processedsample_placeholder
-        ps_placeholder = row.get('processedsample_placeholder', '').strip()
-        if match_confidence in ['high', 'medium', 'low'] and not ps_placeholder:
-            errors.append(f"{row_num}: processedsample_placeholder is required when match_confidence is '{match_confidence}'")
-        if ps_placeholder and ps_placeholder not in processed_samples:
-            errors.append(f"{row_num}: processedsample_placeholder '{ps_placeholder}' not found in material processing YAML")
-        
-        # Check material_processing_protocol_id
-        protocol_id = row.get('material_processing_protocol_id', '').strip()
-        if match_confidence in ['high', 'medium', 'low'] and not protocol_id:
-            errors.append(f"{row_num}: material_processing_protocol_id is required when match_confidence is '{match_confidence}'")
-        if protocol_id and protocol_id not in protocol_names:
-            errors.append(f"{row_num}: material_processing_protocol_id '{protocol_id}' not found in material processing YAML (available: {', '.join(protocol_names)})")
-        if ps_placeholder and protocol_id in protocol_processed_samples and ps_placeholder not in protocol_processed_samples[protocol_id]:
-            errors.append(
-                f"{row_num}: processedsample_placeholder '{ps_placeholder}' is not defined under protocol '{protocol_id}'. "
-                f"Use a ProcessedSample ID key from that protocol's processedsamples list (for example, 'ProcessedSample1_{protocol_id}')."
-            )
+        if not skip_material_processing:
+            # Check processedsample_placeholder
+            ps_placeholder = row.get('processedsample_placeholder', '').strip()
+            if match_confidence in ['high', 'medium', 'low'] and not ps_placeholder:
+                errors.append(f"{row_num}: processedsample_placeholder is required when match_confidence is '{match_confidence}'")
+            if ps_placeholder and ps_placeholder not in processed_samples:
+                errors.append(f"{row_num}: processedsample_placeholder '{ps_placeholder}' not found in material processing YAML")
+
+            # Check material_processing_protocol_id
+            protocol_id = row.get('material_processing_protocol_id', '').strip()
+            if match_confidence in ['high', 'medium', 'low'] and not protocol_id:
+                errors.append(f"{row_num}: material_processing_protocol_id is required when match_confidence is '{match_confidence}'")
+            if protocol_id and protocol_id not in protocol_names:
+                errors.append(f"{row_num}: material_processing_protocol_id '{protocol_id}' not found in material processing YAML (available: {', '.join(protocol_names)})")
+            if ps_placeholder and protocol_id in protocol_processed_samples and ps_placeholder not in protocol_processed_samples[protocol_id]:
+                errors.append(
+                    f"{row_num}: processedsample_placeholder '{ps_placeholder}' is not defined under protocol '{protocol_id}'. "
+                    f"Use a ProcessedSample ID key from that protocol's processedsamples list (for example, 'ProcessedSample1_{protocol_id}')."
+                )
     
     # Check that all raw files are mapped (warning only, not an error)
     unmapped_files = raw_file_names - mapped_raw_files

@@ -111,7 +111,7 @@ class TestMASSIVEWorkflow:
         raw_dir = Path(manager.raw_data_directory)
         raw_dir.mkdir(parents=True, exist_ok=True)
         
-        with patch.object(manager, '_download_file_wget') as mock_download:
+        with patch.object(manager, '_download_file_ftps') as mock_download:
             with patch('os.path.exists', return_value=False):
                 result = manager.download_from_massive(ftp_file="raw_file_info/massive_ftp_locs.csv")
                 
