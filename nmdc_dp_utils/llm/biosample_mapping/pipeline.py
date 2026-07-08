@@ -40,7 +40,8 @@ logging.basicConfig(level=logging.INFO, format='%(levelname)s: %(message)s')
 
 async def get_llm_generated_script(llm_client: LLMClient, conversation_obj: ConversationManager,
                                    biosample_path: str, files_path: str, yaml_path: str, output_path: str,
-                                   skip_material_processing: bool = False):
+                                   skip_material_processing: bool = False,
+                                   supplementary_file_paths: list = None):
     """
     Get LLM to generate a Python script that does the mapping.
 
@@ -63,6 +64,10 @@ async def get_llm_generated_script(llm_client: LLMClient, conversation_obj: Conv
         When True, the emitted script must write only the four base columns
         (raw_data_identifier, biosample_id, biosample_name, match_confidence)
         and must NOT read a material processing YAML. Default: False.
+    supplementary_file_paths : list of str, optional
+        Additional reference CSV/TSV paths the script may read (e.g., a lab
+        processing book that ties filename tokens to biosample names). The
+        contents are also present in the conversation context.
 
     Returns
     -------
@@ -78,6 +83,16 @@ async def get_llm_generated_script(llm_client: LLMClient, conversation_obj: Conv
     else:
         column_name = files_df.columns[0]
 
+    supplementary_clause = ""
+    if supplementary_file_paths:
+        bullets = "\n".join(f"- {p}" for p in supplementary_file_paths)
+        supplementary_clause = (
+            "\n\nAdditional reference metadata files are available at these paths — "
+            "read them with pandas if the additional context indicates they help "
+            "map filenames to biosamples:\n"
+            f"{bullets}"
+        )
+
     if skip_material_processing:
         prompt = f"""Generate a Python script that maps the raw files to biosamples ONLY.
 
@@ -88,7 +103,7 @@ The script should:
 - Read biosamples from: {biosample_path}
 - Read raw files from: {files_path} (column: {column_name})
 - Write output CSV to: {output_path}
-- Use the mapping logic we discussed (parse filenames, match to biosamples)
+- Use the mapping logic we discussed (parse filenames, match to biosamples){supplementary_clause}
 
 The output CSV MUST have exactly these four columns (in this order):
 raw_data_identifier, biosample_id, biosample_name, match_confidence
@@ -106,7 +121,7 @@ The script should:
 - Read raw files from: {files_path} (column: {column_name})
 - Read material processing YAML from: {yaml_path}
 - Write output CSV to: {output_path}
-- Use the mapping logic we discussed (parse filenames, match to biosamples, determine protocols)
+- Use the mapping logic we discussed (parse filenames, match to biosamples, determine protocols){supplementary_clause}
 
 IMPORTANT: Use these EXACT file paths in your script. Do not guess or change the paths.
 
@@ -417,6 +432,7 @@ async def add_study_data_to_conversation(
     material_processing_yaml_path: str,
     additional_context_path: str = None,
     skip_material_processing: bool = False,
+    supplementary_metadata_paths: list = None,
 ):
     """
     Add study-specific data to the conversation context.
@@ -433,6 +449,10 @@ async def add_study_data_to_conversation(
     skip_material_processing (bool) : when True, the YAML message is replaced
         with a schema instruction for a four-column CSV (no processed sample or
         protocol columns). Default: False.
+    supplementary_metadata_paths (list of str) : optional additional tabular
+        reference files (e.g., a lab processing book mapping filename tokens to
+        biosample names). Each is injected as a system message so the LLM sees
+        its contents and can reference the path from the generated script.
     """
     import pandas as pd
     import yaml as yaml_lib
@@ -510,6 +530,18 @@ async def add_study_data_to_conversation(
         role="system",
         content=f"Raw mass spectrometry files:\n{files_minimal}"
     )
+
+    if supplementary_metadata_paths:
+        for sup_path in supplementary_metadata_paths:
+            with open(sup_path, "r") as f:
+                sup_content = f.read()
+            conversation_obj.add_message(
+                role="system",
+                content=(
+                    f"Supplementary reference metadata file at {sup_path} "
+                    f"(readable by the generated script via pandas):\n{sup_content}"
+                )
+            )
 
     if additional_context_path:
         with open(additional_context_path, "r") as f:

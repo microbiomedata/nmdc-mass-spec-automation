@@ -5583,6 +5583,12 @@ class LLMWorkflowManagerMixin:
             validate_and_fix_script
         )
 
+        # Switch LLM interaction context to biosample_mapping.
+        if self._interaction_type != "biosample_mapping":
+            self._interaction_type = "biosample_mapping"
+            self._llm_client = None
+            self._conversation_obj = None
+
         # Define file paths
         biosample_path = str(self.workflow_path / "metadata" / "biosample_attributes.csv")
         raw_files_path = self.workflow_path / "metadata" / "downloaded_files.csv"
@@ -5616,6 +5622,30 @@ class LLMWorkflowManagerMixin:
             additional_context_path = str(default_context_path)
             self.logger.info(f"Using additional context file for biosample mapping: {additional_context_path}")
 
+        # Auto-discover supplementary tabular metadata (e.g., a lab processing
+        # book that ties filename tokens to biosample names). Any CSV/TSV under
+        # metadata/ that isn't a pipeline-owned file is exposed to the LLM.
+        reserved_metadata_names = {
+            "biosample_attributes.csv",
+            "downloaded_files.csv",
+            "llm_biosample_raw_file_mapper.csv",
+            "llm_biosample_raw_file_mapper_unmapped_files.txt",
+            "mapped_raw_files.csv",
+            "biosample_mapping_for_mp_metadata_generation.csv",
+        }
+        supplementary_metadata_paths = sorted(
+            str(p)
+            for p in (self.workflow_path / "metadata").glob("*")
+            if p.is_file()
+            and p.suffix.lower() in {".csv", ".tsv"}
+            and p.name not in reserved_metadata_names
+        )
+        if supplementary_metadata_paths:
+            self.logger.info(
+                f"Using {len(supplementary_metadata_paths)} supplementary metadata file(s) "
+                f"for biosample mapping: {supplementary_metadata_paths}"
+            )
+
         # Add study data to conversation context
         self.logger.info("Loading study data into conversation context...")
         await add_study_data_to_conversation(
@@ -5625,6 +5655,7 @@ class LLMWorkflowManagerMixin:
             material_processing_yaml_path=yaml_path,
             additional_context_path=additional_context_path,
             skip_material_processing=skip_material_processing,
+            supplementary_metadata_paths=supplementary_metadata_paths,
         )
 
         # Generate mapping script
@@ -5638,6 +5669,7 @@ class LLMWorkflowManagerMixin:
                 yaml_path=yaml_path,
                 output_path=output_path,
                 skip_material_processing=skip_material_processing,
+                supplementary_file_paths=supplementary_metadata_paths,
             )
             
             # Clean up markdown if present
