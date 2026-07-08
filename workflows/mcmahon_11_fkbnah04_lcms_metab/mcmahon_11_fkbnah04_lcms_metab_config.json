@@ -13,8 +13,7 @@
         ],
         "processed_data_date_tag": "20260706",
         "workflow_type": "LCMS Metabolomics",
-        "batch_size": 25,
-        "skip_material_processing": true
+        "batch_size": 25
     },
     "paths": {
         "base_directory": "/Users/heal742/LOCAL/05_NMDC/07_automation/nmdc_mass_spec_automation",
@@ -103,9 +102,9 @@
     },
     "skip_triggers": {
         "study_structure_created": true,
-        "raw_data_downloaded": false,
+        "raw_data_downloaded": true,
         "protocol_outline_created": false,
-        "biosample_attributes_fetched": false,
+        "biosample_attributes_fetched": true,
         "biosample_mapping_script_generated": false,
         "biosample_mapping_completed": false,
         "raw_data_inspected": false,
