@@ -49,7 +49,7 @@ async def main():
     
     # Step 5: Inspect raw data files for metadata and QC
     logger.info("5. Inspecting raw data files...")
-    manager.raw_data_inspector(cores=4)
+    manager.raw_data_inspector(cores=1)
 
     # Step 6: Process data (generate WDL configs and execute workflows)
     logger.info("6. Processing data with WDL workflows...")
