@@ -466,14 +466,14 @@ class NMDCWorkflowManager(
         return protocol_info
     
     @skip_if_complete("protocol_outline_created", return_value=True)
-    async def generate_material_processing_yaml(self) -> str:
+    async def generate_material_processing_yaml(self) -> bool:
         """
         Generate material processing YAML using LLM.
 
         Returns
         -------
-        str
-            The generated material processing YAML.
+        bool
+            True if outline generation completed and was approved, False otherwise.
         """
         if self.skip_material_processing():
             self.logger.info(
@@ -498,6 +498,9 @@ class NMDCWorkflowManager(
         approved_outline =  await self.request_approval("protocol outline")
         if approved_outline:
             self.set_skip_trigger("protocol_outline_created", True)
+            return True
+
+        return False
     
     @skip_if_complete("biosample_mapping_completed", return_value=True)
     async def generate_llm_biosample_mapping(self, max_iterations: int = 6) -> bool:
@@ -520,3 +523,6 @@ class NMDCWorkflowManager(
             approved_outline =  await self.request_approval("biosample mapping")
             if approved_outline:
                 self.set_skip_trigger("biosample_mapping_completed", True)
+                return True
+
+        return False
