@@ -5454,7 +5454,42 @@ class LLMWorkflowManagerMixin:
         if self._conversation_obj is None:
             self._conversation_obj = ConversationManager(interaction_type=self._interaction_type)
         return self._conversation_obj
-        
+
+    def check_protocol_examples_compliance(self) -> None:
+        """
+        Check if the protocol examples provided to the LLM are compliant with the current schema.
+
+        Raises:
+            ValueError: If any of the protocol examples are not compliant with the schema.
+        """
+        import logging
+        from nmdc_ms_metadata_gen.validate_yaml_outline import validate_yaml_outline
+
+        root_logger = logging.getLogger()
+        original_level = root_logger.level
+        try:
+            # Temporarily suppress error logging
+            # so 'Validation Passed!' messages don't clutter the output
+            root_logger.setLevel(logging.WARNING)
+            non_compliant_examples = []
+            dirs = ["nmdc_dp_utils/llm/examples/example_1", "nmdc_dp_utils/llm/examples/example_2", "nmdc_dp_utils/llm/examples/example_3", "nmdc_dp_utils/llm/examples/example_4", "nmdc_dp_utils/llm/examples/example_5", "nmdc_dp_utils/llm/examples/example_6", "nmdc_dp_utils/llm/examples/example_7"]
+            for dir in dirs:
+                all_protocols = validate_yaml_outline(f"{dir}/combined_outline.yaml")
+                for protocol in all_protocols:
+                    if protocol['result'] != "All okay!":
+                        non_compliant_examples.append(dir)
+        finally:
+            # Restore original logging level
+            root_logger.setLevel(original_level)
+
+        if non_compliant_examples:
+            error_message = (
+                "The following protocol examples are not compliant with the current schema:\n"
+                + "\n".join(str(example) for example in non_compliant_examples)
+            )
+            self.logger.error(error_message)
+            raise ValueError(error_message)
+
     def load_protocol_description_to_context(self, protocol_description_path: str) -> None:
         """
         Load protocol description from a text file to the LLM conversation context.
