@@ -342,3 +342,12 @@ processing_steps:
 
         assert result is True
         assert manager.should_skip("material_processing_metadata_generated") is True
+
+    def test_check_protocol_examples_compliance(self):
+        from nmdc_dp_utils.workflow_manager_mixins import LLMWorkflowManagerMixin
+
+        with patch.dict(
+            "os.environ",
+            {"CLIENT_ID": "test-client-id", "CLIENT_SECRET": "test-client-secret"},
+        ):
+            LLMWorkflowManagerMixin.check_protocol_examples_compliance()

@@ -5455,7 +5455,8 @@ class LLMWorkflowManagerMixin:
             self._conversation_obj = ConversationManager(interaction_type=self._interaction_type)
         return self._conversation_obj
 
-    def check_protocol_examples_compliance(self) -> None:
+    @staticmethod
+    def check_protocol_examples_compliance() -> None:
         """
         Check if the protocol examples provided to the LLM are compliant with the current schema.
 
@@ -5474,9 +5475,9 @@ class LLMWorkflowManagerMixin:
             non_compliant_examples = []
             dirs = ["nmdc_dp_utils/llm/examples/example_1", "nmdc_dp_utils/llm/examples/example_2", "nmdc_dp_utils/llm/examples/example_3", "nmdc_dp_utils/llm/examples/example_4", "nmdc_dp_utils/llm/examples/example_5", "nmdc_dp_utils/llm/examples/example_6", "nmdc_dp_utils/llm/examples/example_7"]
             for dir in dirs:
-                all_protocols = validate_yaml_outline(f"{dir}/combined_outline.yaml")
+                all_protocols = validate_yaml_outline(f"{dir}/combined_outline.yaml", test=True)
                 for protocol in all_protocols:
-                    if protocol['result'] != "All okay!":
+                    if protocol['result'].lower() != "all okay!":
                         non_compliant_examples.append(dir)
         finally:
             # Restore original logging level
@@ -5487,7 +5488,7 @@ class LLMWorkflowManagerMixin:
                 "The following protocol examples are not compliant with the current schema:\n"
                 + "\n".join(str(example) for example in non_compliant_examples)
             )
-            self.logger.error(error_message)
+            logging.getLogger(__name__).error(error_message)
             raise ValueError(error_message)
 
     def load_protocol_description_to_context(self, protocol_description_path: str) -> None:
