@@ -46,7 +46,7 @@ jobs:
         id: codeowners
         uses: SvanBoxel/codeowners-action@f9e9c6a1998e896bb0ca62402497a06cb58e2e5d
         with:
-          path: "/"
+          path: "tests/test_workflow_manager.py" # needs to be an actual file and all files are covered by CODEOWNERS
 
       - name: Debug owners
         run: echo "Owners ${{ steps.codeowners.outputs.codeowners }}"
