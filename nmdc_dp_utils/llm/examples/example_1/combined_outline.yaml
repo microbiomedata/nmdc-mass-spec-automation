@@ -13,7 +13,7 @@ NOM:
         - ProcessedSample1_NOM
         - ProcessedSample2_NOM
         - ProcessedSample3_NOM
-        processing_institution: Test
+        processing_institution: EMSL
         mass:
           type: nmdc:QuantityValue
           has_raw_value: 6 g

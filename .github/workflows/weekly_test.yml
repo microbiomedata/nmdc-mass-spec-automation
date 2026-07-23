@@ -2,7 +2,6 @@
 name: Weekly Jobs
 
 on:
-  push:
   schedule:
     # Runs at 03:00 UTC every Monday
     - cron: '0 3 * * 1'
