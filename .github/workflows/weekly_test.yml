@@ -32,7 +32,7 @@ jobs:
 
     - name: Run weekly script
       run: |
-        pytest tests/test_workflow_manager.py::test_check_protocol_examples_compliance -v --tb=short
+        pytest tests/test_workflow_manager.py::TestNMDCWorkflowManager::test_check_protocol_examples_compliance -v --tb=short
 
   report-failure:
     needs: weekly-task
