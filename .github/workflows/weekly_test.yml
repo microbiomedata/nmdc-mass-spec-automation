@@ -48,10 +48,24 @@ jobs:
         with: 
           path: './.github/CODEOWNERS'
 
+      - name: Normalize assignees from CODEOWNERS JSON
+        id: assignees
+        run: |
+          # Raw JSON from basic mode, e.g. {"*":["@test1","@test2"]}
+          raw='${{ steps.codeowners.outputs.codeowners }}'
+
+          # Extract the array for the "*" rule, join with spaces: "@test1 @test2"
+          owners=$(echo "$raw" | jq -r '.["*"] | join(" ")')
+
+          # Strip '@' and convert spaces to commas: "test1,test2"
+          normalized=$(echo "$owners" | tr -d '@' | tr ' ' ',')
+
+          echo "normalized=$normalized" >> "$GITHUB_OUTPUT"
+
       - name: Debug owners
         run: echo "Owners ${CODEOWNERS}"
         env:
-          CODEOWNERS: ${{ steps.codeowners.outputs.codeowners }}
+          CODEOWNERS: ${{ steps.codeowners.outputs.normalized }}
 
       - name: Create issue body
         run: |
@@ -65,4 +79,4 @@ jobs:
           title: LLM Examples Failed Schema Compliance
           content-filepath: /tmp/issue-body.md
           labels: report, automated issue
-          assignees: ${{ steps.codeowners.outputs.codeowners }}
+          assignees: ${{ steps.assignees.outputs.normalized }}
