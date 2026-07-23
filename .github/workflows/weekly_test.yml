@@ -49,7 +49,9 @@ jobs:
           path: "tests/test_workflow_manager.py" # needs to be an actual file and all files are covered by CODEOWNERS
 
       - name: Debug owners
-        run: echo "Owners ${{ steps.codeowners.outputs.codeowners }}"
+        run: echo "Owners ${CODEOWNERS}"
+        env:
+          CODEOWNERS: ${{ steps.codeowners.outputs.codeowners }}
 
       - name: Create issue body
         run: |
