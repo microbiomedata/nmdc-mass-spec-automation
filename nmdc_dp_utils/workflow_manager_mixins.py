@@ -5481,16 +5481,22 @@ class LLMWorkflowManagerMixin:
         output_path : str
             Path to the output file.
         content : str
-            Content to be saved to the file.
+            Content to be saved to the file. May be pure YAML or an LLM
+            response that wraps YAML in a markdown fence (with optional prose).
 
         Returns
         -------
         None
         """
-        if content.startswith("```yaml"):
-            content = content.replace("```yaml", "").strip()
-        if content.endswith("```"):
-            content = content[:-3].strip()
+        content = (content or "").strip()
+        # Extract YAML from a markdown fence even when the model prefixes prose
+        # (e.g. "The YAML passed validation...\n\n```yaml\n...").
+        fence = re.search(r"```(?:yaml)?\s*\n", content, flags=re.IGNORECASE)
+        if fence:
+            content = content[fence.end():]
+        if content.rstrip().endswith("```"):
+            content = content.rstrip()[:-3]
+        content = content.strip()
 
         # Ensure the parent directory exists before writing
         output_path_obj = Path(output_path)

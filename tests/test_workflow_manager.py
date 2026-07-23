@@ -323,6 +323,39 @@ processing_steps:
         yaml_path = manager.workflow_path / "protocol_info" / "llm_generated_protocol_outline.yaml"
         assert not yaml_path.exists()
 
+    def test_save_yaml_to_file_strips_prose_and_markdown_fence(self, lcms_config_file, tmp_path):
+        """LLM final answers often prefix prose + ```yaml; save pure YAML only."""
+        from nmdc_dp_utils.workflow_manager import NMDCWorkflowManager
+
+        manager = NMDCWorkflowManager(str(lcms_config_file))
+        out = tmp_path / "outline.yaml"
+        body = "gcms_metabolomics:\n  steps:\n  - Step 1_gcms_metabolomics: {}\n"
+        content = (
+            "The YAML passed validation with no errors. "
+            "Here is the final, validated YAML outline:\n\n"
+            f"```yaml\n{body}```"
+        )
+
+        manager.save_yaml_to_file(output_path=str(out), content=content)
+
+        written = out.read_text()
+        assert written.startswith("gcms_metabolomics:")
+        assert "passed validation" not in written
+        assert "```" not in written
+        assert written == body.strip()
+
+    def test_save_yaml_to_file_preserves_pure_yaml(self, lcms_config_file, tmp_path):
+        """Already-clean YAML is written unchanged (aside from strip)."""
+        from nmdc_dp_utils.workflow_manager import NMDCWorkflowManager
+
+        manager = NMDCWorkflowManager(str(lcms_config_file))
+        out = tmp_path / "outline.yaml"
+        body = "polar_metabolites:\n  steps:\n  - Step 1_polar_metabolites: {}\n"
+
+        manager.save_yaml_to_file(output_path=str(out), content=body)
+
+        assert out.read_text() == body.strip()
+
     def test_generate_material_processing_metadata_noop_when_flag_true(self, temp_config_dir, lcms_config):
         """generate_material_processing_metadata short-circuits without requiring inputs."""
         import json
