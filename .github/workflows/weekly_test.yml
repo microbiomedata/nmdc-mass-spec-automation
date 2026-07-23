@@ -45,9 +45,8 @@ jobs:
       - name: Get CODEOWNERS
         id: codeowners
         uses: SvanBoxel/codeowners-action@f9e9c6a1998e896bb0ca62402497a06cb58e2e5d
-        with:
-          path: "tests/test_workflow_manager.py" # needs to be an actual file and all files are covered by CODEOWNERS
-          codeowners: .github/CODEOWNERS
+        with: 
+          path: './.github/CODEOWNERS'
 
       - name: Debug owners
         run: echo "Owners ${CODEOWNERS}"
