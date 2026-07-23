@@ -2,10 +2,11 @@
 name: Weekly Jobs
 
 on:
+  push
   schedule:
     # Runs at 03:00 UTC every Monday
     - cron: '0 3 * * 1'
-  workflow_dispatch:  # Optional: lets you run it manually from the Actions tab
+  #workflow_dispatch:  # Optional: lets you run it manually from the Actions tab
 
 jobs:
   weekly-task:
@@ -52,7 +53,7 @@ report-failure:
         path: "/"
 
     - name: Debug owners
-      run: echo "Owners: ${{ steps.codeowners.outputs.codeowners }}"
+      run: echo "Owners ${{ steps.codeowners.outputs.codeowners }}"
 
     - name: Create issue body
       run: |
