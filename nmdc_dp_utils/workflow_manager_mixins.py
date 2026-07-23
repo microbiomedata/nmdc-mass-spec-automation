@@ -5487,8 +5487,8 @@ class LLMWorkflowManagerMixin:
         -------
         None
         """
-        if content.startswith("```yaml"):
-            content = content.replace("```yaml", "").strip()
+        if "```yaml" in content:
+            content = re.sub(r"^.*```yaml\s*", "", content, flags=re.DOTALL).strip()
         if content.endswith("```"):
             content = content[:-3].strip()
 
