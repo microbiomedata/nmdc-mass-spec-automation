@@ -482,6 +482,9 @@ class NMDCWorkflowManager(
             self.set_skip_trigger("protocol_outline_created", True)
             return ""
 
+        # check if protocol examples that will be given to LLM are compliant with current schema
+        self.check_protocol_examples_compliance()
+
         # load protocol description into LLM conversation context
         self.load_protocol_description_to_context(
             protocol_description_path=self.workflow_path / "protocol_info" / "protocol_description.txt"
