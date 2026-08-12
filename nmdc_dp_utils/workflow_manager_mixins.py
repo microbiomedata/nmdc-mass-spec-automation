@@ -5525,14 +5525,21 @@ class LLMWorkflowManagerMixin:
         None
         """
         content = (content or "").strip()
-        # Extract YAML from a markdown fence even when the model prefixes prose
+        # Extract YAML from between markdown fences even when the model
+        # adds prose before/after
         # (e.g. "The YAML passed validation...\n\n```yaml\n...").
         fence = re.search(r"```(?:yaml)?\s*\n", content, flags=re.IGNORECASE)
         if fence:
-            content = content[fence.end():]
-        if content.rstrip().endswith("```"):
-            content = content.rstrip()[:-3]
-        content = content.strip()
+            # Find the closing fence after the opening fence
+            closing_fence = re.search(r"\n```", content[fence.end():])
+            if closing_fence:
+                # Extract content between the fences
+                content = content[fence.end(): fence.end() + closing_fence.start()].strip()
+            else:
+                self.logger.warning("Closing markdown fence not found; saving entire content as-is")
+        else:
+            self.logger.warning("Markdown fence not found; saving entire content as-is")
+
 
         # Ensure the parent directory exists before writing
         output_path_obj = Path(output_path)
