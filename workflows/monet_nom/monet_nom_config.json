@@ -1,0 +1,86 @@
+{
+    "study": {
+        "name": "monet_nom",
+        "id": [
+            "nmdc:sty-11-srtxhh77"
+        ]
+    },
+    "workflow": {
+        "name": "monet_nom",
+        "file_type": ".d",
+        "file_filters": [
+            ""
+        ],
+        "processed_data_date_tag": "20260713",
+        "workflow_type": "DI FTICR NOM",
+        "batch_size": 30,
+        "use_child_studies": true,
+        "existing_file_paths": {
+            "protocol_outline": "/home/bmeluch/NMDC/nmdc-mass-spec-automation/workflows/monet_nom_metadata/protocol_info/llm_generated_protocol_outline.yaml",
+            "biosample_attributes": "/home/bmeluch/NMDC/nmdc-mass-spec-automation/workflows/monet_nom_metadata/metadata/biosample_attributes.csv",
+            "downloaded_files": "/home/bmeluch/NMDC/nmdc-mass-spec-automation/workflows/monet_nom_metadata/metadata/downloaded_files.csv",
+            "workflow_reference": "/home/bmeluch/NMDC/nmdc-mass-spec-automation/workflows/monet_nom_metadata/metadata/nmdc_submission_packages/material_processing_metadata_workflowreference.csv",
+            "biosample_mapper": "/home/bmeluch/NMDC/nmdc-mass-spec-automation/workflows/monet_nom_metadata/metadata/llm_biosample_raw_file_mapper.csv"
+        }
+    },
+    "paths": {
+        "base_directory": "/home/bmeluch/NMDC/nmdc-mass-spec-automation",
+        "data_directory": "/home/bmeluch/NMDC/nom_processing"
+    },
+    "docker": {
+        "raw_data_inspector_image": "microbiomedata/metams:3.3.3"
+    },
+    "minio": {
+        "endpoint": "admin.nmdcdemo.emsl.pnl.gov",
+        "secure": true,
+        "bucket": "nom"
+    },
+    "configurations": [
+        {
+            "name": "di_nom_bruker",
+            "file_filter": [
+                ".d"
+            ],
+            "corems_toml": "workflow_inputs/enviroms_nom_corems.toml",
+            "calibration_ref_file_path": "workflow_inputs/Hawkes_neg.ref",
+            "reference_db": "/path/to/database.msp",
+            "scan_translator": "/path/to/scan_translator.toml",
+            "cores": 5,
+            "instrument_used": "7T FT-ICR MS",
+            "mass_spec_configuration_name": "EMSL NOM full profile mass spectrometry, negative",
+            "instrument_instance_specifier": "SciMax01",
+            "metadata_overrides": {
+                "instrument_instance_specifier": {
+                    "_": "SciMax01"
+                }
+            }
+        }
+    ],
+    "metadata": {
+        "instrument_used": "7T FT-ICR MS",
+        "processing_institution_workflow": "NMDC",
+        "processing_institution_generation": "EMSL",
+        "mass_spec_configuration_name": "Mass Spec Configuration",
+        "use_massive_urls": false,
+        "serial_numbers_to_remove": [
+            "Unknown"
+        ],
+        "raw_data_location": "minio",
+        "instrument_instance_specifier": "SciMax01"
+    },
+    "skip_triggers": {
+        "study_structure_created": true,
+        "raw_data_downloaded": true,
+        "protocol_outline_created": true,
+        "biosample_attributes_fetched": true,
+        "biosample_mapping_completed": true,
+        "raw_data_inspected": true,
+        "material_processing_metadata_generated": true,
+        "metadata_mapping_generated": true,
+        "data_processed": true,
+        "processed_data_uploaded_to_minio": true,
+        "metadata_packages_generated": true,
+        "metadata_submitted_dev": true,
+        "metadata_submitted_prod": true
+    }
+}
