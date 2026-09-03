@@ -194,13 +194,33 @@ processing_steps:
         input_csv_content = "raw_data_identifier,biosample_id,biosample_name,match_confidence\ntest_file.raw,nmdc:bsm-11-test,Test Sample,high\n"
         with open(input_csv_path, "w") as f:
             f.write(input_csv_content)
-        
+
+        # Create mock biosample attributes CSV (required by production mode to
+        # look up which study each mapped biosample belongs to)
+        biosample_attributes_path = metadata_dir / "biosample_attributes.csv"
+        biosample_attributes_content = "id,associated_studies\nnmdc:bsm-11-test,['nmdc:sty-11-test']\n"
+        with open(biosample_attributes_path, "w") as f:
+            f.write(biosample_attributes_content)
+
+        # Create mock workflow reference CSV (production mode reads this back off
+        # disk after the mocked generator "runs", since the real generator would
+        # have written it as a side effect)
+        submission_packages_dir = metadata_dir / "nmdc_submission_packages"
+        submission_packages_dir.mkdir(parents=True, exist_ok=True)
+        workflow_reference_csv_path = submission_packages_dir / "material_processing_metadata_workflowreference.csv"
+        workflow_reference_content = "biosample_id,processed_sample_id\nnmdc:bsm-11-test,nmdc:procsm-11-test\n"
+        with open(workflow_reference_csv_path, "w") as f:
+            f.write(workflow_reference_content)
+
         # Add study_id to config
         manager.config["study"] = {"id": "nmdc:sty-11-test"}
         
         # Mock MaterialProcessingMetadataGenerator
         mock_generator_instance = MagicMock()
-        mock_generator_instance.run.return_value = {"test": "metadata"}
+        mock_generator_instance.run.return_value = {
+            "material_processing_set": [],
+            "processed_sample_set": [],
+        }
         mock_generator_instance.validate_nmdc_database.return_value = {"result": "All Okay!"}
         
         mock_generator_class = MagicMock(return_value=mock_generator_instance)
