@@ -275,3 +275,12 @@ processing_steps:
         
         assert result is False, "Should return False when input CSV is missing"
         assert manager.should_skip("material_processing_metadata_generated") is False
+
+    def test_reuse_material_processing_metadata(self, lcms_config_file, tmp_path):
+        """Test that reusing existing metadata sets skip trigger."""
+        from nmdc_dp_utils.workflow_manager import NMDCWorkflowManager
+        
+        manager = NMDCWorkflowManager(str(lcms_config_file))
+
+        # add existing file path to workflow config
+        manager.config["workflow"]["existing_file_paths"]["protocol_outline"] = str(tmp_path / "existing_metadata.json")
