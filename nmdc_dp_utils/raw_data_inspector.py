@@ -241,9 +241,9 @@ def get_dotd_file_info(parser, file_path: Path) -> dict:
     sp = transient.get_mass_spectrum(plot_result=False, auto_process=False)
     scan_types = "centroid" if sp.is_centroid else "profile"
 
-    instrument_model = "placeholder"
-    instrument_name = "placeholder"
-    serial_number = "placeholder"
+    instrument_model = ""
+    instrument_name = ""
+    serial_number = ""
 
     # ParseSampleInfo.xml using beautifulsoup (corems dependency so it should already be there) and extract the value for CreationDateTime
     sample_info_path = file_path / "SampleInfo.xml"

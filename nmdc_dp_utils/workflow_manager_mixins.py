@@ -19,10 +19,12 @@ from nmdc_dp_utils.llm.protocol_conversion.pipeline import get_llm_yaml_outline
 from nmdc_dp_utils.llm.llm_conversation_manager import ConversationManager
 from nmdc_dp_utils.llm.llm_client import LLMClient
 from nmdc_client.calibration_search import CalibrationSearch
+from nmdc_client.study_search import StudySearch
 from nmdc_client.api_client import get_api_base_url
 
 # Import workflow mapping defined in workflow_manager (defined before mixins import)
 from nmdc_ms_metadata_gen.metadata_generator import NMDCMetadataGenerator
+from nmdc_schema.nmdc import Database
 from nmdc_ms_metadata_gen.lcms_metab_metadata_generator import (
     LCMSMetabolomicsMetadataGenerator,
 )
@@ -793,9 +795,13 @@ class WorkflowDataMovementManager:
         )
 
         for file_path in tqdm(files_to_upload, desc="Uploading files"):
-            # Create object name preserving directory structure
-            relative_path = file_path.relative_to(local_path)
-            object_name = f"{folder_name}/{relative_path}"
+
+            if self.config['workflow']['workflow_type'] == "DI FTICR NOM":
+                object_name = f"{folder_name}/{file_path.name}"  # Use only filename for DI FTICR NOM
+            else:
+                # Create object name preserving directory structure
+                relative_path = file_path.relative_to(local_path)
+                object_name = f"{folder_name}/{relative_path}"
 
             try:
                 # Check if file already exists with same size
@@ -1331,6 +1337,7 @@ class NMDCWorkflowDataProcessManager:
 
                     # ALWAYS include calibration files (they are reference files, not samples to be processed)
                     if raw_file.name in calibration_files_set:
+                        print("Skipping calibration file from processed check:", raw_file.name)
                         unprocessed_files.append(raw_file)
                         continue
 
@@ -1345,12 +1352,21 @@ class NMDCWorkflowDataProcessManager:
                             if csv_files:
                                 continue  # Skip this file - already processed
 
-                    elif workflow_type == "GCMS Metabolomics" or workflow_type == "DI FTICR NOM":
-                        # GCMS or NOM: Check if corresponding CSV file exists directly in processed directory
+                    elif workflow_type == "GCMS Metabolomics":
+                        # GCMS: Check if corresponding CSV file exists directly in processed directory
                         csv_file = processed_path / f"{base_name}.csv"
 
                         if csv_file.exists() and csv_file.is_file():
                             continue  # Skip this file - already processed
+                    
+                    elif workflow_type == "DI FTICR NOM":
+                        # NOM: Check if a subfolder exists for this base name and contains CSV, JSON, or PNG files
+                        nom_subfolder = processed_path / base_name
+                        if nom_subfolder.exists() and nom_subfolder.is_dir():
+                            if (nom_subfolder / f"{base_name}.csv").exists() and \
+                                (nom_subfolder / f"{base_name}.json").exists() and \
+                                (nom_subfolder / f"{base_name}_qc.png").exists():
+                                continue  # Skip this file - already processed
 
                     # File is not processed or processing incomplete
                     unprocessed_files.append(raw_file)
@@ -1875,11 +1891,24 @@ class NMDCWorkflowDataProcessManager:
 
                     sub_batch_num = f"{calib_batch_num}.{sub_batch_idx + 1}"
                     print(f"Creating sub-batch {sub_batch_num} with {len(sub_batch_samples)} samples")
+                    # Error if no sample file paths have srfa in the string
+                    if not any("SRFA" in p for p in sub_batch_samples):
+                        raise ValueError(
+                            f"No SRFA file found in file list for {calibration_file} batch {sub_batch_num}. "
+                            f"At least one SRFA file is required for DI NOM workflow."
+                        )
+
                     create_wdl_json(sub_batch_samples, sub_batch_num)
 
                 x = num_sub_batches
             else:
                 # Generate single WDL JSON (batch size not exceeded)
+                # Error if no sample file paths have srfa in the string
+                if not any("SRFA" in p for p in sample_file_paths):
+                    raise ValueError(
+                        f"No SRFA file found in file list for calibration {calibration_file}. "
+                        f"At least one SRFA file is required for DI NOM workflow."
+                    )
                 create_wdl_json(sample_file_paths, calib_batch_num)
                 x = 1
         return x
@@ -2453,7 +2482,6 @@ class NMDCWorkflowBiosampleManager:
             This method is automatically skipped if biosample_attributes_fetched trigger is set.
         """
         from nmdc_client.biosample_search import BiosampleSearch
-        from nmdc_client.study_search import StudySearch
 
         if study_ids is None:
             study_ids = self.config["study"]["id"]
@@ -2491,7 +2519,7 @@ class NMDCWorkflowBiosampleManager:
                 biosamples = biosample_search.get_record_by_filter(
                     filter=f'{{"associated_studies":"{study_id}"}}',
                     max_page_size=1000,
-                    fields="id,name,samp_name,description,gold_biosample_identifiers,insdc_biosample_identifiers,submitter_id,analysis_type",
+                    fields="id,name,samp_name,description,gold_biosample_identifiers,insdc_biosample_identifiers,submitter_id,analysis_type,associated_studies",
                     all_pages=True,
                 )
                 if not biosamples:
@@ -3569,7 +3597,8 @@ class WorkflowMetadataManager:
             "instrument_serial_number"
         ].astype(str)
         file_info_df["instrument_analysis_end_date"] = pd.to_datetime(
-            file_info_df["write_time"]
+            file_info_df["write_time"],
+            utc=True
         ).dt.strftime("%Y-%m-%dT%H:%M:%SZ")
         file_info_df["raw_data_file_short"] = file_info_df["file_name"]
 
@@ -4299,7 +4328,7 @@ class WorkflowMetadataManager:
                 original_row_count = len(df)
 
                 # Merge with mapping to get processed_sample_id based on raw data filename
-                # Left merge to keep all rows from df, adding processed_sample_id column                
+                # Left merge to keep all rows from df, adding processed_sample_id column
                 df_merged = df.merge(
                     mapping_df,
                     left_on="raw_data_file_stem",
@@ -4737,6 +4766,10 @@ class WorkflowMetadataManager:
 
                     # Validate without API first (fast local validation)
                     self.logger.info(f"Validating {config_name} metadata (local, production mode)...")
+                    if "placeholder" in json.dumps(metadata).lower():
+                        self.logger.error(f"Metadata generation for {config_name} produced placeholder values. Check input CSV and configuration.")
+                        failed_files.append((csv_file.name, "Production mode metadata generation produced placeholder values"))
+                        continue
                     validate_local = generator.validate_nmdc_database(
                         json=metadata, use_api=False
                     )
@@ -5214,10 +5247,28 @@ class WorkflowMetadataManager:
             filtered_mapping_df.to_csv(filtered_input_csv_path, index=False)
 
             # Get study ID from config
-            study_id = self.config.get("study", {}).get("id")
-            if not study_id:
+            study_ids = self.config.get("study", {}).get("id")
+            if not study_ids:
                 self.logger.error("study_id not found in config['study']['id']")
                 return False
+            
+            # If study_id is a string, make it a list
+            if isinstance(study_ids, str):
+                study_ids = [study_ids]
+
+            # if using child studies, get all the child study IDs
+            if self.config.get("workflow", {}).get("use_child_studies", False):
+                study_searcher = StudySearch()
+                child_studies = []
+                for study_id in study_ids:
+                    child_study_ids = study_searcher.get_record_by_filter(
+                        filter=f'{{"part_of":"{study_id}"}}',
+                        max_page_size=1000,
+                        fields="id",
+                        all_pages=True,
+                    )
+                    child_studies.extend(child_study_ids)
+                study_ids = study_ids + [s["id"] for s in child_studies]
 
             # Outputs will be written into self.workflow_path / "metadata" / "nmdc_submission_packages"
             output_dir = self.workflow_path / "metadata" / "nmdc_submission_packages"
@@ -5227,9 +5278,10 @@ class WorkflowMetadataManager:
             # First attempt to generate and validate metadata in test mode 
             # Initialize MaterialProcessingMetadataGenerator in test mode
             # Note: Minting credentials are read from environment variables (CLIENT_ID, CLIENT_SECRET)
+            # Test mode does not depend on study id
             generator = MaterialProcessingMetadataGenerator(
                 database_dump_json_path=str(db_path),
-                study_id=study_id,
+                study_id=study_ids[0],  # Use first study ID for test mode since it doesn't mint real IDs
                 yaml_outline_path=str(yaml_path),
                 sample_to_dg_mapping_path=str(filtered_input_csv_path),
                 test=True,
@@ -5248,19 +5300,70 @@ class WorkflowMetadataManager:
                 return False
             
             # If test mode succeeded and test=False, run again in normal mode
+            # Note: Minting credentials are read from environment variables (CLIENT_ID, CLIENT_SECRET)
             if not test:
                 self.logger.info("Test mode succeeded, running MaterialProcessingMetadataGenerator in production mode...")
-                # Note: Minting credentials are read from environment variables (CLIENT_ID, CLIENT_SECRET)
-                generator = MaterialProcessingMetadataGenerator(
-                    database_dump_json_path=str(db_path),
-                    study_id=study_id,
-                    yaml_outline_path=str(yaml_path),
-                    sample_to_dg_mapping_path=str(filtered_input_csv_path),
-                    test=False,
-                )
-                # Run metadata generation
-                self.logger.info("Running MaterialProcessingMetadataGenerator in production mode...")
-                metadata = generator.run()
+                # Run metadata generation for each study_id in the list
+                # List should be one element if not using child studies
+                metadata = Database()
+                biosample_attributes = pd.read_csv(self.workflow_path / "metadata" / "biosample_attributes.csv")
+                biosample_attributes["associated_studies"] = biosample_attributes["associated_studies"].str.strip("[]").str.replace("'", "").str.split(", ")
+                biosample_attributes = biosample_attributes.explode("associated_studies")
+
+                workflow_reference_list = [None] * len(study_ids)
+                validation_list: list = [None] * len(study_ids)
+
+                for study_id in study_ids:
+                    print(study_id)
+                    # Read in filtered_input_csv
+                    temp_csv_path = filtered_input_csv_path.parent / f"temp_filtered_input.csv"
+                    f = pd.read_csv(filtered_input_csv_path)
+                    # Merge and retain only rows that have data
+                    f = f.merge(biosample_attributes, left_on="biosample_id", right_on="id", how="left", suffixes=("", "_attr"))
+                    # If no biosamples with data, skip metadata generation for this study
+                    if study_id not in f["associated_studies"].values:
+                        self.logger.warning(f"No biosamples found for study {study_id} in raw data mapper - skipping material processing metadata generation for this study")
+                        continue
+                    f = f[f["associated_studies"] == study_id]
+                    f.to_csv(temp_csv_path, index=False)
+
+                    generator = MaterialProcessingMetadataGenerator(
+                        database_dump_json_path=str(db_path),
+                        study_id=study_id,
+                        yaml_outline_path=str(yaml_path),
+                        sample_to_dg_mapping_path=str(temp_csv_path),
+                        test=False,
+                    )
+                    # Run metadata generation
+                    self.logger.info("Running MaterialProcessingMetadataGenerator in production mode...")
+                    m = generator.run()
+                    metadata.material_processing_set.extend(m['material_processing_set'])
+                    metadata.processed_sample_set.extend(m['processed_sample_set'])
+
+                    # Save generated material_processing_metadata_workflowreference.csv to a list of dataframes
+                    workflow_reference_csv_path = output_dir / "material_processing_metadata_workflowreference.csv"
+                    if workflow_reference_csv_path.exists():
+                        workflow_reference_list[study_ids.index(study_id)] = pd.read_csv(workflow_reference_csv_path)
+                    else:
+                        Exception(f"no workflowreference output for {study_id}")
+                    validation_txt_path = output_dir / "material_processing_metadata_validation.txt"
+                    if validation_txt_path.exists():
+                        with open(validation_txt_path, "r") as f:
+                            validation_list[study_ids.index(study_id)] = f.read()
+                
+                # Concatenate workflow reference CSVs and write to output
+                workflow_reference_df = pd.concat([df for df in workflow_reference_list if df is not None], ignore_index=True)
+                workflow_reference_df.to_csv(workflow_reference_csv_path, index=False)
+
+                # Concatenate validation txt files and write to output
+                with open(validation_txt_path, "w") as f:
+                    f.write(validation_list[0] if validation_list[0] is not None else "")
+                
+                # Delete temp filtered file
+                temp_csv_path.unlink()
+
+                # Overwrite json dump with compiled metadata
+                generator.dump_nmdc_database(nmdc_database = metadata, json_path = str(db_path))
 
                 # Validate generated metadata
                 self.logger.info("Validating generated metadata...")
