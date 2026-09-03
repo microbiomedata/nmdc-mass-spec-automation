@@ -23,7 +23,7 @@ def test_llm_client_initialization(monkeypatch):
     client = LLMClient()
 
     async_openai.assert_called_once_with(base_url="https://ai-incubator-api.pnnl.gov", api_key="test-key")
-    responses_model.assert_called_once_with(model="gemini-2.5-flash-project", openai_client="client")
+    responses_model.assert_called_once_with(model="claude-sonnet-4-6-project", openai_client="client")
     assert client.client == "client"
     assert client.model_object == "model"
     assert client.use_mcp is True

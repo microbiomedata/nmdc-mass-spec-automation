@@ -218,6 +218,20 @@ class NMDCWorkflowManager(
         """
         return self.config.get("skip_triggers", {}).get(trigger_name, False)
 
+    def skip_material_processing(self) -> bool:
+        """
+        Check whether this workflow is configured to skip all material processing steps.
+
+        When true, the workflow has no protocol/material-processing information and
+        the biosample mapping CSV, material-processing metadata generation, and
+        sample_id -> processed_sample_id substitution are all bypassed.
+
+        Returns:
+            True if workflow.skip_material_processing is set truthy in config,
+            False otherwise (default when the key is absent).
+        """
+        return bool(self.config.get("workflow", {}).get("skip_material_processing", False))
+
     def set_skip_trigger(self, trigger_name: str, value: bool, save: bool = True):
         """
         Set a skip trigger value and optionally save to config file.
@@ -489,20 +503,30 @@ class NMDCWorkflowManager(
         return protocol_info
     
     @skip_if_complete("protocol_outline_created", return_value=True)
-    async def generate_material_processing_yaml(self) -> str:
+    async def generate_material_processing_yaml(self) -> bool:
         """
         Generate material processing YAML using LLM.
 
         Returns
         -------
-        str
-            The generated material processing YAML.
+        bool
+            True if outline generation completed and was approved, False otherwise.
         """
+        if self.skip_material_processing():
+            self.logger.info(
+                "Skipping protocol outline generation (workflow.skip_material_processing=true)"
+            )
+            self.set_skip_trigger("protocol_outline_created", True)
+            return ""
+
+        # check if protocol examples that will be given to LLM are compliant with current schema
+        self.check_protocol_examples_compliance()
+
         # load protocol description into LLM conversation context
         self.load_protocol_description_to_context(
             protocol_description_path=self.workflow_path / "protocol_info" / "protocol_description.txt"
         )
-        
+
         # Generate protocol outline from LLM
         outline = await self.get_llm_generated_yaml_outline()
         output_path = self.workflow_path / "protocol_info" / "llm_generated_protocol_outline.yaml"
@@ -514,6 +538,9 @@ class NMDCWorkflowManager(
         approved_outline =  await self.request_approval("protocol outline")
         if approved_outline:
             self.set_skip_trigger("protocol_outline_created", True)
+            return True
+
+        return False
     
     @skip_if_complete("biosample_mapping_completed", return_value=True)
     async def generate_llm_biosample_mapping(self, max_iterations: int = 6) -> bool:
@@ -526,10 +553,16 @@ class NMDCWorkflowManager(
             True if mapping completed successfully, False otherwise
         """
         # Generate mapping from LLM
-        mapping_success = await self.get_llm_biosample_mapping(max_iterations=max_iterations)
+        mapping_success = await self.get_llm_biosample_mapping(
+            max_iterations=max_iterations,
+            skip_material_processing=self.skip_material_processing(),
+        )
 
         # Prompt user for approval if mappings generated
         if mapping_success:
             approved_outline =  await self.request_approval("biosample mapping")
             if approved_outline:
                 self.set_skip_trigger("biosample_mapping_completed", True)
+                return True
+
+        return False

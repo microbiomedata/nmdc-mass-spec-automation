@@ -1,0 +1,81 @@
+# .github/workflows/weekly-jobs.yml
+name: Weekly Jobs
+
+on:
+  schedule:
+    # Runs at 03:00 UTC every Monday
+    - cron: '0 3 * * 1'
+  workflow_dispatch:  # Optional: lets you run it manually from the Actions tab
+
+jobs:
+  weekly-task:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+    
+    - name: Set up Python 3.12
+      uses: actions/setup-python@a309ff8b426b58ec0e2a45f0f869d46889d02405 # v6.2.0
+      with:
+        python-version: 3.12
+    
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install -r requirements.txt
+
+    - name: Run weekly script
+      run: |
+        pytest tests/test_workflow_manager.py::TestNMDCWorkflowManager::test_check_protocol_examples_compliance -v --tb=short
+
+  report-failure:
+    needs: weekly-task
+    if: failure()             # runs if *any* needs-job failed
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read          # needed to read CODEOWNERS
+      issues: write           # needed to create issues
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+
+      - name: Get CODEOWNERS
+        id: codeowners
+        uses: SvanBoxel/codeowners-action@f9e9c6a1998e896bb0ca62402497a06cb58e2e5d
+        with: 
+          path: './.github/CODEOWNERS'
+
+      - name: Normalize assignees from CODEOWNERS JSON
+        id: assignees
+        run: |
+          # Raw JSON from basic mode, e.g. {"*":["@test1","@test2"]}
+          raw='${{ steps.codeowners.outputs.codeowners }}'
+
+          # Extract the array for the "*" rule, join with spaces: "@test1 @test2"
+          owners=$(echo "$raw" | jq -r '.["*"] | join(" ")')
+
+          # Strip '@' and convert spaces to commas: "test1,test2"
+          normalized=$(echo "$owners" | tr -d '@' | tr ' ' ',')
+
+          echo "normalized=$normalized" >> "$GITHUB_OUTPUT"
+
+      - name: Debug owners
+        run: echo "Owners ${CODEOWNERS}"
+        env:
+          CODEOWNERS: ${{ steps.codeowners.outputs.normalized }}
+
+      - name: Create issue body
+        run: |
+          echo "The scheduled check on LLM examples' schema compliance failed" > /tmp/issue-body.md
+          echo "" >> /tmp/issue-body.md
+          echo "**Workflow run:** https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}" >> /tmp/issue-body.md
+
+      - name: Create Issue
+        uses: peter-evans/create-issue-from-file@fca9117c27cdc29c6c4db3b86c48e4115a786710 # v6.0.0
+        with:
+          title: LLM Examples Failed Schema Compliance
+          content-filepath: /tmp/issue-body.md
+          labels: report, automated issue
+          assignees: ${{ steps.assignees.outputs.normalized }}

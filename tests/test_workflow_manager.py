@@ -261,20 +261,129 @@ processing_steps:
     def test_generate_material_processing_metadata_missing_input_csv(self, lcms_config_file, tmp_path):
         """Test that missing input CSV returns False."""
         from nmdc_dp_utils.workflow_manager import NMDCWorkflowManager
-        
+
         manager = NMDCWorkflowManager(str(lcms_config_file))
-        
+
         # Create YAML but not input CSV
         protocol_dir = manager.workflow_path / "protocol_info"
         protocol_dir.mkdir(parents=True, exist_ok=True)
         yaml_path = protocol_dir / "llm_generated_protocol_outline.yaml"
         with open(yaml_path, "w") as f:
             f.write("test: yaml")
-        
+
         result = manager.generate_material_processing_metadata(test=True)
-        
+
         assert result is False, "Should return False when input CSV is missing"
         assert manager.should_skip("material_processing_metadata_generated") is False
+
+    def test_skip_material_processing_accessor_defaults_false(self, lcms_config_file):
+        """Accessor returns False when workflow.skip_material_processing is absent."""
+        from nmdc_dp_utils.workflow_manager import NMDCWorkflowManager
+
+        manager = NMDCWorkflowManager(str(lcms_config_file))
+
+        # The lcms_config fixture does not set the flag.
+        assert manager.skip_material_processing() is False
+
+    def test_skip_material_processing_accessor_reads_flag(self, temp_config_dir, lcms_config):
+        """Accessor returns True when workflow.skip_material_processing is set."""
+        import json
+        from nmdc_dp_utils.workflow_manager import NMDCWorkflowManager
+
+        lcms_config["workflow"]["skip_material_processing"] = True
+        config_path = temp_config_dir / "config_skip_mp.json"
+        with open(config_path, "w") as f:
+            json.dump(lcms_config, f)
+
+        manager = NMDCWorkflowManager(str(config_path))
+        assert manager.skip_material_processing() is True
+
+    def test_generate_material_processing_yaml_noop_when_flag_true(self, temp_config_dir, lcms_config):
+        """generate_material_processing_yaml short-circuits without touching LLM or disk."""
+        import asyncio
+        import json
+        from nmdc_dp_utils.workflow_manager import NMDCWorkflowManager
+
+        lcms_config["workflow"]["skip_material_processing"] = True
+        # Reset the fixture's protocol_outline_created=True so the decorator does not
+        # short-circuit before our guard runs.
+        lcms_config["skip_triggers"] = {"protocol_outline_created": False}
+        config_path = temp_config_dir / "config_skip_mp_yaml.json"
+        with open(config_path, "w") as f:
+            json.dump(lcms_config, f)
+
+        manager = NMDCWorkflowManager(str(config_path))
+
+        # If the LLM path were entered, this attribute access would fail.
+        # The guard must early-return before any LLM interaction.
+        result = asyncio.run(manager.generate_material_processing_yaml())
+
+        assert result == ""
+        assert manager.should_skip("protocol_outline_created") is True
+        yaml_path = manager.workflow_path / "protocol_info" / "llm_generated_protocol_outline.yaml"
+        assert not yaml_path.exists()
+
+    def test_save_yaml_to_file_strips_prose_and_markdown_fence(self, lcms_config_file, tmp_path):
+        """LLM final answers often prefix prose + ```yaml; save pure YAML only."""
+        from nmdc_dp_utils.workflow_manager import NMDCWorkflowManager
+
+        manager = NMDCWorkflowManager(str(lcms_config_file))
+        out = tmp_path / "outline.yaml"
+        body = "gcms_metabolomics:\n  steps:\n  - Step 1_gcms_metabolomics: {}\n"
+        content = (
+            "The YAML passed validation with no errors. "
+            "Here is the final, validated YAML outline:\n\n"
+            f"```yaml\n{body}```"
+        )
+
+        manager.save_yaml_to_file(output_path=str(out), content=content)
+
+        written = out.read_text()
+        assert written.startswith("gcms_metabolomics:")
+        assert "passed validation" not in written
+        assert "```" not in written
+        assert written == body.strip()
+
+    def test_save_yaml_to_file_preserves_pure_yaml(self, lcms_config_file, tmp_path):
+        """Already-clean YAML is written unchanged (aside from strip)."""
+        from nmdc_dp_utils.workflow_manager import NMDCWorkflowManager
+
+        manager = NMDCWorkflowManager(str(lcms_config_file))
+        out = tmp_path / "outline.yaml"
+        body = "polar_metabolites:\n  steps:\n  - Step 1_polar_metabolites: {}\n"
+
+        manager.save_yaml_to_file(output_path=str(out), content=body)
+
+        assert out.read_text() == body.strip()
+
+    def test_generate_material_processing_metadata_noop_when_flag_true(self, temp_config_dir, lcms_config):
+        """generate_material_processing_metadata short-circuits without requiring inputs."""
+        import json
+        from nmdc_dp_utils.workflow_manager import NMDCWorkflowManager
+
+        lcms_config["workflow"]["skip_material_processing"] = True
+        # Ensure the decorator does not short-circuit before our guard runs.
+        lcms_config["skip_triggers"] = {"material_processing_metadata_generated": False}
+        config_path = temp_config_dir / "config_skip_mp_metadata.json"
+        with open(config_path, "w") as f:
+            json.dump(lcms_config, f)
+
+        manager = NMDCWorkflowManager(str(config_path))
+
+        # No YAML or input CSV on disk — guard must skip file checks.
+        result = manager.generate_material_processing_metadata(test=True)
+
+        assert result is True
+        assert manager.should_skip("material_processing_metadata_generated") is True
+
+    def test_check_protocol_examples_compliance(self):
+        from nmdc_dp_utils.workflow_manager_mixins import LLMWorkflowManagerMixin
+
+        with patch.dict(
+            "os.environ",
+            {"CLIENT_ID": "test-client-id", "CLIENT_SECRET": "test-client-secret"},
+        ):
+            LLMWorkflowManagerMixin.check_protocol_examples_compliance()
 
     def test_reuse_material_processing_metadata(self, lcms_config_file, tmp_path):
         """Test that reusing existing metadata sets skip trigger."""

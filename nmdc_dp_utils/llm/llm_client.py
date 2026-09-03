@@ -34,7 +34,7 @@ class LLMClient():
             Tool filter for MCP server. Defaults to None (no filtering).
         """
         API_KEY = os.getenv("AI_INCUBATOR_API_KEY")
-        self.model_name = "gemini-2.5-flash-project"
+        self.model_name = "claude-sonnet-4-6-project"
         self.base_url = "https://ai-incubator-api.pnnl.gov"
         client = AsyncOpenAI(base_url=self.base_url, api_key=API_KEY)
         self.client = client

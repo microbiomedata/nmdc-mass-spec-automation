@@ -564,7 +564,7 @@ class WorkflowDataMovementManager:
                 continue
 
             try:
-                self._download_file_wget(ftp_location, download_path)
+                self._download_file_ftps(ftp_location, download_path)
                 downloaded_files.append(download_path)
                 tqdm.write(f"Downloaded {file_name}")
             except Exception as e:
@@ -603,27 +603,62 @@ class WorkflowDataMovementManager:
 
         return True
 
-    def _download_file_wget(self, ftp_location: str, download_path: str):
+    def _download_file_ftps(self, ftp_location: str, download_path: str):
         """
-        Download a single file using Python's urllib.
+        Download a single file over explicit FTPS.
+
+        MASSIVE requires FTPS (server responds "421 TLS is required" to plain
+        FTP), so this uses ftplib.FTP_TLS with prot_p rather than urllib —
+        urllib's ftp handler does not support TLS.
 
         Args:
-            ftp_location: FTP URL of the file to download
+            ftp_location: FTP URL of the file to download (ftp://host/path/file)
             download_path: Local path where the file should be saved
 
         Raises:
             RuntimeError: If the download fails for any reason
         """
-        import urllib.request
-        import urllib.error
+        import ftplib
+        from urllib.parse import urlparse, unquote
 
+        parsed = urlparse(ftp_location)
+        if parsed.scheme not in ("ftp", "ftps") or not parsed.hostname:
+            raise RuntimeError(f"Invalid FTP URL: {ftp_location}")
+
+        host = parsed.hostname
+        # Collapse any accidental double slashes in the path (crawler emits some)
+        remote_path = re.sub(r"/+", "/", unquote(parsed.path))
+        remote_dir, _, remote_file = remote_path.rpartition("/")
+        if not remote_file:
+            raise RuntimeError(f"Could not parse filename from URL: {ftp_location}")
+
+        tmp_path = download_path + ".part"
         try:
-            # Download the file using urllib
-            urllib.request.urlretrieve(ftp_location, download_path)
-        except urllib.error.URLError as e:
-            raise RuntimeError(f"Failed to download {ftp_location}: {e}")
+            ftp = ftplib.FTP_TLS(host, timeout=120)
+            try:
+                ftp.login()  # Anonymous
+                ftp.prot_p()
+                if remote_dir:
+                    ftp.cwd(remote_dir)
+                with open(tmp_path, "wb") as f:
+                    ftp.retrbinary(f"RETR {remote_file}", f.write)
+            finally:
+                try:
+                    ftp.quit()
+                except Exception:
+                    ftp.close()
+            os.replace(tmp_path, download_path)
         except Exception as e:
-            raise RuntimeError(f"Unexpected error downloading {ftp_location}: {e}")
+            if os.path.exists(tmp_path):
+                try:
+                    os.remove(tmp_path)
+                except OSError:
+                    pass
+            raise RuntimeError(f"Failed to download {ftp_location}: {e}")
+
+    def _download_file_wget(self, ftp_location: str, download_path: str):
+        """Deprecated alias — kept for backwards compatibility. Use _download_file_ftps."""
+        return self._download_file_ftps(ftp_location, download_path)
 
     def _parse_ftp_file(self, lines: List[str]) -> pd.DataFrame:
         """
@@ -4081,9 +4116,15 @@ class WorkflowMetadataManager:
             if success:
                 success = self._add_associated_studies_to_metadata_csvs()
 
-            # Replace biosample_id (sample_id) with processed_sample_id from material processing metadata
+            # Replace biosample_id (sample_id) with processed_sample_id from material processing metadata.
+            # Skip when the workflow has no material processing: sample_id stays as biosample_id.
             if success:
-                success = self._update_sample_ids_to_processed_sample_ids()
+                if self.skip_material_processing():
+                    self.logger.info(
+                        "Skipping sample_id -> processed_sample_id substitution (workflow.skip_material_processing=true)"
+                    )
+                else:
+                    success = self._update_sample_ids_to_processed_sample_ids()
             
             if success:
                 self.set_skip_trigger("metadata_mapping_generated", True)
@@ -5150,6 +5191,13 @@ class WorkflowMetadataManager:
             >>> # Later run with real ID minting
             >>> success = manager.generate_material_processing_metadata(test=False)
         """
+        if self.skip_material_processing():
+            self.logger.info(
+                "Skipping material processing metadata generation (workflow.skip_material_processing=true)"
+            )
+            self.set_skip_trigger("material_processing_metadata_generated", True)
+            return True
+
         self.logger.info("Generating material processing metadata...")
 
         try:
@@ -5509,7 +5557,43 @@ class LLMWorkflowManagerMixin:
         if self._conversation_obj is None:
             self._conversation_obj = ConversationManager(interaction_type=self._interaction_type)
         return self._conversation_obj
-        
+
+    @staticmethod
+    def check_protocol_examples_compliance() -> None:
+        """
+        Check if the protocol examples provided to the LLM are compliant with the current schema.
+
+        Raises:
+            ValueError: If any of the protocol examples are not compliant with the schema.
+        """
+        import logging
+        from nmdc_ms_metadata_gen.validate_yaml_outline import validate_yaml_outline
+
+        root_logger = logging.getLogger()
+        original_level = root_logger.level
+        try:
+            # Temporarily suppress error logging
+            # so 'Validation Passed!' messages don't clutter the output
+            root_logger.setLevel(logging.WARNING)
+            non_compliant_examples = []
+            dirs = ["nmdc_dp_utils/llm/examples/example_1", "nmdc_dp_utils/llm/examples/example_2", "nmdc_dp_utils/llm/examples/example_3", "nmdc_dp_utils/llm/examples/example_4", "nmdc_dp_utils/llm/examples/example_5", "nmdc_dp_utils/llm/examples/example_6", "nmdc_dp_utils/llm/examples/example_7"]
+            for dir in dirs:
+                all_protocols = validate_yaml_outline(f"{dir}/combined_outline.yaml", test=True)
+                for protocol in all_protocols:
+                    if protocol['result'].lower() != "all okay!":
+                        non_compliant_examples.append(dir)
+        finally:
+            # Restore original logging level
+            root_logger.setLevel(original_level)
+
+        if non_compliant_examples:
+            error_message = (
+                "The following protocol examples are not compliant with the current schema:\n"
+                + "\n".join(str(example) for example in non_compliant_examples)
+            )
+            logging.getLogger(__name__).error(error_message)
+            raise ValueError(error_message)
+
     def load_protocol_description_to_context(self, protocol_description_path: str) -> None:
         """
         Load protocol description from a text file to the LLM conversation context.
@@ -5536,16 +5620,29 @@ class LLMWorkflowManagerMixin:
         output_path : str
             Path to the output file.
         content : str
-            Content to be saved to the file.
+            Content to be saved to the file. May be pure YAML or an LLM
+            response that wraps YAML in a markdown fence (with optional prose).
 
         Returns
         -------
         None
         """
-        if content.startswith("```yaml"):
-            content = content.replace("```yaml", "").strip()
-        if content.endswith("```"):
-            content = content[:-3].strip()
+        content = (content or "").strip()
+        # Extract YAML from between markdown fences even when the model
+        # adds prose before/after
+        # (e.g. "The YAML passed validation...\n\n```yaml\n...").
+        fence = re.search(r"```(?:yaml)?\s*\n", content, flags=re.IGNORECASE)
+        if fence:
+            # Find the closing fence after the opening fence
+            closing_fence = re.search(r"\n```", content[fence.end():])
+            if closing_fence:
+                # Extract content between the fences
+                content = content[fence.end(): fence.end() + closing_fence.start()].strip()
+            else:
+                self.logger.warning("Closing markdown fence not found; saving entire content as-is")
+        else:
+            self.logger.warning("Markdown fence not found; saving entire content as-is")
+
 
         # Ensure the parent directory exists before writing
         output_path_obj = Path(output_path)
@@ -5603,12 +5700,13 @@ class LLMWorkflowManagerMixin:
         return True
 
     async def get_llm_biosample_mapping(
-        self, 
-        max_iterations: int = 6
+        self,
+        max_iterations: int = 6,
+        skip_material_processing: bool = False,
     ) -> bool:
         """
         Get biosample mapping using LLM code generation approach.
-        
+
         This method:
         1. Creates a new conversation context for biosample mapping
         2. Loads study data (biosamples, raw files, material processing YAML)
@@ -5616,12 +5714,16 @@ class LLMWorkflowManagerMixin:
         4. Asks LLM to generate a Python mapping script
         5. Executes and validates the script
         6. Iteratively fixes errors until validation passes
-        
+
         Parameters
         ----------
         max_iterations : int
             Maximum number of fix iterations (default: 6)
-        
+        skip_material_processing : bool
+            When True, the pipeline skips loading the material-processing YAML
+            and produces a four-column mapping CSV (no processedsample or
+            protocol columns). Default: False.
+
         Returns
         -------
         bool
@@ -5632,21 +5734,34 @@ class LLMWorkflowManagerMixin:
             get_llm_generated_script,
             validate_and_fix_script
         )
-        
+
+        # Switch LLM interaction context to biosample_mapping.
+        if self._interaction_type != "biosample_mapping":
+            self._interaction_type = "biosample_mapping"
+            self._llm_client = None
+            self._conversation_obj = None
+
         # Define file paths
         biosample_path = str(self.workflow_path / "metadata" / "biosample_attributes.csv")
-        raw_files_path = self.workflow_path / "metadata" / "downloaded_files.csv"        
-        yaml_path = str(self.workflow_path / "protocol_info" / "llm_generated_protocol_outline.yaml")
+        raw_files_path = self.workflow_path / "metadata" / "downloaded_files.csv"
+        yaml_path = (
+            None
+            if skip_material_processing
+            else str(self.workflow_path / "protocol_info" / "llm_generated_protocol_outline.yaml")
+        )
 
-        # Check that biosample_path, raw_files_path, and yaml_path exist before proceeding
-        if not Path(biosample_path).exists() or not Path(raw_files_path).exists() or not Path(yaml_path).exists():
+        # Check that biosample_path and raw_files_path (and yaml_path when in scope) exist before proceeding
+        missing = []
+        if not Path(biosample_path).exists():
+            missing.append(f" - Biosample attributes file missing: {biosample_path}")
+        if not Path(raw_files_path).exists():
+            missing.append(f" - Downloaded files metadata missing: {raw_files_path}")
+        if not skip_material_processing and not Path(yaml_path).exists():
+            missing.append(f" - Material processing YAML missing: {yaml_path}")
+        if missing:
             self.logger.error("Required files for biosample mapping not found:")
-            if not Path(biosample_path).exists():
-                self.logger.error(f" - Biosample attributes file missing: {biosample_path}")
-            if not Path(raw_files_path).exists():
-                self.logger.error(f" - Downloaded files metadata missing: {raw_files_path}")
-            if not Path(yaml_path).exists():
-                self.logger.error(f" - Material processing YAML missing: {yaml_path}")
+            for msg in missing:
+                self.logger.error(msg)
             return False
 
         output_path = str(self.workflow_path / "metadata" / "llm_biosample_raw_file_mapper.csv")
@@ -5659,6 +5774,30 @@ class LLMWorkflowManagerMixin:
             additional_context_path = str(default_context_path)
             self.logger.info(f"Using additional context file for biosample mapping: {additional_context_path}")
 
+        # Auto-discover supplementary tabular metadata (e.g., a lab processing
+        # book that ties filename tokens to biosample names). Any CSV/TSV under
+        # metadata/ that isn't a pipeline-owned file is exposed to the LLM.
+        reserved_metadata_names = {
+            "biosample_attributes.csv",
+            "downloaded_files.csv",
+            "llm_biosample_raw_file_mapper.csv",
+            "llm_biosample_raw_file_mapper_unmapped_files.txt",
+            "mapped_raw_files.csv",
+            "biosample_mapping_for_mp_metadata_generation.csv",
+        }
+        supplementary_metadata_paths = sorted(
+            str(p)
+            for p in (self.workflow_path / "metadata").glob("*")
+            if p.is_file()
+            and p.suffix.lower() in {".csv", ".tsv"}
+            and p.name not in reserved_metadata_names
+        )
+        if supplementary_metadata_paths:
+            self.logger.info(
+                f"Using {len(supplementary_metadata_paths)} supplementary metadata file(s) "
+                f"for biosample mapping: {supplementary_metadata_paths}"
+            )
+
         # Add study data to conversation context
         self.logger.info("Loading study data into conversation context...")
         await add_study_data_to_conversation(
@@ -5666,9 +5805,11 @@ class LLMWorkflowManagerMixin:
             biosample_attributes_path=biosample_path,
             raw_files_path=raw_files_path,
             material_processing_yaml_path=yaml_path,
-            additional_context_path=additional_context_path
+            additional_context_path=additional_context_path,
+            skip_material_processing=skip_material_processing,
+            supplementary_metadata_paths=supplementary_metadata_paths,
         )
-        
+
         # Generate mapping script
         self.logger.info("Generating biosample mapping script using LLM...")
         try:
@@ -5678,7 +5819,9 @@ class LLMWorkflowManagerMixin:
                 biosample_path=biosample_path,
                 files_path=raw_files_path,
                 yaml_path=yaml_path,
-                output_path=output_path
+                output_path=output_path,
+                skip_material_processing=skip_material_processing,
+                supplementary_file_paths=supplementary_metadata_paths,
             )
             
             # Clean up markdown if present
@@ -5724,7 +5867,8 @@ class LLMWorkflowManagerMixin:
                 biosample_path=biosample_path,
                 files_path=raw_files_path,
                 yaml_path=yaml_path,
-                max_iterations=max_iterations
+                max_iterations=max_iterations,
+                skip_material_processing=skip_material_processing,
             )
             
             if success:
