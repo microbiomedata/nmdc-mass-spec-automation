@@ -385,11 +385,81 @@ processing_steps:
         ):
             LLMWorkflowManagerMixin.check_protocol_examples_compliance()
 
+
     def test_reuse_material_processing_metadata(self, lcms_config_file, tmp_path):
-        """Test that reusing existing metadata sets skip trigger."""
+        """Test that reusing existing metadata creates expected symlinks and sets skip triggers."""
         from nmdc_dp_utils.workflow_manager import NMDCWorkflowManager
-        
+
         manager = NMDCWorkflowManager(str(lcms_config_file))
 
-        # add existing file path to workflow config
-        manager.config["workflow"]["existing_file_paths"]["protocol_outline"] = str(tmp_path / "existing_metadata.json")
+        # Create the existing files that will be reused. Their names must match
+        # what create_workflow_structure expects for each key, or it raises ValueError.
+        existing_protocol_outline = tmp_path / "llm_generated_protocol_outline.yaml"
+        existing_protocol_outline.write_text("processing_steps: []\n")
+        existing_biosample_attributes = tmp_path / "biosample_attributes.csv"
+        existing_biosample_attributes.write_text("biosample_id,attribute\n")
+
+        # Add existing file paths to workflow config.
+        # Use existing material processing outline and biosample attributes
+        manager.config["workflow"]["existing_file_paths"] = {}
+        manager.config["workflow"]["existing_file_paths"]["protocol_outline"] = str(existing_protocol_outline)
+        manager.config["workflow"]["existing_file_paths"]["biosample_attributes"] = str(existing_biosample_attributes)
+
+        result = manager.create_workflow_structure()
+
+        assert result is True
+
+        # Verify symlinks were created in the expected locations, pointing to the existing files
+        outline_symlink = manager.workflow_path / "protocol_info" / "llm_generated_protocol_outline.yaml"
+        biosample_symlink = manager.workflow_path / "metadata" / "biosample_attributes.csv"
+
+        assert outline_symlink.is_symlink()
+        assert outline_symlink.resolve() == existing_protocol_outline.resolve()
+        assert biosample_symlink.is_symlink()
+        assert biosample_symlink.resolve() == existing_biosample_attributes.resolve()
+
+        # Verify the corresponding skip triggers were set
+        assert manager.should_skip("protocol_outline_created") is True
+        assert manager.should_skip("biosample_attributes_fetched") is True
+
+        # No existing paths were provided for these, so no symlinks/triggers should result
+        assert not (manager.workflow_path / "metadata" / "downloaded_files.csv").exists()
+        assert manager.should_skip("raw_data_downloaded") is False
+        assert manager.should_skip("material_processing_metadata_generated") is False
+        assert manager.should_skip("biosample_mapping_completed") is False
+
+    def test_reuse_material_processing_metadata_missing_file(self, lcms_config_file, tmp_path):
+        """A configured existing_file_paths entry pointing to a nonexistent file fails structure creation."""
+        from nmdc_dp_utils.workflow_manager import NMDCWorkflowManager
+
+        manager = NMDCWorkflowManager(str(lcms_config_file))
+
+        manager.config["workflow"]["existing_file_paths"] = {
+            "protocol_outline": str(tmp_path / "llm_generated_protocol_outline.yaml")
+        }
+
+        # create_workflow_structure catches internal errors and returns False rather
+        # than propagating, so no symlink should be created either.
+        result = manager.create_workflow_structure()
+
+        assert result is False
+        outline_symlink = manager.workflow_path / "protocol_info" / "llm_generated_protocol_outline.yaml"
+        assert not outline_symlink.exists()
+
+    def test_reuse_material_processing_metadata_wrong_filename(self, lcms_config_file, tmp_path):
+        """A configured existing_file_paths entry with an unexpected filename fails structure creation."""
+        from nmdc_dp_utils.workflow_manager import NMDCWorkflowManager
+
+        manager = NMDCWorkflowManager(str(lcms_config_file))
+
+        wrong_name_file = tmp_path / "not_the_expected_name.yaml"
+        wrong_name_file.write_text("processing_steps: []\n")
+        manager.config["workflow"]["existing_file_paths"] = {
+            "protocol_outline": str(wrong_name_file)
+        }
+
+        result = manager.create_workflow_structure()
+
+        assert result is False
+        outline_symlink = manager.workflow_path / "protocol_info" / "llm_generated_protocol_outline.yaml"
+        assert not outline_symlink.exists()
