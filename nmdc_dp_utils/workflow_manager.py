@@ -346,6 +346,43 @@ class NMDCWorkflowManager(
             for directory in directories:
                 directory.mkdir(parents=True, exist_ok=True)
 
+            # If existing files are provided (for reusing generated metadata), create symlinks to preserve workflow structure
+            if self.config['workflow']['existing_file_paths']:
+                symlinks_to_create: dict = {}
+                symlinks_to_create['material_processing_outline'] = [self.config['workflow']['existing_file_paths'].get('protocol_outline', None), "llm_generated_protocol_outline.yaml", "protocol_info", "protocol_outline_created"]
+                symlinks_to_create['biosample_attributes'] = [self.config['workflow']['existing_file_paths'].get('biosample_attributes', None), "biosample_attributes.csv", "metadata", "biosample_attributes_fetched"]
+                symlinks_to_create['downloaded_files'] = [self.config['workflow']['existing_file_paths'].get('downloaded_files', None), "downloaded_files.csv", "metadata", "raw_data_downloaded"]
+                symlinks_to_create['workflow_reference'] = [self.config['workflow']['existing_file_paths'].get('workflow_reference', None), "material_processing_metadata_workflowreference.csv", "metadata/nmdc_submission_packages/", "material_processing_metadata_generated"]
+                symlinks_to_create['biosample_mapper'] = [self.config['workflow']['existing_file_paths'].get('biosample_mapper', None), "llm_biosample_raw_file_mapper.csv", "metadata", "biosample_mapping_completed"]
+
+                for key, (existing_path_str, expected_name, folder_name, trigger_name) in symlinks_to_create.items():
+                    if existing_path_str:
+                        existing_path = Path(existing_path_str)
+                        # Confirm the existing path exists and is to the expected file type before creating the symlink
+                        if not existing_path.exists():
+                            self.logger.error(f"Existing {key} path does not exist: {existing_path}")
+                            raise FileNotFoundError(f"Existing {key} path not found")
+                        else:
+                            self.logger.info(f"Existing {key} path found: {existing_path}")
+
+                        if existing_path.name != expected_name:
+                            self.logger.error(f"Existing {key} path must be to a '{expected_name}' file - got {existing_path.name}")
+                            raise ValueError(f"Invalid existing {key} path")
+                    
+                        # Create symlink in folder
+                        symlink_path = self.workflow_path / folder_name / expected_name
+                        if symlink_path.exists():
+                            symlink_path.unlink()
+                        symlink_path.parent.mkdir(parents=True, exist_ok=True)
+                        symlink_path.symlink_to(existing_path.resolve())
+                        self.logger.info(f"Symlinked existing {existing_path_str} from {existing_path} to {symlink_path}")
+
+                        # Set trigger
+                        self.set_skip_trigger(trigger_name, True)
+                    else:
+                        self.logger.info(f"No existing {key} path provided in config")
+                        continue
+
             self.logger.info(
                 f"Created study structure for {self.workflow_name} at {self.workflow_path}"
             )
