@@ -1,0 +1,859 @@
+weom_extraction:
+  steps:
+    - Step 1_weom_extraction:
+        SubSamplingProcess:
+          id: # nmdc:subspr-{shoulder}-{blade}
+          type: nmdc:SubSamplingProcess
+          name: Subsample soil for WEOM
+          description: A portion of field moist soil being taken from <Biosample> for water extraction.
+          has_input:
+            - Biosample
+          has_output:
+            - ProcessedSample1_weom_extraction
+            - ProcessedSample2_weom_extraction
+            - ProcessedSample3_weom_extraction
+          processing_institution: EMSL
+          mass:
+            type: nmdc:QuantityValue
+            has_raw_value: 6 g
+            has_unit: g
+            has_numeric_value: 6
+    - Step 2_weom_extraction:
+        Extraction:
+          id: # nmdc:extrp-{shoulder}-{blade}
+          type: nmdc:Extraction
+          name: Water Extraction for WEOM
+          description: Shaking <ProcessedSample1_weom_extraction> with MilliQ deionized water, followed by centrifugation to collect supernatant for WEOM.
+          has_input:
+            - ProcessedSample1_weom_extraction
+          has_output:
+            - ProcessedSample4_weom_extraction
+          processing_institution: EMSL
+          extraction_targets:
+            - natural organic matter
+          input_mass:
+            type: nmdc:QuantityValue
+            has_raw_value: 6 g
+            has_unit: g
+            has_numeric_value: 6
+          substances_used:
+            - type: nmdc:PortionOfSubstance
+              known_as: water
+              substance_role: solvent
+              volume:
+                type: nmdc:QuantityValue
+                has_raw_value: 30 mL
+                has_unit: mL
+                has_numeric_value: 30
+    - Step 3_weom_extraction:
+        Extraction:
+          id: # nmdc:extrp-{shoulder}-{blade}
+          type: nmdc:Extraction
+          name: Water Extraction for WEOM
+          description: Shaking <ProcessedSample2_weom_extraction> with MilliQ deionized water, followed by centrifugation to collect supernatant for WEOM.
+          has_input:
+            - ProcessedSample2_weom_extraction
+          has_output:
+            - ProcessedSample5_weom_extraction
+          processing_institution: EMSL
+          extraction_targets:
+            - natural organic matter
+          input_mass:
+            type: nmdc:QuantityValue
+            has_raw_value: 6 g
+            has_unit: g
+            has_numeric_value: 6
+          substances_used:
+            - type: nmdc:PortionOfSubstance
+              known_as: water
+              substance_role: solvent
+              volume:
+                type: nmdc:QuantityValue
+                has_raw_value: 30 mL
+                has_unit: mL
+                has_numeric_value: 30
+    - Step 4_weom_extraction:
+        Extraction:
+          id: # nmdc:extrp-{shoulder}-{blade}
+          type: nmdc:Extraction
+          name: Water Extraction for WEOM
+          description: Shaking <ProcessedSample3_weom_extraction> with MilliQ deionized water, followed by centrifugation to collect supernatant for WEOM.
+          has_input:
+            - ProcessedSample3_weom_extraction
+          has_output:
+            - ProcessedSample6_weom_extraction
+          processing_institution: EMSL
+          extraction_targets:
+            - natural organic matter
+          input_mass:
+            type: nmdc:QuantityValue
+            has_raw_value: 6 g
+            has_unit: g
+            has_numeric_value: 6
+          substances_used:
+            - type: nmdc:PortionOfSubstance
+              known_as: water
+              substance_role: solvent
+              volume:
+                type: nmdc:QuantityValue
+                has_raw_value: 30 mL
+                has_unit: mL
+                has_numeric_value: 30
+
+    - Step 5_weom_extraction:
+        ChromatographicSeparationProcess:
+          id: # nmdc:cspro-{shoulder}-{blade}
+          type: nmdc:ChromatographicSeparationProcess
+          name: SPE for WEOM
+          description: Solid phase extraction of water-extractable organic matter from <ProcessedSample4_weom_extraction>.
+          has_input:
+            - ProcessedSample4_weom_extraction
+          has_output:
+            - ProcessedSample7_weom_extraction
+          processing_institution: EMSL
+          protocol_link:
+            name: "Dittmar et al., 2008"
+            url: "https://doi.org/10.4319/lom.2008.6.230"
+            type: nmdc:Protocol
+          chromatographic_category: solid_phase_extraction
+          ordered_mobile_phases:
+            - type: nmdc:MobilePhaseSegment # Activation
+              substances_used:
+                - type: nmdc:PortionOfSubstance
+                  known_as: methanol
+                  volume:
+                    type: nmdc:QuantityValue
+                    has_raw_value: 3 mL
+                    has_unit: mL
+                    has_numeric_value: 3
+            - type: nmdc:MobilePhaseSegment # Conditioning
+              substances_used:
+                - type: nmdc:PortionOfSubstance
+                  known_as: hydrochloric_acid
+                  substance_role: acid
+                  source_concentration:
+                    type: nmdc:QuantityValue
+                    has_raw_value: 0.01 mmol/L
+                    has_unit: mmol/L
+                    has_numeric_value: 0.01
+                  volume:
+                    type: nmdc:QuantityValue
+                    has_raw_value: 5 mL
+                    has_unit: mL
+                    has_numeric_value: 5
+            - type: nmdc:MobilePhaseSegment # Sample Loading (acidified)
+              substances_used:
+                - type: nmdc:PortionOfSubstance
+                  known_as: water # representing the sample itself
+                  substance_role: solvent
+                  volume:
+                    type: nmdc:QuantityValue
+                    has_raw_value: 15 mL
+                    has_unit: mL
+                    has_numeric_value: 15
+                - type: nmdc:PortionOfSubstance # HCl used for acidification of the sample before loading
+                  known_as: hydrochloric_acid
+                  substance_role: acid
+                  source_concentration:
+                    type: nmdc:QuantityValue
+                    has_raw_value: 37 %
+                    has_unit: '%'
+                    has_numeric_value: 37
+            - type: nmdc:MobilePhaseSegment # Washing
+              substances_used:
+                - type: nmdc:PortionOfSubstance
+                  known_as: hydrochloric_acid
+                  substance_role: acid
+                  source_concentration:
+                    type: nmdc:QuantityValue
+                    has_raw_value: 0.01 mmol/L
+                    has_unit: mmol/L
+                    has_numeric_value: 0.01
+                  volume:
+                    type: nmdc:QuantityValue
+                    has_raw_value: 50 mL
+                    has_unit: mL
+                    has_numeric_value: 50
+            - type: nmdc:MobilePhaseSegment # Elution
+              substances_used:
+                - type: nmdc:PortionOfSubstance
+                  known_as: methanol
+                  substance_role: solvent
+                  volume:
+                    type: nmdc:QuantityValue
+                    has_raw_value: 1.5 mL
+                    has_unit: mL
+                    has_numeric_value: 1.5
+          stationary_phase: PS-
+
+    - Step 6_weom_extraction:
+        ChromatographicSeparationProcess:
+          id: # nmdc:cspro-{shoulder}-{blade}
+          type: nmdc:ChromatographicSeparationProcess
+          name: SPE for WEOM
+          description: Solid phase extraction of water-extractable organic matter from <ProcessedSample5_weom_extraction>.
+          has_input:
+            - ProcessedSample5_weom_extraction
+          has_output:
+            - ProcessedSample8_weom_extraction
+          processing_institution: EMSL
+          protocol_link:
+            name: "Dittmar et al., 2008"
+            url: "https://doi.org/10.4319/lom.2008.6.230"
+            type: nmdc:Protocol
+          chromatographic_category: solid_phase_extraction
+          ordered_mobile_phases:
+            - type: nmdc:MobilePhaseSegment # Activation
+              substances_used:
+                - type: nmdc:PortionOfSubstance
+                  known_as: methanol
+                  volume:
+                    type: nmdc:QuantityValue
+                    has_raw_value: 3 mL
+                    has_unit: mL
+                    has_numeric_value: 3
+            - type: nmdc:MobilePhaseSegment # Conditioning
+              substances_used:
+                - type: nmdc:PortionOfSubstance
+                  known_as: hydrochloric_acid
+                  substance_role: acid
+                  source_concentration:
+                    type: nmdc:QuantityValue
+                    has_raw_value: 0.01 mmol/L
+                    has_unit: mmol/L
+                    has_numeric_value: 0.01
+                  volume:
+                    type: nmdc:QuantityValue
+                    has_raw_value: 5 mL
+                    has_unit: mL
+                    has_numeric_value: 5
+            - type: nmdc:MobilePhaseSegment # Sample Loading (acidified)
+              substances_used:
+                - type: nmdc:PortionOfSubstance
+                  known_as: water # representing the sample itself
+                  substance_role: solvent
+                  volume:
+                    type: nmdc:QuantityValue
+                    has_raw_value: 15 mL
+                    has_unit: mL
+                    has_numeric_value: 15
+                - type: nmdc:PortionOfSubstance # HCl used for acidification of the sample before loading
+                  known_as: hydrochloric_acid
+                  substance_role: acid
+                  source_concentration:
+                    type: nmdc:QuantityValue
+                    has_raw_value: 37 %
+                    has_unit: '%'
+                    has_numeric_value: 37
+            - type: nmdc:MobilePhaseSegment # Washing
+              substances_used:
+                - type: nmdc:PortionOfSubstance
+                  known_as: hydrochloric_acid
+                  substance_role: acid
+                  source_concentration:
+                    type: nmdc:QuantityValue
+                    has_raw_value: 0.01 mmol/L
+                    has_unit: mmol/L
+                    has_numeric_value: 0.01
+                  volume:
+                    type: nmdc:QuantityValue
+                    has_raw_value: 50 mL
+                    has_unit: mL
+                    has_numeric_value: 50
+            - type: nmdc:MobilePhaseSegment # Elution
+              substances_used:
+                - type: nmdc:PortionOfSubstance
+                  known_as: methanol
+                  substance_role: solvent
+                  volume:
+                    type: nmdc:QuantityValue
+                    has_raw_value: 1.5 mL
+                    has_unit: mL
+                    has_numeric_value: 1.5
+          stationary_phase: PS-DVB
+
+    - Step 7_weom_extraction:
+        ChromatographicSeparationProcess:
+          id: # nmdc:cspro-{shoulder}-{blade}
+          type: nmdc:ChromatographicSeparationProcess
+          name: SPE for WEOM
+          description: Solid phase extraction of water-extractable organic matter from <ProcessedSample6_weom_extraction>.
+          has_input:
+            - ProcessedSample6_weom_extraction
+          has_output:
+            - ProcessedSample9_weom_extraction
+          processing_institution: EMSL
+          protocol_link:
+            name: "Dittmar et al., 2008"
+            url: "https://doi.org/10.4319/lom.2008.6.230"
+            type: nmdc:Protocol
+          chromatographic_category: solid_phase_extraction
+          ordered_mobile_phases:
+            - type: nmdc:MobilePhaseSegment # Activation
+              substances_used:
+                - type: nmdc:PortionOfSubstance
+                  known_as: methanol
+                  volume:
+                    type: nmdc:QuantityValue
+                    has_raw_value: 3 mL
+                    has_unit: mL
+                    has_numeric_value: 3
+            - type: nmdc:MobilePhaseSegment # Conditioning
+              substances_used:
+                - type: nmdc:PortionOfSubstance
+                  known_as: hydrochloric_acid
+                  substance_role: acid
+                  source_concentration:
+                    type: nmdc:QuantityValue
+                    has_raw_value: 0.01 mmol/L
+                    has_unit: mmol/L
+                    has_numeric_value: 0.01
+                  volume:
+                    type: nmdc:QuantityValue
+                    has_raw_value: 5 mL
+                    has_unit: mL
+                    has_numeric_value: 5
+            - type: nmdc:MobilePhaseSegment # Sample Loading (acidified)
+              substances_used:
+                - type: nmdc:PortionOfSubstance
+                  known_as: water # representing the sample itself
+                  substance_role: solvent
+                  volume:
+                    type: nmdc:QuantityValue
+                    has_raw_value: 15 mL
+                    has_unit: mL
+                    has_numeric_value: 15
+                - type: nmdc:PortionOfSubstance # HCl used for acidification of the sample before loading
+                  known_as: hydrochloric_acid
+                  substance_role: acid
+                  source_concentration:
+                    type: nmdc:QuantityValue
+                    has_raw_value: 37 %
+                    has_unit: '%'
+                    has_numeric_value: 37
+            - type: nmdc:MobilePhaseSegment # Washing
+              substances_used:
+                - type: nmdc:PortionOfSubstance
+                  known_as: hydrochloric_acid
+                  substance_role: acid
+                  source_concentration:
+                    type: nmdc:QuantityValue
+                    has_raw_value: 0.01 mmol/L
+                    has_unit: mmol/L
+                    has_numeric_value: 0.01
+                  volume:
+                    type: nmdc:QuantityValue
+                    has_raw_value: 50 mL
+                    has_unit: mL
+                    has_numeric_value: 50
+            - type: nmdc:MobilePhaseSegment # Elution
+              substances_used:
+                - type: nmdc:PortionOfSubstance
+                  known_as: methanol
+                  substance_role: solvent
+                  volume:
+                    type: nmdc:QuantityValue
+                    has_raw_value: 1.5 mL
+                    has_unit: mL
+                    has_numeric_value: 1.5
+          stationary_phase: PS-DVB
+
+  processedsamples:
+    - ProcessedSample1_weom_extraction:
+        ProcessedSample:
+          id: #nmdc:
+          type: nmdc:ProcessedSample
+          name: <Biosample>_weom_subsample
+          description: Subsample of <Biosample> for water extraction.
+    - ProcessedSample2_weom_extraction:
+        ProcessedSample:
+          id: #nmdc:
+          type: nmdc:ProcessedSample
+          name: <Biosample>_weom_subsample
+          description: Subsample of <Biosample> for water extraction.
+    - ProcessedSample3_weom_extraction:
+        ProcessedSample:
+          id: #nmdc:
+          type: nmdc:ProcessedSample
+          name: <Biosample>_weom_subsample
+          description: Subsample of <Biosample> for water extraction.
+    - ProcessedSample4_weom_extraction:
+        ProcessedSample:
+          id: #nmdc:
+          type: nmdc:ProcessedSample
+          name: <Biosample>_weom_extract
+          description: Water-extractable organic matter from <Biosample>.
+          sampled_portion: aqueous_layer
+    - ProcessedSample5_weom_extraction:
+        ProcessedSample:
+          id: #nmdc:
+          type: nmdc:ProcessedSample
+          name: <Biosample>_weom_extract
+          description: Water-extractable organic matter from <Biosample>.
+          sampled_portion: aqueous_layer
+    - ProcessedSample6_weom_extraction:
+        ProcessedSample:
+          id: #nmdc:
+          type: nmdc:ProcessedSample
+          name: <Biosample>_weom_extract
+          description: Water-extractable organic matter from <Biosample>.
+          sampled_portion: aqueous_layer
+    - ProcessedSample7_weom_extraction:
+        ProcessedSample:
+          id: #nmdc:
+          type: nmdc:ProcessedSample
+          name: <Biosample>_weom_spe
+          description: Solid phase extracted water-extractable organic matter from <Biosample>.
+          sampled_portion: aqueous_layer
+    - ProcessedSample8_weom_extraction:
+        ProcessedSample:
+          id: #nmdc:
+          type: nmdc:ProcessedSample
+          name: <Biosample>_weom_spe
+          description: Solid phase extracted water-extractable organic matter from <Biosample>.
+          sampled_portion: aqueous_layer
+    - ProcessedSample9_weom_extraction:
+        ProcessedSample:
+          id: #nmdc:
+          type: nmdc:ProcessedSample
+          name: <Biosample>_weom_spe
+          description: Solid phase extracted water-extractable organic matter from <Biosample>.
+          sampled_portion: aqueous_layer
+
+
+maom_extraction:
+  steps:
+    - Step 1_maom_extraction:
+        SubSamplingProcess:
+          id: # nmdc:subspr-{shoulder}-{blade}
+          type: nmdc:SubSamplingProcess
+          name: Subsample soil for MAOM
+          description: A portion of field moist soil being taken from <Biosample> for HCl extraction.
+          has_input:
+            - Biosample
+          has_output:
+            - ProcessedSample1_maom_extraction
+            - ProcessedSample2_maom_extraction
+            - ProcessedSample3_maom_extraction
+          processing_institution: EMSL
+          mass:
+            type: nmdc:QuantityValue
+            has_raw_value: 1 g
+            has_unit: g
+            has_numeric_value: 1
+    - Step 2_maom_extraction:
+        Extraction:
+          id: # nmdc:extrp-{shoulder}-{blade}
+          type: nmdc:Extraction
+          name: HCl Extraction for MAOM
+          description: Shaking <ProcessedSample1_maom_extraction> with 0.5M HCl, followed by centrifugation to collect supernatant for MAOM.
+          has_input:
+            - ProcessedSample1_maom_extraction
+          has_output:
+            - ProcessedSample4_maom_extraction
+          processing_institution: EMSL
+          extraction_targets:
+            - natural organic matter
+          input_mass:
+            type: nmdc:QuantityValue
+            has_raw_value: 1 g
+            has_unit: g
+            has_numeric_value: 1
+          substances_used:
+            - type: nmdc:PortionOfSubstance
+              known_as: hydrochloric_acid
+              substance_role: acid
+              source_concentration:
+                type: nmdc:QuantityValue
+                has_raw_value: 500 mmol/L
+                has_unit: mmol/L
+                has_numeric_value: 500
+              volume:
+                type: nmdc:QuantityValue
+                has_raw_value: 40 mL
+                has_unit: mL
+                has_numeric_value: 40
+    - Step 3_maom_extraction:
+        Extraction:
+          id: # nmdc:extrp-{shoulder}-{blade}
+          type: nmdc:Extraction
+          name: HCl Extraction for MAOM
+          description: Shaking <ProcessedSample2_maom_extraction> with 0.5M HCl, followed by centrifugation to collect supernatant for MAOM.
+          has_input:
+            - ProcessedSample2_maom_extraction
+          has_output:
+            - ProcessedSample5_maom_extraction
+          processing_institution: EMSL
+          extraction_targets:
+            - natural organic matter
+          input_mass:
+            type: nmdc:QuantityValue
+            has_raw_value: 1 g
+            has_unit: g
+            has_numeric_value: 1
+          substances_used:
+            - type: nmdc:PortionOfSubstance
+              known_as: hydrochloric_acid
+              substance_role: acid
+              source_concentration:
+                type: nmdc:QuantityValue
+                has_raw_value: 500 mmol/L
+                has_unit: mmol/L
+                has_numeric_value: 500
+              volume:
+                type: nmdc:QuantityValue
+                has_raw_value: 40 mL
+                has_unit: mL
+                has_numeric_value: 40
+    - Step 4_maom_extraction:
+        Extraction:
+          id: # nmdc:extrp-{shoulder}-{blade}
+          type: nmdc:Extraction
+          name: HCl Extraction for MAOM
+          description: Shaking <ProcessedSample3_maom_extraction> with 0.5M HCl, followed by centrifugation to collect supernatant for MAOM.
+          has_input:
+            - ProcessedSample3_maom_extraction
+          has_output:
+            - ProcessedSample6_maom_extraction
+          processing_institution: EMSL
+          extraction_targets:
+            - natural organic matter
+          input_mass:
+            type: nmdc:QuantityValue
+            has_raw_value: 1 g
+            has_unit: g
+            has_numeric_value: 1
+          substances_used:
+            - type: nmdc:PortionOfSubstance
+              known_as: hydrochloric_acid
+              substance_role: acid
+              source_concentration:
+                type: nmdc:QuantityValue
+                has_raw_value: 500 mmol/L
+                has_unit: mmol/L
+                has_numeric_value: 500
+              volume:
+                type: nmdc:QuantityValue
+                has_raw_value: 40 mL
+                has_unit: mL
+                has_numeric_value: 40
+
+    - Step 5_maom_extraction:
+        ChromatographicSeparationProcess:
+          id: # nmdc:cspro-{shoulder}-{blade}
+          type: nmdc:ChromatographicSeparationProcess
+          name: SPE for MAOM
+          description: Solid phase extraction of HCl-extractable organic matter from <ProcessedSample4_maom_extraction>.
+          has_input:
+            - ProcessedSample4_maom_extraction
+          has_output:
+            - ProcessedSample7_maom_extraction
+          processing_institution: EMSL
+          protocol_link:
+            name: "Dittmar et al., 2008"
+            url: "https://doi.org/10.4319/lom.2008.6.230"
+            type: nmdc:Protocol
+          chromatographic_category: solid_phase_extraction
+          ordered_mobile_phases:
+            - type: nmdc:MobilePhaseSegment # Activation
+              substances_used:
+                - type: nmdc:PortionOfSubstance
+                  known_as: methanol
+                  volume:
+                    type: nmdc:QuantityValue
+                    has_raw_value: 3 mL
+                    has_unit: mL
+                    has_numeric_value: 3
+            - type: nmdc:MobilePhaseSegment # Conditioning
+              substances_used:
+                - type: nmdc:PortionOfSubstance
+                  known_as: hydrochloric_acid
+                  substance_role: acid
+                  source_concentration:
+                    type: nmdc:QuantityValue
+                    has_raw_value: 0.01 mmol/L
+                    has_unit: mmol/L
+                    has_numeric_value: 0.01
+                  volume:
+                    type: nmdc:QuantityValue
+                    has_raw_value: 5 mL
+                    has_unit: mL
+                    has_numeric_value: 5
+            - type: nmdc:MobilePhaseSegment # Sample Loading (acidified)
+              substances_used:
+                - type: nmdc:PortionOfSubstance
+                  known_as: water # representing the sample itself
+                  substance_role: solvent
+                  volume:
+                    type: nmdc:QuantityValue
+                    has_raw_value: 15 mL
+                    has_unit: mL
+                    has_numeric_value: 15
+                - type: nmdc:PortionOfSubstance # HCl used for acidification of the sample before loading
+                  known_as: hydrochloric_acid
+                  substance_role: acid
+                  source_concentration:
+                    type: nmdc:QuantityValue
+                    has_raw_value: 37 %
+                    has_unit: '%'
+                    has_numeric_value: 37
+            - type: nmdc:MobilePhaseSegment # Washing
+              substances_used:
+                - type: nmdc:PortionOfSubstance
+                  known_as: hydrochloric_acid
+                  substance_role: acid
+                  source_concentration:
+                    type: nmdc:QuantityValue
+                    has_raw_value: 0.01 mmol/L
+                    has_unit: mmol/L
+                    has_numeric_value: 0.01
+                  volume:
+                    type: nmdc:QuantityValue
+                    has_raw_value: 50 mL
+                    has_unit: mL
+                    has_numeric_value: 50
+            - type: nmdc:MobilePhaseSegment # Elution
+              substances_used:
+                - type: nmdc:PortionOfSubstance
+                  known_as: methanol
+                  substance_role: solvent
+                  volume:
+                    type: nmdc:QuantityValue
+                    has_raw_value: 1.5 mL
+                    has_unit: mL
+                    has_numeric_value: 1.5
+          stationary_phase: PS-DVB
+
+    - Step 6_maom_extraction:
+        ChromatographicSeparationProcess:
+          id: # nmdc:cspro-{shoulder}-{blade}
+          type: nmdc:ChromatographicSeparationProcess
+          name: SPE for MAOM
+          description: Solid phase extraction of HCl-extractable organic matter from <ProcessedSample5_maom_extraction>.
+          has_input:
+            - ProcessedSample5_maom_extraction
+          has_output:
+            - ProcessedSample8_maom_extraction
+          processing_institution: EMSL
+          protocol_link:
+            name: "Dittmar et al., 2008"
+            url: "https://doi.org/10.4319/lom.2008.6.230"
+            type: nmdc:Protocol
+          chromatographic_category: solid_phase_extraction
+          ordered_mobile_phases:
+            - type: nmdc:MobilePhaseSegment # Activation
+              substances_used:
+                - type: nmdc:PortionOfSubstance
+                  known_as: methanol
+                  volume:
+                    type: nmdc:QuantityValue
+                    has_raw_value: 3 mL
+                    has_unit: mL
+                    has_numeric_value: 3
+            - type: nmdc:MobilePhaseSegment # Conditioning
+              substances_used:
+                - type: nmdc:PortionOfSubstance
+                  known_as: hydrochloric_acid
+                  substance_role: acid
+                  source_concentration:
+                    type: nmdc:QuantityValue
+                    has_raw_value: 0.01 mmol/L
+                    has_unit: mmol/L
+                    has_numeric_value: 0.01
+                  volume:
+                    type: nmdc:QuantityValue
+                    has_raw_value: 5 mL
+                    has_unit: mL
+                    has_numeric_value: 5
+            - type: nmdc:MobilePhaseSegment # Sample Loading (acidified)
+              substances_used:
+                - type: nmdc:PortionOfSubstance
+                  known_as: water # representing the sample itself
+                  substance_role: solvent
+                  volume:
+                    type: nmdc:QuantityValue
+                    has_raw_value: 15 mL
+                    has_unit: mL
+                    has_numeric_value: 15
+                - type: nmdc:PortionOfSubstance # HCl used for acidification of the sample before loading
+                  known_as: hydrochloric_acid
+                  substance_role: acid
+                  source_concentration:
+                    type: nmdc:QuantityValue
+                    has_raw_value: 37 %
+                    has_unit: '%'
+                    has_numeric_value: 37
+            - type: nmdc:MobilePhaseSegment # Washing
+              substances_used:
+                - type: nmdc:PortionOfSubstance
+                  known_as: hydrochloric_acid
+                  substance_role: acid
+                  source_concentration:
+                    type: nmdc:QuantityValue
+                    has_raw_value: 0.01 mmol/L
+                    has_unit: mmol/L
+                    has_numeric_value: 0.01
+                  volume:
+                    type: nmdc:QuantityValue
+                    has_raw_value: 50 mL
+                    has_unit: mL
+                    has_numeric_value: 50
+            - type: nmdc:MobilePhaseSegment # Elution
+              substances_used:
+                - type: nmdc:PortionOfSubstance
+                  known_as: methanol
+                  substance_role: solvent
+                  volume:
+                    type: nmdc:QuantityValue
+                    has_raw_value: 1.5 mL
+                    has_unit: mL
+                    has_numeric_value: 1.5
+          stationary_phase: PS-DVB
+
+    - Step 7_maom_extraction:
+        ChromatographicSeparationProcess:
+          id: # nmdc:cspro-{shoulder}-{blade}
+          type: nmdc:ChromatographicSeparationProcess
+          name: SPE for MAOM
+          description: Solid phase extraction of HCl-extractable organic matter from <ProcessedSample6_maom_extraction>.
+          has_input:
+            - ProcessedSample6_maom_extraction
+          has_output:
+            - ProcessedSample9_maom_extraction
+          processing_institution: EMSL
+          protocol_link:
+            name: "Dittmar et al., 2008"
+            url: "https://doi.org/10.4319/lom.2008.6.230"
+            type: nmdc:Protocol
+          chromatographic_category: solid_phase_extraction
+          ordered_mobile_phases:
+            - type: nmdc:MobilePhaseSegment # Activation
+              substances_used:
+                - type: nmdc:PortionOfSubstance
+                  known_as: methanol
+                  volume:
+                    type: nmdc:QuantityValue
+                    has_raw_value: 3 mL
+                    has_unit: mL
+                    has_numeric_value: 3
+            - type: nmdc:MobilePhaseSegment # Conditioning
+              substances_used:
+                - type: nmdc:PortionOfSubstance
+                  known_as: hydrochloric_acid
+                  substance_role: acid
+                  source_concentration:
+                    type: nmdc:QuantityValue
+                    has_raw_value: 0.01 mmol/L
+                    has_unit: mmol/L
+                    has_numeric_value: 0.01
+                  volume:
+                    type: nmdc:QuantityValue
+                    has_raw_value: 5 mL
+                    has_unit: mL
+                    has_numeric_value: 5
+            - type: nmdc:MobilePhaseSegment # Sample Loading (acidified)
+              substances_used:
+                - type: nmdc:PortionOfSubstance
+                  known_as: water # representing the sample itself
+                  substance_role: solvent
+                  volume:
+                    type: nmdc:QuantityValue
+                    has_raw_value: 15 mL
+                    has_unit: mL
+                    has_numeric_value: 15
+                - type: nmdc:PortionOfSubstance # HCl used for acidification of the sample before loading
+                  known_as: hydrochloric_acid
+                  substance_role: acid
+                  source_concentration:
+                    type: nmdc:QuantityValue
+                    has_raw_value: 37 %
+                    has_unit: '%'
+                    has_numeric_value: 37
+            - type: nmdc:MobilePhaseSegment # Washing
+              substances_used:
+                - type: nmdc:PortionOfSubstance
+                  known_as: hydrochloric_acid
+                  substance_role: acid
+                  source_concentration:
+                    type: nmdc:QuantityValue
+                    has_raw_value: 0.01 mmol/L
+                    has_unit: mmol/L
+                    has_numeric_value: 0.01
+                  volume:
+                    type: nmdc:QuantityValue
+                    has_raw_value: 50 mL
+                    has_unit: mL
+                    has_numeric_value: 50
+            - type: nmdc:MobilePhaseSegment # Elution
+              substances_used:
+                - type: nmdc:PortionOfSubstance
+                  known_as: methanol
+                  substance_role: solvent
+                  volume:
+                    type: nmdc:QuantityValue
+                    has_raw_value: 1.5 mL
+                    has_unit: mL
+                    has_numeric_value: 1.5
+          stationary_phase: PS-DVB
+
+  processedsamples:
+    - ProcessedSample1_maom_extraction:
+        ProcessedSample:
+          id: #nmdc:
+          type: nmdc:ProcessedSample
+          name: <Biosample>_maom_subsample
+          description: Subsample of <Biosample> for HCl extraction.
+    - ProcessedSample2_maom_extraction:
+        ProcessedSample:
+          id: #nmdc:
+          type: nmdc:ProcessedSample
+          name: <Biosample>_maom_subsample
+          description: Subsample of <Biosample> for HCl extraction.
+    - ProcessedSample3_maom_extraction:
+        ProcessedSample:
+          id: #nmdc:
+          type: nmdc:ProcessedSample
+          name: <Biosample>_maom_subsample
+          description: Subsample of <Biosample> for HCl extraction.
+    - ProcessedSample4_maom_extraction:
+        ProcessedSample:
+          id: #nmdc:
+          type: nmdc:ProcessedSample
+          name: <Biosample>_maom_extract
+          description: HCl-extractable organic matter from <Biosample>.
+          sampled_portion: aqueous_layer
+    - ProcessedSample5_maom_extraction:
+        ProcessedSample:
+          id: #nmdc:
+          type: nmdc:ProcessedSample
+          name: <Biosample>_maom_extract
+          description: HCl-extractable organic matter from <Biosample>.
+          sampled_portion: aqueous_layer
+    - ProcessedSample6_maom_extraction:
+        ProcessedSample:
+          id: #nmdc:
+          type: nmdc:ProcessedSample
+          name: <Biosample>_maom_extract
+          description: HCl-extractable organic matter from <Biosample>.
+          sampled_portion: aqueous_layer
+    - ProcessedSample7_maom_extraction:
+        ProcessedSample:
+          id: #nmdc:
+          type: nmdc:ProcessedSample
+          name: <Biosample>_maom_spe
+          description: Solid phase extracted HCl-extractable organic matter from <Biosample>.
+          sampled_portion: aqueous_layer
+    - ProcessedSample8_maom_extraction:
+        ProcessedSample:
+          id: #nmdc:
+          type: nmdc:ProcessedSample
+          name: <Biosample>_maom_spe
+          description: Solid phase extracted HCl-extractable organic matter from <Biosample>.
+          sampled_portion: aqueous_layer
+    - ProcessedSample9_maom_extraction:
+        ProcessedSample:
+          id: #nmdc:
+          type: nmdc:ProcessedSample
+          name: <Biosample>_maom_spe
+          description: Solid phase extracted HCl-extractable organic matter from <Biosample>.
+          sampled_portion: aqueous_layer
