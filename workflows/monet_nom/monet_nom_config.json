@@ -11,7 +11,7 @@
         "file_filters": [
             ""
         ],
-        "processed_data_date_tag": "20260713",
+        "processed_data_date_tag": "20261010",
         "workflow_type": "DI FTICR NOM",
         "batch_size": 30,
         "use_child_studies": true,

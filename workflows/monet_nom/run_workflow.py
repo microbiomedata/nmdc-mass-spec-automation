@@ -8,6 +8,8 @@ Batch 1 of ??? so many files.
 import sys
 from pathlib import Path
 import asyncio
+import time
+import urllib3.exceptions
 
 # Ensure project root is on sys.path so package `nmdc_dp_utils` is importable
 PROJECT_ROOT = Path(__file__).resolve().parents[2]
@@ -36,12 +38,25 @@ async def main():
     manager.zip_bruker_files(
         local_directory=str(manager.raw_data_directory)
     )
-    manager.upload_to_minio(
-        local_directory=str(manager.raw_data_directory),
-        bucket_name=manager.config.get("minio", {}).get("bucket"),
-        folder_name=str(Path("monet_nom") / "raw"), # set static string here so we don't get a separate folder for each download batch
-        file_pattern="*.zip"
-    )
+    max_upload_attempts = 5
+    for attempt in range(1, max_upload_attempts + 1):
+        try:
+            manager.upload_to_minio(
+                local_directory=str(manager.raw_data_directory),
+                bucket_name=manager.config.get("minio", {}).get("bucket"),
+                folder_name=str(Path("monet_nom") / "raw"), # set static string here so we don't get a separate folder for each download batch
+                file_pattern="*.zip"
+            )
+            break
+        except urllib3.exceptions.MaxRetryError:
+            if attempt == max_upload_attempts:
+                raise
+            wait_seconds = 2 ** attempt
+            logger.warning(
+                f"MinIO upload failed (attempt {attempt}/{max_upload_attempts}) due to repeated 503s, "
+                f"retrying in {wait_seconds}s..."
+            )
+            time.sleep(wait_seconds)
 
     # downloaded_files.csv already exists because you made it manually. to list all the files we needed to generate metadata for. so don't use manager.fetch raw data
 
