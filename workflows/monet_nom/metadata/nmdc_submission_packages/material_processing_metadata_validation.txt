@@ -1,0 +1,104 @@
+
+================================================================================
+VALIDATING GENERATED OUTPUT
+================================================================================
+Calculating expected counts...
+
+================================================================================
+PLACEHOLDER COMBINATIONS BY PROTOCOL:
+================================================================================
+
+maom_extraction:
+  Target placeholders: ['ProcessedSample7_maom_extraction', 'ProcessedSample8_maom_extraction']
+  Resulting samples: ['ProcessedSample1_maom_extraction', 'ProcessedSample2_maom_extraction', 'ProcessedSample4_maom_extraction', 'ProcessedSample5_maom_extraction', 'ProcessedSample7_maom_extraction', 'ProcessedSample8_maom_extraction']
+  Biosamples with this combination: 3
+  Steps required per biosample: 5
+  Processed samples required per biosample: 6
+  Total steps for this combination: 15
+  Total samples for this combination: 18
+
+maom_extraction:
+  Target placeholders: ['ProcessedSample7_maom_extraction', 'ProcessedSample8_maom_extraction', 'ProcessedSample9_maom_extraction']
+  Resulting samples: ['ProcessedSample1_maom_extraction', 'ProcessedSample2_maom_extraction', 'ProcessedSample3_maom_extraction', 'ProcessedSample4_maom_extraction', 'ProcessedSample5_maom_extraction', 'ProcessedSample6_maom_extraction', 'ProcessedSample7_maom_extraction', 'ProcessedSample8_maom_extraction', 'ProcessedSample9_maom_extraction']
+  Biosamples with this combination: 194
+  Steps required per biosample: 7
+  Processed samples required per biosample: 9
+  Total steps for this combination: 1358
+  Total samples for this combination: 1746
+
+maom_extraction:
+  Target placeholders: ['ProcessedSample7_maom_extraction', 'ProcessedSample9_maom_extraction']
+  Resulting samples: ['ProcessedSample1_maom_extraction', 'ProcessedSample3_maom_extraction', 'ProcessedSample4_maom_extraction', 'ProcessedSample6_maom_extraction', 'ProcessedSample7_maom_extraction', 'ProcessedSample9_maom_extraction']
+  Biosamples with this combination: 1
+  Steps required per biosample: 5
+  Processed samples required per biosample: 6
+  Total steps for this combination: 5
+  Total samples for this combination: 6
+
+maom_extraction:
+  Target placeholders: ['ProcessedSample8_maom_extraction', 'ProcessedSample9_maom_extraction']
+  Resulting samples: ['ProcessedSample2_maom_extraction', 'ProcessedSample3_maom_extraction', 'ProcessedSample5_maom_extraction', 'ProcessedSample6_maom_extraction', 'ProcessedSample8_maom_extraction', 'ProcessedSample9_maom_extraction']
+  Biosamples with this combination: 2
+  Steps required per biosample: 5
+  Processed samples required per biosample: 6
+  Total steps for this combination: 10
+  Total samples for this combination: 12
+
+weom_extraction:
+  Target placeholders: ['ProcessedSample7_weom_extraction', 'ProcessedSample8_weom_extraction']
+  Resulting samples: ['ProcessedSample1_weom_extraction', 'ProcessedSample2_weom_extraction', 'ProcessedSample4_weom_extraction', 'ProcessedSample5_weom_extraction', 'ProcessedSample7_weom_extraction', 'ProcessedSample8_weom_extraction']
+  Biosamples with this combination: 3
+  Steps required per biosample: 5
+  Processed samples required per biosample: 6
+  Total steps for this combination: 15
+  Total samples for this combination: 18
+
+weom_extraction:
+  Target placeholders: ['ProcessedSample7_weom_extraction', 'ProcessedSample8_weom_extraction', 'ProcessedSample9_weom_extraction']
+  Resulting samples: ['ProcessedSample1_weom_extraction', 'ProcessedSample2_weom_extraction', 'ProcessedSample3_weom_extraction', 'ProcessedSample4_weom_extraction', 'ProcessedSample5_weom_extraction', 'ProcessedSample6_weom_extraction', 'ProcessedSample7_weom_extraction', 'ProcessedSample8_weom_extraction', 'ProcessedSample9_weom_extraction']
+  Biosamples with this combination: 186
+  Steps required per biosample: 7
+  Processed samples required per biosample: 9
+  Total steps for this combination: 1302
+  Total samples for this combination: 1674
+
+weom_extraction:
+  Target placeholders: ['ProcessedSample7_weom_extraction', 'ProcessedSample9_weom_extraction']
+  Resulting samples: ['ProcessedSample1_weom_extraction', 'ProcessedSample3_weom_extraction', 'ProcessedSample4_weom_extraction', 'ProcessedSample6_weom_extraction', 'ProcessedSample7_weom_extraction', 'ProcessedSample9_weom_extraction']
+  Biosamples with this combination: 2
+  Steps required per biosample: 5
+  Processed samples required per biosample: 6
+  Total steps for this combination: 10
+  Total samples for this combination: 12
+
+weom_extraction:
+  Target placeholders: ['ProcessedSample8_weom_extraction', 'ProcessedSample9_weom_extraction']
+  Resulting samples: ['ProcessedSample2_weom_extraction', 'ProcessedSample3_weom_extraction', 'ProcessedSample5_weom_extraction', 'ProcessedSample6_weom_extraction', 'ProcessedSample8_weom_extraction', 'ProcessedSample9_weom_extraction']
+  Biosamples with this combination: 2
+  Steps required per biosample: 5
+  Processed samples required per biosample: 6
+  Total steps for this combination: 10
+  Total samples for this combination: 12
+
+================================================================================
+VALIDATION SUMMARY:
+================================================================================
+
+Biosamples:
+  Unique in mapping: 200
+
+Material Processing Steps:
+  Expected: 2725
+  Actual:   2725
+  ✓ MATCH
+
+Processed Samples:
+  Expected: 3498
+  Actual:   3498
+  ✓ MATCH
+
+Unique placeholder combinations: 8
+
+================================================================================
+✓ VALIDATION PASSED: All counts match!
+================================================================================
